@@ -34,7 +34,7 @@ import {
   type RngCursor,
 } from '../core/index.ts';
 
-export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker', 'comeback'] as const;
+export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker', 'comeback', 'artisan'] as const;
 export type PersonaId = (typeof PERSONA_IDS)[number];
 
 export interface Persona {
@@ -425,6 +425,9 @@ export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   dealseeker: greedy('dealseeker', { ...BALANCED, flagUnlock: 40, flagLock: 20, dealDrive: 1 }),
   // Spikes hype until it holds COMEBACK_SWITCH_AT scandals, then switches to paying them off.
   comeback,
+  // Player-like, craft-leaning: high craft, moderate hype, risk-averse. No weight is zero, so the
+  // probe rule can never capture it (it is the player crafter no longer models).
+  artisan: greedy('artisan', { hype: 0.5, craft: 1.5, capital: 0.5, heat: -1, scandal: -10, risk: -8, hand: 1.5, slots: 2, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0.25 }),
 };
 
 /** Salt that separates each persona's decision stream from the game's own RNG. */
@@ -435,6 +438,7 @@ export const PERSONA_SALT: { readonly [K in PersonaId]: number } = {
   hypechaser: 0x68797065,
   dealseeker: 0x6465616c,
   comeback: 0x636f6d65,
+  artisan: 0x61727469,
 };
 
 // ---------------------------------------------------------------------------
