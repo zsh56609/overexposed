@@ -49,6 +49,14 @@ export interface RunRecord {
   readonly curve: readonly TurnSnapshot[];
   readonly draws: Readonly<Record<string, number>>;
   readonly plays: Readonly<Record<string, number>>;
+  /** Times each card was on a draft offer, and taken. */
+  readonly offered: Readonly<Record<string, number>>;
+  readonly drafted: Readonly<Record<string, number>>;
+  readonly draftPicks: number;
+  readonly extraPicks: number;
+  readonly rerolls: number;
+  /** Capital spent on extra picks and rerolls. */
+  readonly draftSpend: number;
   readonly final: Resources | null;
   /** Flags held when the run ended. */
   readonly flags: readonly string[];
@@ -80,6 +88,7 @@ function checkInvariants(s: GameState): void {
   if (s.act < 1 || s.act > rules.acts) fail(`act = ${s.act}`);
   if (s.turn < 1 || s.turn > rules.acts * rules.turnsPerAct) fail(`turn = ${s.turn}`);
   if ((s.phase === 'gate') !== (s.gateOffer.length > 0)) fail(`phase ${s.phase} with ${s.gateOffer.length} gates on offer`);
+  if ((s.phase === 'draft') !== (s.draft !== null)) fail(`phase ${s.phase} with draft state ${s.draft === null ? 'absent' : 'present'}`);
 }
 
 export type TraceFn = (state: GameState, action: Action | null) => void;
@@ -91,6 +100,12 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   const plays: Record<string, number> = {};
   const curve: TurnSnapshot[] = [];
   const gateChecks: { gateId: string; met: boolean }[] = [];
+  const offered: Record<string, number> = {};
+  const drafted: Record<string, number> = {};
+  let draftPicks = 0;
+  let extraPicks = 0;
+  let rerolls = 0;
+  let draftSpend = 0;
   let scandalsCrystallised = 0;
   let cardsPlayed = 0;
   let actions = 0;
@@ -106,6 +121,17 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
         cardsPlayed++;
       } else if (e.type === 'scandal') scandalsCrystallised++;
       else if (e.type === 'turnEnd') curve.push({ turn: e.turn, ...e.resources, scandals: e.scandalCount });
+      else if (e.type === 'draftOffer') for (const id of e.cardIds) offered[id] = (offered[id] ?? 0) + 1;
+      else if (e.type === 'draftPick') {
+        drafted[e.cardId] = (drafted[e.cardId] ?? 0) + 1;
+        draftPicks++;
+      } else if (e.type === 'draftExtraPick') {
+        extraPicks++;
+        draftSpend += e.cost;
+      } else if (e.type === 'draftReroll') {
+        rerolls++;
+        draftSpend += e.cost;
+      }
     }
   };
 
@@ -153,6 +179,12 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     curve,
     draws,
     plays,
+    offered,
+    drafted,
+    draftPicks,
+    extraPicks,
+    rerolls,
+    draftSpend,
     final: state?.resources ?? null,
     flags: state ? Object.keys(state.flags) : [],
     softLock,
@@ -162,7 +194,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
 
 /** Everything that must be identical when a seed is replayed. */
 function fingerprint(r: RunRecord): string {
-  return JSON.stringify([r.endingId, r.scandalsAtEnd, r.actions, r.final, r.curve, r.gates, r.plays, r.draws, r.crash]);
+  return JSON.stringify([r.endingId, r.scandalsAtEnd, r.actions, r.final, r.curve, r.gates, r.plays, r.draws, r.drafted, r.crash]);
 }
 
 /** Run seeds for a batch: the same list for every persona, so personas are compared on identical deals. */

@@ -27,6 +27,7 @@ import {
   type ContentIndex,
   type Effect,
   type GameState,
+  type ResourceKey,
   type RngCursor,
 } from '../core/index.ts';
 
@@ -159,10 +160,83 @@ function score(s: GameState, w: Weights): number {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Drafting: the card's own effects scored straight off the weight table. No simulation.
+
+const weightOf = (target: ResourceKey, w: Weights) =>
+  target === 'hype' ? w.hype : target === 'craft' ? w.craft : target === 'capital' ? w.capital : w.heat;
+
+const scandalTagCache = new WeakMap<ContentIndex, ReadonlySet<string>>();
+
+/** Tags carried by scandal cards: exhausting one of these removes a scandal. */
+function scandalTags(content: ContentIndex): ReadonlySet<string> {
+  let tags = scandalTagCache.get(content);
+  if (!tags) {
+    tags = new Set(content.scandalIds.flatMap((id) => getCard(content, id)?.tags ?? []));
+    scandalTagCache.set(content, tags);
+  }
+  return tags;
+}
+
+/** Conditionals take the branch that holds in the current state. */
+function effectsValue(effects: readonly Effect[] | undefined, s: GameState, w: Weights): number {
+  let v = 0;
+  for (const e of effects ?? []) {
+    switch (e.op) {
+      case 'resource':
+        v += weightOf(e.target, w) * e.value;
+        break;
+      case 'draw':
+        v += w.hand * e.count;
+        break;
+      case 'slots':
+        v += w.slots * e.value;
+        break;
+      case 'setFlag':
+        if (!Object.hasOwn(s.flags, e.flag)) v += flagValue(e.flag, s.content, w);
+        break;
+      case 'exhaustTag':
+        if (scandalTags(s.content).has(e.tag)) v -= w.scandal * (e.count ?? 1);
+        break;
+      case 'conditional':
+        v += effectsValue(evaluate(e.if, s) ? e.then : e.else, s, w);
+        break;
+      case 'addCard':
+        break;
+    }
+  }
+  return v;
+}
+
+/** Value per slot of playing the card once. */
+function cardValue(s: GameState, cardId: string, w: Weights): number {
+  const def = getCard(s.content, cardId);
+  if (!def) return 0;
+  return (effectsValue(def.effects, s, w) + effectsValue(def.onDraw, s, w)) / Math.max(1, def.cost);
+}
+
+function draftChoice(state: GameState, legal: readonly Action[], w: Weights): Action {
+  const dr = state.draft;
+  if (!dr) return legal[0] as Action;
+  const cfg = state.content.rules.draft;
+  const ranked = dr.offer.map((id) => ({ id, v: cardValue(state, id, w) })).sort((a, b) => b.v - a.v);
+  const can = (type: Action['type']) => legal.some((a) => a.type === type);
+  // Nothing on offer is worth what a reroll costs: reroll.
+  if (can('DRAFT_REROLL') && (ranked.at(0)?.v ?? 0) < cfg.rerollCost * w.capital) return { type: 'DRAFT_REROLL' };
+  // The best card these picks would leave behind is worth more than an extra pick costs: buy one.
+  const leftBehind = ranked.at(dr.picksLeft);
+  if (can('DRAFT_EXTRA_PICK') && leftBehind && leftBehind.v > cfg.extraPickCost * w.capital) return { type: 'DRAFT_EXTRA_PICK' };
+  const best = ranked.at(0);
+  return best ? { type: 'DRAFT_PICK', cardId: best.id } : (legal[0] as Action);
+}
+
+// ---------------------------------------------------------------------------
+
 function greedy(id: PersonaId, w: Weights): Persona {
   return {
     id,
     choose(state, legal) {
+      if (state.phase === 'draft') return draftChoice(state, legal, w);
       if (state.phase === 'gate') {
         let best = legal[0] as Action;
         let bestScore = Number.NEGATIVE_INFINITY;
@@ -198,11 +272,14 @@ function greedy(id: PersonaId, w: Weights): Persona {
   };
 }
 
-/** Plays a uniformly random playable card until none is playable; picks a random gate. */
+/**
+ * Plays a uniformly random playable card until none is playable. Gates and drafts: a uniformly
+ * random legal action (so it also buys extra picks and rerolls at random when it can afford them).
+ */
 const random: Persona = {
   id: 'random',
   choose(state, legal, rng) {
-    const pool = state.phase === 'gate' ? legal : legal.filter((a) => a.type === 'PLAY_CARD');
+    const pool = state.phase === 'play' ? legal.filter((a) => a.type === 'PLAY_CARD') : legal;
     return pool.length === 0 ? END_TURN : (pool[nextInt(rng, pool.length)] as Action);
   },
 };

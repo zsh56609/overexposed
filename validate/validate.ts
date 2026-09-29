@@ -61,7 +61,8 @@ const q = (v: unknown) => JSON.stringify(v);
 const CARD_FIELDS = ['id', 'kind', 'cost', 'nameKey', 'textKey', 'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn'];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'requires', 'onPass', 'onFail'];
 const ENDING_FIELDS = ['id', 'priority', 'conditions', 'textKey'];
-const RULES_FIELDS = ['acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered', 'heatThreshold', 'heatVent', 'startingResources', 'startingDeck'];
+const RULES_FIELDS = ['acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered', 'heatThreshold', 'heatVent', 'startingResources', 'startingDeck', 'draft'];
+const DRAFT_FIELDS = ['offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
 /** Hard numeric bounds. Values outside them are errors, not taste. */
 const LIMIT = {
@@ -77,6 +78,8 @@ const LIMIT = {
   slotsPerTurn: [1, 20],
   heat: [1, 1_000],
   startingResource: [0, 1_000],
+  draftCount: [0, 10],
+  price: [0, 100],
 } as const satisfies Record<string, readonly [number, number]>;
 
 type Owner = { readonly kind: 'card'; readonly id: string } | { readonly kind: 'gate'; readonly id: string; readonly act: number };
@@ -272,8 +275,22 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
       v.warn('structure', 'rules.startingDeck', `${total} cards can't fill a hand of ${raw.handSize}`);
     }
   }
+
+  if (!isObj(raw.draft)) v.error('schema', 'rules.draft', 'must be an object: { offerSize, picks, extraPickCost, maxExtraPicks, rerollCost, maxRerolls }');
+  else {
+    v.fields(raw.draft, DRAFT_FIELDS, 'rules.draft');
+    v.int(raw.draft.offerSize, 'rules.draft.offerSize', LIMIT.count);
+    v.int(raw.draft.picks, 'rules.draft.picks', LIMIT.draftCount);
+    v.int(raw.draft.maxExtraPicks, 'rules.draft.maxExtraPicks', LIMIT.draftCount);
+    v.int(raw.draft.maxRerolls, 'rules.draft.maxRerolls', LIMIT.draftCount);
+    v.int(raw.draft.extraPickCost, 'rules.draft.extraPickCost', LIMIT.price);
+    v.int(raw.draft.rerollCost, 'rules.draft.rerollCost', LIMIT.price);
+  }
   return raw;
 }
+
+const draftOn = (rules: Obj | null) => !!rules && isObj(rules.draft) && isInt(rules.draft.picks) && rules.draft.picks > 0;
+const actMinOf = (c: Obj) => (isInt(c.actMin) ? c.actMin : 1);
 
 function checkList(v: Ctx, raw: unknown, file: string, label: string, each: (o: Obj, where: string) => void): Obj[] {
   if (!Array.isArray(raw)) {
@@ -377,12 +394,15 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
 // ---------------------------------------------------------------------------
 // Cross-checks
 
-function checkReferences(v: Ctx, rules: Obj | null): void {
+function checkReferences(v: Ctx, rules: Obj | null, cards: readonly Obj[]): void {
   if (rules && Array.isArray(rules.startingDeck)) {
     rules.startingDeck.forEach((entry, i) => {
-      if (isObj(entry) && isStr(entry.cardId) && !v.cardIds.has(entry.cardId)) {
-        v.error('references', `rules.startingDeck[${i}].cardId`, `no card with id ${q(entry.cardId)}`);
-      }
+      if (!isObj(entry) || !isStr(entry.cardId)) return;
+      const at = `rules.startingDeck[${i}].cardId`;
+      if (!v.cardIds.has(entry.cardId)) return v.error('references', at, `no card with id ${q(entry.cardId)}`);
+      const kind = cards.find((c) => c.id === entry.cardId)?.kind;
+      if (kind === 'opportunity') v.error('structure', at, `${q(entry.cardId)} is an opportunity: opportunities are draft-only`);
+      if (kind === 'scandal') v.warn('structure', at, `${q(entry.cardId)} is a scandal in the starting deck`);
     });
   }
   for (const ref of v.addCardRefs) {
@@ -393,6 +413,7 @@ function checkReferences(v: Ctx, rules: Obj | null): void {
 /**
  * Earliest act each card can enter a run:
  *   starting deck → act 1 · scandal → max(1, actMin) via crystallisation ·
+ *   any other card → max(1, actMin) via the draft (when drafting is on) ·
  *   addCard in a card's effects → that card's act · addCard in an act-N gate → act N+1.
  * A card whose earliest act is past the last act can never be drawn.
  */
@@ -410,7 +431,8 @@ function checkReachability(v: Ctx, rules: Obj | null, cards: readonly Obj[]): Re
     for (const entry of rules.startingDeck) if (isObj(entry) && isStr(entry.cardId)) lower(entry.cardId, 1);
   }
   for (const c of cards) {
-    if (c.kind === 'scandal' && isStr(c.id)) lower(c.id, Math.max(1, isInt(c.actMin) ? c.actMin : 1));
+    if (!isStr(c.id)) continue;
+    if (c.kind === 'scandal' || draftOn(rules)) lower(c.id, Math.max(1, actMinOf(c)));
   }
   for (let changed = true; changed; ) {
     changed = false;
@@ -425,7 +447,7 @@ function checkReachability(v: Ctx, rules: Obj | null, cards: readonly Obj[]): Re
     const why =
       act !== Number.POSITIVE_INFINITY && gateOnly.length > 0
         ? `only added by act-${v.acts} gates, after the last turn`
-        : 'not in the starting deck, not a scandal, and no reachable addCard adds it';
+        : 'not in the starting deck, not draftable in any act, not a scandal, and no reachable addCard adds it';
     v.error('reachability', `card ${id}`, `can never be drawn: ${why}`);
   }
   return earliest;
@@ -438,8 +460,15 @@ function checkStructure(v: Ctx, rules: Obj | null, cards: readonly Obj[], gates:
     if (n === 0) v.error('structure', `act ${act}`, 'has no gate');
     else if (n < gatesOffered) v.warn('structure', `act ${act}`, `has ${n} gate(s); ${gatesOffered} are offered per act`);
 
-    const scandals = cards.filter((c) => c.kind === 'scandal' && (isInt(c.actMin) ? c.actMin : 1) <= act);
+    const scandals = cards.filter((c) => c.kind === 'scandal' && actMinOf(c) <= act);
     if (scandals.length === 0) v.error('structure', `act ${act}`, 'no scandal card can crystallise from heat in this act');
+
+    if (draftOn(rules) && rules && isObj(rules.draft)) {
+      const pool = cards.filter((c) => c.kind !== 'scandal' && actMinOf(c) <= act).length;
+      const offerSize = isInt(rules.draft.offerSize) ? rules.draft.offerSize : 0;
+      if (pool === 0) v.error('structure', `act ${act}`, 'the draft pool is empty: no non-scandal card has actMin <= this act');
+      else if (pool < offerSize) v.warn('structure', `act ${act}`, `draft pool has ${pool} card(s); offers are ${offerSize}`);
+    }
   }
   for (const [flag, where] of v.flagsRead) {
     if (!v.flagsSet.has(flag)) v.warn('structure', where, `flag ${q(flag)} is read but no setFlag ever sets it`);
@@ -480,7 +509,7 @@ export function validateContent(raw: RawContent, i18n?: unknown): ValidationResu
   const cards = checkCards(v, raw.cards);
   const gates = checkGates(v, raw.gates);
   const endings = checkEndings(v, raw.endings);
-  checkReferences(v, rules);
+  checkReferences(v, rules, cards);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);

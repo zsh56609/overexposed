@@ -56,6 +56,10 @@ function describe(e: GameEvent): string {
       const r = e.resources;
       return `end T${e.turn}: hype ${r.hype} craft ${r.craft} capital ${r.capital} heat ${r.heat} scandals ${e.scandalCount}`;
     }
+    case 'draftOffer': return `\nDRAFT act ${e.act}: ${e.cardIds.join(' | ')}`;
+    case 'draftPick': return `DRAFT PICK ${e.cardId}`;
+    case 'draftExtraPick': return `EXTRA PICK -${e.cost} capital`;
+    case 'draftReroll': return `REROLL -${e.cost} capital`;
     case 'gateOffer': return `GATE OFFER ${e.gateIds.join(' | ')}`;
     case 'gate': return `GATE ${e.gateId} ${e.passed ? 'PASS' : 'FAIL'}`;
     case 'ending': return `ENDING ${e.endingId ?? 'none'}`;

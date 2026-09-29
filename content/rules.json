@@ -16,5 +16,13 @@
     { "cardId": "lay_low", "count": 1 },
     { "cardId": "networking", "count": 1 },
     { "cardId": "crisis_pr", "count": 1 }
-  ]
+  ],
+  "draft": {
+    "offerSize": 3,
+    "picks": 1,
+    "extraPickCost": 4,
+    "maxExtraPicks": 1,
+    "rerollCost": 2,
+    "maxRerolls": 1
+  }
 }

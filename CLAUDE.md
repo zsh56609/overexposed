@@ -55,9 +55,12 @@ The player plants the seeds of their own collapse. Failure is never random.
 ### Run structure
 
 - 3 acts × 4 turns = 12 turns
+- Start of each act: a Draft — `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After act 3: ending resolution. **A run always completes.**
+
+Actions: `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`.
 
 End-of-turn resolution, in order:
 1. `onEndOfTurn` effects of every card still in hand, in hand order.
@@ -70,7 +73,7 @@ End-of-turn resolution, in order:
 |---|---|
 | `hype` | Fast currency. Drives chart position and most Gates. |
 | `craft` | Slow currency. Solves Gates hype can't. Resists Heat. |
-| `capital` | Spent to remove Scandals and buy Opportunities. |
+| `capital` | Spent to remove Scandals, and in the draft to buy an extra pick or reroll the offer. |
 | `heat` | Shadow of hype. Crystallises into Scandals. Never spent, only reduced. |
 
 `slots` is per-turn energy, refreshed each turn. Not a resource.
@@ -104,8 +107,8 @@ At end of turn, if `heat >= heatThreshold(act)`, add one Scandal card to the dis
 }
 ```
 
-`kind`: `action` | `opportunity` | `scandal`
-`actMin`: earliest act this card may be offered. Omit for act 1.
+`kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only: never in the starting deck.
+`actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 
@@ -191,6 +194,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - cards unreachable in any act
 - **missing `priority: 0` fallback ending**
 - numeric ranges
+- opportunity cards in the starting deck; an act with an empty draft pool
 
 Load failures are loud in dev, graceful in the shipped build.
 

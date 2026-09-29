@@ -95,7 +95,7 @@ export interface CardDef {
   /** Default true. Scandals are false: they only take up room in the hand. */
   readonly playable?: boolean;
   readonly tags?: readonly string[];
-  /** Earliest act this card may be offered. Default 1. Scandals only crystallise from this act on. */
+  /** Earliest act this card may be offered in a draft. Default 1. Scandals only crystallise from this act on. */
   readonly actMin?: number;
   /** Engine extension: the card can only be played while this condition holds (e.g. a capital price). */
   readonly requires?: Condition;
@@ -122,6 +122,20 @@ export interface EndingDef {
   readonly textKey: string;
 }
 
+/** The draft that opens each act. Prices are in capital. */
+export interface DraftRules {
+  /** Cards offered from the draftable pool. */
+  readonly offerSize: number;
+  /** Free picks per act. 0 turns drafting off. */
+  readonly picks: number;
+  /** Price of one more pick from the same offer. */
+  readonly extraPickCost: number;
+  readonly maxExtraPicks: number;
+  /** Price of replacing the offer with a fresh one. */
+  readonly rerollCost: number;
+  readonly maxRerolls: number;
+}
+
 /** Run-level tuning numbers. Data, so the heat loop can be tuned without touching code. */
 export interface Rules {
   readonly acts: number;
@@ -135,7 +149,9 @@ export interface Rules {
   /** Heat removed each time heat crystallises into a Scandal. */
   readonly heatVent: number;
   readonly startingResources: Resources;
+  /** Opportunity cards may not appear here: they are draft-only. */
   readonly startingDeck: readonly { readonly cardId: string; readonly count: number }[];
+  readonly draft: DraftRules;
 }
 
 export interface Content {
@@ -158,6 +174,8 @@ export interface ContentIndex {
   readonly endings: readonly EndingDef[];
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
+  /** Every non-scandal card id in content order: the pool drafts are offered from (filtered by actMin). */
+  readonly draftPool: readonly string[];
 }
 
 export function indexContent(content: Content): ContentIndex {
@@ -170,6 +188,7 @@ export function indexContent(content: Content): ContentIndex {
     gatesByAct,
     endings: [...content.endings].sort((a, b) => b.priority - a.priority),
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
+    draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
   };
 }
 

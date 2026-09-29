@@ -64,11 +64,19 @@ export interface Report {
   }[];
   /** Share of runs holding each flag at the end. */
   readonly flagsHeld: Readonly<Record<string, Readonly<Record<Group, number>>>>;
+  /** Per persona, per run: cards acquired in drafts, extra picks bought, rerolls, capital spent on them. */
+  readonly draft: Readonly<
+    Record<string, { acquired: { mean: number; min: number; max: number }; extraPicks: number; rerolls: number; spend: number; capitalAtEnd: number }>
+  >;
   readonly cards: readonly {
     id: string;
     kind: string;
     playRate: number | null;
     runsPlayed: number;
+    /** Draft offers containing the card, times it was taken, and taken / offered (pooled). */
+    offered: number;
+    drafted: number;
+    draftRate: number | null;
     byPersona: Readonly<Record<string, { drawnPerRun: number; playedPerRun: number; playRate: number | null }>>;
   }[];
   readonly runLength: Readonly<
@@ -148,13 +156,35 @@ export function buildReport(batch: BatchResult): Report {
     ]),
   ) as Record<string, Record<Group, number>>;
 
+  // Draft
+  const draft = Object.fromEntries(
+    personas.map((p) => {
+      const rs = healthy.filter((r) => r.persona === p);
+      const acquired = rs.map((r) => r.draftPicks);
+      return [
+        p,
+        {
+          acquired: { mean: mean(acquired), min: Math.min(...acquired), max: Math.max(...acquired) },
+          extraPicks: mean(rs.map((r) => r.extraPicks)),
+          rerolls: mean(rs.map((r) => r.rerolls)),
+          spend: mean(rs.map((r) => r.draftSpend)),
+          capitalAtEnd: mean(rs.map((r) => r.final?.capital ?? 0)),
+        },
+      ];
+    }),
+  );
+
   // Cards
-  const count = (rs: readonly RunRecord[], field: 'draws' | 'plays', id: string) => sum(rs.map((r) => r[field][id] ?? 0));
+  const count = (rs: readonly RunRecord[], field: 'draws' | 'plays' | 'offered' | 'drafted', id: string) =>
+    sum(rs.map((r) => r[field][id] ?? 0));
   const cards = content.cards.map((card) => ({
     id: card.id,
     kind: card.kind,
     playRate: card.playable === false ? null : ratio(count(healthy, 'plays', card.id), count(healthy, 'draws', card.id)),
     runsPlayed: healthy.filter((r) => (r.plays[card.id] ?? 0) > 0).length / Math.max(1, healthy.length),
+    offered: count(healthy, 'offered', card.id),
+    drafted: count(healthy, 'drafted', card.id),
+    draftRate: ratio(count(healthy, 'drafted', card.id), count(healthy, 'offered', card.id)),
     byPersona: Object.fromEntries(
       personas.map((p) => {
         const rs = healthy.filter((r) => r.persona === p);
@@ -265,6 +295,7 @@ export function buildReport(batch: BatchResult): Report {
     scandalsHeld,
     gates,
     flagsHeld,
+    draft,
     cards,
     runLength,
     curves,
@@ -346,10 +377,22 @@ export function formatReport(r: Report): string {
     ),
   );
 
-  h('CARDS  (per persona: plays per run / play rate = played / drawn)');
+  h('DRAFT  (per run: cards acquired, extra picks bought, rerolls, capital spent on them, capital left at the end)');
   out.push(
     table(
-      ['card', 'kind', ...P, 'pooled play%', 'runs played'],
+      ['persona', 'acquired', 'min', 'max', 'extra picks', 'rerolls', 'capital spent', 'capital at end'],
+      P.map((p) => {
+        const d = r.draft[p];
+        if (!d) return [p, '-', '-', '-', '-', '-', '-', '-'];
+        return [p, n1(d.acquired.mean), n0(d.acquired.min), n0(d.acquired.max), n1(d.extraPicks), n1(d.rerolls), n1(d.spend), n1(d.capitalAtEnd)];
+      }),
+    ),
+  );
+
+  h('CARDS  (per persona: plays per run / play rate = played / drawn; draft% = taken when offered)');
+  out.push(
+    table(
+      ['card', 'kind', ...P, 'pooled play%', 'runs played', 'draft%'],
       r.cards.map((c) => [
         c.id,
         c.kind,
@@ -360,6 +403,7 @@ export function formatReport(r: Report): string {
         }),
         pc(c.playRate),
         c.kind === 'scandal' ? '-' : pc(c.runsPlayed),
+        c.kind === 'scandal' ? '-' : `${pc(c.draftRate)} (${c.offered})`,
       ]),
     ),
   );

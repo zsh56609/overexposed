@@ -1,9 +1,18 @@
 import { indexContent, CoreError, getCard, type AddCardZone, type Content, type ContentIndex, type ResourceKey, type Resources } from './content.ts';
 import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
 import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
-import { startTurn } from './reducer.ts';
+import { beginAct } from './reducer.ts';
 
-export type Phase = 'play' | 'gate' | 'ended';
+export type Phase = 'draft' | 'play' | 'gate' | 'ended';
+
+/** The draft that opens an act: pick from the offer; capital buys an extra pick or a new offer. */
+export interface DraftState {
+  /** Card ids on offer, distinct. */
+  readonly offer: readonly string[];
+  readonly picksLeft: number;
+  readonly extraPicksBought: number;
+  readonly rerollsUsed: number;
+}
 
 /** One physical card in the run. Duplicates of a card id have distinct uids. */
 export interface CardInstance {
@@ -40,6 +49,10 @@ export type GameEvent =
       readonly resources: Resources;
       readonly scandalCount: number;
     }
+  | { readonly type: 'draftOffer'; readonly act: number; readonly cardIds: readonly string[] }
+  | { readonly type: 'draftPick'; readonly uid: number; readonly cardId: string }
+  | { readonly type: 'draftExtraPick'; readonly cost: number }
+  | { readonly type: 'draftReroll'; readonly cost: number }
   | { readonly type: 'gateOffer'; readonly gateIds: readonly string[] }
   | { readonly type: 'gate'; readonly gateId: string; readonly passed: boolean }
   | { readonly type: 'ending'; readonly endingId: string | null }
@@ -71,6 +84,8 @@ export interface GameState {
   readonly exhausted: readonly CardInstance[];
   readonly nextUid: number;
 
+  /** Non-null only in the 'draft' phase. */
+  readonly draft: DraftState | null;
   /** Gate ids on offer; non-empty only in the 'gate' phase. */
   readonly gateOffer: readonly string[];
   readonly gateHistory: readonly GateRecord[];
@@ -85,7 +100,7 @@ export interface StateOptions {
   readonly strict?: boolean;
 }
 
-/** Build the run and deal turn 1. The returned state is waiting for PLAY_CARD / END_TURN. */
+/** Build the run and open act 1: the returned state waits on the act-1 draft (or turn 1 if drafting is off). */
 export function createInitialState(seed: number, content: Content, options: StateOptions = {}): GameState {
   const index = indexContent(content);
   const strict = options.strict ?? true;
@@ -117,6 +132,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
     discard: [],
     exhausted: [],
     nextUid: uid,
+    draft: null,
     gateOffer: [],
     gateHistory: [],
     endingId: null,
@@ -124,6 +140,6 @@ export function createInitialState(seed: number, content: Content, options: Stat
     budget: EFFECT_BUDGET,
   };
   shuffleInPlace(d.rng, d.deck);
-  startTurn(d);
+  beginAct(d);
   return closeDraft(d);
 }
