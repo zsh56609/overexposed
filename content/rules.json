@@ -4,7 +4,7 @@
   "handSize": 5,
   "slotsPerTurn": 3,
   "gatesOffered": 2,
-  "heatThreshold": [10, 9, 8],
+  "heatThreshold": [7, 6, 5],
   "startingResources": { "hype": 0, "craft": 0, "capital": 3, "heat": 0 },
   "startingDeck": [
     { "cardId": "vocal_coaching", "count": 2 },

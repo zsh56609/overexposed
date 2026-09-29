@@ -1,6 +1,7 @@
 node_modules/
 dist/
-sim/out/
+sim/out/*
+!sim/out/tuning-log.md
 *.tsbuildinfo
 *.log
 .vite/
