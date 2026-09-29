@@ -21,12 +21,15 @@ import {
   getGate,
   nextInt,
   reduce,
+  RESOURCE_KEYS,
   scandalCount,
   type Action,
+  type CardDef,
   type Condition,
   type ContentIndex,
   type Effect,
   type GameState,
+  type Range,
   type ResourceKey,
   type RngCursor,
 } from '../core/index.ts';
@@ -176,7 +179,8 @@ function score(s: GameState, w: Weights): number {
 }
 
 // ---------------------------------------------------------------------------
-// Drafting: the card's own effects scored straight off the weight table. No simulation.
+// Drafting: the card's own effects scored straight off the weight table, discounted by how likely it is
+// to be playable and, for one-shots, by being used up. No simulation.
 
 const weightOf = (target: ResourceKey, w: Weights) =>
   target === 'hype' ? w.hype : target === 'craft' ? w.craft : target === 'capital' ? w.capital : w.heat;
@@ -224,17 +228,97 @@ function effectsValue(effects: readonly Effect[] | undefined, s: GameState, w: W
 }
 
 /** Value per slot of playing the card once. */
-function cardValue(s: GameState, cardId: string, w: Weights): number {
+function playValue(s: GameState, def: CardDef, w: Weights): number {
+  return (effectsValue(def.effects, s, w) + effectsValue(def.onDraw, s, w)) / Math.max(1, def.cost);
+}
+
+const within = (value: number, r: Range) => (r.min === undefined || value >= r.min) && (r.max === undefined || value <= r.max);
+
+/**
+ * How likely a `requires` condition is to hold when the card comes up, 0..1: the product over its
+ * clauses. A minimum already met counts 1; an unmet one is projected at the run's growth so far (gain
+ * per completed turn) and counts the share of the remaining turns in which it will hold — 0 if it
+ * won't be reached in time, an even 0.5 on turn 1 with no history. A maximum exceeded now counts 0.5
+ * (it can come back down). An act/turn window counts the share of remaining turns inside it. A
+ * forbidden flag already held is permanent: 0. A required flag not held yet: 0.5.
+ */
+function requiresOdds(c: Condition | undefined, s: GameState): number {
+  if (!c) return 1;
+  const rules = s.content.rules;
+  const total = rules.acts * rules.turnsPerAct;
+  const remaining = Math.max(1, total - s.turn + 1);
+  const elapsed = s.turn - 1;
+  const clause = (value: number, start: number, r: Range | undefined): number => {
+    if (!r) return 1;
+    let odds = r.max !== undefined && value > r.max ? 0.5 : 1;
+    if (r.min !== undefined && value < r.min) {
+      const rate = elapsed > 0 ? (value - start) / elapsed : 0;
+      if (elapsed === 0) odds *= 0.5;
+      else if (rate <= 0) return 0;
+      else {
+        const turnsToReach = (r.min - value) / rate;
+        if (turnsToReach >= remaining) return 0;
+        odds *= (remaining - turnsToReach) / remaining;
+      }
+    }
+    return odds;
+  };
+  let odds = 1;
+  for (const key of RESOURCE_KEYS) odds *= clause(s.resources[key], rules.startingResources[key], c[key]);
+  odds *= clause(scandalCount(s), 0, c.scandalCount);
+  if (c.act || c.turn) {
+    let inside = 0;
+    for (let t = s.turn; t <= total; t++) {
+      if ((!c.act || within(Math.ceil(t / rules.turnsPerAct), c.act)) && (!c.turn || within(t, c.turn))) inside++;
+    }
+    odds *= inside / remaining;
+  }
+  const f = c.flags;
+  if (f) {
+    const has = (flag: string) => Object.hasOwn(s.flags, flag);
+    if (f.not?.some(has)) return 0; // flags are never unset
+    if (f.all && !f.all.every(has)) odds *= 0.5;
+    if (f.any && !f.any.some(has)) odds *= 0.5;
+  }
+  return odds;
+}
+
+/** The part of effectsValue that sets flags: permanent, so it is gained once however often the card is played. */
+function flagsValue(effects: readonly Effect[] | undefined, s: GameState, w: Weights): number {
+  let v = 0;
+  for (const e of effects ?? []) {
+    if (e.op === 'setFlag' && !Object.hasOwn(s.flags, e.flag)) v += flagValue(e.flag, s.content, w);
+    else if (e.op === 'conditional') v += flagsValue(evaluate(e.if, s) ? e.then : e.else, s, w);
+  }
+  return v;
+}
+
+/**
+ * Draft value (CLAUDE.md §5): the odds its `requires` will hold × value per slot of one play, with a
+ * one-shot's repeatable part scaled by the share of a kept card's uses it gets. The rest of the run
+ * draws a card about remainingTurns × handSize ÷ (cards owned + 1) times; a kept card can be played
+ * each time, a one-shot (opportunity) only once, so its repeatable effects count min(1, 1 ÷ draws).
+ * Setting a flag is permanent and counts in full either way. Kept cards stay in per-play units, so the
+ * capital prices of rerolls and extra picks keep their meaning.
+ */
+function draftValue(s: GameState, cardId: string, w: Weights): number {
   const def = getCard(s.content, cardId);
   if (!def) return 0;
-  return (effectsValue(def.effects, s, w) + effectsValue(def.onDraw, s, w)) / Math.max(1, def.cost);
+  const rules = s.content.rules;
+  const remaining = Math.max(1, rules.acts * rules.turnsPerAct - s.turn + 1);
+  const owned = s.deck.length + s.hand.length + s.discard.length;
+  const draws = (remaining * rules.handSize) / (owned + 1);
+  const useShare = def.kind === 'opportunity' ? Math.min(1, 1 / draws) : 1;
+  const perPlay = playValue(s, def, w);
+  const once = (flagsValue(def.effects, s, w) + flagsValue(def.onDraw, s, w)) / Math.max(1, def.cost);
+  return requiresOdds(def.requires, s) * ((perPlay - once) * useShare + once);
 }
 
 function draftChoice(state: GameState, legal: readonly Action[], w: Weights): Action {
   const dr = state.draft;
   if (!dr) return legal[0] as Action;
   const cfg = state.content.rules.draft;
-  const ranked = dr.offer.map((id) => ({ id, v: cardValue(state, id, w) })).sort((a, b) => b.v - a.v);
+  const ranked = dr.offer.map((id) => ({ id, v: draftValue(state, id, w) })).sort((a, b) => b.v - a.v);
   const can = (type: Action['type']) => legal.some((a) => a.type === type);
   // Nothing on offer is worth what a reroll costs: reroll.
   if (can('DRAFT_REROLL') && (ranked.at(0)?.v ?? 0) < cfg.rerollCost * w.capital) return { type: 'DRAFT_REROLL' };

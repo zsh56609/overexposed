@@ -79,6 +79,14 @@ export interface Report {
   >;
   /** Share of turns ending with 0, 1, 2, 3+ scandals crystallised. */
   readonly crystalTurns: Readonly<Record<Group, readonly [number, number, number, number]>>;
+  /** Per scandal card: its kind tags, crystallised per run, and the share of runs it crystallised in at least once. */
+  readonly scandalKinds: readonly {
+    id: string;
+    kinds: readonly string[];
+    byGroup: Readonly<Record<Group, { perRun: number; runs: number }>>;
+  }[];
+  /** Pooled: share of all crystallised scandals blamed on each card ('none' = no card to blame). */
+  readonly blame: readonly { cause: string; share: number }[];
   /**
    * Per act (index 0 = act 1), over every turn of that act: mean effective threshold at the heat
    * check, scandals crystallised per turn, the share of turns that crystallised 2+ at once, and
@@ -192,6 +200,32 @@ export function buildReport(batch: BatchResult): Report {
     }
     crystalTurns[g] = [counts[0] / Math.max(1, turns), counts[1] / Math.max(1, turns), counts[2] / Math.max(1, turns), counts[3] / Math.max(1, turns)];
   }
+
+  // Scandal kinds: which scandals actually appear, and which cards they are blamed on
+  const scandalCards = content.cards.filter((c) => c.kind === 'scandal');
+  const sharedTags = (scandalCards[0]?.tags ?? []).filter((t) => scandalCards.every((c) => c.tags?.includes(t)));
+  const scandalKinds = scandalCards.map((c) => ({
+    id: c.id,
+    kinds: (c.tags ?? []).filter((t) => !sharedTags.includes(t)),
+    byGroup: Object.fromEntries(
+      groups.map(([g, rs]) => {
+        const ok = rs.filter((r) => r.crash === null);
+        return [
+          g,
+          {
+            perRun: mean(ok.map((r) => r.crystallisedById[c.id] ?? 0)),
+            runs: ok.filter((r) => (r.crystallisedById[c.id] ?? 0) > 0).length / Math.max(1, ok.length),
+          },
+        ];
+      }),
+    ) as Record<Group, { perRun: number; runs: number }>,
+  }));
+  const blameCounts: Record<string, number> = {};
+  for (const r of records) for (const [cause, n] of Object.entries(r.blamedOn)) blameCounts[cause] = (blameCounts[cause] ?? 0) + n;
+  const blamed = sum(Object.values(blameCounts));
+  const blame = Object.entries(blameCounts)
+    .map(([cause, n]) => ({ cause, share: n / Math.max(1, blamed) }))
+    .sort((a, b) => b.share - a.share);
 
   const { acts, turnsPerAct } = content.rules;
   const cascadeByAct = {} as Record<Group, { threshold: number; perTurn: number; multi: number; drawn: number }[]>;
@@ -474,6 +508,8 @@ export function buildReport(batch: BatchResult): Report {
     endings: { ids: endingIds, share },
     scandalsHeld,
     crystalTurns,
+    scandalKinds,
+    blame,
     cascadeByAct,
     gates,
     flagsHeld,
@@ -551,6 +587,22 @@ export function formatReport(r: Report): string {
       [...P, 'pooled' as const].map((g) => [g, ...r.crystalTurns[g].map((x) => pc(x))]),
     ),
   );
+
+  h('SCANDAL KINDS  (crystallised per run / share of runs it crystallised in)');
+  out.push(
+    table(
+      ['scandal', 'kind', ...P, 'pooled'],
+      r.scandalKinds.map((s) => [
+        s.id,
+        s.kinds.join('+') || '-',
+        ...[...P, 'pooled' as const].map((g) => {
+          const x = s.byGroup[g];
+          return x ? `${n1(x.perRun)} / ${pc(x.runs)}` : '-';
+        }),
+      ]),
+    ),
+  );
+  out.push(`  blamed on (share of all crystallised scandals): ${r.blame.map((b) => `${b.cause} ${pc(b.share)}`).join(', ')}`);
 
   h('CASCADE BY ACT  (per turn: mean effective threshold / scandals crystallised / share of turns with 2+ / scandal cards drawn (choke); peak = act crystallising most per turn)');
   out.push(

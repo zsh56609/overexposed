@@ -43,6 +43,8 @@
   "card.fan_meetup.text": "Went viral: gain 6 Hype and 2 Capital. Otherwise: gain 3 Hype and 1 Capital.",
   "card.late_night_show.name": "Late Night Show",
   "card.late_night_show.text": "Needs 25 Hype. Gain 8 Hype, 3 Heat. Craft 30+: lose 3 Heat.",
+  "card.cover_single.name": "Cover Single",
+  "card.cover_single.text": "Gain 1 Capital and 2 Heat. Craft 15+: gain 5 Hype. Otherwise: gain 3 Hype.",
   "card.brand_deal.name": "Brand Deal",
   "card.brand_deal.text": "Opportunity. Needs 20 Hype. Gain 7 Capital, 2 Heat.",
   "card.film_cameo.name": "Film Cameo",

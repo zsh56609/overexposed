@@ -60,6 +60,9 @@ export interface RunRecord {
   readonly scandalsCrystallised: number;
   /** Crystallised scandals matched to the blamed card by tag (the rest fell back to seeded random). */
   readonly scandalsByTag: number;
+  /** Crystallised scandals by scandal card id, and by the card blamed for them ('none' = nothing to blame). */
+  readonly crystallisedById: Readonly<Record<string, number>>;
+  readonly blamedOn: Readonly<Record<string, number>>;
   /** Turns whose end crystallised 2+ scandals at once, and the most in any one turn. */
   readonly multiScandalTurns: number;
   readonly maxScandalsInTurn: number;
@@ -164,6 +167,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   const scandalIds = new Set(content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id));
   let scandalsDrawnThisTurn = 0;
   const flagSources: Record<string, string> = {};
+  const crystallisedById: Record<string, number> = {};
+  const blamedOn: Record<string, number> = {};
 
   const tally = (s: GameState, action: Action | null) => {
     const played = s.events.find((e) => e.type === 'play');
@@ -193,6 +198,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
       } else if (e.type === 'scandal') {
         scandalsCrystallised++;
         if (e.byTag) scandalsByTag++;
+        crystallisedById[e.cardId] = (crystallisedById[e.cardId] ?? 0) + 1;
+        blamedOn[e.cause ?? 'none'] = (blamedOn[e.cause ?? 'none'] ?? 0) + 1;
       }
       else if (e.type === 'turnEnd') {
         curve.push({
@@ -255,6 +262,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     scandalsAtEnd: state ? scandalCount(state) : 0,
     scandalsCrystallised,
     scandalsByTag,
+    crystallisedById,
+    blamedOn,
     multiScandalTurns,
     maxScandalsInTurn,
     turnsCompleted: curve.length,

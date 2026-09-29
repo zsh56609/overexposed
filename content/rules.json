@@ -12,7 +12,8 @@
   "startingResources": { "hype": 0, "craft": 0, "capital": 3, "heat": 0 },
   "startingDeck": [
     { "cardId": "vocal_coaching", "count": 2 },
-    { "cardId": "open_mic", "count": 2 },
+    { "cardId": "open_mic", "count": 1 },
+    { "cardId": "cover_single", "count": 1 },
     { "cardId": "side_gig", "count": 2 },
     { "cardId": "press_junket", "count": 1 },
     { "cardId": "viral_stunt", "count": 1 },

@@ -320,6 +320,25 @@
     ]
   },
   {
+    "id": "cover_single",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.cover_single.name",
+    "textKey": "card.cover_single.text",
+    "playable": true,
+    "tags": ["hype", "recording", "money"],
+    "effects": [
+      { "op": "resource", "target": "capital", "value": 1 },
+      { "op": "resource", "target": "heat", "value": 2 },
+      {
+        "op": "conditional",
+        "if": { "craft": { "min": 15 } },
+        "then": [{ "op": "resource", "target": "hype", "value": 5 }],
+        "else": [{ "op": "resource", "target": "hype", "value": 3 }]
+      }
+    ]
+  },
+  {
     "id": "brand_deal",
     "kind": "opportunity",
     "cost": 1,
@@ -459,7 +478,7 @@
     "textKey": "card.old_rumor.text",
     "playable": false,
     "tags": ["scandal", "money"],
-    "actMin": 3,
+    "actMin": 2,
     "onEndOfTurn": [
       {
         "op": "conditional",
