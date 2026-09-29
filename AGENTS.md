@@ -204,12 +204,16 @@ Requirements are evaluated at resolution. Prefer conditions on state at that mom
 }
 ```
 
-Prose keys: `nameKey`, `goalKey` (its goals-board line, also the hint for a locked ending), `textKey`.
+Prose keys: `nameKey`, `goalKey` (its goals-board line, also the hint for a locked ending), `textKey`. `boardOrder`: its place on the goals board (narrative order, aspirations first), never its `priority`.
 Resolved after turn 12 by descending `priority`; first match wins.
 **`priority: 0` is an unconditional fallback. It must always exist.**
 **No other ending may be a single-axis threshold:** at least two condition keys (validate enforces). A lone threshold makes one resource a dominant strategy. Star rewards surviving the spiral (hype + signed + a scandal ceiling); meltdown's scandal bar sits above star's ceiling so it never preempts a controlled hype run.
 
 Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
+
+### Awards
+
+`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — the condition shape plus `ending` (`any`/`not` ending ids), `peakScandals` and `bestMonthHype` (read off `turnEnd` events) — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state and the event history, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
 
 ### Content budget
 
@@ -245,6 +249,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - **missing `priority: 0` fallback ending**
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
+- awards: fields, conditions, ending ids, a fallback award, at most 8
 - player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, an ending without name, goal line or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
@@ -400,6 +405,7 @@ npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
 npm run check:preview  # every UI preview against the real reducer outcome
+npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 ```
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

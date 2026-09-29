@@ -1,13 +1,16 @@
 export * from './content.ts';
 export * from './rng.ts';
 export * from './state.ts';
+export { awardHolds, yearAwards, yearStats, type YearStats } from './awards.ts';
 export {
   effectiveHeatThreshold,
+  endingIfYearEndedNow,
   evaluate,
   explainCondition,
   heatLine,
   heatOutlook,
   lineMoved,
+  monthsLeft,
   scandalCount,
   type ClauseReport,
   type ConditionSubject,

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "best_new_artist",
+    "nameKey": "award.best_new_artist.name",
+    "citationKey": "award.best_new_artist.citation",
+    "conditions": { "ending": { "any": ["star"] } }
+  },
+  {
+    "id": "breakthrough_of_the_year",
+    "nameKey": "award.breakthrough_of_the_year.name",
+    "citationKey": "award.breakthrough_of_the_year.citation",
+    "conditions": { "bestMonthHype": { "min": 20 } }
+  },
+  {
+    "id": "peoples_choice",
+    "nameKey": "award.peoples_choice.name",
+    "citationKey": "award.peoples_choice.citation",
+    "conditions": { "hype": { "min": 105 } }
+  },
+  {
+    "id": "critics_choice",
+    "nameKey": "award.critics_choice.name",
+    "citationKey": "award.critics_choice.citation",
+    "conditions": { "craft": { "min": 90 }, "ending": { "not": ["star"] } }
+  },
+  {
+    "id": "comeback_of_the_year",
+    "nameKey": "award.comeback_of_the_year.name",
+    "citationKey": "award.comeback_of_the_year.citation",
+    "conditions": { "peakScandals": { "min": 3 }, "scandalCount": { "max": 2 } }
+  },
+  {
+    "id": "scandal_of_the_year",
+    "nameKey": "award.scandal_of_the_year.name",
+    "citationKey": "award.scandal_of_the_year.citation",
+    "conditions": { "scandalCount": { "min": 9 } }
+  },
+  {
+    "id": "most_promising_newcomer",
+    "nameKey": "award.most_promising_newcomer.name",
+    "citationKey": "award.most_promising_newcomer.citation",
+    "fallback": true
+  }
+]

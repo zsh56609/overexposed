@@ -6,6 +6,61 @@ rules).
 
 ---
 
+## 2026-09-30 — The story at the moment of decision; goals in view; awards
+
+The author's playtest of layer 2 part 1 found two things. The story
+arrived after the decision: a card's headline printed only once it was
+played, so choices were still made on numbers. And the goals board
+vanished during decisions, because the preview took over the right
+rail. Full text of decisions 21–24 in docs/ui-plan.md §13.
+
+1. The preview leads with the headline (21): the exact variant the feed
+   will print, from the same hash, in the card's register. The END TURN
+   preview names each scandal by its crystallisation headline.
+   check:preview asserts the preview's headline is the feed's.
+2. Decision 6 pulled forward: the preview floats beside the hovered card
+   and the goals board holds the right rail permanently.
+3. The goals board is in narrative order, aspirations first, with an "If
+   the year ended today" marker from a /core query (22).
+4. The final gate's prediction includes the awards; when every option
+   gives the same ending and the same awards: "Either way, the year ends
+   as <ending>." (23).
+5. Register follows visibility, not resource (24). This replaces the
+   resource mapping in "Writing pass and disclosure" below.
+6. A voice rule: every headline variant must read correctly in every
+   branch of its card, because the variant is chosen by a hash, not by
+   the branch that fired (docs/writing/voice.md).
+
+The eleven questions, answered: Old Rumour's story changes (draft v2);
+registers as in 5; the gap cards' registers come from draft v2; Burnout
+stays; the final gate as in 4; the goals board as in 3; the ending
+heading reads "One year later.", the feed's "The Coverage", and a
+negative flag requirement "Not yet <flag label>"; heat carry-over is
+part of the one month-end line, not a line of its own; decision 5 keeps
+"author-controlled"; both readings stand — the headline hash is on seed,
+month and card instance, and "line moved" measures the first line; the
+awards are defined, tuned with the sim and shown unstyled:
+
+| Award | Won when |
+|---|---|
+| Best New Artist | the year ends as Headliner |
+| Breakthrough of the Year | fastest rise: hype gained 20+ in one month (month end to month end) |
+| People's Choice | hype 105+ |
+| Critics' Choice | craft 90+, any ending but Headliner |
+| Comeback of the Year | 3+ scandals held at some month end, 2 or fewer at the end |
+| Scandal of the Year | 9+ scandals held at the end |
+| Most Promising Newcomer (Still) | only when no other award is won |
+
+Conditions live in `content/awards.json`; /core's `yearAwards` reads them
+against the final state and the run's event history (peak scandals and
+the best month come from `turnEnd` events), so no GameEvent or GameState
+field was added and `npm run sim` stays byte-identical. Target: every
+award won in at least a few percent and at most about 40% of player-like
+runs, and no run without an award. Measured (`npm run sim:awards`, 1000
+runs per persona, seed 20260929): 31.0%, 26.2%, 26.1%, 27.6%, 5.2%, 8.5%
+and 19.5% in the order above; no run without an award; 31.8% of runs win
+two or more. Seeds 1 and 424242 agree within a point.
+
 ## 2026-09-30 — The seven pending items from the layer 1 handoff
 
 Full text in docs/ui-plan.md §13 (decisions 1, 2, 4 and 18–20).

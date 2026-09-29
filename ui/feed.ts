@@ -4,7 +4,7 @@
 // event that caused it: the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
-import { getCard, lineMoved, RESOURCE_KEYS, type GameEvent, type Register, type ResourceKey } from '../core/index.ts';
+import { getCard, lineMoved, monthsLeft, RESOURCE_KEYS, type GameEvent, type Register, type ResourceKey } from '../core/index.ts';
 import { t } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
@@ -122,11 +122,15 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
         else if (e.type === 'exhaust') b.details.push(t('ui.feed.exhaust', { card: cardName(c, e.cardId) }));
         else if (e.type === 'flag') b.details.push(t('ui.feed.flag', { flag: flagName(e.flag) }));
       }
+      // One month-end line: its deltas and the heat that carries over (decision 18), not a line each.
+      // The year's last month carries nothing: there is no next month.
       const d = deltasText(b.deltas);
-      if (d) push('detail', t('ui.feed.monthEnd', { deltas: d }));
-      for (const x of b.details) push('detail', x);
       const turnEnd = head.find((e) => e.type === 'turnEnd');
-      if (turnEnd?.type === 'turnEnd' && turnEnd.resources.heat !== 0) push('detail', t('ui.feed.carry', { n: turnEnd.resources.heat }));
+      const carry = turnEnd?.type === 'turnEnd' && step.before && monthsLeft(step.before) !== 0 ? turnEnd.resources.heat : 0;
+      if (d && carry !== 0) push('detail', t('ui.feed.monthEndCarry', { deltas: d, n: carry }));
+      else if (d) push('detail', t('ui.feed.monthEnd', { deltas: d }));
+      else if (carry !== 0) push('detail', t('ui.feed.carry', { n: carry }));
+      for (const x of b.details) push('detail', x);
       tellLine();
     }
 

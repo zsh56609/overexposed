@@ -9,7 +9,7 @@
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
 
 import { CoreError, getCard, getGate, type GateDef } from './content.ts';
-import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
+import { effectiveHeatThreshold, endingIfYearEndedNow, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { nextInt } from './rng.ts';
 import {
   addCard,
@@ -391,9 +391,9 @@ function advanceAct(d: Draft): void {
 
 /** Descending priority, first match wins. Validation guarantees a priority-0 unconditional fallback. */
 function resolveEnding(d: Draft): void {
-  const ending = d.content.endings.find((e) => evaluate(e.conditions, d));
+  const endingId = endingIfYearEndedNow(d);
   d.phase = 'ended';
-  d.endingId = ending?.id ?? null;
-  if (!ending) fault(d, 'noEndingMatched', String(d.turn));
+  d.endingId = endingId;
+  if (endingId === null) fault(d, 'noEndingMatched', String(d.turn));
   d.events.push({ type: 'ending', endingId: d.endingId });
 }

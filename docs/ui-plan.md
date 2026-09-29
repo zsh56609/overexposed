@@ -41,7 +41,8 @@ Title → new run
     → draw → play → end turn → resolution (end-of-turn card effects,
       heat check, crystallisation)
     [last turn of the season] → Gate → season transition
-  after the winter gate → Ending (the awards ceremony, §8) → play again
+  after the winter gate → Ending (the ending and the year's awards, §8)
+  → play again
 ```
 
 ---
@@ -85,7 +86,8 @@ decisions 5 and 15). Pure typography, no
 illustration.
 
 The goals board (§8) holds the right rail from the stat strip to the
-bottom of the stage, so it stays in view through every decision. The card
+bottom of the stage, so it stays in view through every decision, in
+narrative order with the "If the year ended today" marker (decision 22). The card
 preview is not a rail panel: it floats beside the hovered card (§4,
 decision 6), inside the play area on the left, and never covers the
 goals. The masthead carries the seed, in an unobtrusive corner and still
@@ -159,7 +161,10 @@ only, and it counts no scandals (decision 1):
 - the display always shows current state, whatever caused it. The
   explanation attaches to the event that caused the change: the season
   transition says the line tightened, the gate result says heat was
-  added, the month-end resolution says what residue carried over. No
+  added, the month-end resolution says what residue carried over — as
+  part of the one month-end line, never a line of its own, and not at
+  all in the year's last month, which has no next month (/core's
+  monthsLeft). No
   separate warning panel (decision 18). The season transition also
   states how far the line moved this season (decision 13).
 
@@ -210,22 +215,34 @@ through /core's "as if this card were in hand" query (decision 8).
 **Gate** — 2 offered, pick 1. Each shows its flavour line (flavorKey)
 and every requirement live as met / unmet.
 The final gate is an informed choice: each option shows which ending it
-leads to (decision 11).
+leads to (decision 11) and the awards it would bring — "This ends the
+year as: Nobody Yet · Critics' Choice". When every option gives the same
+ending and the same awards, one plain line replaces the identical
+predictions: "Either way, the year ends as <ending>." (decision 23).
 
 **Goals board** — visible from the first turn, and through every
 decision: it holds the right rail on its own (§3). The four endings, each
 with its name, its goal line (goalKey) and what it requires, live via
 explainCondition. The player must always know what they are steering
-toward (decision 10).
+toward (decision 10). Narrative order, aspirations first — Headliner, The
+Musician's Musician, Cautionary Tale, Nobody Yet — from each ending's
+`boardOrder`, never its resolution priority. A marker labelled "If the
+year ended today" sits on the ending the year would resolve to now,
+from /core's `endingIfYearEndedNow` (decision 22).
 
 **Deck viewer** — read-only deck and discard lists, sorted by name, never
 revealing draw order (decision 12).
 
-**Ending** — in layer 2, the year-end awards ceremony (decision 16;
-docs/decisions.md). The ending decides the headline; below it, the
-categories the player was nominated in, won, or lost.
+**Ending** — the ending and the year's awards (decision 16;
+docs/decisions.md). The ending decides the headline.
 - ending name and text, from the ending's nameKey and textKey
   (decisions 9 and 15)
+- below them, every award won this run with its citation: a plain list,
+  no reveal, no ceremony presentation (2026-09-30). Every award whose
+  conditions hold is won; the fallback (Most Promising Newcomer (Still))
+  only when nothing else is, so every year wins at least one. Conditions
+  live in `content/awards.json`; /core's `yearAwards` reads them against
+  the final state and the run's event history
 - run summary (peak hype, scandals held, milestone flags such as signed,
   ...)
 - **the other endings shown as locked**, each with its name and a
@@ -372,7 +389,8 @@ it.
     it available for bug reports.
 15. Player-facing prose — schema:
     - cards: headlineKeys (an array of variants) and register
-      (loud | quiet | money), which drives feed typography
+      (loud | quiet | money), which drives feed typography; the register
+      follows visibility, not resource (decision 24)
     - scandals: headlineKey (printed on crystallisation) and textKey
       (shown while in hand)
     - endings: nameKey, goalKey (goals-board line), textKey
@@ -399,7 +417,9 @@ it.
     The explanation attaches to the event that caused the change: the
     season transition says the line tightened, the gate result says heat
     was added, the month-end resolution says what residue carried over.
-    No separate warning panel. (2026-09-30)
+    No separate warning panel. (2026-09-30; the carry-over is part of the
+    one month-end line, not a line of its own every month — amended
+    2026-09-30.)
 19. "No art before 10/26" means illustration only — the four ending
     illustrations. Layer 2 visual craft (type, palette, layout, texture)
     proceeds once the meaning layer is in; the loop is already tuned.
@@ -419,6 +439,24 @@ it.
     decision 6 pulled forward from part 2 — the preview floats beside the
     card, the goals board holds the right rail — the story and the goal
     are both in view when the player chooses. (2026-09-30)
+22. The goals board is in narrative order — Headliner, The Musician's
+    Musician, Cautionary Tale, Nobody Yet: aspirations first, not
+    resolution order. A marker labelled "If the year ended today" shows
+    which ending the year would resolve to now, from a new /core
+    read-only query (`endingIfYearEndedNow`, like heatOutlook). The
+    reducer resolves the real ending with the same query, so the marker
+    cannot disagree with it. (2026-09-30)
+23. The final gate's prediction names the ending and the awards each
+    option would bring: "This ends the year as: Nobody Yet · Critics'
+    Choice". Only when both options give the same ending AND the same
+    awards, say so plainly instead of showing two identical predictions:
+    "Either way, the year ends as <ending>." check:preview asserts each
+    prediction's awards are those of the real finished year. (2026-09-30)
+24. Register follows visibility, not resource. Public acts are LOUD,
+    private work is quiet, transactions are Money. Resource is a guide.
+    Signing, apologising on camera and reinventing an image are public;
+    networking is private. The rule and its table live in
+    docs/writing/voice.md. (2026-09-30)
 
 ### Still open
 

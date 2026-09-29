@@ -16,11 +16,18 @@ The game's thesis is that being seen has a cost, and that the work nobody
 sees goes unrecorded. The feed's typography carries that thesis: craft is
 nearly invisible on the front page, while a single stunt can fill it.
 
+**Register follows visibility, not resource** (docs/ui-plan.md §13,
+decision 24). Ask who sees the act, not what it earns. Public acts are
+LOUD, private work is quiet, transactions are Money. The resource a card
+moves is a guide, never the rule: signing, apologising on camera and
+reinventing an image are public, so LOUD, whatever they cost or earn;
+networking is private, so quiet, even though it builds a career.
+
 | Register | Used for | How it is written | Layer 2 typography |
 |---|---|---|---|
-| **LOUD** | hype / heat actions | Tabloid headline. All caps, third person, present tense, a little cruel. | Large serif headline |
-| **quiet** | craft actions | Diary voice. Second person, restrained. | Small italic, like a margin note |
-| **Money** | capital actions | Business-page voice. Plain, occasionally dry. | Business-section styling |
+| **LOUD** | public acts — anything done where the press, a crowd or a camera can see it | Tabloid headline. All caps, third person, present tense, a little cruel. | Large serif headline |
+| **quiet** | private work — practice, recovery, the favours and rooms nobody reports on | Diary voice. Second person, restrained. | Small italic, like a margin note |
+| **Money** | transactions — fees, deals, hires and purchases | Business-page voice. Plain, occasionally dry. | Business-section styling |
 
 ## Rules
 

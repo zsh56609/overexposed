@@ -136,6 +136,36 @@ export interface EndingDef {
   readonly nameKey?: string;
   readonly goalKey?: string;
   readonly textKey: string;
+  /** Position on the goals board, 1 first (decision 22): narrative order, aspirations first. Display only. */
+  readonly boardOrder?: number;
+}
+
+/**
+ * An award's conditions: the condition shape, checked against the final state, plus what only a finished
+ * year has — the ending it resolved to, and two stats derived from the run's event history.
+ */
+export interface AwardConditions extends Condition {
+  /** The year's ending: one of `any`, none of `not`. */
+  readonly ending?: { readonly any?: readonly string[]; readonly not?: readonly string[] };
+  /** The most scandals held at any month end during the run. */
+  readonly peakScandals?: Range;
+  /** The biggest hype gain from one month end to the next: the fastest rise. */
+  readonly bestMonthHype?: Range;
+}
+
+export const AWARD_ONLY_KEYS = ['ending', 'peakScandals', 'bestMonthHype'] as const;
+
+/**
+ * A year-end award (docs/ui-plan.md §13, decisions 16 and 20). It presents an outcome and changes no play.
+ * Every award whose conditions hold is granted; a fallback only when no other award is, so every year
+ * ends with at least one.
+ */
+export interface AwardDef {
+  readonly id: string;
+  readonly nameKey: string;
+  readonly citationKey: string;
+  readonly conditions?: AwardConditions;
+  readonly fallback?: boolean;
 }
 
 /** The drafts inside each act. Prices are in capital; caps are per draft. */
@@ -188,6 +218,8 @@ export interface Content {
   readonly cards: readonly CardDef[];
   readonly gates: readonly GateDef[];
   readonly endings: readonly EndingDef[];
+  /** A separate list, capped at 8 (decision 20). Absent: no awards. */
+  readonly awards?: readonly AwardDef[];
 }
 
 // ---------------------------------------------------------------------------
@@ -201,6 +233,8 @@ export interface ContentIndex {
   readonly gatesByAct: Readonly<Record<string, readonly GateDef[]>>;
   /** Endings in resolution order: descending priority, ties in content order. */
   readonly endings: readonly EndingDef[];
+  /** Awards in content order. */
+  readonly awards: readonly AwardDef[];
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
   /** Tags every scandal carries (e.g. the marker removal cards target). They say nothing about the kind of trouble. */
@@ -221,6 +255,7 @@ export function indexContent(content: Content): ContentIndex {
     gates: Object.fromEntries(content.gates.map((g) => [g.id, g])),
     gatesByAct,
     endings: [...content.endings].sort((a, b) => b.priority - a.priority),
+    awards: content.awards ?? [],
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
   };

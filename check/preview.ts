@@ -4,8 +4,9 @@
 // Seeded walks through /core, one per run seed, choosing like the random persona (any playable card
 // before ending the turn), so play reaches heat, crossings, gates and endings. At every state the check
 // takes each action the UI previews and compares the preview with the action's real result:
-//   play phase — every card in hand, and END_TURN; gate phase — every offered gate; draft phase — the
-//   live requirement of every card on offer.
+//   play phase — every card in hand (its outcome, and its headline against the feed's), and END_TURN;
+//   gate phase — every offered gate, and at the final gate the ending and awards each option predicts;
+//   draft phase — the live requirement of every card on offer.
 // Exit code 1 on any mismatch.
 
 import {
@@ -22,6 +23,7 @@ import {
   reduce,
   RESOURCE_KEYS,
   seedRng,
+  yearAwards,
   type Action,
   type Content,
   type GameEvent,
@@ -43,7 +45,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0 };
+const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsOnly: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -120,16 +122,21 @@ function checkPlayPhase(s: GameState, seed: number): void {
   );
   if (!same(pe.scandalCards, realCards)) report('endTurn scandal cards', seed, s.turn, `preview ${JSON.stringify(pe.scandalCards)}, real ${JSON.stringify(realCards)}`);
   if (pe.heatAfter !== end.resources.heat) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${end.resources.heat}`);
+  // Heat carries into a next month unless this month end leads straight to the year's end.
+  const yearEnds = real.phase === 'gate' && reduce(real, { type: 'CHOOSE_GATE', gateId: real.gateOffer[0] ?? '' }).phase === 'ended';
+  if (pe.carries === yearEnds) report('endTurn carries', seed, s.turn, `preview carries=${pe.carries}, but the year ${yearEnds ? 'ends' : 'goes on'}`);
   counts.monthEndScandals += realCards.length;
   counts.copies += realCards.filter((x) => x.cause.kind === 'added').length;
   // The preview never reveals the next turn's draw.
   if (pe.outcome.drawn !== 0) report('endTurn leak', seed, s.turn, `preview reports ${pe.outcome.drawn} next-turn draws`);
 }
 
-function checkGatePhase(s: GameState, seed: number): void {
+/** `history`: every event of the walk so far, as the UI's queue holds them — what a year's awards are read from. */
+function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[]): void {
+  const predicted: string[] = [];
   for (const gateId of s.gateOffer) {
     counts.gates++;
-    const p = previewGate(s, gateId);
+    const p = previewGate(s, gateId, history);
     const real = reduce(s, { type: 'CHOOSE_GATE', gateId });
     const gate = real.events.find((e) => e.type === 'gate');
     const passed = gate?.type === 'gate' && gate.passed;
@@ -139,6 +146,10 @@ function checkGatePhase(s: GameState, seed: number): void {
     const realEnding = ending?.type === 'ending' ? ending.endingId : null;
     if (p.endingId !== realEnding) report('gate ending', seed, s.turn, `${gateId}: preview ${p.endingId}, real ${realEnding}`);
     if (realEnding !== null) counts.finalGates++;
+    // ...and the awards it brings (decision 23): those of the real finished year, read off the whole run.
+    const realAwards = real.phase === 'ended' ? yearAwards(real, [...history, ...real.events]) : null;
+    if (!same(p.awardIds, realAwards)) report('gate awards', seed, s.turn, `${gateId}: preview ${JSON.stringify(p.awardIds)}, real ${JSON.stringify(realAwards)}`);
+    predicted.push(`${p.endingId}|${(p.awardIds ?? []).join()}`);
     if (p.clauses.every((c) => c.met) !== evaluate(getGate(s.content, gateId)?.requires, s)) report('gate clauses', seed, s.turn, `${gateId}: clauses disagree with evaluate`);
     // Independent of the events: the next season opens on its draft (or the run ends) before anything
     // else can touch resources, so the real state diff is exactly the gate's branch.
@@ -148,6 +159,11 @@ function checkGatePhase(s: GameState, seed: number): void {
         if (p.outcome.deltas[k] !== delta) report('gate delta', seed, s.turn, `${gateId} ${k}: preview ${p.outcome.deltas[k]}, real ${delta}`);
       }
     } else report('gate delta', seed, s.turn, `${gateId}: next season did not open on a draft (${real.phase})`);
+  }
+  // A final gate whose options end the year identically (said once), or differ only in their awards.
+  if (predicted.length > 1 && !predicted.some((x) => x.startsWith('null|'))) {
+    if (new Set(predicted).size === 1) counts.eitherWay++;
+    else if (new Set(predicted.map((x) => x.split('|')[0])).size === 1) counts.awardsOnly++;
   }
 }
 
@@ -173,12 +189,14 @@ for (let i = 0; i < RUNS; i++) {
   const seed = deriveSeed(SEED, i);
   const rng = cursor(seedRng(deriveSeed(seed, 0x75693121)));
   let s = createInitialState(seed, content, { strict: true });
+  const history: GameEvent[] = [...s.events];
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
     if (s.phase === 'play') checkPlayPhase(s, seed);
-    else if (s.phase === 'gate') checkGatePhase(s, seed);
+    else if (s.phase === 'gate') checkGatePhase(s, seed, history);
     else if (s.phase === 'draft') checkDraftPhase(s, seed);
     s = reduce(s, choose(s, rng));
+    history.push(...s.events);
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
 }
@@ -186,7 +204,8 @@ for (let i = 0; i < RUNS; i++) {
 console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
-    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending), ${counts.draftCards} draft offers ` +
+    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending and its awards; ${counts.eitherWay} final gates said "either way", ` +
+    `${counts.awardsOnly} differing only in awards), ${counts.draftCards} draft offers ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

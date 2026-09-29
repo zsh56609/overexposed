@@ -12,9 +12,11 @@ import {
   getGate,
   heatLine,
   legalActions,
+  monthsLeft,
   playCheck,
   reduce,
   RESOURCE_KEYS,
+  yearAwards,
   type AddCardZone,
   type ClauseReport,
   type Effect,
@@ -101,6 +103,8 @@ export interface EndTurnPreview {
   readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause }[];
   /** Heat left after the vent: it carries into the next month. */
   readonly heatAfter: number;
+  /** Whether there is a next month to carry it into: not in the year's last month (/core's monthsLeft). */
+  readonly carries: boolean;
   /** onEndOfTurn effects, the scandals and the vent — up to turnEnd, never the next turn's draw. */
   readonly outcome: Outcome;
 }
@@ -129,6 +133,7 @@ export function previewEndTurn(state: GameState): EndTurnPreview | null {
     crystallised: end?.type === 'turnEnd' ? end.crystallised : 0,
     scandalCards,
     heatAfter: end?.type === 'turnEnd' ? end.resources.heat : state.resources.heat,
+    carries: monthsLeft(state) !== 0,
     outcome: outcomeOf(events),
   };
 }
@@ -202,10 +207,14 @@ export interface GatePreview {
   readonly outcome: Outcome;
   /** The ending this choice leads to, when it is the run's last choice (decision 11); otherwise null. */
   readonly endingId: string | null;
+  /** With the ending, the awards the year would bring (decision 23, via /core's yearAwards); otherwise null. */
+  readonly awardIds: readonly string[] | null;
 }
 
-export function previewGate(state: GameState, gateId: string): GatePreview {
-  const events = reduce(state, { type: 'CHOOSE_GATE', gateId }).events;
+/** `history`: the run's events so far, which a finished year's awards are read from. */
+export function previewGate(state: GameState, gateId: string, history: readonly GameEvent[] = []): GatePreview {
+  const after = reduce(state, { type: 'CHOOSE_GATE', gateId });
+  const events = after.events;
   const at = events.findIndex((e) => e.type === 'gate');
   const rest = events.slice(at + 1);
   const stop = rest.findIndex((e) => e.type === 'draftOffer' || e.type === 'turnStart' || e.type === 'ending' || e.type === 'gateOffer');
@@ -217,6 +226,7 @@ export function previewGate(state: GameState, gateId: string): GatePreview {
     passes: gate?.type === 'gate' ? gate.passed : false,
     outcome: outcomeOf(stop === -1 ? rest : rest.slice(0, stop)),
     endingId: ending?.type === 'ending' ? ending.endingId : null,
+    awardIds: after.phase === 'ended' ? yearAwards(after, [...history, ...events]) : null,
   };
 }
 

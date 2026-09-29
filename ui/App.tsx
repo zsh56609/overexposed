@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import {
   createInitialState,
+  endingIfYearEndedNow,
   explainCondition,
   getCard,
   getGate,
@@ -14,6 +15,7 @@ import {
   reduce,
   RESOURCE_KEYS,
   scandalCount,
+  yearAwards,
   type Action,
   type CardInstance,
   type ContentIndex,
@@ -22,9 +24,11 @@ import {
 import { content, STRICT } from './content.ts';
 import { feedLines, type FeedLine } from './feed.ts';
 import { t } from './i18n.ts';
-import { legalOf, previewDraftCard, previewEndTurn, previewGate, previewPlay, type EndTurnPreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
+import { legalOf, previewDraftCard, previewEndTurn, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
 import {
+  awardCitation,
+  awardName,
   blockerText,
   cardName,
   cardRuleLines,
@@ -203,7 +207,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           <section className="bottom">
             {s.phase === 'play' && <Hand s={s} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
             {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
-            {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
+            {s.phase === 'gate' && <GatePanel s={s} steps={snap.steps} legal={legal} act={act} />}
           </section>
           {card && focus?.kind === 'card' && (
             <Floating anchor={focus.anchor}>
@@ -307,18 +311,23 @@ function Side({ s }: { s: GameState }) {
 
 // ---------------------------------------------------------------------------
 // Goals (decision 10): every ending, its name, its goal line and its requirements, live from the first turn.
+// In narrative order, aspirations first (decision 22) — content order is resolution priority, never shown —
+// with a marker on the ending the year would resolve to today, from /core.
 
 function GoalsBoard({ s }: { s: GameState }) {
   const c = s.content;
+  const today = endingIfYearEndedNow(s);
+  const board = [...c.endings].sort((a, b) => (a.boardOrder ?? Infinity) - (b.boardOrder ?? Infinity));
   return (
     <div className="goals">
       <h2>{t('ui.goals.title')}</h2>
-      {c.endings.map((e) => {
+      {board.map((e) => {
         const clauses = explainCondition(e.conditions, s);
         const name = endingName(c, e.id);
         const goal = endingGoal(c, e.id);
         return (
-          <div key={e.id} className="goal">
+          <div key={e.id} className={e.id === today ? 'goal today' : 'goal'}>
+            {e.id === today && <div className="today-mark">{t('ui.goals.today')}</div>}
             <strong className={prose(name)}>{name}</strong> <em className={prose(goal)}>{goal}</em>
             <div className="clauses">
               {clauses.length === 0 ? (
@@ -436,7 +445,7 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
         </>
       )}
       <OutcomeLines c={c} o={p.outcome} skipScandals />
-      <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>
+      {p.carries && <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>}
     </div>
   );
 }
@@ -602,15 +611,35 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
 // ---------------------------------------------------------------------------
 // Gate
 
-function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Action) => void }) {
+/** How a year-ending choice ends the year: the ending, then the awards it brings (decision 23). */
+function yearEndText(c: ContentIndex, p: GatePreview): string | null {
+  if (p.endingId === null) return null;
+  const ending = endingName(c, p.endingId);
+  const awards = (p.awardIds ?? []).map((id) => awardName(c, id)).join(' · ');
+  return awards ? t('ui.gate.withAwards', { ending, awards }) : ending;
+}
+
+function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly PlayedStep[]; legal: Legal; act: (a: Action) => void }) {
   const c = s.content;
+  const history = useMemo(() => steps.flatMap((step) => step.events), [steps]);
+  const previews = s.gateOffer.map((id) => previewGate(s, id, history));
+  // The run's last choice is an informed one (decision 11): which ending, and which awards (decision 23).
+  // Two identical predictions are said once, plainly.
+  const [first] = previews;
+  const eitherWay =
+    first !== undefined &&
+    first.endingId !== null &&
+    previews.length > 1 &&
+    previews.every((p) => p.endingId === first.endingId && (p.awardIds ?? []).join() === (first.awardIds ?? []).join());
   return (
     <div className="gates">
       <h2>{t('ui.gate.title', { season: seasonName(c, s.act) })}</h2>
+      {eitherWay && <p className="leads">{t('ui.gate.eitherWay', { ending: yearEndText(c, first) ?? '' })}</p>}
       <div className="gate-row">
-        {s.gateOffer.map((id) => {
+        {previews.map((p) => {
+          const id = p.gateId;
           const gate = getGate(c, id);
-          const p = previewGate(s, id);
+          const yearEnd = eitherWay ? null : yearEndText(c, p);
           const flavor = gateFlavor(c, id);
           return (
             <div key={id} className="gate">
@@ -632,8 +661,7 @@ function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Act
               <p className="branches">
                 {t('ui.gate.onPass')}: {effectsText(c, gate?.onPass ?? [])} · {t('ui.gate.onFail')}: {effectsText(c, gate?.onFail ?? [])}
               </p>
-              {/* The run's last choice is an informed one (decision 11): which ending it leads to. */}
-              {p.endingId !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: endingName(c, p.endingId) })}</p>}
+              {yearEnd !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: yearEnd })}</p>}
               <button className="take" disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
                 {t('ui.gate.choose', { gate: gateName(c, id) })}
               </button>
@@ -712,6 +740,8 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
   const flags = Object.keys(s.flags);
   const name = endingName(c, id);
   const text = endingText(c, id);
+  // Every award the year won, from /core (decision 16): a plain list, no reveal, no ceremony.
+  const awards = yearAwards(s, events);
   return (
     <div className="ending">
       <button className="play-again" onClick={onRestart}>
@@ -722,6 +752,18 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
           <p className="muted">{t('ui.ending.title')}</p>
           <h1 className={prose(name)}>{name}</h1>
           <p className={prose(text, 'ending-text')}>{text}</p>
+          <h2>{t('ui.ending.awards')}</h2>
+          <ul className="awards">
+            {awards.map((award) => {
+              const awardTitle = awardName(c, award);
+              const citation = awardCitation(c, award);
+              return (
+                <li key={award}>
+                  <strong className={prose(awardTitle)}>{awardTitle}</strong> <em className={prose(citation)}>{citation}</em>
+                </li>
+              );
+            })}
+          </ul>
         </div>
         <div className="ending-facts">
           <h2>{t('ui.ending.summary')}</h2>

@@ -44,13 +44,14 @@ export interface RawContent {
   readonly cards: unknown;
   readonly gates: unknown;
   readonly endings: unknown;
+  readonly awards: unknown;
 }
 
 export interface ValidationResult {
   readonly issues: readonly Issue[];
   /** Earliest act each card can enter a run; Infinity = never. */
   readonly earliestAct: Readonly<Record<string, number>>;
-  readonly counts: { readonly cards: number; readonly gates: number; readonly endings: number; readonly i18nKeys: number };
+  readonly counts: { readonly cards: number; readonly gates: number; readonly endings: number; readonly awards: number; readonly i18nKeys: number };
 }
 
 type Obj = Readonly<Record<string, unknown>>;
@@ -65,7 +66,10 @@ const CARD_FIELDS = [
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn',
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKey', 'requires', 'onPass', 'onFail'];
-const ENDING_FIELDS = ['id', 'priority', 'nameKey', 'goalKey', 'conditions', 'textKey'];
+const ENDING_FIELDS = ['id', 'priority', 'boardOrder', 'nameKey', 'goalKey', 'conditions', 'textKey'];
+const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
+/** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
+const MAX_AWARDS = 8;
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
@@ -441,7 +445,10 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
     if (e.conditions !== undefined) checkCondition(v, e.conditions, `${where}.conditions`);
     for (const field of ['nameKey', 'goalKey'] as const) if (e[field] !== undefined) v.key(e[field], `${where}.${field}`);
     v.key(e.textKey, `${where}.textKey`);
+    v.int(e.boardOrder, `${where}.boardOrder`, [1, 100], { optional: true });
   });
+  const orders = endings.map((e) => e.boardOrder).filter(isInt);
+  if (new Set(orders).size !== orders.length) v.warn('structure', 'content/endings.json', 'two endings share a boardOrder: the goals board breaks the tie by priority');
 
   const unconditional = (e: Obj) => e.conditions === undefined || (isObj(e.conditions) && Object.keys(e.conditions).length === 0);
   const fallbacks = endings.filter((e) => e.priority === 0);
@@ -473,6 +480,46 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
     if (axes < 2) v.error('structure', `ending ${String(e.id)}.conditions`, `single-axis ending (${axes} condition key); endings need at least two`);
   }
   return endings;
+}
+
+/**
+ * Year-end awards (decisions 16 and 20): the condition shape, plus the award-only keys (the year's ending,
+ * peak scandals, best month's hype rise). At most 8, and a fallback so that every year ends with one.
+ */
+function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
+  const endingIds = new Set(endings.map((e) => e.id).filter(isStr));
+  const awards = checkList(v, raw, 'content/awards.json', 'award', (a, where) => {
+    v.fields(a, AWARD_FIELDS, where);
+    v.key(a.nameKey, `${where}.nameKey`);
+    v.key(a.citationKey, `${where}.citationKey`);
+    if (a.fallback !== undefined && typeof a.fallback !== 'boolean') v.error('schema', `${where}.fallback`, 'must be a boolean');
+    if (a.fallback === true && a.conditions !== undefined) v.error('structure', where, 'a fallback award is granted only when no other is: it takes no conditions');
+    if (a.fallback !== true && a.conditions === undefined) v.error('structure', where, 'needs "conditions", or "fallback": true');
+    if (a.conditions === undefined) return;
+    if (!isObj(a.conditions)) return v.error('schema', `${where}.conditions`, 'must be an object');
+    const { ending, peakScandals, bestMonthHype, ...base } = a.conditions;
+    checkCondition(v, base, `${where}.conditions`);
+    if (ending !== undefined) {
+      const at = `${where}.conditions.ending`;
+      if (!isObj(ending)) v.error('schema', at, 'must be an object like { "any": ["star"] }');
+      else {
+        v.fields(ending, ['any', 'not'], at);
+        for (const k of ['any', 'not'] as const) {
+          const list = ending[k];
+          if (list === undefined) continue;
+          if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of ending ids');
+          else for (const id of list) if (!endingIds.has(id)) v.error('references', `${at}.${k}`, `no ending with id ${q(id)}`);
+        }
+      }
+    }
+    if (peakScandals !== undefined) checkRange(v, peakScandals, `${where}.conditions.peakScandals`, LIMIT.conditionBound);
+    if (bestMonthHype !== undefined) checkRange(v, bestMonthHype, `${where}.conditions.bestMonthHype`, LIMIT.conditionBound);
+  });
+  if (awards.length > MAX_AWARDS) v.error('ranges', 'content/awards.json', `${awards.length} awards; the list is capped at ${MAX_AWARDS}`);
+  if (awards.length > 0 && !awards.some((a) => a.fallback === true)) {
+    v.error('structure', 'content/awards.json', 'no fallback award: every year must end with at least one');
+  }
+  return awards;
 }
 
 // ---------------------------------------------------------------------------
@@ -589,7 +636,7 @@ function checkI18n(v: Ctx, i18n: unknown): number {
     else if (i18n[key] === '') v.error('i18n', where, `key ${q(key)} is empty in i18n/en.json`);
   }
   for (const key of Object.keys(i18n)) {
-    if (/^(card|gate|ending|act)\./.test(key) && !v.keysUsed.has(key)) {
+    if (/^(card|gate|ending|act|award)\./.test(key) && !v.keysUsed.has(key)) {
       v.warn('i18n', `i18n/en.json ${q(key)}`, 'no content uses this key');
     }
   }
@@ -607,7 +654,15 @@ export const OPENING_KEY = 'story.opening';
  * headline or in-hand line, every ending missing its name, goal line or text, every gate missing its
  * flavour, every season missing its opener, and the opening. Missing prose must be visible, not silent.
  */
-function checkProse(v: Ctx, i18n: Obj, rules: Obj | null, cards: readonly Obj[], gates: readonly Obj[], endings: readonly Obj[]): void {
+function checkProse(
+  v: Ctx,
+  i18n: Obj,
+  rules: Obj | null,
+  cards: readonly Obj[],
+  gates: readonly Obj[],
+  endings: readonly Obj[],
+  awards: readonly Obj[],
+): void {
   const written = (key: unknown) =>
     isStr(key) && typeof i18n[key] === 'string' && i18n[key] !== '' && !String(i18n[key]).startsWith(PROSE_PLACEHOLDER);
   const nameOf = (o: Obj) => (isStr(o.nameKey) && typeof i18n[o.nameKey] === 'string' ? ` (${String(i18n[o.nameKey])})` : '');
@@ -633,6 +688,10 @@ function checkProse(v: Ctx, i18n: Obj, rules: Obj | null, cards: readonly Obj[],
     if (!written(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
   }
   if (!written(OPENING_KEY)) v.warn('prose', OPENING_KEY, 'no opening premise');
+  for (const a of awards) {
+    const missing = (['nameKey', 'citationKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
+    if (missing.length > 0) v.warn('prose', `award ${String(a.id)}`, `no ${missing.join(', ')}`);
+  }
 }
 
 /** Validate parsed content. Pass i18n to check keys and prose (the sim doesn't: it never touches /i18n). */
@@ -642,12 +701,17 @@ export function validateContent(raw: RawContent, i18n?: unknown): ValidationResu
   const cards = checkCards(v, raw.cards);
   const gates = checkGates(v, raw.gates);
   const endings = checkEndings(v, raw.endings);
+  const awards = checkAwards(v, raw.awards, endings);
   checkReferences(v, rules, cards);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);
-  if (isObj(i18n)) checkProse(v, i18n, rules, cards, gates, endings);
-  return { issues: v.issues, earliestAct, counts: { cards: cards.length, gates: gates.length, endings: endings.length, i18nKeys } };
+  if (isObj(i18n)) checkProse(v, i18n, rules, cards, gates, endings, awards);
+  return {
+    issues: v.issues,
+    earliestAct,
+    counts: { cards: cards.length, gates: gates.length, endings: endings.length, awards: awards.length, i18nKeys },
+  };
 }
 
 // ---------------------------------------------------------------------------

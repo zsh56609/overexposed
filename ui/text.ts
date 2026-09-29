@@ -43,6 +43,8 @@ export const seasonOpener = (c: ContentIndex, act: number): string => t(c.rules.
 export const endingName = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.nameKey ?? `ending.${id}.name`);
 export const endingGoal = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.goalKey ?? `ending.${id}.goal`);
 export const endingText = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.textKey ?? `ending.${id}.text`);
+export const awardName = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
+export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
 /** The headline a scandal prints when it crystallises. */
 export const scandalHeadline = (c: ContentIndex, id: string): string => t(getCard(c, id)?.headlineKey ?? `card.${id}.headline`);
 

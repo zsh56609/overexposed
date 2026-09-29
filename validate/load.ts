@@ -11,6 +11,7 @@ export const CONTENT_FILES = {
   cards: 'content/cards.json',
   gates: 'content/gates.json',
   endings: 'content/endings.json',
+  awards: 'content/awards.json',
 } as const satisfies Record<keyof RawContent, string>;
 
 export function readJson(relPath: string): unknown {
@@ -28,6 +29,7 @@ export function loadRawContent(): RawContent {
     cards: readJson(CONTENT_FILES.cards),
     gates: readJson(CONTENT_FILES.gates),
     endings: readJson(CONTENT_FILES.endings),
+    awards: readJson(CONTENT_FILES.awards),
   };
 }
 

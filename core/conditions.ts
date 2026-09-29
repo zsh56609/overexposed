@@ -86,7 +86,20 @@ export function lineMoved(before: ConditionSubject, after: ConditionSubject): nu
   return firstLine(after) - firstLine(before);
 }
 
-function inRange(value: number, range: Range): boolean {
+/**
+ * The ending the year would resolve to if it ended now (decision 22): descending priority, first match —
+ * the rule the reducer resolves the real ending by, so the goals board's marker can't disagree with it.
+ */
+export function endingIfYearEndedNow(s: ConditionSubject): string | null {
+  return s.content.endings.find((e) => evaluate(e.conditions, s))?.id ?? null;
+}
+
+/** Months of the year still to come after the current one: 0 in its last month, when nothing carries over. */
+export function monthsLeft(s: ConditionSubject): number {
+  return s.content.rules.acts * s.content.rules.turnsPerAct - s.turn;
+}
+
+export function inRange(value: number, range: Range): boolean {
   return (range.min === undefined || value >= range.min) && (range.max === undefined || value <= range.max);
 }
 
