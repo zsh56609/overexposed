@@ -62,6 +62,8 @@ export interface Report {
     passRate: number | null;
     byPersona: Readonly<Record<string, { chosen: number; passRate: number | null }>>;
   }[];
+  /** Share of runs holding each flag at the end. */
+  readonly flagsHeld: Readonly<Record<string, Readonly<Record<Group, number>>>>;
   readonly cards: readonly {
     id: string;
     kind: string;
@@ -131,6 +133,20 @@ export function buildReport(batch: BatchResult): Report {
       ),
     };
   });
+
+  // Flags held at run end
+  const flagIds = [...new Set(healthy.flatMap((r) => r.flags))].sort();
+  const flagsHeld = Object.fromEntries(
+    flagIds.map((flag) => [
+      flag,
+      Object.fromEntries(
+        groups.map(([g, rs]) => {
+          const ok = rs.filter((r) => r.crash === null && r.softLock === null);
+          return [g, ok.filter((r) => r.flags.includes(flag)).length / Math.max(1, ok.length)];
+        }),
+      ),
+    ]),
+  ) as Record<string, Record<Group, number>>;
 
   // Cards
   const count = (rs: readonly RunRecord[], field: 'draws' | 'plays', id: string) => sum(rs.map((r) => r[field][id] ?? 0));
@@ -248,6 +264,7 @@ export function buildReport(batch: BatchResult): Report {
     endings: { ids: endingIds, share },
     scandalsHeld,
     gates,
+    flagsHeld,
     cards,
     runLength,
     curves,
@@ -318,6 +335,14 @@ export function formatReport(r: Report): string {
           return b && b.chosen > 0 ? `${pc(b.passRate)} (${b.chosen})` : '-';
         }),
       ]),
+    ),
+  );
+
+  h('FLAGS HELD AT RUN END  (share of runs)');
+  out.push(
+    table(
+      ['flag', ...P, 'pooled'],
+      Object.keys(r.flagsHeld).map((f) => [f, ...[...P, 'pooled' as const].map((g) => pc(r.flagsHeld[f]?.[g] ?? 0))]),
     ),
   );
 

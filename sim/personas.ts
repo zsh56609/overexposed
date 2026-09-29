@@ -1,14 +1,18 @@
 // Player personas. Each is a policy: (state, legal actions) → action.
 //
-// The three strategic personas share one greedy player and differ only in what they value.
-// None of them knows any card, gate or ending id: they read resources, scandals and the
-// rules, so content can change without touching this file.
+// The strategic personas share one greedy player and differ only in what they value.
+// None of them needs to know any card, gate or ending id: they read resources, scandals,
+// flags and the rules, so content can change without touching this file.
 //
 // Greedy step: simulate every playable card through the pure reducer, score the resulting
 // state, play the best gain per slot; end the turn when no card improves the score.
 // Gates: simulate each choice, score the result, add a bonus if the gate would pass.
 // (Simulating draw effects peeks at the seeded deck. The score only counts hand size,
 // not which cards arrived, so the peek is worth little.)
+//
+// Flags: a flag that some ending, gate or card condition requires (flags.all / flags.any)
+// is worth `flagUnlock`; one that a condition forbids (flags.not) costs `flagLock`.
+// `flagScores` overrides that per flag id.
 
 import {
   evaluate,
@@ -19,11 +23,14 @@ import {
   reduce,
   scandalCount,
   type Action,
+  type Condition,
+  type ContentIndex,
+  type Effect,
   type GameState,
   type RngCursor,
 } from '../core/index.ts';
 
-export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser'] as const;
+export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker'] as const;
 export type PersonaId = (typeof PERSONA_IDS)[number];
 
 export interface Persona {
@@ -47,13 +54,99 @@ interface Weights {
   readonly slots: number;
   /** Added to a gate choice that would pass. */
   readonly gatePass: number;
+  /** Per flag held that some condition requires. */
+  readonly flagUnlock: number;
+  /** Per flag held that some condition forbids (subtracted). */
+  readonly flagLock: number;
+  /** Per-flag overrides by flag id. */
+  readonly flagScores?: Readonly<Record<string, number>>;
+  /**
+   * Pull toward this act's gates whose onPass sets a valued flag: their flag value × progress
+   * (0..1) toward the gate's requirements. 0 = off. Lets a persona plan for a deal it wants.
+   */
+  readonly dealDrive: number;
 }
 
 const END_TURN: Action = { type: 'END_TURN' };
 
+interface FlagRefs {
+  readonly unlocks: ReadonlySet<string>;
+  readonly locks: ReadonlySet<string>;
+}
+
+const flagRefsCache = new WeakMap<ContentIndex, FlagRefs>();
+
+/** Which flags the content's conditions require or forbid. Computed once per content. */
+function flagRefs(content: ContentIndex): FlagRefs {
+  const cached = flagRefsCache.get(content);
+  if (cached) return cached;
+  const unlocks = new Set<string>();
+  const locks = new Set<string>();
+  const scan = (c: Condition | undefined) => {
+    for (const f of [...(c?.flags?.all ?? []), ...(c?.flags?.any ?? [])]) unlocks.add(f);
+    for (const f of c?.flags?.not ?? []) locks.add(f);
+  };
+  const scanEffects = (effects: readonly Effect[] | undefined) => {
+    for (const e of effects ?? []) {
+      if (e.op !== 'conditional') continue;
+      scan(e.if);
+      scanEffects(e.then);
+      scanEffects(e.else);
+    }
+  };
+  for (const ending of content.endings) scan(ending.conditions);
+  for (const gate of Object.values(content.gates)) {
+    scan(gate.requires);
+    scanEffects(gate.onPass);
+    scanEffects(gate.onFail);
+  }
+  for (const card of Object.values(content.cards)) {
+    scan(card.requires);
+    scanEffects(card.effects);
+    scanEffects(card.onDraw);
+    scanEffects(card.onEndOfTurn);
+  }
+  const refs = { unlocks, locks };
+  flagRefsCache.set(content, refs);
+  return refs;
+}
+
+function flagValue(flag: string, content: ContentIndex, w: Weights): number {
+  if (w.flagScores && Object.hasOwn(w.flagScores, flag)) return w.flagScores[flag] as number;
+  const refs = flagRefs(content);
+  return (refs.unlocks.has(flag) ? w.flagUnlock : 0) - (refs.locks.has(flag) ? w.flagLock : 0);
+}
+
+/** How close the state is to meeting a condition, 0..1: each `min` scores value/min, other clauses 0 or 1. */
+function progress(c: Condition, s: GameState): number {
+  const parts: number[] = [];
+  for (const key of ['hype', 'craft', 'capital', 'heat'] as const) {
+    const min = c[key]?.min;
+    if (min !== undefined && min > 0) parts.push(Math.min(1, s.resources[key] / min));
+  }
+  const rest: Condition = { scandalCount: c.scandalCount, act: c.act, turn: c.turn, flags: c.flags };
+  if (Object.values(rest).some((v) => v !== undefined)) parts.push(evaluate(rest, s) ? 1 : 0);
+  return parts.length === 0 ? 1 : parts.reduce((a, b) => a + b, 0) / parts.length;
+}
+
+function dealPull(s: GameState, w: Weights): number {
+  let total = 0;
+  for (const gate of s.content.gatesByAct[String(s.act)] ?? []) {
+    let gain = 0;
+    for (const e of gate.onPass) {
+      if (e.op === 'setFlag' && !Object.hasOwn(s.flags, e.flag)) gain += Math.max(0, flagValue(e.flag, s.content, w));
+    }
+    if (gain > 0) total += gain * progress(gate.requires, s);
+  }
+  return total;
+}
+
 function score(s: GameState, w: Weights): number {
   const r = s.resources;
   const atRisk = s.phase === 'play' && r.heat >= heatThreshold(s.content.rules, s.act) ? 1 : 0;
+  let flags = 0;
+  for (const flag of Object.keys(s.flags)) flags += flagValue(flag, s.content, w);
+  if (w.dealDrive !== 0 && s.phase !== 'ended') flags += w.dealDrive * dealPull(s, w);
   return (
     w.hype * r.hype +
     w.craft * r.craft +
@@ -61,7 +154,8 @@ function score(s: GameState, w: Weights): number {
     w.heat * r.heat +
     w.scandal * scandalCount(s) +
     w.risk * atRisk +
-    w.hand * s.hand.length
+    w.hand * s.hand.length +
+    flags
   );
 }
 
@@ -113,14 +207,18 @@ const random: Persona = {
   },
 };
 
+const BALANCED = { hype: 1, craft: 1, capital: 0.5, heat: -0.5, scandal: -8, risk: -6, hand: 1.5, slots: 2, gatePass: 6 };
+
 export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   // Balanced: grows everything, treats heat as debt, buys off scandals, dodges thresholds.
-  minmaxer: greedy('minmaxer', { hype: 1, craft: 1, capital: 0.5, heat: -0.5, scandal: -8, risk: -6, hand: 1.5, slots: 2, gatePass: 6 }),
+  minmaxer: greedy('minmaxer', { ...BALANCED, flagUnlock: 12, flagLock: 12, dealDrive: 0 }),
   random,
   // Craft first, very heat-averse.
-  crafter: greedy('crafter', { hype: 0.25, craft: 1.5, capital: 0.4, heat: -1, scandal: -10, risk: -8, hand: 1, slots: 1.5, gatePass: 6 }),
+  crafter: greedy('crafter', { hype: 0.25, craft: 1.5, capital: 0.4, heat: -1, scandal: -10, risk: -8, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
   // Hype first, blind to heat and scandals.
-  hypechaser: greedy('hypechaser', { hype: 1.5, craft: 0.25, capital: 0.3, heat: 0, scandal: 0, risk: 0, hand: 1, slots: 1.5, gatePass: 6 }),
+  hypechaser: greedy('hypechaser', { hype: 1.5, craft: 0.25, capital: 0.3, heat: 0, scandal: 0, risk: 0, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
+  // Balanced resources, but weights flags heavily and plays toward the gates that grant them.
+  dealseeker: greedy('dealseeker', { ...BALANCED, flagUnlock: 40, flagLock: 20, dealDrive: 1 }),
 };
 
 /** Salt that separates each persona's decision stream from the game's own RNG. */
@@ -129,4 +227,5 @@ export const PERSONA_SALT: { readonly [K in PersonaId]: number } = {
   random: 0x72616e64,
   crafter: 0x63726166,
   hypechaser: 0x68797065,
+  dealseeker: 0x6465616c,
 };

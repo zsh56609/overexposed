@@ -50,6 +50,8 @@ export interface RunRecord {
   readonly draws: Readonly<Record<string, number>>;
   readonly plays: Readonly<Record<string, number>>;
   readonly final: Resources | null;
+  /** Flags held when the run ended. */
+  readonly flags: readonly string[];
   readonly softLock: string | null;
   readonly crash: string | null;
 }
@@ -152,6 +154,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     draws,
     plays,
     final: state?.resources ?? null,
+    flags: state ? Object.keys(state.flags) : [],
     softLock,
     crash,
   };
