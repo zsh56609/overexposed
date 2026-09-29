@@ -131,7 +131,7 @@
     "nameKey": "card.tabloid_story.name",
     "textKey": "card.tabloid_story.text",
     "playable": false,
-    "tags": ["scandal"],
+    "tags": ["scandal", "press"],
     "onEndOfTurn": [{ "op": "resource", "target": "hype", "value": -4 }]
   },
   {
@@ -141,7 +141,7 @@
     "nameKey": "card.public_feud.name",
     "textKey": "card.public_feud.text",
     "playable": false,
-    "tags": ["scandal"],
+    "tags": ["scandal", "gig"],
     "actMin": 2,
     "onDraw": [{ "op": "slots", "value": -1 }],
     "onEndOfTurn": [{ "op": "resource", "target": "capital", "value": -2 }]
@@ -423,7 +423,7 @@
     "nameKey": "card.bad_press.name",
     "textKey": "card.bad_press.text",
     "playable": false,
-    "tags": ["scandal"]
+    "tags": ["scandal", "recording"]
   },
   {
     "id": "burnout",
@@ -432,7 +432,7 @@
     "nameKey": "card.burnout.name",
     "textKey": "card.burnout.text",
     "playable": false,
-    "tags": ["scandal"],
+    "tags": ["scandal", "gig"],
     "onEndOfTurn": [{ "op": "resource", "target": "craft", "value": -3 }]
   },
   {
@@ -442,7 +442,7 @@
     "nameKey": "card.copycat_story.name",
     "textKey": "card.copycat_story.text",
     "playable": false,
-    "tags": ["scandal"],
+    "tags": ["scandal", "stunt"],
     "onEndOfTurn": [
       {
         "op": "conditional",
@@ -458,7 +458,7 @@
     "nameKey": "card.old_rumor.name",
     "textKey": "card.old_rumor.text",
     "playable": false,
-    "tags": ["scandal"],
+    "tags": ["scandal", "money"],
     "actMin": 2,
     "onEndOfTurn": [
       {

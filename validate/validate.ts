@@ -66,7 +66,7 @@ const RULES_FIELDS = [
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft',
 ];
-const DRAFT_FIELDS = ['offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
+const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
 /** Hard numeric bounds. Values outside them are errors, not taste. */
 const LIMIT = {
@@ -299,6 +299,13 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
   if (!isObj(raw.draft)) v.error('schema', 'rules.draft', 'must be an object: { offerSize, picks, extraPickCost, maxExtraPicks, rerollCost, maxRerolls }');
   else {
     v.fields(raw.draft, DRAFT_FIELDS, 'rules.draft');
+    const atTurns = raw.draft.atTurns;
+    if (!Array.isArray(atTurns)) v.error('schema', 'rules.draft.atTurns', 'must be an array of turn-within-act numbers, e.g. [1, 3]');
+    else {
+      const perAct = isInt(raw.turnsPerAct) ? raw.turnsPerAct : 1;
+      atTurns.forEach((t, i) => v.int(t, `rules.draft.atTurns[${i}]`, [1, perAct]));
+      if (new Set(atTurns).size !== atTurns.length) v.error('ranges', 'rules.draft.atTurns', 'lists a turn twice');
+    }
     v.int(raw.draft.offerSize, 'rules.draft.offerSize', LIMIT.count);
     v.int(raw.draft.picks, 'rules.draft.picks', LIMIT.draftCount);
     v.int(raw.draft.maxExtraPicks, 'rules.draft.maxExtraPicks', LIMIT.draftCount);
@@ -309,7 +316,13 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
   return raw;
 }
 
-const draftOn = (rules: Obj | null) => !!rules && isObj(rules.draft) && isInt(rules.draft.picks) && rules.draft.picks > 0;
+const draftOn = (rules: Obj | null) =>
+  !!rules &&
+  isObj(rules.draft) &&
+  isInt(rules.draft.picks) &&
+  rules.draft.picks > 0 &&
+  Array.isArray(rules.draft.atTurns) &&
+  rules.draft.atTurns.length > 0;
 const actMinOf = (c: Obj) => (isInt(c.actMin) ? c.actMin : 1);
 
 function checkList(v: Ctx, raw: unknown, file: string, label: string, each: (o: Obj, where: string) => void): Obj[] {

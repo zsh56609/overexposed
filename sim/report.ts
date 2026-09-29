@@ -60,7 +60,10 @@ export interface Report {
   };
   readonly endings: { readonly ids: readonly string[]; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
   readonly scandalsHeld: Readonly<
-    Record<Group, { median: number; mean: number; p90: number; max: number; crystallised: number; multiTurns: number; maxInTurn: number }>
+    Record<
+      Group,
+      { median: number; mean: number; p90: number; max: number; crystallised: number; byTag: number | null; multiTurns: number; maxInTurn: number }
+    >
   >;
   /** Share of turns ending with 0, 1, 2, 3+ scandals crystallised. */
   readonly crystalTurns: Readonly<Record<Group, readonly [number, number, number, number]>>;
@@ -137,6 +140,7 @@ export function buildReport(batch: BatchResult): Report {
           p90: quantile(xs, 0.9),
           max: Math.max(...xs),
           crystallised: mean(ok.map((r) => r.scandalsCrystallised)),
+          byTag: ratio(sum(ok.map((r) => r.scandalsByTag)), sum(ok.map((r) => r.scandalsCrystallised))),
           multiTurns: mean(ok.map((r) => r.multiScandalTurns)),
           maxInTurn: Math.max(...ok.map((r) => r.maxScandalsInTurn)),
         },
@@ -401,10 +405,10 @@ export function formatReport(r: Report): string {
   h('SCANDALS  (held at run end; crystallised per run; turns per run that crystallised 2+ at once; most in one turn)');
   out.push(
     table(
-      ['group', 'median', 'mean', 'p90', 'max', 'crystallised', '2+ turns', 'max/turn'],
+      ['group', 'median', 'mean', 'p90', 'max', 'crystallised', 'by tag', '2+ turns', 'max/turn'],
       [...P, 'pooled' as const].map((g) => {
         const s = r.scandalsHeld[g];
-        return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max), n1(s.crystallised), n1(s.multiTurns), n0(s.maxInTurn)];
+        return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max), n1(s.crystallised), pc(s.byTag), n1(s.multiTurns), n0(s.maxInTurn)];
       }),
     ),
   );

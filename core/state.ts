@@ -1,11 +1,22 @@
 import { indexContent, CoreError, getCard, type AddCardZone, type Content, type ContentIndex, type ResourceKey, type Resources } from './content.ts';
 import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
 import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
-import { beginAct } from './reducer.ts';
+import { beginTurn } from './reducer.ts';
 
 export type Phase = 'draft' | 'play' | 'gate' | 'ended';
 
-/** The draft that opens an act: pick from the offer; capital buys an extra pick or a new offer. */
+/**
+ * Heat changes since the last end-of-turn check, each with the card whose effect caused it (null for
+ * gates). Crystallisation replays them to blame each scandal on the card that pushed heat over its line.
+ */
+export interface HeatLedger {
+  readonly start: number;
+  /** Who pushed heat up most recently before `start` — blamed for lines already crossed then. */
+  readonly startSource: string | null;
+  readonly changes: readonly { readonly cardId: string | null; readonly delta: number }[];
+}
+
+/** A card draft inside an act: pick from the offer; capital buys an extra pick or a new offer. */
 export interface DraftState {
   /** Card ids on offer, distinct. */
   readonly offer: readonly string[];
@@ -41,7 +52,8 @@ export type GameEvent =
   | { readonly type: 'flag'; readonly flag: string }
   | { readonly type: 'addCard'; readonly uid: number; readonly cardId: string; readonly to: AddCardZone }
   | { readonly type: 'exhaust'; readonly uid: number; readonly cardId: string }
-  | { readonly type: 'scandal'; readonly uid: number; readonly cardId: string }
+  /** `cause`: the card blamed for pushing heat over the line; `byTag`: the scandal matches its tag (false = seeded fallback). */
+  | { readonly type: 'scandal'; readonly uid: number; readonly cardId: string; readonly cause: string | null; readonly byTag: boolean }
   | {
       readonly type: 'turnEnd';
       readonly act: number;
@@ -78,6 +90,7 @@ export interface GameState {
   readonly slots: number;
   readonly resources: Resources;
   readonly flags: Readonly<Record<string, true>>;
+  readonly heatLedger: HeatLedger;
 
   /** Draw pile. The top of the deck is the END of the array. */
   readonly deck: readonly CardInstance[];
@@ -103,7 +116,7 @@ export interface StateOptions {
   readonly strict?: boolean;
 }
 
-/** Build the run and open act 1: the returned state waits on the act-1 draft (or turn 1 if drafting is off). */
+/** Build the run and open turn 1: the returned state waits on its draft (or on play if drafting is off). */
 export function createInitialState(seed: number, content: Content, options: StateOptions = {}): GameState {
   const index = indexContent(content);
   const strict = options.strict ?? true;
@@ -130,6 +143,8 @@ export function createInitialState(seed: number, content: Content, options: Stat
     slots: 0,
     resources: { ...rules.startingResources },
     flags: {},
+    heatLedger: { start: rules.startingResources.heat, startSource: null, changes: [] },
+    source: null,
     deck,
     hand: [],
     discard: [],
@@ -143,6 +158,6 @@ export function createInitialState(seed: number, content: Content, options: Stat
     budget: EFFECT_BUDGET,
   };
   shuffleInPlace(d.rng, d.deck);
-  beginAct(d);
+  beginTurn(d);
   return closeDraft(d);
 }

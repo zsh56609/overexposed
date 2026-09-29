@@ -10,9 +10,9 @@
 // (Simulating draw effects peeks at the seeded deck. The score only counts hand size,
 // not which cards arrived, so the peek is worth little.)
 //
-// Flags: a flag that some ending, gate or card condition requires (flags.all / flags.any)
-// is worth `flagUnlock`; one that a condition forbids (flags.not) costs `flagLock`.
-// `flagScores` overrides that per flag id.
+// Flags: a flag that conditions require (flags.all / flags.any) is worth `flagUnlock`, one they
+// forbid (flags.not) costs `flagLock`, each weighted by what reads it — an ending 1.0, a gate 0.4,
+// a card condition 0.1, summed over the distinct tiers. `flagScores` overrides that per flag id.
 
 import {
   effectiveHeatThreshold,
@@ -70,44 +70,56 @@ interface Weights {
 
 const END_TURN: Action = { type: 'END_TURN' };
 
+/** How much a flag matters by what reads it: an ending outranks a gate, which outranks a card condition. */
+const TIER = { ending: 1, gate: 0.4, card: 0.1 } as const;
+type Tier = keyof typeof TIER;
+
 interface FlagRefs {
-  readonly unlocks: ReadonlySet<string>;
-  readonly locks: ReadonlySet<string>;
+  /** Flag → summed tier weight of the distinct tiers that require / forbid it. */
+  readonly unlocks: ReadonlyMap<string, number>;
+  readonly locks: ReadonlyMap<string, number>;
 }
 
 const flagRefsCache = new WeakMap<ContentIndex, FlagRefs>();
 
-/** Which flags the content's conditions require or forbid. Computed once per content. */
+/** Which flags the content's conditions require or forbid, and how much they matter. Computed once per content. */
 function flagRefs(content: ContentIndex): FlagRefs {
   const cached = flagRefsCache.get(content);
   if (cached) return cached;
-  const unlocks = new Set<string>();
-  const locks = new Set<string>();
-  const scan = (c: Condition | undefined) => {
-    for (const f of [...(c?.flags?.all ?? []), ...(c?.flags?.any ?? [])]) unlocks.add(f);
-    for (const f of c?.flags?.not ?? []) locks.add(f);
+  const unlockTiers = new Map<string, Set<Tier>>();
+  const lockTiers = new Map<string, Set<Tier>>();
+  const note = (map: Map<string, Set<Tier>>, flag: string, tier: Tier) => {
+    const tiers = map.get(flag) ?? new Set<Tier>();
+    tiers.add(tier);
+    map.set(flag, tiers);
   };
-  const scanEffects = (effects: readonly Effect[] | undefined) => {
+  const scan = (c: Condition | undefined, tier: Tier) => {
+    for (const f of [...(c?.flags?.all ?? []), ...(c?.flags?.any ?? [])]) note(unlockTiers, f, tier);
+    for (const f of c?.flags?.not ?? []) note(lockTiers, f, tier);
+  };
+  const scanEffects = (effects: readonly Effect[] | undefined, tier: Tier) => {
     for (const e of effects ?? []) {
       if (e.op !== 'conditional') continue;
-      scan(e.if);
-      scanEffects(e.then);
-      scanEffects(e.else);
+      scan(e.if, tier);
+      scanEffects(e.then, tier);
+      scanEffects(e.else, tier);
     }
   };
-  for (const ending of content.endings) scan(ending.conditions);
+  for (const ending of content.endings) scan(ending.conditions, 'ending');
   for (const gate of Object.values(content.gates)) {
-    scan(gate.requires);
-    scanEffects(gate.onPass);
-    scanEffects(gate.onFail);
+    scan(gate.requires, 'gate');
+    scanEffects(gate.onPass, 'gate');
+    scanEffects(gate.onFail, 'gate');
   }
   for (const card of Object.values(content.cards)) {
-    scan(card.requires);
-    scanEffects(card.effects);
-    scanEffects(card.onDraw);
-    scanEffects(card.onEndOfTurn);
+    scan(card.requires, 'card');
+    scanEffects(card.effects, 'card');
+    scanEffects(card.onDraw, 'card');
+    scanEffects(card.onEndOfTurn, 'card');
   }
-  const refs = { unlocks, locks };
+  const total = (map: Map<string, Set<Tier>>) =>
+    new Map([...map].map(([flag, tiers]) => [flag, [...tiers].reduce((sum, t) => sum + TIER[t], 0)] as const));
+  const refs = { unlocks: total(unlockTiers), locks: total(lockTiers) };
   flagRefsCache.set(content, refs);
   return refs;
 }
@@ -115,7 +127,7 @@ function flagRefs(content: ContentIndex): FlagRefs {
 function flagValue(flag: string, content: ContentIndex, w: Weights): number {
   if (w.flagScores && Object.hasOwn(w.flagScores, flag)) return w.flagScores[flag] as number;
   const refs = flagRefs(content);
-  return (refs.unlocks.has(flag) ? w.flagUnlock : 0) - (refs.locks.has(flag) ? w.flagLock : 0);
+  return w.flagUnlock * (refs.unlocks.get(flag) ?? 0) - w.flagLock * (refs.locks.get(flag) ?? 0);
 }
 
 /** How close the state is to meeting a condition, 0..1: each `min` scores value/min, other clauses 0 or 1. */

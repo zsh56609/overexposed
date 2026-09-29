@@ -32,6 +32,9 @@ export interface Draft {
   slots: number;
   resources: Record<ResourceKey, number>;
   flags: Record<string, true>;
+  heatLedger: { start: number; startSource: string | null; changes: { cardId: string | null; delta: number }[] };
+  /** The card whose effects are resolving right now (null: a gate or the engine). Draft-only, never in GameState. */
+  source: string | null;
   deck: CardInstance[];
   hand: CardInstance[];
   discard: CardInstance[];
@@ -58,6 +61,8 @@ export function openDraft(s: GameState): Draft {
     slots: s.slots,
     resources: { ...s.resources },
     flags: { ...s.flags },
+    heatLedger: { start: s.heatLedger.start, startSource: s.heatLedger.startSource, changes: [...s.heatLedger.changes] },
+    source: null,
     deck: [...s.deck],
     hand: [...s.hand],
     discard: [...s.discard],
@@ -85,6 +90,7 @@ export function closeDraft(d: Draft): GameState {
     slots: d.slots,
     resources: d.resources,
     flags: d.flags,
+    heatLedger: d.heatLedger,
     deck: d.deck,
     hand: d.hand,
     discard: d.discard,
@@ -173,7 +179,18 @@ export function addResource(d: Draft, target: ResourceKey, delta: number): void 
   const before = d.resources[target];
   const after = Math.max(0, before + delta);
   d.resources[target] = after;
-  if (after !== before) d.events.push({ type: 'resource', target, delta: after - before, value: after });
+  if (after === before) return;
+  d.events.push({ type: 'resource', target, delta: after - before, value: after });
+  if (target === 'heat') d.heatLedger.changes.push({ cardId: d.source, delta: after - before });
+}
+
+/** Apply a card's effects with that card recorded as their source (for heat blame). */
+export function applyCardEffects(d: Draft, cardId: string, effects: readonly Effect[] | undefined): void {
+  if (!effects) return;
+  const previous = d.source;
+  d.source = cardId;
+  applyEffects(d, effects);
+  d.source = previous;
 }
 
 export function addSlots(d: Draft, delta: number): void {
@@ -228,7 +245,7 @@ function drawOne(d: Draft): boolean {
   const card = d.deck.pop() as CardInstance;
   d.hand.push(card);
   d.events.push({ type: 'draw', uid: card.uid, cardId: card.cardId });
-  applyEffects(d, getCard(d.content, card.cardId)?.onDraw);
+  applyCardEffects(d, card.cardId, getCard(d.content, card.cardId)?.onDraw);
   return true;
 }
 

@@ -42,6 +42,8 @@ export interface RunRecord {
   readonly endingId: string | null;
   readonly scandalsAtEnd: number;
   readonly scandalsCrystallised: number;
+  /** Crystallised scandals matched to the blamed card by tag (the rest fell back to seeded random). */
+  readonly scandalsByTag: number;
   /** Turns whose end crystallised 2+ scandals at once, and the most in any one turn. */
   readonly multiScandalTurns: number;
   readonly maxScandalsInTurn: number;
@@ -113,6 +115,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let rerolls = 0;
   let draftSpend = 0;
   let scandalsCrystallised = 0;
+  let scandalsByTag = 0;
   let multiScandalTurns = 0;
   let maxScandalsInTurn = 0;
   let cardsPlayed = 0;
@@ -130,7 +133,10 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
       else if (e.type === 'play') {
         plays[e.cardId] = (plays[e.cardId] ?? 0) + 1;
         cardsPlayed++;
-      } else if (e.type === 'scandal') scandalsCrystallised++;
+      } else if (e.type === 'scandal') {
+        scandalsCrystallised++;
+        if (e.byTag) scandalsByTag++;
+      }
       else if (e.type === 'turnEnd') {
         curve.push({ turn: e.turn, ...e.resources, scandals: e.scandalCount, threshold: e.threshold, crystallised: e.crystallised });
       }
@@ -184,6 +190,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     endingId: state?.endingId ?? null,
     scandalsAtEnd: state ? scandalCount(state) : 0,
     scandalsCrystallised,
+    scandalsByTag,
     multiScandalTurns,
     maxScandalsInTurn,
     turnsCompleted: curve.length,

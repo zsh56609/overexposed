@@ -14,6 +14,7 @@ import { nextInt } from './rng.ts';
 import {
   addCard,
   addResource,
+  applyCardEffects,
   applyEffects,
   closeDraft,
   drawToHandSize,
@@ -172,8 +173,14 @@ function playCard(state: GameState, uid: number): GameState {
 
   d.slots -= def.cost;
   d.events.push({ type: 'play', uid: card.uid, cardId: card.cardId, cost: def.cost });
-  applyEffects(d, def.effects);
-  d.discard.push(card);
+  applyCardEffects(d, card.cardId, def.effects);
+  // Opportunities are one-shot: spent, not discarded.
+  if (def.kind === 'opportunity') {
+    d.exhausted.push(card);
+    d.events.push({ type: 'exhaust', uid: card.uid, cardId: card.cardId });
+  } else {
+    d.discard.push(card);
+  }
   return closeDraft(d);
 }
 
@@ -185,7 +192,7 @@ function endTurn(state: GameState): GameState {
   // 1. End-of-turn penalties/bonuses for every card still in hand, in hand order.
   for (const card of [...d.hand]) {
     if (!d.hand.includes(card)) continue; // removed by an earlier trigger this turn
-    applyEffects(d, getCard(d.content, card.cardId)?.onEndOfTurn);
+    applyCardEffects(d, card.cardId, getCard(d.content, card.cardId)?.onEndOfTurn);
   }
 
   // 2. Heat → Scandal: one scandal per full effective threshold of heat; a residue carries over.
@@ -205,11 +212,11 @@ function endTurn(state: GameState): GameState {
     crystallised,
   });
 
-  // 4. Next turn, or this act's Gate.
+  // 4. Next turn (its draft first, if it has one), or this act's Gate.
   if (turnInAct(d) >= rules.turnsPerAct) offerGates(d);
   else {
     d.turn++;
-    startTurn(d);
+    beginTurn(d);
   }
   return closeDraft(d);
 }
@@ -233,10 +240,10 @@ function chooseGate(state: GameState, gateId: string): GameState {
 // ---------------------------------------------------------------------------
 // Flow steps (operate on the reducer's draft)
 
-/** Open the current act: its draft if drafting is on and the pool has cards, else straight to its first turn. */
-export function beginAct(d: Draft): void {
+/** Open the current turn: a card draft first if this turn-in-act is listed in draft.atTurns, else play. */
+export function beginTurn(d: Draft): void {
   const cfg = d.content.rules.draft;
-  if (!cfg || cfg.picks <= 0) return startTurn(d);
+  if (!cfg || cfg.picks <= 0 || !cfg.atTurns.includes(turnInAct(d))) return startTurn(d);
   const offer = rollOffer(d);
   if (offer.length === 0) {
     fault(d, 'noDraftPool', String(d.act));
@@ -272,24 +279,58 @@ export function startTurn(d: Draft): void {
  * count = floor(heat / threshold): add `count` Scandals to the discard pile and remove vent × count
  * heat. vent < threshold, so a residue always carries into the next turn — the cascade's medium —
  * and each new scandal lowers the next turn's threshold. Returns the count.
- * Each scandal is a seeded pick among those whose actMin has been reached.
+ *
+ * Failure is never random: scandal k is blamed on the card whose heat pushed the level over its
+ * line, k × threshold (found by replaying this turn's heat changes), and becomes the kind of trouble
+ * that card courts — see pickScandal. Then a new heat ledger opens for the next turn.
  */
 function crystallise(d: Draft, threshold: number): number {
-  if (!(threshold > 0)) return 0;
-  const count = Math.floor(d.resources.heat / threshold);
-  if (count === 0) return 0;
+  const ledger = d.heatLedger;
+  const count = threshold > 0 ? Math.floor(d.resources.heat / threshold) : 0;
+
+  const blame: (string | null)[] = [];
+  let level = ledger.start;
+  let lastPusher = ledger.startSource;
+  for (let k = 1; k <= count && k * threshold <= level; k++) blame[k] = ledger.startSource;
+  for (const change of ledger.changes) {
+    const before = level;
+    level += change.delta;
+    if (change.delta <= 0) continue;
+    lastPusher = change.cardId;
+    for (let k = Math.floor(before / threshold) + 1; k <= count && k * threshold <= level; k++) blame[k] = change.cardId;
+  }
+
   const pool = d.content.scandalIds.filter((id) => (getCard(d.content, id)?.actMin ?? 1) <= d.act);
-  if (pool.length === 0) {
-    fault(d, 'noScandalForAct', String(d.act));
-    return 0;
+  let made = 0;
+  if (count > 0 && pool.length === 0) fault(d, 'noScandalForAct', String(d.act));
+  else {
+    for (let k = 1; k <= count; k++) {
+      const cause = blame[k] ?? lastPusher;
+      const { cardId, byTag } = pickScandal(d, pool, cause);
+      const card = addCard(d, cardId, 'discard');
+      d.events.push({ type: 'scandal', uid: card.uid, cardId, cause, byTag });
+      made++;
+    }
+    if (made > 0) addResource(d, 'heat', -d.content.rules.vent * made);
   }
-  for (let i = 0; i < count; i++) {
-    const cardId = pool[nextInt(d.rng, pool.length)] as string;
-    const card = addCard(d, cardId, 'discard');
-    d.events.push({ type: 'scandal', uid: card.uid, cardId });
-  }
-  addResource(d, 'heat', -d.content.rules.vent * count);
-  return count;
+  d.heatLedger = { start: d.resources.heat, startSource: lastPusher, changes: [] };
+  return made;
+}
+
+/**
+ * The kind of trouble you courted: a scandal sharing a tag with the blamed card (tags every scandal
+ * carries don't count). Among several, the one held fewest of, then content order. Seeded random
+ * only when nothing matches, e.g. heat from a gate.
+ */
+function pickScandal(d: Draft, pool: readonly string[], cause: string | null): { cardId: string; byTag: boolean } {
+  const shared = d.content.scandalSharedTags;
+  const causeTags = (cause === null ? [] : (getCard(d.content, cause)?.tags ?? [])).filter((t) => !shared.includes(t));
+  const matches = pool.filter((id) => getCard(d.content, id)?.tags?.some((t) => causeTags.includes(t)));
+  if (matches.length === 0) return { cardId: pool[nextInt(d.rng, pool.length)] as string, byTag: false };
+  const held = (id: string) => [d.deck, d.hand, d.discard].reduce((n, zone) => n + zone.filter((c) => c.cardId === id).length, 0);
+  let best = matches[0] as string;
+  for (const id of matches) if (held(id) < held(best)) best = id;
+  return { cardId: best, byTag: true };
 }
 
 function offerGates(d: Draft): void {
@@ -321,7 +362,7 @@ function advanceAct(d: Draft): void {
   if (d.act < d.content.rules.acts) {
     d.act++;
     d.turn++;
-    beginAct(d);
+    beginTurn(d);
   } else {
     resolveEnding(d);
   }

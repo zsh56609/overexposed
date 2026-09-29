@@ -51,7 +51,7 @@ function describe(e: GameEvent): string {
     case 'flag': return `flag ${e.flag}`;
     case 'addCard': return `add ${e.cardId}->${e.to}`;
     case 'exhaust': return `exhaust ${e.cardId}`;
-    case 'scandal': return `SCANDAL ${e.cardId}`;
+    case 'scandal': return `SCANDAL ${e.cardId} <- ${e.cause ?? '?'}${e.byTag ? '' : ' (no tag match: seeded)'}`;
     case 'turnEnd': {
       const r = e.resources;
       return `end T${e.turn}: hype ${r.hype} craft ${r.craft} capital ${r.capital} heat ${r.heat} scandals ${e.scandalCount}`;

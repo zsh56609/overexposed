@@ -122,11 +122,13 @@ export interface EndingDef {
   readonly textKey: string;
 }
 
-/** The draft that opens each act. Prices are in capital. */
+/** The drafts inside each act. Prices are in capital; caps are per draft. */
 export interface DraftRules {
+  /** Turn-within-act numbers (1-based) whose start opens a draft. */
+  readonly atTurns: readonly number[];
   /** Cards offered from the draftable pool. */
   readonly offerSize: number;
-  /** Free picks per act. 0 turns drafting off. */
+  /** Free picks per draft. 0 turns drafting off. */
   readonly picks: number;
   /** Price of one more pick from the same offer. */
   readonly extraPickCost: number;
@@ -178,6 +180,8 @@ export interface ContentIndex {
   readonly endings: readonly EndingDef[];
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
+  /** Tags every scandal carries (e.g. the marker removal cards target). They say nothing about the kind of trouble. */
+  readonly scandalSharedTags: readonly string[];
   /** Every non-scandal card id in content order: the pool drafts are offered from (filtered by actMin). */
   readonly draftPool: readonly string[];
 }
@@ -185,7 +189,10 @@ export interface ContentIndex {
 export function indexContent(content: Content): ContentIndex {
   const gatesByAct: Record<string, GateDef[]> = {};
   for (const gate of content.gates) (gatesByAct[String(gate.act)] ??= []).push(gate);
+  const scandals = content.cards.filter((c) => c.kind === 'scandal');
+  const firstTags = scandals[0]?.tags ?? [];
   return {
+    scandalSharedTags: firstTags.filter((t) => scandals.every((c) => c.tags?.includes(t))),
     rules: content.rules,
     cards: Object.fromEntries(content.cards.map((c) => [c.id, c])),
     gates: Object.fromEntries(content.gates.map((g) => [g.id, g])),

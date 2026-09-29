@@ -55,7 +55,7 @@ The player plants the seeds of their own collapse. Failure is never random.
 ### Run structure
 
 - 3 acts × 4 turns = 12 turns
-- Start of each act: a Draft — `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps live in `content/rules.json` → `draft`.
+- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 3 of every act, 6 per run), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After act 3: ending resolution. **A run always completes.**
@@ -93,7 +93,7 @@ All four numbers live in `content/rules.json`. No per-turn cap: excess heat is n
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
 - Removal is deliberately expensive: only a few cards exhaust a Scandal, and they cost `capital`.
-- Which Scandal crystallises: a seeded-random pick among scandal cards whose `actMin` has been reached. A tuning knob, not a rule.
+- Which Scandal crystallises: the kind of trouble you courted. Each scandal is blamed on the card whose heat pushed the level over its line (k × effective threshold, found by replaying the turn's heat changes) and is one that shares a tag with that card — tags every scandal carries don't count; among several, the one held fewest of. Seeded random only when nothing matches (e.g. heat from a gate). Scandals therefore carry a kind tag matching the heat sources: `press`, `stunt`, `gig`, `recording`, `money`.
 
 **This is the one mechanic the design bets on. Tune it before anything else.**
 
@@ -115,7 +115,7 @@ All four numbers live in `content/rules.json`. No per-turn cap: excess heat is n
 }
 ```
 
-`kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only: never in the starting deck.
+`kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
@@ -217,7 +217,7 @@ Load failures are loud in dev, graceful in the shipped build.
 The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
-- Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`. The greedy personas value flags: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock` (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on, where N is derived from content (the scandal ceiling of the ending that demands the most hype).
+- Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on, where N is derived from content (the scandal ceiling of the ending that demands the most hype).
 - Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
