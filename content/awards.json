@@ -27,7 +27,7 @@
     "id": "comeback_of_the_year",
     "nameKey": "award.comeback_of_the_year.name",
     "citationKey": "award.comeback_of_the_year.citation",
-    "conditions": { "peakScandals": { "min": 3 }, "scandalCount": { "max": 2 } }
+    "conditions": { "scandalDrop": { "min": 2 } }
   },
   {
     "id": "scandal_of_the_year",

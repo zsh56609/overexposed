@@ -15,6 +15,7 @@ import {
   isEffectOp,
   REGISTERS,
   RESOURCE_KEYS,
+  YEAR_STAT_KEYS,
 } from '../core/index.ts';
 
 export const CHECKS = {
@@ -484,7 +485,7 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
 
 /**
  * Year-end awards (decisions 16 and 20): the condition shape, plus the award-only keys (the year's ending,
- * peak scandals, best month's hype rise). At most 8, and a fallback so that every year ends with one.
+ * and a range on any year stat — YEAR_STAT_KEYS). At most 8, and a fallback so that every year ends with one.
  */
 function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
   const endingIds = new Set(endings.map((e) => e.id).filter(isStr));
@@ -497,8 +498,9 @@ function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
     if (a.fallback !== true && a.conditions === undefined) v.error('structure', where, 'needs "conditions", or "fallback": true');
     if (a.conditions === undefined) return;
     if (!isObj(a.conditions)) return v.error('schema', `${where}.conditions`, 'must be an object');
-    const { ending, peakScandals, bestMonthHype, ...base } = a.conditions;
-    checkCondition(v, base, `${where}.conditions`);
+    const { ending, ...rest } = a.conditions;
+    const stats: readonly string[] = YEAR_STAT_KEYS;
+    checkCondition(v, Object.fromEntries(Object.entries(rest).filter(([k]) => !stats.includes(k))), `${where}.conditions`);
     if (ending !== undefined) {
       const at = `${where}.conditions.ending`;
       if (!isObj(ending)) v.error('schema', at, 'must be an object like { "any": ["star"] }');
@@ -512,8 +514,7 @@ function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
         }
       }
     }
-    if (peakScandals !== undefined) checkRange(v, peakScandals, `${where}.conditions.peakScandals`, LIMIT.conditionBound);
-    if (bestMonthHype !== undefined) checkRange(v, bestMonthHype, `${where}.conditions.bestMonthHype`, LIMIT.conditionBound);
+    for (const k of YEAR_STAT_KEYS) if (rest[k] !== undefined) checkRange(v, rest[k], `${where}.conditions.${k}`, LIMIT.conditionBound);
   });
   if (awards.length > MAX_AWARDS) v.error('ranges', 'content/awards.json', `${awards.length} awards; the list is capped at ${MAX_AWARDS}`);
   if (awards.length > 0 && !awards.some((a) => a.fallback === true)) {

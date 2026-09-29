@@ -45,7 +45,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsOnly: 0 };
+const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -160,10 +160,11 @@ function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[
       }
     } else report('gate delta', seed, s.turn, `${gateId}: next season did not open on a draft (${real.phase})`);
   }
-  // A final gate whose options end the year identically (said once), or differ only in their awards.
+  // A final gate (decision 23): the ending said once when every option gives the same one ("either way"),
+  // and each option's awards shown only when the options bring different ones.
   if (predicted.length > 1 && !predicted.some((x) => x.startsWith('null|'))) {
-    if (new Set(predicted).size === 1) counts.eitherWay++;
-    else if (new Set(predicted.map((x) => x.split('|')[0])).size === 1) counts.awardsOnly++;
+    if (new Set(predicted.map((x) => x.split('|')[0])).size === 1) counts.eitherWay++;
+    if (new Set(predicted.map((x) => x.split('|')[1])).size > 1) counts.awardsShown++;
   }
 }
 
@@ -205,7 +206,7 @@ console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending and its awards; ${counts.eitherWay} final gates said "either way", ` +
-    `${counts.awardsOnly} differing only in awards), ${counts.draftCards} draft offers ` +
+    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

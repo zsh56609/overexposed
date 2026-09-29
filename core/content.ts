@@ -141,19 +141,28 @@ export interface EndingDef {
 }
 
 /**
+ * What only a whole year shows, derived from the run's event history and its end (core/awards.ts). Any
+ * award may put a range on any of them; none belongs to one award.
+ */
+export const YEAR_STAT_KEYS = ['peakScandals', 'scandalDrop', 'bestMonthHype'] as const;
+export type YearStatKey = (typeof YEAR_STAT_KEYS)[number];
+
+/**
  * An award's conditions: the condition shape, checked against the final state, plus what only a finished
- * year has — the ending it resolved to, and two stats derived from the run's event history.
+ * year has — the ending it resolved to, and the year stats.
  */
 export interface AwardConditions extends Condition {
   /** The year's ending: one of `any`, none of `not`. */
   readonly ending?: { readonly any?: readonly string[]; readonly not?: readonly string[] };
   /** The most scandals held at any month end during the run. */
   readonly peakScandals?: Range;
+  /** How far the year came down from that peak: peak minus the scandals held at the year's end. */
+  readonly scandalDrop?: Range;
   /** The biggest hype gain from one month end to the next: the fastest rise. */
   readonly bestMonthHype?: Range;
 }
 
-export const AWARD_ONLY_KEYS = ['ending', 'peakScandals', 'bestMonthHype'] as const;
+export const AWARD_ONLY_KEYS = ['ending', ...YEAR_STAT_KEYS] as const;
 
 /**
  * A year-end award (docs/ui-plan.md §13, decisions 16 and 20). It presents an outcome and changes no play.

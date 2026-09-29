@@ -213,7 +213,7 @@ Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
 
 ### Awards
 
-`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — the condition shape plus `ending` (`any`/`not` ending ids), `peakScandals` and `bestMonthHype` (read off `turnEnd` events) — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state and the event history, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
+`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — the condition shape plus `ending` (`any`/`not` ending ids) and year stats — `peakScandals`, `scandalDrop` (peak minus end), `bestMonthHype`, from `turnEnd` events — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state and the event history, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
 
 ### Content budget
 

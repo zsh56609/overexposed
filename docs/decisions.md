@@ -6,6 +6,55 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 6d165fe answered: the seven questions
+
+The author reviewed and played round 6d165fe. The headline leading the
+floating preview, the goals board in view during every decision and the
+honest "Either way" line work. Content expansion is not part of this
+round: it will come as a separate design document.
+
+1. **The final gate mostly leaves the ending unchanged** (75.7% of
+   player-like final gates end the year the same way either way):
+   accepted. A year is decided by the year, not by the last step. The
+   climax will move to the awards ceremony and a year-in-review in later
+   phases.
+2. **Nobody Yet's text against its awards: change neither.** It is a gap
+   in the ending taxonomy, not a wording problem, and rewording would
+   hide the symptom. A famous singer who never signed and holds a few
+   scandals fits no ending — too unsigned for Headliner, too many
+   scandals for The Musician's Musician, too few for Cautionary Tale —
+   and falls to Nobody Yet. That player is a real archetype: famous on
+   their own, no label. **Open issue for content expansion**, where it
+   will likely become a fifth ending — a deliberate unfreeze of the
+   frozen ending list.
+3. **Comeback of the Year is a relative drop**: peak scandals minus the
+   scandals held at the year's end, at least N. A comeback is about how
+   far you recovered, not reaching an absolute low. "Peak minus end" is a
+   general year stat in the award engine (`scandalDrop`), open to any
+   award, not a special case. N = 2, tuned with `npm run sim:awards`: won
+   in 12.6%, 12.0% and 11.5% of player-like runs (seeds 20260929, 1,
+   424242) and in 30.5%, 31.3% and 28.4% of the comeback persona's — its
+   most frequent winner. N = 3 would sit at the band's floor (3.1–3.5% of
+   player-like runs; 8.8–10.3% of the comeback persona's).
+4. **Branch-specific variants** are rewritten in draft v3. Cover Single
+   keeps "FANS SAY THE COVER BEATS THE ORIGINAL": "fans say" reports an
+   opinion, true in either branch.
+5. **Newcomer-assuming headlines** are rewritten in draft v3 to be
+   time-neutral. Fame-aware press labels that change as the player gets
+   famous are planned for content expansion; "newcomer" can return then
+   as the low-fame form.
+6. **Decision 23 revised**: the "Either way" line shows the ending only.
+   Awards are revealed on the ending screen, which keeps anticipation for
+   the ceremony and removes the list problem. When the options bring
+   different awards, each option shows its own, because then they bear on
+   the choice.
+7. **Flag negation**: every flag has its own positive and negative label
+   (draft v3), and validate fails when either is missing. The general
+   "Not yet <flag>" template is gone.
+
+Also confirmed: Cautionary Tale with Most Promising Newcomer (Still)
+reads as irony. Intended; kept.
+
 ## 2026-09-30 — The story at the moment of decision; goals in view; awards
 
 The author's playtest of layer 2 part 1 found two things. The story

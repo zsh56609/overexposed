@@ -310,7 +310,7 @@
   "ui.gate.nowFail": "Right now you would FAIL",
   "ui.gate.choose": "Choose {gate}",
   "ui.gate.leadsTo": "This ends the year as: {ending}",
-  "ui.gate.withAwards": "{ending} · {awards}",
+  "ui.gate.awards": "Awards: {awards}",
   "ui.gate.eitherWay": "Either way, the year ends as {ending}.",
   "ui.ending.title": "One year later.",
   "ui.ending.summary": "Run summary",

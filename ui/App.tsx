@@ -611,35 +611,26 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
 // ---------------------------------------------------------------------------
 // Gate
 
-/** How a year-ending choice ends the year: the ending, then the awards it brings (decision 23). */
-function yearEndText(c: ContentIndex, p: GatePreview): string | null {
-  if (p.endingId === null) return null;
-  const ending = endingName(c, p.endingId);
-  const awards = (p.awardIds ?? []).map((id) => awardName(c, id)).join(' · ');
-  return awards ? t('ui.gate.withAwards', { ending, awards }) : ending;
-}
+const awardList = (c: ContentIndex, p: GatePreview): string => (p.awardIds ?? []).map((id) => awardName(c, id)).join(' · ');
 
 function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly PlayedStep[]; legal: Legal; act: (a: Action) => void }) {
   const c = s.content;
   const history = useMemo(() => steps.flatMap((step) => step.events), [steps]);
   const previews = s.gateOffer.map((id) => previewGate(s, id, history));
-  // The run's last choice is an informed one (decision 11): which ending, and which awards (decision 23).
-  // Two identical predictions are said once, plainly.
-  const [first] = previews;
-  const eitherWay =
-    first !== undefined &&
-    first.endingId !== null &&
-    previews.length > 1 &&
-    previews.every((p) => p.endingId === first.endingId && (p.awardIds ?? []).join() === (first.awardIds ?? []).join());
+  // The run's last choice is an informed one (decision 11). The ending: one plain line when every option
+  // gives the same one, otherwise on each option. Awards are the ending screen's to reveal — shown on each
+  // option only when the options bring different ones, because then they bear on the choice (decision 23).
+  const ending = previews[0]?.endingId ?? null;
+  const sameEnding = ending !== null && previews.length > 1 && previews.every((p) => p.endingId === ending);
+  const awardsDiffer = ending !== null && new Set(previews.map((p) => (p.awardIds ?? []).join())).size > 1;
   return (
     <div className="gates">
       <h2>{t('ui.gate.title', { season: seasonName(c, s.act) })}</h2>
-      {eitherWay && <p className="leads">{t('ui.gate.eitherWay', { ending: yearEndText(c, first) ?? '' })}</p>}
+      {sameEnding && <p className="leads">{t('ui.gate.eitherWay', { ending: endingName(c, ending) })}</p>}
       <div className="gate-row">
         {previews.map((p) => {
           const id = p.gateId;
           const gate = getGate(c, id);
-          const yearEnd = eitherWay ? null : yearEndText(c, p);
           const flavor = gateFlavor(c, id);
           return (
             <div key={id} className="gate">
@@ -661,7 +652,8 @@ function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly Pla
               <p className="branches">
                 {t('ui.gate.onPass')}: {effectsText(c, gate?.onPass ?? [])} · {t('ui.gate.onFail')}: {effectsText(c, gate?.onFail ?? [])}
               </p>
-              {yearEnd !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: yearEnd })}</p>}
+              {!sameEnding && p.endingId !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: endingName(c, p.endingId) })}</p>}
+              {awardsDiffer && <p className="leads">{t('ui.gate.awards', { awards: awardList(c, p) })}</p>}
               <button className="take" disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
                 {t('ui.gate.choose', { gate: gateName(c, id) })}
               </button>

@@ -214,11 +214,13 @@ through /core's "as if this card were in hand" query (decision 8).
 
 **Gate** — 2 offered, pick 1. Each shows its flavour line (flavorKey)
 and every requirement live as met / unmet.
-The final gate is an informed choice: each option shows which ending it
-leads to (decision 11) and the awards it would bring — "This ends the
-year as: Nobody Yet · Critics' Choice". When every option gives the same
-ending and the same awards, one plain line replaces the identical
-predictions: "Either way, the year ends as <ending>." (decision 23).
+The final gate is an informed choice (decision 11). When every option
+gives the same ending, one plain line says so: "Either way, the year
+ends as <ending>."; otherwise each option shows "This ends the year as:
+<ending>". Awards are the ending screen's to reveal: they appear on the
+options only when the options bring different awards, each option with
+its own ("Awards: Critics' Choice"), because then they bear on the
+choice (decision 23, revised).
 
 **Goals board** — visible from the first turn, and through every
 decision: it holds the right rail on its own (§3). The four endings, each
@@ -446,12 +448,17 @@ it.
     read-only query (`endingIfYearEndedNow`, like heatOutlook). The
     reducer resolves the real ending with the same query, so the marker
     cannot disagree with it. (2026-09-30)
-23. The final gate's prediction names the ending and the awards each
-    option would bring: "This ends the year as: Nobody Yet · Critics'
-    Choice". Only when both options give the same ending AND the same
-    awards, say so plainly instead of showing two identical predictions:
-    "Either way, the year ends as <ending>." check:preview asserts each
-    prediction's awards are those of the real finished year. (2026-09-30)
+23. The final gate's prediction. The "Either way" line shows the ENDING
+    ONLY: "Either way, the year ends as <ending>." — whenever both
+    options give the same ending. Awards are revealed on the ending
+    screen, which keeps anticipation for the ceremony and removes the
+    list problem. When the two options bring DIFFERENT awards, show each
+    option's awards on that option, because then they bear on the
+    choice. check:preview asserts each prediction's ending and awards
+    are those of the real finished year. (2026-09-30; revised
+    2026-09-30 — first version: "This ends the year as: <ending> ·
+    <awards>" on each option, "Either way" only when ending and awards
+    both matched.)
 24. Register follows visibility, not resource. Public acts are LOUD,
     private work is quiet, transactions are Money. Resource is a guide.
     Signing, apologising on camera and reinventing an image are public;
