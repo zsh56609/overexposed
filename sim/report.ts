@@ -3,16 +3,22 @@
 
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
 import { indexContent } from '../core/index.ts';
-import { comebackLimit, type PersonaId } from './personas.ts';
+import { comebackLimit, ignoredAxes, PERSONA_IDS, type PersonaId, type ProbeAxis } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
  * Tuning targets, CLAUDE.md §5. Population: every persona, equal runs each on the same seeds.
  * Per-persona bands are checked on each persona separately; pooled bands weight personas equally.
+ * Two persona classes (see ignoredAxes): player-like personas carry the concentration band; control
+ * probes carry assertions that fail if the design thesis breaks.
  */
 export const BANDS = {
-  /** Per persona: no single ending may take more than this share of its runs. */
+  /** Per player-like persona: no single ending may take more than this share of its runs. */
   personaEndingMax: 0.7,
+  /** A probe ignoring heat must reach the collapse ending (the one with a scandal floor) in more than this share. */
+  probeHeatCollapseMin: 0.8,
+  /** A probe ignoring hype must reach the top-hype ending (the one demanding the most hype) in less than this share. */
+  probeHypeTopMax: 0.05,
   /** Pooled median scandals held at run end. */
   scandalMedian: [2, 5],
   /** Pooled per gate: requirement already satisfied when offered. */
@@ -52,6 +58,11 @@ export interface Report {
     readonly seconds: number;
     readonly acts: number;
     readonly turnsPerAct: number;
+    /** Per persona: the axes it ignores entirely. Empty = player-like; any = control probe. */
+    readonly ignores: Readonly<Record<string, readonly ProbeAxis[]>>;
+    /** Endings the probe assertions name, derived from content. */
+    readonly collapseEnding: string | null;
+    readonly topHypeEnding: string | null;
     /** Scandals held at which comeback switches from spiking to cleaning up (derived from content). */
     readonly comebackLimit: number | null;
   };
@@ -319,17 +330,62 @@ export function buildReport(batch: BatchResult): Report {
   const bands: BandCheck[] = [];
   const topEnding = (p: PersonaId) =>
     endingIds.map((id) => ({ id, share: share[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
-  const concentrated = personas.filter((p) => topEnding(p).share > BANDS.personaEndingMax);
+  const ignores = Object.fromEntries(personas.map((p) => [p, ignoredAxes(p)])) as Record<PersonaId, readonly ProbeAxis[]>;
+  const players = personas.filter((p) => ignores[p].length === 0);
+  const concentrated = players.filter((p) => topEnding(p).share > BANDS.personaEndingMax);
   bands.push({
-    target: `per persona: no single ending > ${pct(BANDS.personaEndingMax)} of its runs`,
-    pass: concentrated.length === 0,
-    actual: personas
-      .map((p) => {
-        const t = topEnding(p);
-        return `${p} ${t.id} ${pct(t.share)}${t.share > BANDS.personaEndingMax ? ' (over)' : ''}`;
-      })
-      .join(', '),
+    target: `player-like personas: no single ending > ${pct(BANDS.personaEndingMax)} of its runs`,
+    pass: players.length === 0 ? null : concentrated.length === 0,
+    actual:
+      players.length === 0
+        ? 'no player-like persona in this batch'
+        : players
+            .map((p) => {
+              const t = topEnding(p);
+              return `${p} ${t.id} ${pct(t.share)}${t.share > BANDS.personaEndingMax ? ' (over)' : ''}`;
+            })
+            .join(', '),
   });
+
+  // Probe assertions. Their endings come from content: the collapse ending sets a scandal floor
+  // (highest priority first); the top-hype ending demands the most hype among the rest — a collapse
+  // ending with a high hype floor must never pass for the reward.
+  const collapseEnding =
+    [...content.endings].sort((a, b) => b.priority - a.priority).find((e) => e.conditions?.scandalCount?.min !== undefined)?.id ?? null;
+  const topHypeEnding =
+    content.endings
+      .filter((e) => e.conditions?.hype?.min !== undefined && e.conditions.scandalCount?.min === undefined)
+      .reduce<{ id: string; min: number } | null>((best, e) => {
+        const min = e.conditions?.hype?.min as number;
+        return best === null || min > best.min ? { id: e.id, min } : best;
+      }, null)?.id ?? null;
+  // With every persona in the batch, a missing probe is a broken instrument: fail. A filtered batch: n/a.
+  const fullBatch = PERSONA_IDS.every((p) => personas.includes(p));
+  const probeBand = (axis: ProbeAxis, ending: string | null, target: string, holds: (x: number) => boolean): BandCheck => {
+    const probes = personas.filter((p) => ignores[p].includes(axis));
+    if (ending === null) return { target, pass: false, actual: `no ending to assert on (${axis === 'heat' ? 'none sets a scandal floor' : 'none demands hype'})` };
+    if (probes.length === 0) return { target, pass: fullBatch ? false : null, actual: `no persona in this batch ignores ${axis}` };
+    const x = (p: PersonaId) => share[p][ending] ?? 0;
+    return {
+      target,
+      pass: probes.every((p) => holds(x(p))),
+      actual: probes.map((p) => `${p} ${ending} ${pct(x(p))}${holds(x(p)) ? '' : ' (thesis broken)'}`).join(', '),
+    };
+  };
+  bands.push(
+    probeBand(
+      'heat',
+      collapseEnding,
+      `probes ignoring heat: ${collapseEnding ?? 'collapse ending'} > ${pct(BANDS.probeHeatCollapseMin)} of runs`,
+      (x) => x > BANDS.probeHeatCollapseMin,
+    ),
+    probeBand(
+      'hype',
+      topHypeEnding,
+      `probes ignoring hype: ${topHypeEnding ?? 'top-hype ending'} < ${pct(BANDS.probeHypeTopMax)} of runs`,
+      (x) => x < BANDS.probeHypeTopMax,
+    ),
+  );
   const med = scandalsHeld.pooled.median;
   bands.push({
     target: `scandals held at run end: median ${BANDS.scandalMedian[0]}-${BANDS.scandalMedian[1]} (pooled)`,
@@ -356,8 +412,10 @@ export function buildReport(batch: BatchResult): Report {
   bands.push({ target: 'soft-locks: 0', pass: softLocks.length === 0, actual: String(softLocks.length) });
   bands.push({ target: 'crashes: 0', pass: crashes.length === 0, actual: String(crashes.length) });
 
+  const playerScandals = records.filter((r) => r.crash === null && players.includes(r.persona)).map((r) => r.scandalsAtEnd);
   const diagnostics = [
     { label: 'ending distribution (pooled)', value: endingIds.map((id) => `${id} ${pct(pooledShare[id] ?? 0)}`).join(', ') },
+    { label: 'scandals held at run end, player-like personas only', value: playerScandals.length ? `median ${median(playerScandals)}` : 'n/a' },
     { label: 'gate pass% (passed when chosen, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
   ];
 
@@ -370,6 +428,9 @@ export function buildReport(batch: BatchResult): Report {
       seconds: batch.ms / 1000,
       acts: content.rules.acts,
       turnsPerAct: content.rules.turnsPerAct,
+      ignores,
+      collapseEnding,
+      topHypeEnding,
       comebackLimit: personas.includes('comeback') ? comebackLimit(indexContent(content)) : null,
     },
     health: { crashes, softLocks, replay: batch.replay },
@@ -408,7 +469,9 @@ const n1 = (x: number) => (Number.isFinite(x) ? x.toFixed(1) : '-');
 const n0 = (x: number) => (Number.isFinite(x) ? x.toFixed(0) : '-');
 
 export function formatReport(r: Report): string {
-  const P = r.meta.personas;
+  // Player-like personas first, control probes last, so the two classes read separately.
+  const isProbe = (p: PersonaId) => (r.meta.ignores[p] ?? []).length > 0;
+  const P = [...r.meta.personas.filter((p) => !isProbe(p)), ...r.meta.personas.filter(isProbe)];
   const out: string[] = [];
   const h = (title: string) => out.push('', title);
 
@@ -416,6 +479,11 @@ export function formatReport(r: Report): string {
     `SIM  seed=${r.meta.seed}  ${r.meta.runsPerPersona} runs x ${P.length} personas = ${r.meta.totalRuns} runs  (${r.meta.seconds.toFixed(1)}s)`,
     `crashes: ${r.health.crashes.length}   soft-locks: ${r.health.softLocks.length} (limit ${MAX_ACTIONS} actions)   ` +
       `replay check: ${r.health.replay.checked - r.health.replay.mismatches.length}/${r.health.replay.checked} identical`,
+  );
+  const probes = P.filter(isProbe);
+  out.push(
+    `persona classes: player-like ${P.filter((p) => !isProbe(p)).join(', ') || '-'}; ` +
+      `probes ${probes.map((p) => `${p} (ignores ${(r.meta.ignores[p] ?? []).join(' and ')})`).join(', ') || '-'}`,
   );
   if (r.meta.comebackLimit !== null) out.push(`comeback switches from spike to clean-up at ${r.meta.comebackLimit} scandals held`);
   for (const c of r.health.crashes.slice(0, 10)) out.push(`  CRASH  --replay=${c.seed} --persona=${c.persona}  ${c.error}`);

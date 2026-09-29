@@ -36,6 +36,8 @@ export type PersonaId = (typeof PERSONA_IDS)[number];
 
 export interface Persona {
   readonly id: PersonaId;
+  /** Every weight table the persona decides by (comeback has two modes). Absent: it doesn't score states. */
+  readonly weights?: readonly Weights[];
   /** `legal` is never empty. `rng` is the persona's own seeded stream, separate from the game's. */
   choose(state: GameState, legal: readonly Action[], rng: RngCursor): Action;
 }
@@ -281,7 +283,7 @@ function greedyChoose(state: GameState, legal: readonly Action[], w: Weights): A
 }
 
 function greedy(id: PersonaId, w: Weights): Persona {
-  return { id, choose: (state, legal) => greedyChoose(state, legal, w) };
+  return { id, weights: [w], choose: (state, legal) => greedyChoose(state, legal, w) };
 }
 
 // ---------------------------------------------------------------------------
@@ -322,6 +324,7 @@ const COMEBACK_CLEANUP: Weights = {
 
 const comeback: Persona = {
   id: 'comeback',
+  weights: [COMEBACK_SPIKE, COMEBACK_CLEANUP],
   choose: (state, legal) =>
     greedyChoose(state, legal, scandalCount(state) < comebackLimit(state.content) ? COMEBACK_SPIKE : COMEBACK_CLEANUP),
 };
@@ -344,9 +347,9 @@ export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   // Balanced: grows everything, treats heat as debt, buys off scandals, dodges thresholds.
   minmaxer: greedy('minmaxer', { ...BALANCED, flagUnlock: 12, flagLock: 12, dealDrive: 0 }),
   random,
-  // Craft first, very heat-averse.
-  crafter: greedy('crafter', { hype: 0.25, craft: 1.5, capital: 0.4, heat: -1, scandal: -10, risk: -8, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
-  // Hype first, blind to heat and scandals.
+  // Probe: craft only, very heat-averse, hype ignored entirely.
+  crafter: greedy('crafter', { hype: 0, craft: 1.5, capital: 0.4, heat: -1, scandal: -10, risk: -8, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
+  // Probe: hype first, heat and scandals ignored entirely.
   hypechaser: greedy('hypechaser', { hype: 1.5, craft: 0.25, capital: 0.3, heat: 0, scandal: 0, risk: 0, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
   // Balanced resources, but weights flags heavily and plays toward the gates that grant them.
   dealseeker: greedy('dealseeker', { ...BALANCED, flagUnlock: 40, flagLock: 20, dealDrive: 1 }),
@@ -363,3 +366,24 @@ export const PERSONA_SALT: { readonly [K in PersonaId]: number } = {
   dealseeker: 0x6465616c,
   comeback: 0x636f6d65,
 };
+
+// ---------------------------------------------------------------------------
+// Classes (CLAUDE.md §5), derived from weights, never from ids. A persona that gives an axis zero
+// weight in every mode ignores it entirely: it is a control probe — an experiment on the design
+// thesis, not a model of a player. Everyone else is player-like, random included (it scores nothing).
+
+export type ProbeAxis = 'heat' | 'hype';
+
+/** Axes the persona ignores entirely. heat: heat, scandal and risk weights all 0. hype: hype weight 0. */
+export function ignoredAxes(id: PersonaId): readonly ProbeAxis[] {
+  const modes = PERSONAS[id].weights ?? [];
+  if (modes.length === 0) return [];
+  const axes: ProbeAxis[] = [];
+  if (modes.every((w) => w.heat === 0 && w.scandal === 0 && w.risk === 0)) axes.push('heat');
+  if (modes.every((w) => w.hype === 0)) axes.push('hype');
+  return axes;
+}
+
+export function isProbe(id: PersonaId): boolean {
+  return ignoredAxes(id).length > 0;
+}
