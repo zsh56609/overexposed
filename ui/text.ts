@@ -89,11 +89,15 @@ function actText(c: ContentIndex, range: Range): string {
   return t('ui.cond.actUntil', { season: seasonName(c, max ?? last) });
 }
 
+/** A label set inside a sentence: "Signed to a label" → "signed to a label". */
+const midSentence = (label: string): string => label.charAt(0).toLocaleLowerCase('en') + label.slice(1);
+
 function flagsText(test: { readonly all?: readonly string[]; readonly any?: readonly string[]; readonly not?: readonly string[] }): string {
   const parts: string[] = [];
   if (test.all?.length) parts.push(t('ui.clause.flagsAll', { flags: test.all.map(flagName).join(', ') }));
   if (test.any?.length) parts.push(t('ui.clause.flagsAny', { flags: test.any.map(flagName).join(', ') }));
-  if (test.not?.length) parts.push(t('ui.clause.flagsNot', { flags: test.not.map(flagName).join(', ') }));
+  // A negative flag requirement reads "Not yet <flag label>" (draft v2), for every flag.
+  if (test.not?.length) parts.push(t('ui.clause.flagsNot', { flags: test.not.map((f) => midSentence(flagName(f))).join(', ') }));
   return parts.join('; ');
 }
 

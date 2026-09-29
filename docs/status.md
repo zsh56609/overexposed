@@ -72,21 +72,9 @@ Checks (2026-09-30):
 
 ## Gap list: prose still to write
 
-Each has a visible `TODO(prose)` placeholder in `i18n/en.json`; validate
-lists them. The register column is a suggestion from the card's main
-resource, for the author to confirm.
-
-| Id | Name | Kind | Effect | Missing | Suggested register |
-|---|---|---|---|---|---|
-| ghostwriter | Ghostwriter | action | Needs 3 Capital. Pay 3 Capital: gain 7 Craft. | headline, register | Money or quiet |
-| tabloid_bait | Tabloid Bait | action | 2+ Scandals: gain 10 Hype, 4 Heat. Otherwise: gain 3 Hype, 2 Heat. | headline, register | LOUD |
-| street_team | Street Team | action | Needs 2 Capital. Pay 2 Capital: gain 5 Hype, draw 1. | headline, register | LOUD |
-| demo_tape | Demo Tape | action | Needs 15 Craft. Add a Studio Session to your discard pile. Gain 2 Craft. | headline, register | quiet |
-| late_night_show | Late Night Show | action | Needs 25 Hype. Gain 8 Hype, 3 Heat. Craft 30+: lose 3 Heat. | headline, register | LOUD |
-| film_cameo | Film Cameo | opportunity | Needs 35 Hype. Gain 12 Hype, 2 Craft, 4 Heat. | headline, register | LOUD |
-| award_campaign | Award Campaign | opportunity | Needs 40 Craft. Gain 7 Hype. Lose 2 Heat. | headline, register | LOUD or quiet |
-| burnout | Burnout | scandal (gig) | In hand at month end: lose 3 Craft. | crystallisation headline, in-hand line (name kept; the draft's "Lip-Sync Claims" was only a suggestion) | — |
-| gate_festival | Festival Slot | summer gate | Needs Hype 35+. Pass: +6 Hype, +3 Capital. Fail: +3 Heat. | flavour | — |
+None. Draft v2 (`docs/writing/draft-v2.md`, imported 2026-09-30) filled
+every gap; `npm run validate` reports no prose warnings. The voice rules
+live in `docs/writing/voice.md`.
 
 ## Known issues
 
@@ -136,9 +124,9 @@ and the season transition beat (D13).
 
 - **Playtest this build** (the meaning layer): does the run now say what
   you are doing, what you are aiming for and what you can do?
-- **Write the gap list** above, and revise the imported prose in
-  `i18n/en.json` (now its canonical home; `docs/writing/draft-v1.md` is a
-  historical record).
+- **Revise the imported prose** in `i18n/en.json` as playtests suggest
+  (its canonical home; the drafts in `docs/writing/` are historical
+  records).
 - **itch and Safari/iPad.** Set the embed's viewport dimensions to
   1280×720 with the fullscreen button on, upload a new build, and play it
   in Safari on a Mac and, if possible, an iPad in landscape. To build:
