@@ -1,0 +1,129 @@
+import { indexContent, CoreError, getCard, type AddCardZone, type Content, type ContentIndex, type ResourceKey, type Resources } from './content.ts';
+import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
+import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
+import { startTurn } from './reducer.ts';
+
+export type Phase = 'play' | 'gate' | 'ended';
+
+/** One physical card in the run. Duplicates of a card id have distinct uids. */
+export interface CardInstance {
+  readonly uid: number;
+  readonly cardId: string;
+}
+
+export interface GateRecord {
+  readonly act: number;
+  readonly offered: readonly string[];
+  readonly gateId: string;
+  readonly passed: boolean;
+}
+
+/**
+ * What the last action did, in order. Ids and numbers only.
+ * The UI replays these for motion (card flight, number roll-up); the sim tallies them.
+ */
+export type GameEvent =
+  | { readonly type: 'turnStart'; readonly act: number; readonly turn: number }
+  | { readonly type: 'shuffle'; readonly count: number }
+  | { readonly type: 'draw'; readonly uid: number; readonly cardId: string }
+  | { readonly type: 'play'; readonly uid: number; readonly cardId: string; readonly cost: number }
+  | { readonly type: 'resource'; readonly target: ResourceKey; readonly delta: number; readonly value: number }
+  | { readonly type: 'slots'; readonly delta: number; readonly value: number }
+  | { readonly type: 'flag'; readonly flag: string }
+  | { readonly type: 'addCard'; readonly uid: number; readonly cardId: string; readonly to: AddCardZone }
+  | { readonly type: 'exhaust'; readonly uid: number; readonly cardId: string }
+  | { readonly type: 'scandal'; readonly uid: number; readonly cardId: string }
+  | {
+      readonly type: 'turnEnd';
+      readonly act: number;
+      readonly turn: number;
+      readonly resources: Resources;
+      readonly scandalCount: number;
+    }
+  | { readonly type: 'gateOffer'; readonly gateIds: readonly string[] }
+  | { readonly type: 'gate'; readonly gateId: string; readonly passed: boolean }
+  | { readonly type: 'ending'; readonly endingId: string | null }
+  /** Only in non-strict (shipped) mode, where bad content degrades instead of throwing. */
+  | { readonly type: 'warning'; readonly code: string; readonly ref: string };
+
+export interface GameState {
+  readonly seed: number;
+  /** true: bad content or an illegal action throws (dev, sim). false: degrade gracefully (shipped build). */
+  readonly strict: boolean;
+  readonly content: ContentIndex;
+  readonly rng: RngState;
+
+  readonly phase: Phase;
+  /** 1-based. */
+  readonly act: number;
+  /** 1-based, global across acts: act 2 starts at turn turnsPerAct + 1. */
+  readonly turn: number;
+  /** Per-turn energy; refreshed at the start of each turn. Not a resource. */
+  readonly slots: number;
+  readonly resources: Resources;
+  readonly flags: Readonly<Record<string, true>>;
+
+  /** Draw pile. The top of the deck is the END of the array. */
+  readonly deck: readonly CardInstance[];
+  readonly hand: readonly CardInstance[];
+  readonly discard: readonly CardInstance[];
+  /** Permanently removed (exhaustTag). */
+  readonly exhausted: readonly CardInstance[];
+  readonly nextUid: number;
+
+  /** Gate ids on offer; non-empty only in the 'gate' phase. */
+  readonly gateOffer: readonly string[];
+  readonly gateHistory: readonly GateRecord[];
+  /** Set when phase becomes 'ended'. */
+  readonly endingId: string | null;
+
+  readonly events: readonly GameEvent[];
+}
+
+export interface StateOptions {
+  /** Default true. The shipped build passes false. */
+  readonly strict?: boolean;
+}
+
+/** Build the run and deal turn 1. The returned state is waiting for PLAY_CARD / END_TURN. */
+export function createInitialState(seed: number, content: Content, options: StateOptions = {}): GameState {
+  const index = indexContent(content);
+  const strict = options.strict ?? true;
+  const rules = index.rules;
+
+  const deck: CardInstance[] = [];
+  let uid = 1;
+  for (const entry of rules.startingDeck) {
+    if (!getCard(index, entry.cardId)) {
+      if (strict) throw new CoreError('unknownCard', entry.cardId);
+      continue;
+    }
+    for (let i = 0; i < entry.count; i++) deck.push({ uid: uid++, cardId: entry.cardId });
+  }
+
+  const d: Draft = {
+    seed: seed >>> 0,
+    strict,
+    content: index,
+    rng: cursor(seedRng(seed)),
+    phase: 'play',
+    act: 1,
+    turn: 1,
+    slots: 0,
+    resources: { ...rules.startingResources },
+    flags: {},
+    deck,
+    hand: [],
+    discard: [],
+    exhausted: [],
+    nextUid: uid,
+    gateOffer: [],
+    gateHistory: [],
+    endingId: null,
+    events: [],
+    budget: EFFECT_BUDGET,
+  };
+  shuffleInPlace(d.rng, d.deck);
+  startTurn(d);
+  return closeDraft(d);
+}
