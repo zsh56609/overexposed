@@ -289,34 +289,20 @@ function greedy(id: PersonaId, w: Weights): Persona {
 // ---------------------------------------------------------------------------
 // comeback: spike hype, then pay to clean up — the route the design says exists.
 
-const comebackLimitCache = new WeakMap<ContentIndex, number>();
-
 /**
- * The scandal count at which comeback stops spiking and starts cleaning up: the scandal ceiling of
- * the ending that demands the most hype (today star's). Fallback: one below the lowest scandal floor
- * any ending sets (the meltdown line). Derived from content; no ids.
+ * Scandals held at which comeback stops spiking and starts cleaning up (N). An instrument setting,
+ * fixed here on purpose: it used to be derived from star's scandal ceiling, so tuning that ceiling
+ * silently changed the tester's behaviour too. 5 is the value the derivation gave when it was
+ * frozen (round 4); change it only as a deliberate change to the instrument.
  */
-export function comebackLimit(content: ContentIndex): number {
-  const cached = comebackLimitCache.get(content);
-  if (cached !== undefined) return cached;
-  let best: { hypeMin: number; ceiling: number } | null = null;
-  for (const e of content.endings) {
-    const hypeMin = e.conditions?.hype?.min;
-    const ceiling = e.conditions?.scandalCount?.max;
-    if (hypeMin !== undefined && ceiling !== undefined && (!best || hypeMin > best.hypeMin)) best = { hypeMin, ceiling };
-  }
-  const floors = content.endings.map((e) => e.conditions?.scandalCount?.min).filter((m): m is number => m !== undefined);
-  const limit = best?.ceiling ?? (floors.length > 0 ? Math.min(...floors) - 1 : 3);
-  comebackLimitCache.set(content, limit);
-  return limit;
-}
+export const COMEBACK_SWITCH_AT = 5;
 
-/** Below the limit: all-in on hype, heat ignored, capital banked for later. */
+/** Below N: all-in on hype, heat ignored, capital banked for later. */
 const COMEBACK_SPIKE: Weights = {
   hype: 1.5, craft: 0.5, capital: 0.6, heat: 0, scandal: -2, risk: 0, hand: 1, slots: 1.5, gatePass: 6,
   flagUnlock: 20, flagLock: 10, dealDrive: 1,
 };
-/** At or above the limit: buy scandals off and stop feeding heat. */
+/** At or above N: buy scandals off and stop feeding heat. */
 const COMEBACK_CLEANUP: Weights = {
   hype: 0.8, craft: 0.5, capital: 0.8, heat: -1, scandal: -15, risk: -10, hand: 1, slots: 1.5, gatePass: 6,
   flagUnlock: 20, flagLock: 10, dealDrive: 1,
@@ -326,7 +312,7 @@ const comeback: Persona = {
   id: 'comeback',
   weights: [COMEBACK_SPIKE, COMEBACK_CLEANUP],
   choose: (state, legal) =>
-    greedyChoose(state, legal, scandalCount(state) < comebackLimit(state.content) ? COMEBACK_SPIKE : COMEBACK_CLEANUP),
+    greedyChoose(state, legal, scandalCount(state) < COMEBACK_SWITCH_AT ? COMEBACK_SPIKE : COMEBACK_CLEANUP),
 };
 
 /**
@@ -353,7 +339,7 @@ export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   hypechaser: greedy('hypechaser', { hype: 1.5, craft: 0.25, capital: 0.3, heat: 0, scandal: 0, risk: 0, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
   // Balanced resources, but weights flags heavily and plays toward the gates that grant them.
   dealseeker: greedy('dealseeker', { ...BALANCED, flagUnlock: 40, flagLock: 20, dealDrive: 1 }),
-  // Spikes hype until it holds comebackLimit() scandals, then switches to paying them off.
+  // Spikes hype until it holds COMEBACK_SWITCH_AT scandals, then switches to paying them off.
   comeback,
 };
 

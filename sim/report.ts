@@ -2,8 +2,7 @@
 // Ids and numbers only; no content display strings.
 
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
-import { indexContent } from '../core/index.ts';
-import { comebackLimit, ignoredAxes, PERSONA_IDS, type PersonaId, type ProbeAxis } from './personas.ts';
+import { COMEBACK_SWITCH_AT, ignoredAxes, PERSONA_IDS, type PersonaId, type ProbeAxis } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
@@ -63,7 +62,7 @@ export interface Report {
     /** Endings the probe assertions name, derived from content. */
     readonly collapseEnding: string | null;
     readonly topHypeEnding: string | null;
-    /** Scandals held at which comeback switches from spiking to cleaning up (derived from content). */
+    /** Scandals held at which comeback switches from spiking to cleaning up (a fixed persona parameter). */
     readonly comebackLimit: number | null;
   };
   readonly health: {
@@ -431,7 +430,7 @@ export function buildReport(batch: BatchResult): Report {
       ignores,
       collapseEnding,
       topHypeEnding,
-      comebackLimit: personas.includes('comeback') ? comebackLimit(indexContent(content)) : null,
+      comebackLimit: personas.includes('comeback') ? COMEBACK_SWITCH_AT : null,
     },
     health: { crashes, softLocks, replay: batch.replay },
     endings: { ids: endingIds, share },
@@ -485,7 +484,9 @@ export function formatReport(r: Report): string {
     `persona classes: player-like ${P.filter((p) => !isProbe(p)).join(', ') || '-'}; ` +
       `probes ${probes.map((p) => `${p} (ignores ${(r.meta.ignores[p] ?? []).join(' and ')})`).join(', ') || '-'}`,
   );
-  if (r.meta.comebackLimit !== null) out.push(`comeback switches from spike to clean-up at ${r.meta.comebackLimit} scandals held`);
+  if (r.meta.comebackLimit !== null) {
+    out.push(`comeback switches from spike to clean-up at ${r.meta.comebackLimit} scandals held (fixed persona parameter)`);
+  }
   for (const c of r.health.crashes.slice(0, 10)) out.push(`  CRASH  --replay=${c.seed} --persona=${c.persona}  ${c.error}`);
   for (const s of r.health.softLocks.slice(0, 10)) out.push(`  SOFT-LOCK  --replay=${s.seed} --persona=${s.persona}  ${s.reason}`);
 
