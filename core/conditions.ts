@@ -70,6 +70,55 @@ function flagsHold(flags: Readonly<Record<string, true>>, test: FlagTest): boole
   return true;
 }
 
+/** One clause of a condition, checked against a state: what it asks, what the state has, and whether it holds. */
+export type ClauseReport =
+  | {
+      readonly key: 'hype' | 'craft' | 'capital' | 'heat' | 'scandalCount' | 'act' | 'turn';
+      readonly range: Range;
+      readonly value: number;
+      readonly met: boolean;
+    }
+  | { readonly key: 'flags'; readonly test: FlagTest; readonly met: boolean }
+  /** A key outside the condition shape: never holds (validate reports it). */
+  | { readonly key: 'unknown'; readonly name: string; readonly met: false };
+
+/**
+ * Every clause of a condition with its verdict, in the condition's key order — what the UI shows as
+ * met / unmet. `explainCondition(c, s).every((x) => x.met)` equals `evaluate(c, s)`; this never throws.
+ */
+export function explainCondition(condition: Condition | undefined, s: ConditionSubject): ClauseReport[] {
+  if (!condition) return [];
+  const out: ClauseReport[] = [];
+  for (const key of Object.keys(condition)) {
+    switch (key) {
+      case 'hype':
+      case 'craft':
+      case 'capital':
+      case 'heat': {
+        const range = condition[key] ?? {};
+        out.push({ key, range, value: s.resources[key], met: inRange(s.resources[key], range) });
+        break;
+      }
+      case 'scandalCount':
+      case 'act':
+      case 'turn': {
+        const range = condition[key] ?? {};
+        const value = key === 'scandalCount' ? scandalCount(s) : key === 'act' ? s.act : s.turn;
+        out.push({ key, range, value, met: inRange(value, range) });
+        break;
+      }
+      case 'flags': {
+        const test = condition.flags ?? {};
+        out.push({ key, test, met: flagsHold(s.flags, test) });
+        break;
+      }
+      default:
+        out.push({ key: 'unknown', name: key, met: false });
+    }
+  }
+  return out;
+}
+
 /** An absent condition always holds. Every key present must hold. */
 export function evaluate(condition: Condition | undefined, s: ConditionSubject): boolean {
   if (!condition) return true;

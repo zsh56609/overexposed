@@ -9,7 +9,7 @@
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
 
 import { CoreError, getCard, getGate, type GateDef } from './content.ts';
-import { effectiveHeatThreshold, evaluate, scandalCount } from './conditions.ts';
+import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { nextInt } from './rng.ts';
 import {
   addCard,
@@ -60,12 +60,33 @@ function illegal(state: GameState, code: string, ref: string): GameState {
 // ---------------------------------------------------------------------------
 // Queries (read-only; for the UI and the sim)
 
-export function canPlay(state: GameState, uid: number): boolean {
-  if (state.phase !== 'play') return false;
+/** Why a card can't be played right now. Ids and numbers only; the UI words them. */
+export type PlayBlocker =
+  | { readonly code: 'notPlayPhase' }
+  | { readonly code: 'notInHand' }
+  /** Scandals (and any `playable: false` card) only take up room in the hand. */
+  | { readonly code: 'unplayable' }
+  | { readonly code: 'slots'; readonly cost: number; readonly slots: number }
+  /** The card's `requires` doesn't hold: the clauses that fail. */
+  | { readonly code: 'requires'; readonly clauses: readonly ClauseReport[] };
+
+/** Whether a card in hand can be played, and every reason it can't. The one place that rule lives. */
+export function playCheck(state: GameState, uid: number): { readonly ok: boolean; readonly blockers: readonly PlayBlocker[] } {
+  if (state.phase !== 'play') return { ok: false, blockers: [{ code: 'notPlayPhase' }] };
   const card = state.hand.find((c) => c.uid === uid);
   const def = card && getCard(state.content, card.cardId);
-  if (!def || def.playable === false) return false;
-  return def.cost <= state.slots && evaluate(def.requires, state);
+  if (!def) return { ok: false, blockers: [{ code: 'notInHand' }] };
+  if (def.playable === false) return { ok: false, blockers: [{ code: 'unplayable' }] };
+  const blockers: PlayBlocker[] = [];
+  if (def.cost > state.slots) blockers.push({ code: 'slots', cost: def.cost, slots: state.slots });
+  if (!evaluate(def.requires, state)) {
+    blockers.push({ code: 'requires', clauses: explainCondition(def.requires, state).filter((c) => !c.met) });
+  }
+  return { ok: blockers.length === 0, blockers };
+}
+
+export function canPlay(state: GameState, uid: number): boolean {
+  return playCheck(state, uid).ok;
 }
 
 /** One more pick from the same offer: affordable, under the cap, and a card left to take. */

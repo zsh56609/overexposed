@@ -1,6 +1,15 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { App } from './App.tsx';
+import { checkContentInDev } from './content.ts';
+import './style.css';
 
-// Toolchain entry only. No UI until 10/10 (CLAUDE.md §7).
+void checkContentInDev();
 const root = document.getElementById('root');
-if (root) createRoot(root).render(<StrictMode>{null}</StrictMode>);
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}

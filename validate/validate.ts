@@ -601,6 +601,13 @@ function importsOf(src: string): string[] {
   return out;
 }
 
+// /ui computes no rule (docs/ui-plan.md §1): it asks /core. A heuristic backstop, not a proof — it
+// catches the usual slip, comparing a game value in the UI, e.g. `state.resources.capital >= 4`.
+const STATE_READ = String.raw`(?:\.resources\s*(?:\.\s*\w+|\[[^\]]*\])|\.slots\b|\bscandalCount\s*\([^)]*\)|\.(?:hype|craft|capital|heat|turn|act)\b)`;
+const COMPARE = String.raw`(?:<=|>=|<(?![/=>\w])|(?<![=\-])>(?!=))`;
+const UI_RULE = [new RegExp(`${STATE_READ}\\s*${COMPARE}`), new RegExp(`${COMPARE}\\s*[\\w.]*?${STATE_READ}`)];
+const UI_HEAT_MATHS = /\b(?:effectiveHeatThreshold|heatThreshold|thresholdFloor|degradePerScandal)\b|\.vent\b/;
+
 export function checkBoundaries(files: readonly { readonly path: string; readonly text: string }[]): Issue[] {
   const issues: Issue[] = [];
   const err = (where: string, message: string) => issues.push({ level: 'error', check: 'boundaries', where, message });
@@ -615,6 +622,14 @@ export function checkBoundaries(files: readonly { readonly path: string; readonl
         if (/(^|\/)(ui|i18n)(\/|$)/.test(spec) || spec === 'react' || spec.startsWith('react-dom')) {
           err(path, `sim must not import /ui or /i18n, found ${q(spec)}`);
         }
+      } else if (path.startsWith('ui/')) {
+        if (/(^|\/)(sim|check)(\/|$)/.test(spec)) err(path, `ui must not import /sim or /check, found ${q(spec)}`);
+      }
+    }
+    if (path.startsWith('ui/')) {
+      for (const line of stripStrings(src).split('\n')) {
+        if (UI_HEAT_MATHS.test(line)) err(path, `heat maths in /ui — ask /core (heatOutlook): ${line.trim()}`);
+        if (UI_RULE.some((re) => re.test(line))) err(path, `compares a game value in /ui — rules live in /core (legalActions, playCheck, explainCondition, previews): ${line.trim()}`);
       }
     }
   }

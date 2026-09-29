@@ -1,0 +1,56 @@
+/* Layer 1: functional and plain. Layer 2 replaces all of this (CLAUDE.md §6). System fonts only. */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font: 14px/1.35 system-ui, sans-serif; background: #f4f1ea; color: #15120e; }
+button { font: inherit; cursor: pointer; }
+button:disabled, button[aria-disabled='true'] { cursor: not-allowed; }
+h1, h2, h3 { margin: 0.2em 0; }
+h2 { font-size: 1rem; }
+ul, ol { margin: 0.25em 0; padding-left: 1.2em; }
+.muted { color: #6b6457; font-size: 0.9em; }
+.error { background: #ffd6d2; color: #7a0c02; padding: 0.4em 0.6em; margin: 0.4em; }
+.met { color: #1f6b2a; }
+.unmet { color: #a3150b; }
+.pass { color: #1f6b2a; font-weight: bold; }
+.alarm { color: #b3160a; font-weight: bold; }
+.lead { color: #b3160a; font-weight: bold; }
+
+.title { max-width: 40em; margin: 15vh auto; text-align: center; }
+.title h1 { font-size: 3rem; letter-spacing: 0.08em; }
+.big { font-size: 1.6rem; padding: 0.5em 2em; margin: 1em; }
+
+.app { display: flex; flex-direction: column; height: 100vh; max-width: 1400px; margin: 0 auto; }
+.masthead { display: flex; justify-content: space-between; align-items: baseline; padding: 0.4em 0.8em; border-bottom: 2px solid #15120e; }
+.masthead .name { font-weight: bold; letter-spacing: 0.1em; }
+.stats { display: flex; flex-wrap: wrap; gap: 0.3em 1.2em; padding: 0.4em 0.8em; border-bottom: 1px solid #b9b2a3; }
+.stat-heat, .togo { font-weight: bold; }
+
+.middle { flex: 1; display: flex; min-height: 0; }
+.feed { flex: 1; overflow-y: auto; padding: 0.4em 0.8em; border-right: 1px solid #b9b2a3; }
+.feed ol { list-style: none; padding: 0; }
+.feed .month { margin-top: 0.6em; font-weight: bold; }
+.side { width: 22em; overflow-y: auto; padding: 0.4em 0.8em; }
+.mini-gate { margin-bottom: 0.4em; }
+.preview { border: 1px solid #15120e; padding: 0.4em; margin-top: 0.6em; background: #fff; }
+.preview.danger { border: 3px solid #b3160a; }
+.preview.blocked { border-style: dashed; }
+
+.bottom { border-top: 2px solid #15120e; padding: 0.4em 0.8em; }
+.cards { display: flex; flex-wrap: wrap; gap: 0.5em; }
+.card { display: flex; flex-direction: column; gap: 0.2em; width: 12em; min-height: 8em; padding: 0.4em; text-align: left; background: #fff; border: 1px solid #15120e; }
+.card.off { opacity: 0.55; }
+.card.scandal { background: #fbe1dd; border: 2px dashed #b3160a; font-style: italic; opacity: 1; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8em; margin-top: 0.5em; }
+.end { font-size: 1.1rem; padding: 0.3em 1.2em; }
+.gate-row { display: flex; flex-wrap: wrap; gap: 1em; }
+.gate { flex: 1; min-width: 16em; border: 1px solid #15120e; padding: 0.4em; background: #fff; }
+
+.ending { max-width: 44em; margin: 2em auto; padding: 0 1em; }
+.play-again { display: block; width: 100%; font-size: 3rem; padding: 0.4em; margin-bottom: 0.6em; }
+
+@media (max-width: 800px) {
+  .middle { flex-direction: column; }
+  .side { width: auto; }
+  .card { width: 10em; }
+}

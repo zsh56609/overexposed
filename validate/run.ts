@@ -3,7 +3,7 @@
 import { loadRawContent, readJson, readSources } from './load.ts';
 import { CHECKS, checkBoundaries, validateContent, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
-const SOURCE_DIRS = ['core', 'sim', 'validate', 'ui'];
+const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
 const issues: Issue[] = [];
 let result: ValidationResult | null = null;
