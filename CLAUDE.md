@@ -171,6 +171,8 @@ Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
 20 action · 6 opportunity · 6 scandal · 6 gate · 4 ending = 42 pieces.
 A ceiling, not a target.
 
+Card design rules: a card must create an interaction (tags, `conditional`, `requires`), not just add a resource. Keep cards that convert between axes (spend craft to cool heat, spend capital or hype to exhaust a scandal) so the two engines connect. Scandals vary in how they hurt: taking a hand slot, draining at end of turn, and worsening while left in the deck.
+
 ---
 
 ## 3. i18n

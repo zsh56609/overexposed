@@ -145,5 +145,314 @@
     "actMin": 2,
     "onDraw": [{ "op": "slots", "value": -1 }],
     "onEndOfTurn": [{ "op": "resource", "target": "capital", "value": -2 }]
+  },
+  {
+    "id": "ghostwriter",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.ghostwriter.name",
+    "textKey": "card.ghostwriter.text",
+    "tags": ["money", "recording"],
+    "requires": { "capital": { "min": 3 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -3 },
+      { "op": "resource", "target": "craft", "value": 7 }
+    ]
+  },
+  {
+    "id": "meditation_retreat",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.meditation_retreat.name",
+    "textKey": "card.meditation_retreat.text",
+    "tags": ["recovery", "training"],
+    "requires": { "craft": { "min": 10 } },
+    "effects": [
+      { "op": "resource", "target": "craft", "value": -4 },
+      { "op": "resource", "target": "heat", "value": -8 }
+    ]
+  },
+  {
+    "id": "apology_tour",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.apology_tour.name",
+    "textKey": "card.apology_tour.text",
+    "tags": ["recovery", "press"],
+    "requires": { "scandalCount": { "min": 1 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": -6 },
+      { "op": "exhaustTag", "tag": "scandal", "count": 1 }
+    ]
+  },
+  {
+    "id": "collab_single",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.collab_single.name",
+    "textKey": "card.collab_single.text",
+    "tags": ["hype", "recording"],
+    "effects": [
+      {
+        "op": "conditional",
+        "if": { "flags": { "all": ["signed_label"] } },
+        "then": [
+          { "op": "resource", "target": "hype", "value": 9 },
+          { "op": "resource", "target": "capital", "value": 2 }
+        ],
+        "else": [
+          { "op": "resource", "target": "hype", "value": 4 },
+          { "op": "resource", "target": "heat", "value": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tabloid_bait",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.tabloid_bait.name",
+    "textKey": "card.tabloid_bait.text",
+    "tags": ["hype", "stunt"],
+    "effects": [
+      {
+        "op": "conditional",
+        "if": { "scandalCount": { "min": 2 } },
+        "then": [
+          { "op": "resource", "target": "hype", "value": 10 },
+          { "op": "resource", "target": "heat", "value": 4 }
+        ],
+        "else": [
+          { "op": "resource", "target": "hype", "value": 3 },
+          { "op": "resource", "target": "heat", "value": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "reinvent_image",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.reinvent_image.name",
+    "textKey": "card.reinvent_image.text",
+    "tags": ["recovery"],
+    "effects": [
+      { "op": "exhaustTag", "tag": "stunt", "count": 1 },
+      { "op": "resource", "target": "heat", "value": -6 },
+      { "op": "resource", "target": "hype", "value": -2 }
+    ]
+  },
+  {
+    "id": "sellout_ad",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.sellout_ad.name",
+    "textKey": "card.sellout_ad.text",
+    "tags": ["money", "stunt"],
+    "effects": [
+      { "op": "resource", "target": "capital", "value": 6 },
+      { "op": "resource", "target": "craft", "value": -3 },
+      { "op": "resource", "target": "heat", "value": 1 }
+    ]
+  },
+  {
+    "id": "street_team",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.street_team.name",
+    "textKey": "card.street_team.text",
+    "tags": ["hype", "social"],
+    "requires": { "capital": { "min": 2 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -2 },
+      { "op": "resource", "target": "hype", "value": 5 },
+      { "op": "draw", "count": 1 }
+    ]
+  },
+  {
+    "id": "demo_tape",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.demo_tape.name",
+    "textKey": "card.demo_tape.text",
+    "tags": ["craft", "recording"],
+    "requires": { "craft": { "min": 15 } },
+    "effects": [
+      { "op": "addCard", "cardId": "studio_session", "to": "discard", "count": 1 },
+      { "op": "resource", "target": "craft", "value": 2 }
+    ]
+  },
+  {
+    "id": "fan_meetup",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.fan_meetup.name",
+    "textKey": "card.fan_meetup.text",
+    "tags": ["hype", "social"],
+    "effects": [
+      {
+        "op": "conditional",
+        "if": { "flags": { "all": ["went_viral"] } },
+        "then": [
+          { "op": "resource", "target": "hype", "value": 6 },
+          { "op": "resource", "target": "capital", "value": 2 }
+        ],
+        "else": [
+          { "op": "resource", "target": "hype", "value": 3 },
+          { "op": "resource", "target": "capital", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "late_night_show",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.late_night_show.name",
+    "textKey": "card.late_night_show.text",
+    "tags": ["hype", "press"],
+    "actMin": 2,
+    "requires": { "hype": { "min": 25 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 8 },
+      { "op": "resource", "target": "heat", "value": 3 },
+      { "op": "conditional", "if": { "craft": { "min": 30 } }, "then": [{ "op": "resource", "target": "heat", "value": -3 }] }
+    ]
+  },
+  {
+    "id": "brand_deal",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.brand_deal.name",
+    "textKey": "card.brand_deal.text",
+    "tags": ["money", "stunt"],
+    "requires": { "hype": { "min": 20 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": 7 },
+      { "op": "resource", "target": "heat", "value": 2 }
+    ]
+  },
+  {
+    "id": "film_cameo",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.film_cameo.name",
+    "textKey": "card.film_cameo.text",
+    "tags": ["hype", "press"],
+    "actMin": 2,
+    "requires": { "hype": { "min": 35 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 12 },
+      { "op": "resource", "target": "heat", "value": 4 },
+      { "op": "resource", "target": "craft", "value": 2 }
+    ]
+  },
+  {
+    "id": "mentorship",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.mentorship.name",
+    "textKey": "card.mentorship.text",
+    "tags": ["craft", "training"],
+    "effects": [
+      { "op": "resource", "target": "craft", "value": 4 },
+      { "op": "conditional", "if": { "craft": { "min": 30 } }, "then": [{ "op": "draw", "count": 2 }] }
+    ]
+  },
+  {
+    "id": "world_tour",
+    "kind": "opportunity",
+    "cost": 2,
+    "nameKey": "card.world_tour.name",
+    "textKey": "card.world_tour.text",
+    "tags": ["hype", "gig"],
+    "actMin": 3,
+    "requires": { "capital": { "min": 5 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -5 },
+      { "op": "resource", "target": "hype", "value": 16 },
+      { "op": "resource", "target": "heat", "value": 6 }
+    ]
+  },
+  {
+    "id": "award_campaign",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.award_campaign.name",
+    "textKey": "card.award_campaign.text",
+    "tags": ["craft", "press"],
+    "actMin": 2,
+    "requires": { "craft": { "min": 40 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 7 },
+      { "op": "resource", "target": "heat", "value": -2 }
+    ]
+  },
+  {
+    "id": "legal_team",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.legal_team.name",
+    "textKey": "card.legal_team.text",
+    "tags": ["recovery", "fixer"],
+    "actMin": 2,
+    "requires": { "capital": { "min": 6 }, "scandalCount": { "min": 1 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -6 },
+      { "op": "exhaustTag", "tag": "scandal", "count": 2 }
+    ]
+  },
+  {
+    "id": "bad_press",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.bad_press.name",
+    "textKey": "card.bad_press.text",
+    "playable": false,
+    "tags": ["scandal"]
+  },
+  {
+    "id": "burnout",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.burnout.name",
+    "textKey": "card.burnout.text",
+    "playable": false,
+    "tags": ["scandal"],
+    "onEndOfTurn": [{ "op": "resource", "target": "craft", "value": -3 }]
+  },
+  {
+    "id": "copycat_story",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.copycat_story.name",
+    "textKey": "card.copycat_story.text",
+    "playable": false,
+    "tags": ["scandal"],
+    "onEndOfTurn": [
+      {
+        "op": "conditional",
+        "if": { "heat": { "min": 4 } },
+        "then": [{ "op": "addCard", "cardId": "copycat_story", "to": "discard", "count": 1 }]
+      }
+    ]
+  },
+  {
+    "id": "old_rumor",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.old_rumor.name",
+    "textKey": "card.old_rumor.text",
+    "playable": false,
+    "tags": ["scandal"],
+    "actMin": 2,
+    "onEndOfTurn": [
+      {
+        "op": "conditional",
+        "if": { "act": { "min": 3 } },
+        "then": [{ "op": "resource", "target": "hype", "value": -8 }],
+        "else": [{ "op": "resource", "target": "hype", "value": -3 }]
+      }
+    ]
   }
 ]
