@@ -62,7 +62,7 @@ const CARD_FIELDS = ['id', 'kind', 'cost', 'nameKey', 'textKey', 'playable', 'ta
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'requires', 'onPass', 'onFail'];
 const ENDING_FIELDS = ['id', 'priority', 'conditions', 'textKey'];
 const RULES_FIELDS = [
-  'acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered',
+  'acts', 'turnsPerAct', 'actNameKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft',
 ];
@@ -246,6 +246,13 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
   v.fields(raw, RULES_FIELDS, where);
   if (v.int(raw.acts, 'rules.acts', LIMIT.acts)) v.acts = raw.acts;
   if (v.int(raw.turnsPerAct, 'rules.turnsPerAct', LIMIT.turnsPerAct)) v.totalTurns = v.acts * raw.turnsPerAct;
+  if (!Array.isArray(raw.actNameKeys)) v.error('schema', 'rules.actNameKeys', 'must be an array: one i18n key per act');
+  else {
+    if (raw.actNameKeys.length !== v.acts) {
+      v.error('ranges', 'rules.actNameKeys', `has ${raw.actNameKeys.length} entries for ${v.acts} acts`);
+    }
+    raw.actNameKeys.forEach((k, i) => v.key(k, `rules.actNameKeys[${i}]`));
+  }
   v.int(raw.handSize, 'rules.handSize', LIMIT.handSize);
   v.int(raw.slotsPerTurn, 'rules.slotsPerTurn', LIMIT.slotsPerTurn);
   v.int(raw.gatesOffered, 'rules.gatesOffered', LIMIT.count);
@@ -544,7 +551,7 @@ function checkI18n(v: Ctx, i18n: unknown): number {
     else if (i18n[key] === '') v.error('i18n', where, `key ${q(key)} is empty in i18n/en.json`);
   }
   for (const key of Object.keys(i18n)) {
-    if (/^(card|gate|ending)\./.test(key) && !v.keysUsed.has(key)) {
+    if (/^(card|gate|ending|act)\./.test(key) && !v.keysUsed.has(key)) {
       v.warn('i18n', `i18n/en.json ${q(key)}`, 'no content uses this key');
     }
   }

@@ -48,17 +48,17 @@ A career simulation. One run compresses an entertainment career into ~20 minutes
 Your deck is your résumé.
 
 **Primary engine: deck construction.** The player builds a set of moves and exploits their interactions.
-**Secondary engine: resource cascade.** Fast growth accrues Heat; Heat crystallises into permanent Scandal cards; Scandals choke the hand in act 3.
+**Secondary engine: resource cascade.** Fast growth accrues Heat; Heat crystallises into permanent Scandal cards; Scandals choke the hand in winter, the last act.
 
 The player plants the seeds of their own collapse. Failure is never random.
 
 ### Run structure
 
-- 3 acts × 4 turns = 12 turns
-- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 3 of every act, 6 per run), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
+- 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — and the UI names them by season, never by number. Act count, turns per act and the season name keys (`actNameKeys`) live in `content/rules.json`, never as constants.
+- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 3 of every act, 8 per run), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
-- After act 3: ending resolution. **A run always completes.**
+- After the last act (winter): ending resolution. **A run always completes.**
 
 Actions: `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`.
 
@@ -145,16 +145,16 @@ Conditions use one shape everywhere:
 
 ```json
 {
-  "id": "gate_a1_audition",
+  "id": "gate_audition",
   "act": 1,
-  "nameKey": "gate.a1_audition.name",
+  "nameKey": "gate.audition.name",
   "requires": { "craft": { "min": 18 } },
   "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
   "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
 }
 ```
 
-Two gates offered per act. Failing a Gate is a setback, never a run-ender.
+Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ### Ending schema
@@ -188,7 +188,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `gate.<id>.name` · `ending.<id>.text` · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `gate.<id>.name` · `ending.<id>.text` · `act.<season>.name` · `ui.<area>.<label>`
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
 

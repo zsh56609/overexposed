@@ -142,6 +142,8 @@ export interface DraftRules {
 export interface Rules {
   readonly acts: number;
   readonly turnsPerAct: number;
+  /** i18n key naming each act, in order (the seasons). One per act. */
+  readonly actNameKeys: readonly string[];
   readonly handSize: number;
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */

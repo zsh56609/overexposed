@@ -50,6 +50,8 @@ export interface Report {
     readonly personas: readonly PersonaId[];
     readonly totalRuns: number;
     readonly seconds: number;
+    readonly acts: number;
+    readonly turnsPerAct: number;
     /** Scandals held at which comeback switches from spiking to cleaning up (derived from content). */
     readonly comebackLimit: number | null;
   };
@@ -366,6 +368,8 @@ export function buildReport(batch: BatchResult): Report {
       personas,
       totalRuns: records.length,
       seconds: batch.ms / 1000,
+      acts: content.rules.acts,
+      turnsPerAct: content.rules.turnsPerAct,
       comebackLimit: personas.includes('comeback') ? comebackLimit(indexContent(content)) : null,
     },
     health: { crashes, softLocks, replay: batch.replay },
@@ -523,7 +527,8 @@ export function formatReport(r: Report): string {
     ),
   );
 
-  h('RESOURCE CURVES  (mean after end-of-turn resolution; act boundaries after T4, T8)');
+  const boundaries = Array.from({ length: r.meta.acts - 1 }, (_, i) => `T${(i + 1) * r.meta.turnsPerAct}`).join(', ');
+  h(`RESOURCE CURVES  (mean after end-of-turn resolution; act boundaries after ${boundaries})`);
   for (const p of P) {
     const rows = r.curves[p] ?? [];
     out.push(`  ${p}`);

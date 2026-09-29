@@ -366,7 +366,7 @@
     "nameKey": "card.world_tour.name",
     "textKey": "card.world_tour.text",
     "tags": ["hype", "gig"],
-    "actMin": 3,
+    "actMin": 4,
     "requires": { "capital": { "min": 5 } },
     "effects": [
       { "op": "resource", "target": "capital", "value": -5 },
@@ -381,7 +381,7 @@
     "nameKey": "card.award_campaign.name",
     "textKey": "card.award_campaign.text",
     "tags": ["craft", "press"],
-    "actMin": 2,
+    "actMin": 3,
     "requires": { "craft": { "min": 40 } },
     "effects": [
       { "op": "resource", "target": "hype", "value": 7 },
@@ -395,7 +395,7 @@
     "nameKey": "card.legal_team.name",
     "textKey": "card.legal_team.text",
     "tags": ["recovery", "fixer"],
-    "actMin": 2,
+    "actMin": 3,
     "requires": { "capital": { "min": 6 }, "scandalCount": { "min": 1 } },
     "effects": [
       { "op": "resource", "target": "capital", "value": -6 },
@@ -459,11 +459,11 @@
     "textKey": "card.old_rumor.text",
     "playable": false,
     "tags": ["scandal", "money"],
-    "actMin": 2,
+    "actMin": 3,
     "onEndOfTurn": [
       {
         "op": "conditional",
-        "if": { "act": { "min": 3 } },
+        "if": { "act": { "min": 4 } },
         "then": [{ "op": "resource", "target": "hype", "value": -8 }],
         "else": [{ "op": "resource", "target": "hype", "value": -3 }]
       }
