@@ -261,6 +261,7 @@
   "ui.effect.resource": "{delta} {resource}",
   "ui.effect.draw": "draw {count}",
   "ui.effect.addCard": "add {count}× {card} to your {zone}",
+  "ui.effect.copySelf": "copies itself into your {zone}",
   "ui.effect.exhaustTag": "remove {count} {tag} card(s) for good",
   "ui.effect.slots": "{delta} slots this turn",
   "ui.effect.setFlag": "{flag}",

@@ -47,20 +47,26 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .opening { max-width: 36em; display: flex; flex-direction: column; gap: 0.6em; font-size: 1.05em; }
 .big { font-size: 1.4em; padding: 0.4em 2em; }
 
-/* Run: masthead, stats, middle (feed | this season | preview or goals), bottom (hand, draft or gate) */
+/* Run: masthead and stats across the top; below, the play area (feed | this season, then hand, draft or
+   gate) beside the goals rail, which stays in view through every decision (decision 6). */
 .app { position: relative; height: 100%; display: flex; flex-direction: column; }
 .masthead { flex: none; display: flex; align-items: baseline; gap: 1em; padding: 0.3em 0.8em; border-bottom: 2px solid var(--ink); }
 .masthead .name { font-weight: bold; letter-spacing: 0.1em; }
 .masthead .seed { flex: 1; text-align: right; }
+.masthead .counts { font-size: 0.85em; }
+.masthead .deck-open { font-size: 0.8em; padding: 0 0.5em; }
 .stats { flex: none; display: flex; gap: 1em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 .stat-heat, .togo { font-weight: bold; }
 
-.middle { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px 500px; }
+.body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
+/* The play area is the floating preview's frame: its offsets are the anchors' coordinates. */
+.main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; border-right: 1px solid var(--rule); }
+.middle { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 300px; }
+.middle.wide { grid-template-columns: minmax(0, 1fr); }
 .middle > * { min-height: 0; overflow: hidden; padding: 0.4em 0.8em; }
-.side { border-right: 1px solid var(--rule); }
+.goals-rail { min-height: 0; overflow: hidden; padding: 0.4em 0.8em; }
 .side-box { display: flex; flex-direction: column; gap: 0.3em; }
 .mini-gate ul { font-size: 0.85em; }
-.deck-open { align-self: flex-start; }
 
 /* The feed: aggregated per action, the card's register sets its headline (decisions 5, 15). */
 .feed { overflow-y: auto; border-right: 1px solid var(--rule); }
@@ -81,6 +87,12 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .goal .clauses { display: flex; flex-wrap: wrap; column-gap: 0.8em; font-size: 0.9em; }
 
 .preview { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
+/* The floating preview: attached above the hovered card or END TURN (Floating in App.tsx sets its box). */
+.floating { position: absolute; z-index: 4; }
+.floating .preview { box-shadow: 3px 3px 0 var(--ink); }
+.preview-headline { font-size: 1.05em; }
+.scandal-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.25em; }
+.scandal-list li { display: flex; flex-direction: column; }
 .preview.danger { border: 3px solid var(--red); }
 .preview.blocked { border-style: dashed; }
 
@@ -88,7 +100,7 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .row { display: flex; align-items: center; gap: 0.8em; margin-bottom: 0.4em; }
 .cards { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.5em; }
 /* Five cards take the full type size; a bigger hand (draw effects) shrinks it to stay one row. */
-.hand .cards { font-size: clamp(0.8em, calc(5em / var(--n, 5)), 1em); }
+.hand .cards { font-size: clamp(0.8em, calc(4.5em / var(--n, 5)), 0.9em); }
 .card { display: flex; flex-direction: column; gap: 0.2em; min-width: 0; padding: 0.3em 0.4em; text-align: left; color: inherit; background: #fff; border: 1px solid var(--ink); }
 .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 0.4em; }
 .card.off { opacity: 0.55; }

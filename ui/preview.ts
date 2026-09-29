@@ -6,6 +6,7 @@
 // draw reports how many cards, never which.
 
 import {
+  deriveSeed,
   explainCondition,
   getCard,
   getGate,
@@ -19,9 +20,21 @@ import {
   type Effect,
   type GameEvent,
   type GameState,
+  type ContentIndex,
   type PlayBlocker,
+  type Register,
   type ResourceKey,
 } from '../core/index.ts';
+
+/**
+ * The headline variant a card prints when played (decision 15): a pure hash of run seed, month and card
+ * instance — never the game RNG. The preview and the feed both call this, so the headline shown before the
+ * decision is the one printed after it (decision 21). Null when the card has no headlines (a scandal).
+ */
+export function playHeadlineKey(c: ContentIndex, seed: number, turn: number, uid: number, cardId: string): string | null {
+  const keys = getCard(c, cardId)?.headlineKeys ?? [];
+  return keys.length === 0 ? null : (keys[deriveSeed(deriveSeed(seed, turn), uid) % keys.length] ?? null);
+}
 
 /** Where heat sits against the line, as /core reports it (decision 1). */
 export type HeatLine = ReturnType<typeof heatLine>;
@@ -126,6 +139,9 @@ export function previewEndTurn(state: GameState): EndTurnPreview | null {
 export interface PlayPreview {
   readonly uid: number;
   readonly cardId: string;
+  /** The headline this card prints if played now, and its voice: the preview's first line (decision 21). */
+  readonly headlineKey: string | null;
+  readonly register: Register | null;
   readonly ok: boolean;
   /** Every reason it can't be played (empty when ok). */
   readonly blockers: readonly PlayBlocker[];
@@ -147,9 +163,12 @@ export function previewPlay(state: GameState, uid: number): PlayPreview {
   const card = state.hand.find((c) => c.uid === uid);
   const check = playCheck(state, uid);
   const endTurnNow = previewEndTurn(state);
+  const cardId = card?.cardId ?? '';
   const base = {
     uid,
-    cardId: card?.cardId ?? '',
+    cardId,
+    headlineKey: playHeadlineKey(state.content, state.seed, state.turn, uid, cardId),
+    register: getCard(state.content, cardId)?.register ?? null,
     ok: check.ok,
     blockers: check.blockers,
     lineBefore: heatLine(state),

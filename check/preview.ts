@@ -30,6 +30,9 @@ import {
 import { validateContent } from '../validate/validate.ts';
 import { loadRawContent } from '../validate/load.ts';
 import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
+import { feedLines } from '../ui/feed.ts';
+import { t } from '../ui/i18n.ts';
+import { cardName } from '../ui/text.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -40,7 +43,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0 };
+const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -84,6 +87,12 @@ function checkPlayPhase(s: GameState, seed: number): void {
     const realAfter = end?.type === 'turnEnd' ? end.crystallised : -1;
     if (p.endTurnAfter?.crystallised !== realAfter) report('crossing', seed, s.turn, `${card.cardId}: preview ${p.endTurnAfter?.crystallised}, real ${realAfter}`);
     if (p.linesCrossed !== 0) counts.crossings++;
+    // Decision 21: the headline the preview leads with is the one the feed prints once the card is played —
+    // the real feed code, run on the real step.
+    const shown = p.headlineKey === null ? t('ui.feed.noHeadline', { card: cardName(s.content, card.cardId) }) : t(p.headlineKey);
+    const printed = feedLines([{ id: 1, action: { type: 'PLAY_CARD', uid: card.uid }, before: s, after: real, events: real.events }]).find((l) => l.kind === 'headline')?.text;
+    if (shown !== printed) report('headline', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(shown)}, feed ${JSON.stringify(printed)}`);
+    counts.headlines++;
   }
   // END_TURN
   counts.endTurns++;
@@ -175,7 +184,7 @@ for (let i = 0; i < RUNS; i++) {
 }
 
 console.log(
-  `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line), ` +
+  `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending), ${counts.draftCards} draft offers ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,

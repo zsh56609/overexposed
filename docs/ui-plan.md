@@ -52,20 +52,18 @@ A fixed 1280×720 logical stage, scaled to fit the viewport (§9).
 
 ```
 ┌────────────────────────────────────────────────────────────┐
-│  OVEREXPOSED                          SPRING · MONTH 2 / 12│  masthead
+│ OVEREXPOSED   seed · deck 8 · discard 4   SPRING · M2      │  masthead
 ├────────────────────────────────────────────────────────────┤
-│  HYPE 34   CRAFT 21   CAPITAL 6          HEAT 4 · 3 TO GO  │  stat strip
-├───────────────────────────────────────────┬────────────────┤
-│                                           │ THIS SEASON    │
-│   This turn's front page                  │  gates (live)  │
-│   one headline per card played            │                │
-│   scandal = red lead story                │  deck 8        │
-│                                           │  discard 4     │
-│                                           │  scandals 2    │
-├───────────────────────────────────────────┴────────────────┤
-│  [card] [card] [card] [dead] [card]       SLOTS ●●○        │  hand
-│                         [ END TURN · 1 scandal will print ]│
-└────────────────────────────────────────────────────────────┘
+│ HYPE 34  CRAFT 21  CAPITAL 6  HEAT 4 · 3 TO GO             │  stat strip
+├─────────────────────────────┬──────────────┬───────────────┤
+│ This turn's front page      │ THIS SEASON  │ GOALS         │
+│ one headline per card       │  gates, live │  Headliner    │
+│ scandal = red lead story    │              │  Musician's   │
+├─────────────────────────────┴──────────────┤  Cautionary   │
+│ [card] [card] [card] [dead] [card] SLOTS   │  Nobody Yet   │  hand
+│       [ END TURN · 1 scandal will print ]  │  (in view     │
+│                                            │   always)     │
+└────────────────────────────────────────────┴───────────────┘
 ```
 
 The stat strip shows heat as integers only (§5): the heat value, then
@@ -86,11 +84,13 @@ are the author's content, read from the card's headline variants (§13,
 decisions 5 and 15). Pure typography, no
 illustration.
 
-The card preview is not a rail panel: it floats beside the hovered card
-(§4). Layer 2 also adds the goals board (§8), the deck viewer (§8), and
-moves the seed off the main screen into an unobtrusive corner, still
-available for bug reports (decision 14). Where the goals board and the
-deck viewer sit is a layer 2 layout call.
+The goals board (§8) holds the right rail from the stat strip to the
+bottom of the stage, so it stays in view through every decision. The card
+preview is not a rail panel: it floats beside the hovered card (§4,
+decision 6), inside the play area on the left, and never covers the
+goals. The masthead carries the seed, in an unobtrusive corner and still
+available for bug reports (decision 14), with the deck and discard counts
+and the button that opens the deck viewer (§8).
 
 ---
 
@@ -100,6 +100,9 @@ Hovering (desktop) or long-pressing (touch) a card shows its outcome
 before it is played, in a floating panel attached to the hovered card
 (decision 6):
 
+- first, the headline the card would print — the exact variant the feed
+  will use, in the card's register (decision 21): the story at the moment
+  of the decision, not after it
 - the delta for each resource
 - the resulting heat, in the integer display of §5
 - whether it crosses the line — a light warning only (§5, decision 3):
@@ -110,8 +113,9 @@ before it is played, in a floating panel attached to the hovered card
 Ending the month is the preview that matters most, and it is shown on
 the END TURN button itself, e.g. "1 scandal will print" (decision 2).
 It counts every scandal card month end will add, from any cause —
-crystallised, or copied by a Copycat Story — and shows each one's cause
-on hover.
+crystallised, or copied by a Copycat Story. Hovering it floats a preview
+that names each one by the headline it would print, with its cause
+(decision 21).
 
 Implementation: run the reducer on the hypothetical action (PLAY_CARD or
 END_TURN) and read the outcome from the events it returns. A card that
@@ -121,7 +125,8 @@ state itself.
 
 **The preview must match the real outcome exactly.** This is tested:
 `npm run check:preview` replays a batch of seeded states and compares
-every preview with the real outcome.
+every preview with the real outcome — its headline included, against
+what the feed prints once the card is played.
 
 The design principle is that failure is never random. Without a preview,
 a scandal reads as a random penalty; with one, it reads as a consequence
@@ -207,10 +212,11 @@ and every requirement live as met / unmet.
 The final gate is an informed choice: each option shows which ending it
 leads to (decision 11).
 
-**Goals board** — visible from the first turn: the four endings, each
+**Goals board** — visible from the first turn, and through every
+decision: it holds the right rail on its own (§3). The four endings, each
 with its name, its goal line (goalKey) and what it requires, live via
-explainCondition. The player must always know
-what they are steering toward (decision 10).
+explainCondition. The player must always know what they are steering
+toward (decision 10).
 
 **Deck viewer** — read-only deck and discard lists, sorted by name, never
 revealing draw order (decision 12).
@@ -402,6 +408,17 @@ it.
     content because it bounds balance and scope. Awards present an
     outcome and change no play. They are a separate list, capped at 8.
     (2026-09-30)
+21. The preview leads with the headline. Hovering a card, the preview's
+    first line is the exact headline that card would print — the same
+    variant the feed will use, computed from the same hash. Then the
+    numbers, then any line crossing. For a quiet or Money card, show its
+    line in that register. The END TURN preview names the scandals that
+    would print by their crystallisation headlines, not only by count.
+    check:preview asserts that the headline shown in the preview is
+    identical to the one the feed prints after the card is played. With
+    decision 6 pulled forward from part 2 — the preview floats beside the
+    card, the goals board holds the right rail — the story and the goal
+    are both in view when the player chooses. (2026-09-30)
 
 ### Still open
 

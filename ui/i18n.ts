@@ -1,6 +1,7 @@
 // Display strings. Every word the player reads comes from /i18n/en.json by key (CLAUDE.md §3).
 
-import en from '../i18n/en.json';
+// The import attribute lets Node load this module too (npm run check:preview runs the feed itself).
+import en from '../i18n/en.json' with { type: 'json' };
 
 const strings: Readonly<Record<string, string>> = en;
 const warned = new Set<string>();

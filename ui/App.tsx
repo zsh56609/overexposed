@@ -4,7 +4,7 @@
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import {
   createInitialState,
   explainCondition,
@@ -40,6 +40,7 @@ import {
   heatText,
   isPlaceholder,
   resourceName,
+  scandalHeadline,
   seasonName,
   signed,
   zoneName,
@@ -107,8 +108,51 @@ function Title({ onStart, error }: { onStart: (seed: number) => void; error: str
   );
 }
 
-/** What the right-hand column previews: a card, the end of the month, or nothing (the goals board). */
-type Focus = { readonly kind: 'card'; readonly uid: number } | { readonly kind: 'end' } | null;
+/**
+ * Where a floating preview attaches (decision 6): the hovered element's box, in the play area's own layout
+ * pixels — offsets, so the stage's scale never enters into it.
+ */
+interface Anchor {
+  readonly left: number;
+  readonly top: number;
+  readonly width: number;
+  /** The play area the preview floats in. */
+  readonly areaWidth: number;
+  readonly areaHeight: number;
+}
+
+function anchorOf(el: HTMLElement): Anchor {
+  const area = el.offsetParent as HTMLElement | null;
+  return { left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, areaWidth: area?.offsetWidth ?? 0, areaHeight: area?.offsetHeight ?? 0 };
+}
+
+/** What floats beside the player's pointer: a card's preview, the end of the month's, or nothing. */
+type Focus = { readonly kind: 'card'; readonly uid: number; readonly anchor: Anchor } | { readonly kind: 'end'; readonly anchor: Anchor } | null;
+
+const FLOAT_WIDTH = 400;
+const FLOAT_GAP = 8;
+
+/**
+ * A preview attached to the element it describes, inside the play area and so never over the goals rail.
+ * It sits above the element when there is room; a preview taller than that room slides down until it
+ * fits, over the element if it must — it never leaves the play area.
+ */
+function Floating({ anchor, children }: { anchor: Anchor; children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const centre = anchor.left + anchor.width / 2;
+  const left = Math.min(Math.max(FLOAT_GAP, centre - FLOAT_WIDTH / 2), anchor.areaWidth - FLOAT_WIDTH - FLOAT_GAP);
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const h = el.offsetHeight;
+    el.style.top = `${Math.max(FLOAT_GAP, Math.min(anchor.top - h - FLOAT_GAP, anchor.areaHeight - h - FLOAT_GAP))}px`;
+  });
+  return (
+    <div className="floating" ref={box} style={{ left, width: FLOAT_WIDTH }}>
+      {children}
+    </div>
+  );
+}
 
 function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const { queue } = run;
@@ -138,33 +182,44 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   return (
     <div className="app">
-      <Masthead s={s} />
+      <Masthead s={s} onDeck={() => setDeckOpen(true)} />
       <StatStrip s={s} />
       {error && (
         <p className="error overlay">
           {t('ui.error.title')}: {error}
         </p>
       )}
-      <div className="middle">
-        <Feed steps={snap.steps} />
-        <aside className="side">
-          <Side s={s} onDeck={() => setDeckOpen(true)} />
-        </aside>
-        <aside className="preview-col">
-          {card ? (
-            <PlayPreviewView c={c} p={card} />
-          ) : focus?.kind === 'end' && endPreview ? (
-            <EndTurnPreviewView c={c} p={endPreview} />
-          ) : (
-            <GoalsBoard s={s} />
+      {/* The goals stay in view through every decision (decision 6): the preview floats in the play area. */}
+      <div className="body">
+        <div className="main">
+          <div className={s.phase === 'gate' ? 'middle wide' : 'middle'}>
+            <Feed steps={snap.steps} />
+            {s.phase !== 'gate' && (
+              <aside className="side">
+                <Side s={s} />
+              </aside>
+            )}
+          </div>
+          <section className="bottom">
+            {s.phase === 'play' && <Hand s={s} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
+            {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
+            {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
+          </section>
+          {card && focus?.kind === 'card' && (
+            <Floating anchor={focus.anchor}>
+              <PlayPreviewView c={c} p={card} />
+            </Floating>
           )}
+          {focus?.kind === 'end' && endPreview && (
+            <Floating anchor={focus.anchor}>
+              <EndTurnPreviewView c={c} p={endPreview} />
+            </Floating>
+          )}
+        </div>
+        <aside className="goals-rail">
+          <GoalsBoard s={s} />
         </aside>
       </div>
-      <section className="bottom">
-        {s.phase === 'play' && <Hand s={s} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
-        {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
-        {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
-      </section>
       {deckOpen && <DeckViewer s={s} onClose={() => setDeckOpen(false)} />}
     </div>
   );
@@ -173,12 +228,18 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 // ---------------------------------------------------------------------------
 // Frame: masthead, stat strip, feed, side panel
 
-function Masthead({ s }: { s: GameState }) {
+function Masthead({ s, onDeck }: { s: GameState; onDeck: () => void }) {
   const r = s.content.rules;
   return (
     <header className="masthead">
       <span className="name">{t('ui.masthead.name')}</span>
       <span className="seed muted">{t('ui.side.seed', { seed: s.seed })}</span>
+      <span className="counts">
+        {t('ui.side.deck', { n: s.deck.length })} · {t('ui.side.discard', { n: s.discard.length })} · {t('ui.side.scandals', { n: scandalCount(s) })}
+      </span>
+      <button className="deck-open" onClick={onDeck}>
+        {t('ui.deck.open')}
+      </button>
       <span className="when">{t('ui.masthead.when', { season: seasonName(s.content, s.act), turn: s.turn, total: r.acts * r.turnsPerAct })}</span>
     </header>
   );
@@ -222,32 +283,24 @@ function FeedRow({ line }: { line: FeedLine }) {
   return <li className={prose(line.text, `feed-${line.kind}${reg}`)}>{line.text}</li>;
 }
 
-function Side({ s, onDeck }: { s: GameState; onDeck: () => void }) {
+/** This season's gates, live. Not shown at a gate: the gate panel shows them in full there. */
+function Side({ s }: { s: GameState }) {
   const c = s.content;
   return (
     <div className="side-box">
-      {/* At a gate the gate panel shows this season's gates in full; here they would only repeat it. */}
-      {s.phase !== 'gate' && <h2>{t('ui.side.thisSeason')}</h2>}
-      {s.phase !== 'gate' &&
-        (c.gatesByAct[String(s.act)] ?? []).map((g) => (
-          <div key={g.id} className="mini-gate">
-            <strong>{gateName(c, g.id)}</strong>
-            <ul>
-              {explainCondition(g.requires, s).map((clause, i) => (
-                <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                  {clauseLine(clause)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      <p>
-        {t('ui.side.deck', { n: s.deck.length })} · {t('ui.side.discard', { n: s.discard.length })} ·{' '}
-        {t('ui.side.scandals', { n: scandalCount(s) })}
-      </p>
-      <button className="deck-open" onClick={onDeck}>
-        {t('ui.deck.open')}
-      </button>
+      <h2>{t('ui.side.thisSeason')}</h2>
+      {(c.gatesByAct[String(s.act)] ?? []).map((g) => (
+        <div key={g.id} className="mini-gate">
+          <strong>{gateName(c, g.id)}</strong>
+          <ul>
+            {explainCondition(g.requires, s).map((clause, i) => (
+              <li key={i} className={clause.met ? 'met' : 'unmet'}>
+                {clauseLine(clause)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
@@ -308,29 +361,37 @@ function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outc
   );
 }
 
+/** The headline a card would print, in its register: the preview's first line (decision 21). */
+function PreviewHeadline({ c, p }: { c: ContentIndex; p: PlayPreview }) {
+  const text = p.headlineKey === null ? t('ui.feed.noHeadline', { card: cardName(c, p.cardId) }) : t(p.headlineKey);
+  return <p className={prose(text, `preview-headline${p.register ? ` reg-${p.register}` : ''}`)}>{text}</p>;
+}
+
 function PlayPreviewView({ c, p }: { c: ContentIndex; p: PlayPreview }) {
   if (!p.ok || !p.outcome || !p.lineAfter) {
+    const scandal = getCard(c, p.cardId)?.kind === 'scandal';
     const text = cardText(c, p.cardId);
     return (
       <div className="preview blocked">
-        <h3>{t('ui.preview.unplayable', { card: cardName(c, p.cardId) })}</h3>
+        {/* A scandal prints nothing when held: its in-hand line and rules. Any other card: the story it would print. */}
+        {scandal ? <p className={prose(text, 'preview-headline in-hand')}>{text}</p> : <PreviewHeadline c={c} p={p} />}
+        <p className="muted">{t('ui.preview.unplayable', { card: cardName(c, p.cardId) })}</p>
         <ul>
           {p.blockers.map((b, i) => (
             <li key={i}>{blockerText(b)}</li>
           ))}
         </ul>
-        <p className={prose(text, 'muted')}>{text}</p>
         {cardRuleLines(c, p.cardId).map((line, i) => (
           <p key={i}>{line}</p>
         ))}
       </div>
     );
   }
-  // A card that crosses a line gets a light warning only (decision 3): the count lives on END TURN.
+  // Story first, then the numbers, then any line crossing: a light warning only (decision 3).
   const crossing = Math.sign(p.linesCrossed);
   return (
     <div className="preview">
-      <h3>{t('ui.preview.title', { card: cardName(c, p.cardId) })}</h3>
+      <PreviewHeadline c={c} p={p} />
       <OutcomeLines c={c} o={p.outcome} />
       <p>{t('ui.preview.heat', { before: p.heatBefore, after: p.heatAfter ?? '', line: heatText(p.lineAfter) })}</p>
       {crossing !== 0 && <p className="warn">{t(crossing === 1 ? 'ui.preview.crosses' : 'ui.preview.cools')}</p>}
@@ -349,9 +410,11 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
       ) : (
         <>
           <p className="alarm">{t('ui.preview.endList')}</p>
-          <ul>
+          {/* Each scandal by the headline it would print (decision 21), then the card and its cause. */}
+          <ul className="scandal-list">
             {p.scandalCards.map((sc, i) => {
               const card = cardName(c, sc.cardId);
+              const headline = scandalHeadline(c, sc.cardId);
               const line =
                 sc.cause.kind === 'crystallised'
                   ? sc.cause.cardId === null
@@ -363,8 +426,9 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
                       ? t('ui.preview.endCopySelf', { card })
                       : t('ui.preview.endAdded', { card, source: cardName(c, sc.cause.byCardId) });
               return (
-                <li key={i} className="lead">
-                  {line}
+                <li key={i}>
+                  <span className={prose(headline, 'lead')}>{headline}</span>
+                  <span className="muted cause">{line}</span>
                 </li>
               );
             })}
@@ -407,12 +471,12 @@ function Hand({
           className={`end${printing ? ' printing' : ''}`}
           disabled={!legal.endTurn}
           onPointerEnter={(e) => {
-            if (e.pointerType === 'mouse') setFocus({ kind: 'end' });
+            if (e.pointerType === 'mouse') setFocus({ kind: 'end', anchor: anchorOf(e.currentTarget) });
           }}
           onPointerLeave={(e) => {
             if (e.pointerType === 'mouse') setFocus(null);
           }}
-          onFocus={() => setFocus({ kind: 'end' })}
+          onFocus={(e) => setFocus({ kind: 'end', anchor: anchorOf(e.currentTarget) })}
           onBlur={() => setFocus(null)}
           onClick={() => {
             setFocus(null);
@@ -435,21 +499,24 @@ function Hand({
               className={`card${scandal ? ' scandal' : ''}${playable ? '' : ' off'}`}
               aria-disabled={!playable}
               onPointerEnter={(e) => {
-                if (e.pointerType === 'mouse') setFocus({ kind: 'card', uid: card.uid });
+                if (e.pointerType === 'mouse') setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) });
               }}
+              onFocus={(e) => setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) })}
+              onBlur={() => setFocus(null)}
               onPointerLeave={(e) => {
                 if (e.pointerType === 'mouse') setFocus(null);
               }}
               onPointerDown={(e) => {
                 if (e.pointerType === 'mouse') return;
                 longPressed.current = false;
+                const anchor = anchorOf(e.currentTarget);
                 pressTimer.current = window.setTimeout(() => {
                   longPressed.current = true;
-                  setFocus({ kind: 'card', uid: card.uid });
+                  setFocus({ kind: 'card', uid: card.uid, anchor });
                 }, 450);
               }}
               onPointerUp={() => window.clearTimeout(pressTimer.current)}
-              onClick={() => {
+              onClick={(e) => {
                 if (longPressed.current) {
                   longPressed.current = false; // a long-press previews; it never plays
                   return;
@@ -457,7 +524,7 @@ function Hand({
                 if (playable) {
                   setFocus(null);
                   act({ type: 'PLAY_CARD', uid: card.uid });
-                } else setFocus({ kind: 'card', uid: card.uid }); // tapping a card you can't play shows why
+                } else setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) }); // tapping a card you can't play shows why
               }}
             >
               <span className="card-head">

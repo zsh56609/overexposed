@@ -2,7 +2,6 @@
 // Nothing here decides anything — a clause arrives already marked met or unmet by /core.
 
 import {
-  deriveSeed,
   getCard,
   getGate,
   type AddCardZone,
@@ -16,6 +15,7 @@ import {
   type ResourceKey,
 } from '../core/index.ts';
 import { t } from './i18n.ts';
+import { playHeadlineKey } from './preview.ts';
 
 const signedFormat = new Intl.NumberFormat('en', { signDisplay: 'exceptZero' });
 /** "+3", "-2", "0". */
@@ -51,12 +51,9 @@ export const scandalHeadline = (c: ContentIndex, id: string): string => t(getCar
  * instance — never the game RNG, so prose can't move a sim result or break a replay (decision 15).
  */
 export function playHeadline(c: ContentIndex, seed: number, turn: number, uid: number, cardId: string): { text: string; register: Register | null } {
-  const card = getCard(c, cardId);
-  const keys = card?.headlineKeys ?? [];
-  const register = card?.register ?? null;
-  if (keys.length === 0) return { text: t('ui.feed.noHeadline', { card: cardName(c, cardId) }), register };
-  const pick = deriveSeed(deriveSeed(seed, turn), uid) % keys.length;
-  return { text: t(keys[pick] as string), register };
+  const key = playHeadlineKey(c, seed, turn, uid, cardId);
+  const register = getCard(c, cardId)?.register ?? null;
+  return { text: key === null ? t('ui.feed.noHeadline', { card: cardName(c, cardId) }) : t(key), register };
 }
 
 // ---------------------------------------------------------------------------
@@ -134,13 +131,15 @@ export function blockerText(b: PlayBlocker): string {
   }
 }
 
-export function effectText(c: ContentIndex, e: Effect): string {
+/** An effect in words. `self`: the card the effect belongs to, so a card adding a copy of itself says so. */
+export function effectText(c: ContentIndex, e: Effect, self?: string): string {
   switch (e.op) {
     case 'resource':
       return t('ui.effect.resource', { delta: signed(e.value), resource: resourceName(e.target) });
     case 'draw':
       return t('ui.effect.draw', { count: e.count });
     case 'addCard':
+      if (e.cardId === self) return t('ui.effect.copySelf', { count: e.count ?? 1, zone: zoneName(e.to) });
       return t('ui.effect.addCard', { count: e.count ?? 1, card: cardName(c, e.cardId), zone: zoneName(e.to) });
     case 'exhaustTag':
       return t('ui.effect.exhaustTag', { count: e.count ?? 1, tag: tagName(e.tag) });
@@ -149,14 +148,14 @@ export function effectText(c: ContentIndex, e: Effect): string {
     case 'setFlag':
       return t('ui.effect.setFlag', { flag: flagName(e.flag) });
     case 'conditional': {
-      const vars = { cond: conditionText(c, e.if), then: effectsText(c, e.then), else: effectsText(c, e.else ?? []) };
+      const vars = { cond: conditionText(c, e.if), then: effectsText(c, e.then, self), else: effectsText(c, e.else ?? [], self) };
       return t(e.else?.length ? 'ui.effect.conditionalElse' : 'ui.effect.conditional', vars);
     }
   }
 }
 
-export const effectsText = (c: ContentIndex, effects: readonly Effect[]): string =>
-  effects.length ? effects.map((e) => effectText(c, e)).join(', ') : t('ui.effect.none');
+export const effectsText = (c: ContentIndex, effects: readonly Effect[], self?: string): string =>
+  effects.length ? effects.map((e) => effectText(c, e, self)).join(', ') : t('ui.effect.none');
 
 /**
  * A card's rules, told by the interface from its effects — for a scandal, whose text is prose (its in-hand
@@ -165,7 +164,7 @@ export const effectsText = (c: ContentIndex, effects: readonly Effect[]): string
 export function cardRuleLines(c: ContentIndex, id: string): string[] {
   const card = getCard(c, id);
   const lines: string[] = [];
-  if (card?.onDraw?.length) lines.push(t('ui.card.whenDrawn', { effects: effectsText(c, card.onDraw) }));
-  if (card?.onEndOfTurn?.length) lines.push(t('ui.card.atMonthEnd', { effects: effectsText(c, card.onEndOfTurn) }));
+  if (card?.onDraw?.length) lines.push(t('ui.card.whenDrawn', { effects: effectsText(c, card.onDraw, id) }));
+  if (card?.onEndOfTurn?.length) lines.push(t('ui.card.atMonthEnd', { effects: effectsText(c, card.onEndOfTurn, id) }));
   return lines;
 }
