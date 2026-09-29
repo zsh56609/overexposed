@@ -210,7 +210,7 @@ The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
 - Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`. The greedy personas value flags: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock` (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily.
-- Report: ending distribution, per-card play rate, resource curves by turn, scandals held at end, gate pass rates, run length, soft-lock count
+- Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
 
@@ -218,14 +218,19 @@ The primary QA instrument, not an extra. Build it in week one.
 
 ### Tuning targets
 
-| Metric | Band |
-|---|---|
-| Each ending reached | ≥10%, none >45% |
-| Scandals held at run end | median 2–5 |
-| Gate pass rate | 40–80% per gate |
-| Card play rate | every card >2% |
-| minmaxer vs random ending distribution | significantly different |
-| Soft-locks | 0 |
+**Band population:** every persona in `sim/personas.ts`, 1000 runs each on the same run seeds (`npm run sim -- --runs=1000`). Per-persona bands are checked on each persona separately. Pooled bands weight every persona equally (equal runs each). A pass counts only after it also holds on two alternate batch seeds (`--seed=`).
+
+| Metric | Population | Band |
+|---|---|---|
+| Ending concentration | each persona separately | no single ending above 70% of that persona's runs |
+| Scandals held at run end | all runs, pooled | median 2–5 |
+| Gate difficulty: met% (requirement already satisfied when offered) | all offers, pooled | 35–65% per gate |
+| Card play rate (played ÷ drawn) | all runs, pooled | every playable card > 2% |
+| minmaxer vs random ending distribution | those two personas | significantly different (χ² p < 0.01 and total variation ≥ 0.2) |
+| Soft-locks | all runs | 0 |
+| Crashes | all runs | 0 |
+
+Diagnostics, reported but not bands: the pooled ending distribution and gate pass% (passed when chosen). Both measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending.
 
 ---
 

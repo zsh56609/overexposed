@@ -5,13 +5,18 @@ import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from
 import type { PersonaId } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
-/** Tuning targets, CLAUDE.md §5. */
+/**
+ * Tuning targets, CLAUDE.md §5. Population: every persona, equal runs each on the same seeds.
+ * Per-persona bands are checked on each persona separately; pooled bands weight personas equally.
+ */
 export const BANDS = {
-  endingMin: 0.1,
-  endingMax: 0.45,
+  /** Per persona: no single ending may take more than this share of its runs. */
+  personaEndingMax: 0.7,
+  /** Pooled median scandals held at run end. */
   scandalMedian: [2, 5],
-  gatePass: [0.4, 0.8],
-  /** Play rate = times played / times drawn, pooled over personas. */
+  /** Pooled per gate: requirement already satisfied when offered. */
+  gateMet: [0.35, 0.65],
+  /** Pooled play rate = times played / times drawn. */
   cardPlayRate: 0.02,
   /** "Significantly different" made concrete: chi-square p below this AND total variation distance at least… */
   skillP: 0.01,
@@ -87,6 +92,8 @@ export interface Report {
   readonly curves: Readonly<Record<string, readonly ({ turn: number } & Record<Metric, Dist>)[]>>;
   readonly skill: { chi2: number; df: number; p: number; tvd: number } | null;
   readonly bands: readonly BandCheck[];
+  /** Reported for context, not pass/fail: they measure the persona mix as much as the game. */
+  readonly diagnostics: readonly { readonly label: string; readonly value: string }[];
 }
 
 const ratio = (a: number, b: number) => (b === 0 ? null : a / b);
@@ -265,10 +272,18 @@ export function buildReport(batch: BatchResult): Report {
   const pct = (x: number | null) => (x === null ? 'n/a' : `${(x * 100).toFixed(1)}%`);
   const pooledShare = share.pooled;
   const bands: BandCheck[] = [];
+  const topEnding = (p: PersonaId) =>
+    endingIds.map((id) => ({ id, share: share[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
+  const concentrated = personas.filter((p) => topEnding(p).share > BANDS.personaEndingMax);
   bands.push({
-    target: `each ending reached >= ${pct(BANDS.endingMin)}, none > ${pct(BANDS.endingMax)} (pooled)`,
-    pass: endingIds.every((id) => (pooledShare[id] ?? 0) >= BANDS.endingMin && (pooledShare[id] ?? 0) <= BANDS.endingMax),
-    actual: endingIds.map((id) => `${id} ${pct(pooledShare[id] ?? 0)}`).join(', '),
+    target: `per persona: no single ending > ${pct(BANDS.personaEndingMax)} of its runs`,
+    pass: concentrated.length === 0,
+    actual: personas
+      .map((p) => {
+        const t = topEnding(p);
+        return `${p} ${t.id} ${pct(t.share)}${t.share > BANDS.personaEndingMax ? ' (over)' : ''}`;
+      })
+      .join(', '),
   });
   const med = scandalsHeld.pooled.median;
   bands.push({
@@ -276,11 +291,11 @@ export function buildReport(batch: BatchResult): Report {
     pass: med >= BANDS.scandalMedian[0] && med <= BANDS.scandalMedian[1],
     actual: `median ${med}; ` + personas.map((p) => `${p} ${scandalsHeld[p].median}`).join(', '),
   });
-  const gateOut = gates.filter((g) => g.passRate === null || g.passRate < BANDS.gatePass[0] || g.passRate > BANDS.gatePass[1]);
+  const gateOut = gates.filter((g) => g.metRate === null || g.metRate < BANDS.gateMet[0] || g.metRate > BANDS.gateMet[1]);
   bands.push({
-    target: `gate pass rate ${pct(BANDS.gatePass[0])}-${pct(BANDS.gatePass[1])} per gate (when chosen, pooled)`,
+    target: `gate difficulty: met% ${pct(BANDS.gateMet[0])}-${pct(BANDS.gateMet[1])} per gate (requirement satisfied when offered, pooled)`,
     pass: gateOut.length === 0,
-    actual: gateOut.length === 0 ? 'all in band' : `out of band: ${gateOut.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ')}`,
+    actual: gateOut.length === 0 ? 'all in band' : `out of band: ${gateOut.map((g) => `${g.id} ${pct(g.metRate)}`).join(', ')}`,
   });
   const cardsOut = cards.filter((c) => c.kind !== 'scandal' && (c.playRate === null || c.playRate <= BANDS.cardPlayRate));
   bands.push({
@@ -295,6 +310,11 @@ export function buildReport(batch: BatchResult): Report {
   });
   bands.push({ target: 'soft-locks: 0', pass: softLocks.length === 0, actual: String(softLocks.length) });
   bands.push({ target: 'crashes: 0', pass: crashes.length === 0, actual: String(crashes.length) });
+
+  const diagnostics = [
+    { label: 'ending distribution (pooled)', value: endingIds.map((id) => `${id} ${pct(pooledShare[id] ?? 0)}`).join(', ') },
+    { label: 'gate pass% (passed when chosen, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
+  ];
 
   return {
     meta: {
@@ -315,6 +335,7 @@ export function buildReport(batch: BatchResult): Report {
     curves,
     skill,
     bands,
+    diagnostics,
   };
 }
 
@@ -452,6 +473,9 @@ export function formatReport(r: Report): string {
     h('SKILL CHECK  minmaxer vs random ending distribution');
     out.push(`  chi2 = ${r.skill.chi2.toFixed(1)}, df = ${r.skill.df}, ${fmtP(r.skill.p)}, total variation distance = ${r.skill.tvd.toFixed(2)}`);
   }
+
+  h('DIAGNOSTICS  (not bands: they measure the persona mix as much as the game)');
+  for (const d of r.diagnostics) out.push(`  ${d.label}: ${d.value}`);
 
   h('BANDS  (CLAUDE.md §5)');
   for (const b of r.bands) {
