@@ -99,6 +99,8 @@ export interface Report {
   }[];
   /** Share of runs holding each flag at the end. */
   readonly flagsHeld: Readonly<Record<string, Readonly<Record<Group, number>>>>;
+  /** Per flag and group: runs that set it, and the share of those set by each source (card or gate id). */
+  readonly flagSources: Readonly<Record<string, Readonly<Record<Group, { runs: number; bySource: Readonly<Record<string, number>> }>>>>;
   /** Per persona, per run: cards acquired in drafts, extra picks bought, rerolls, capital spent on them. */
   readonly draft: Readonly<
     Record<
@@ -244,6 +246,22 @@ export function buildReport(batch: BatchResult): Report {
       ),
     ]),
   ) as Record<string, Record<Group, number>>;
+
+  // What set each flag, among the runs that set it
+  const flagSources = Object.fromEntries(
+    flagIds.map((flag) => [
+      flag,
+      Object.fromEntries(
+        groups.map(([g, rs]) => {
+          const set = rs.filter((r) => r.crash === null && r.softLock === null && r.flagSources[flag] !== undefined);
+          const bySource: Record<string, number> = {};
+          for (const r of set) bySource[r.flagSources[flag] as string] = (bySource[r.flagSources[flag] as string] ?? 0) + 1;
+          for (const src of Object.keys(bySource)) bySource[src] = (bySource[src] as number) / set.length;
+          return [g, { runs: set.length, bySource }];
+        }),
+      ),
+    ]),
+  ) as Report['flagSources'];
 
   // Draft
   const draft = Object.fromEntries(
@@ -459,6 +477,7 @@ export function buildReport(batch: BatchResult): Report {
     cascadeByAct,
     gates,
     flagsHeld,
+    flagSources,
     draft,
     cards,
     runLength,
@@ -570,6 +589,24 @@ export function formatReport(r: Report): string {
     table(
       ['flag', ...P, 'pooled'],
       Object.keys(r.flagsHeld).map((f) => [f, ...[...P, 'pooled' as const].map((g) => pc(r.flagsHeld[f]?.[g] ?? 0))]),
+    ),
+  );
+
+  h('FLAG SOURCES  (of the runs that set the flag: share set by each card or gate; runs setting it in brackets)');
+  out.push(
+    table(
+      ['flag', 'source', ...P, 'pooled'],
+      Object.entries(r.flagSources).flatMap(([flag, byGroup]) => {
+        const sources = [...new Set(Object.values(byGroup).flatMap((x) => Object.keys(x.bySource)))].sort();
+        return sources.map((src) => [
+          flag,
+          src,
+          ...[...P, 'pooled' as const].map((g) => {
+            const x = byGroup[g];
+            return x && x.runs > 0 ? `${pc(x.bySource[src] ?? 0)} (${x.runs})` : '-';
+          }),
+        ]);
+      }),
     ),
   );
 

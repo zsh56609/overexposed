@@ -49,7 +49,8 @@ export type GameEvent =
   | { readonly type: 'play'; readonly uid: number; readonly cardId: string; readonly cost: number }
   | { readonly type: 'resource'; readonly target: ResourceKey; readonly delta: number; readonly value: number }
   | { readonly type: 'slots'; readonly delta: number; readonly value: number }
-  | { readonly type: 'flag'; readonly flag: string }
+  /** `source`: the card whose effect set the flag; null = a gate or the engine. */
+  | { readonly type: 'flag'; readonly flag: string; readonly source: string | null }
   | { readonly type: 'addCard'; readonly uid: number; readonly cardId: string; readonly to: AddCardZone }
   | { readonly type: 'exhaust'; readonly uid: number; readonly cardId: string }
   /** `cause`: the card blamed for pushing heat over the line; `byTag`: the scandal matches its tag (false = seeded fallback). */

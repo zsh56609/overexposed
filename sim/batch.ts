@@ -85,6 +85,8 @@ export interface RunRecord {
   readonly final: Resources | null;
   /** Flags held when the run ended. */
   readonly flags: readonly string[];
+  /** What set each flag: the card whose effect set it, or the gate chosen. */
+  readonly flagSources: Readonly<Record<string, string>>;
   readonly softLock: string | null;
   readonly crash: string | null;
 }
@@ -161,6 +163,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   const removal = removalCards(content);
   const scandalIds = new Set(content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id));
   let scandalsDrawnThisTurn = 0;
+  const flagSources: Record<string, string> = {};
 
   const tally = (s: GameState, action: Action | null) => {
     const played = s.events.find((e) => e.type === 'play');
@@ -179,7 +182,9 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     // Events arrive in order, so a turn's draws sit between its turnStart and its turnEnd.
     for (const e of s.events) {
       if (e.type === 'turnStart') scandalsDrawnThisTurn = 0;
-      else if (e.type === 'draw') {
+      else if (e.type === 'flag') {
+        flagSources[e.flag] ??= e.source ?? (action?.type === 'CHOOSE_GATE' ? action.gateId : 'engine');
+      } else if (e.type === 'draw') {
         draws[e.cardId] = (draws[e.cardId] ?? 0) + 1;
         if (scandalIds.has(e.cardId)) scandalsDrawnThisTurn++;
       } else if (e.type === 'play') {
@@ -269,6 +274,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     capital,
     final: state?.resources ?? null,
     flags: state ? Object.keys(state.flags) : [],
+    flagSources,
     softLock,
     crash,
   };

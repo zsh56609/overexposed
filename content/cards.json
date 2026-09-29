@@ -410,9 +410,9 @@
     "textKey": "card.indie_label.text",
     "tags": ["money", "recording"],
     "actMin": 2,
-    "requires": { "hype": { "min": 40 }, "capital": { "min": 6 }, "flags": { "not": ["signed_label"] } },
+    "requires": { "hype": { "min": 40 }, "capital": { "min": 4 }, "flags": { "not": ["signed_label"] } },
     "effects": [
-      { "op": "resource", "target": "capital", "value": -6 },
+      { "op": "resource", "target": "capital", "value": -4 },
       { "op": "setFlag", "flag": "signed_label" }
     ]
   },
