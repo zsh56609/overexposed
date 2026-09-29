@@ -1,0 +1,11 @@
+{
+  // /core in isolation: ES library only, no DOM, no Node, no ambient types.
+  // Any use of window/document/localStorage/process/console here fails typecheck (CLAUDE.md §0.1).
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.core.tsbuildinfo",
+    "lib": ["ES2022"],
+    "types": []
+  },
+  "include": ["core"]
+}

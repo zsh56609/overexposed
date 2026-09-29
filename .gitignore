@@ -1,0 +1,8 @@
+node_modules/
+dist/
+sim/out/
+*.tsbuildinfo
+*.log
+.vite/
+.DS_Store
+Thumbs.db
