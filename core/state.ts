@@ -41,6 +41,7 @@ export interface GateRecord {
 /**
  * What the last action did, in order. Ids and numbers only.
  * The UI replays these for motion (card flight, number roll-up); the sim tallies them.
+ * FROZEN for UI (CLAUDE.md §2 "GameEvents"): the list and every field below are the UI's contract.
  */
 export type GameEvent =
   | { readonly type: 'turnStart'; readonly act: number; readonly turn: number }

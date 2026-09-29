@@ -43,6 +43,21 @@ export function effectiveHeatThreshold(s: ConditionSubject): number {
   return Math.max(thresholdFloor(rules, s.act), heatThreshold(rules, s.act) - scandalCount(s) * rules.degradePerScandal);
 }
 
+/**
+ * What the heat meter shows (CLAUDE.md §2, frozen): whole points of heat still to go before the
+ * end-of-turn check makes one more scandal, and how many it would make if the turn ended now. The
+ * effective threshold itself can be fractional (4.5) and is never shown to the player. Computed from
+ * the state as it stands: onEndOfTurn effects still to fire this turn can move it.
+ */
+export function heatOutlook(s: ConditionSubject): { readonly scandalsIfTurnEndedNow: number; readonly heatToNextScandal: number } {
+  const threshold = effectiveHeatThreshold(s);
+  const heat = s.resources.heat;
+  const scandalsIfTurnEndedNow = Math.floor(heat / threshold);
+  // The next line sits at threshold × (n + 1); heat is whole, so the first heat that crosses it is its ceiling.
+  const nextLine = threshold * (scandalsIfTurnEndedNow + 1);
+  return { scandalsIfTurnEndedNow, heatToNextScandal: Math.max(1, Math.ceil(nextLine - 1e-9) - heat) };
+}
+
 function inRange(value: number, range: Range): boolean {
   return (range.min === undefined || value >= range.min) && (range.max === undefined || value <= range.max);
 }

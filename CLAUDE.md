@@ -42,6 +42,21 @@ UI dispatches actions; it never mutates state.
 
 ## 2. Game design
 
+### FROZEN for UI (2026-09-29)
+
+The UI is built around the items below. Changing any of them now means reworking layout, flow or animation, so they are fixed. Everything else — card, gate and ending numbers (requirements, effects, prices), draft prices and timing, `actMin`, card text — stays tunable through content, and the UI reads it from content, never hardcodes it.
+
+| Frozen | As it stands |
+|---|---|
+| Run structure | 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — named through `rules.actNameKeys` |
+| Gates | 8 gates, two per season. After each season's last turn, 2 are offered and the player picks 1 |
+| Endings | 4, ids fixed: `meltdown`, `star`, `craftsman`, `nobody`. Their condition numbers stay tunable |
+| Resources | `hype`, `craft`, `capital`, `heat`; 3 slots per turn; a hand of 5. No new resources |
+| Starting deck | 11 cards: `vocal_coaching` ×2, `side_gig` ×2, `open_mic`, `cover_single`, `press_junket`, `viral_stunt`, `lay_low`, `networking`, `crisis_pr` |
+| Heat formula | the formula in "The Heat → Scandal loop", with `heatThreshold` [7, 6, 6, 5], `thresholdFloor` [7, 6, 5, 4.5], `degradePerScandal` 0.5, `vent` 4. No further changes to any of the four |
+| Heat display | whole numbers only: points until the next scandal (see "Displayed heat") — never the effective threshold |
+| GameEvent list | the events and fields in "GameEvents" below |
+
 ### Premise
 
 A career simulation. One run compresses an entertainment career into ~20 minutes.
@@ -67,6 +82,34 @@ End-of-turn resolution, in order:
 2. The Heat → Scandal check (below).
 3. The whole hand, Scandals included, goes to the discard pile. The next turn draws back up to hand size.
 
+### GameEvents (frozen)
+
+Every action returns the new state with `events`: what happened, in order, ids and numbers only. The UI animates from these and never diffs states. Defined in `core/state.ts`.
+
+| Event | Fields | Emitted when |
+|---|---|---|
+| `turnStart` | `act`, `turn` | A turn opens, after its draft if it has one: slots refresh (no `slots` event), then the draw |
+| `shuffle` | `count` | The deck ran out: the discard pile (`count` cards) is shuffled into it |
+| `draw` | `uid`, `cardId` | A card moves from the deck to the hand — the turn's draw or a `draw` effect. Its `onDraw` events follow |
+| `play` | `uid`, `cardId`, `cost` | A card is played and `cost` slots are spent (no `slots` event). Its effect events follow; then `exhaust` if it was an opportunity, otherwise it silently goes to the discard pile |
+| `resource` | `target`, `delta`, `value` | A resource changed: `delta` is the real change after flooring at 0, `value` the new total. Never emitted for a change of 0 |
+| `slots` | `delta`, `value` | A `slots` effect changed this turn's slots |
+| `flag` | `flag`, `source` | A flag is set for the first time. `source`: the card whose effect set it; null = a gate or the engine |
+| `addCard` | `uid`, `cardId`, `to` | A new card instance enters `deck`, `discard` or `hand`: a draft pick, an effect, a gate reward, or a crystallised scandal |
+| `exhaust` | `uid`, `cardId` | A card leaves the run for good: `exhaustTag` removal, or a played opportunity |
+| `scandal` | `uid`, `cardId`, `cause`, `byTag` | A scandal crystallised at end of turn; follows the `addCard` of the same `uid`. `cause`: the card blamed for pushing heat over the line (null = nothing to blame); `byTag`: it matched the cause's kind tag (false = seeded fallback) |
+| `turnEnd` | `act`, `turn`, `resources`, `scandalCount`, `threshold`, `crystallised` | End-of-turn resolution finished and the hand is discarded (no event of its own). `resources` after the vent; `threshold`: the effective threshold the check used — for tools, never shown; `crystallised`: scandals made |
+| `draftOffer` | `act`, `cardIds` | A draft opens with these cards, or a reroll replaced them |
+| `draftPick` | `uid`, `cardId` | A card is taken from the offer; follows its `addCard` (to the deck) |
+| `draftExtraPick` | `cost` | An extra pick was bought; follows the capital `resource` event |
+| `draftReroll` | `cost` | The offer was rerolled; follows the capital `resource` event, followed by a new `draftOffer` |
+| `gateOffer` | `gateIds` | The season is over: its gates are offered |
+| `gate` | `gateId`, `passed` | A gate was chosen and resolved; its onPass / onFail events follow |
+| `ending` | `endingId` | The run is over |
+| `warning` | `code`, `ref` | Shipped (lenient) build only: bad content or an illegal action was skipped instead of thrown |
+
+Typical sequences: **END_TURN** → onEndOfTurn effect events → per scandal `addCard` + `scandal` → heat `resource` (the vent) → `turnEnd` → the next turn (`draftOffer`, or `turnStart` + `draw`s) or `gateOffer`. **CHOOSE_GATE** → `gate` → its effect events → the next season's first turn, or `ending`. **DRAFT_PICK** → `addCard` + `draftPick` → `turnStart` + `draw`s once no picks are left.
+
 ### Resources
 
 | Key | Role |
@@ -89,6 +132,8 @@ heat -= vent * count                          // vent < every thresholdFloor, so
 ```
 
 All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFloor` hold one entry per act. The floor tightens season by season, so degradation cannot exhaust itself early: late in the run the same pile of scandals drags the threshold lower than it could in spring. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
+
+**Displayed heat (frozen).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from `heatOutlook(state)` in /core: `heatToNextScandal` — points of heat until the end-of-turn check makes one more scandal — and `scandalsIfTurnEndedNow`. Both come from the state as it stands; onEndOfTurn effects still to fire this turn (e.g. a Copycat Story adding a scandal) can move them.
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
@@ -256,7 +301,7 @@ Diagnostics, reported but not bands: the pooled ending distribution and gate pas
 
 Illustration is concentrated at emotional beats:
 - **4 endings — required.** These are what players screenshot and what drives "one more run".
-- 3 act gates — if time allows
+- 4 season gates (one per season) — if time allows
 - Meltdown trigger — nice to have
 
 **Source: public-domain photo collage.** Cut out → halftone → one spot colour → layered into the layout. The craft is in cropping, screen and composition — design, not drawing.
