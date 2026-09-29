@@ -6,10 +6,10 @@ import { COMEBACK_SWITCH_AT, ignoredAxes, PERSONA_IDS, type PersonaId, type Prob
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
- * Tuning targets, CLAUDE.md §5. Population: every persona, equal runs each on the same seeds.
- * Per-persona bands are checked on each persona separately; pooled bands weight personas equally.
- * Two persona classes (see ignoredAxes): player-like personas carry the concentration band; control
- * probes carry assertions that fail if the design thesis breaks.
+ * Tuning targets, CLAUDE.md §5. Every persona runs the same seeds, equal runs each. Two persona
+ * classes (see ignoredAxes): player-like personas are the band population — the concentration band per
+ * persona, the aggregate bands pooled over them with equal weight. Control probes only carry assertions
+ * that fail if the design thesis breaks; their draws never set gate difficulty or the scandal median.
  */
 export const BANDS = {
   /** Per player-like persona: no single ending may take more than this share of its runs. */
@@ -18,11 +18,11 @@ export const BANDS = {
   probeHeatCollapseMin: 0.8,
   /** A probe ignoring hype must reach the top-hype ending (the one demanding the most hype) in less than this share. */
   probeHypeTopMax: 0.05,
-  /** Pooled median scandals held at run end. */
+  /** Player-like, pooled: median scandals held at run end. */
   scandalMedian: [2, 5],
-  /** Pooled per gate: requirement already satisfied when offered. */
+  /** Player-like, pooled, per gate: requirement already satisfied when offered. */
   gateMet: [0.35, 0.65],
-  /** Pooled play rate = times played / times drawn. */
+  /** Player-like, pooled: play rate = times played / times drawn. */
   cardPlayRate: 0.02,
   /** "Significantly different" made concrete: chi-square p below this AND total variation distance at least… */
   skillP: 0.01,
@@ -33,7 +33,8 @@ const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'c
 /** Metrics printed with one decimal in the curve tables. */
 const FINE: readonly string[] = ['scandals', 'threshold', 'crystallised', 'scandalsDrawn'];
 type Metric = (typeof METRICS)[number];
-type Group = PersonaId | 'pooled';
+/** A persona, or 'players': every player-like persona pooled with equal weight (the band population). */
+type Group = PersonaId | 'players';
 
 interface Dist {
   readonly mean: number;
@@ -129,7 +130,7 @@ export interface Report {
     kind: string;
     playRate: number | null;
     runsPlayed: number;
-    /** Draft offers containing the card, times it was taken, and taken / offered (pooled). */
+    /** Player-like, pooled: draft offers containing the card, times it was taken, and taken / offered. */
     offered: number;
     drafted: number;
     draftRate: number | null;
@@ -153,9 +154,14 @@ function dist(xs: readonly number[]): Dist {
 
 export function buildReport(batch: BatchResult): Report {
   const { records, personas, content } = batch;
+  const ignores = Object.fromEntries(personas.map((p) => [p, ignoredAxes(p)])) as Record<PersonaId, readonly ProbeAxis[]>;
+  const players = personas.filter((p) => ignores[p].length === 0);
   const byPersona = (p: PersonaId) => records.filter((r) => r.persona === p);
-  const groups: [Group, readonly RunRecord[]][] = [...personas.map((p): [Group, RunRecord[]] => [p, byPersona(p)]), ['pooled', records]];
+  const playerRecords = records.filter((r) => players.includes(r.persona));
+  const groups: [Group, readonly RunRecord[]][] = [...personas.map((p): [Group, RunRecord[]] => [p, byPersona(p)]), ['players', playerRecords]];
   const healthy = records.filter((r) => r.crash === null && r.softLock === null);
+  /** The band population: healthy runs of player-like personas. */
+  const healthyPlayers = healthy.filter((r) => players.includes(r.persona));
 
   // Endings
   const endingIds = content.endings.map((e) => e.id);
@@ -221,7 +227,7 @@ export function buildReport(batch: BatchResult): Report {
     ) as Record<Group, { perRun: number; runs: number }>,
   }));
   const blameCounts: Record<string, number> = {};
-  for (const r of records) for (const [cause, n] of Object.entries(r.blamedOn)) blameCounts[cause] = (blameCounts[cause] ?? 0) + n;
+  for (const r of playerRecords) for (const [cause, n] of Object.entries(r.blamedOn)) blameCounts[cause] = (blameCounts[cause] ?? 0) + n;
   const blamed = sum(Object.values(blameCounts));
   const blame = Object.entries(blameCounts)
     .map(([cause, n]) => ({ cause, share: n / Math.max(1, blamed) }))
@@ -241,14 +247,14 @@ export function buildReport(batch: BatchResult): Report {
     });
   }
 
-  // Gates
+  // Gates: aggregates over the player-like population; per persona below
   const gates = content.gates.map((gate) => {
     const offeredIn = (rs: readonly RunRecord[]) => rs.flatMap((r) => r.gates).filter((g) => g.offered.includes(gate.id));
     const chosenIn = (rs: readonly RunRecord[]) => rs.flatMap((r) => r.gates).filter((g) => g.gateId === gate.id);
-    const offered = offeredIn(healthy).length;
-    const chosen = chosenIn(healthy);
+    const offered = offeredIn(healthyPlayers).length;
+    const chosen = chosenIn(healthyPlayers);
     const passed = chosen.filter((g) => g.passed).length;
-    const checks = healthy.flatMap((r) => r.gateChecks).filter((c) => c.gateId === gate.id);
+    const checks = healthyPlayers.flatMap((r) => r.gateChecks).filter((c) => c.gateId === gate.id);
     return {
       id: gate.id,
       act: gate.act,
@@ -325,14 +331,15 @@ export function buildReport(batch: BatchResult): Report {
   // Cards
   const count = (rs: readonly RunRecord[], field: 'draws' | 'plays' | 'offered' | 'drafted', id: string) =>
     sum(rs.map((r) => r[field][id] ?? 0));
+  // Cards: aggregates over the player-like population; per persona below
   const cards = content.cards.map((card) => ({
     id: card.id,
     kind: card.kind,
-    playRate: card.playable === false ? null : ratio(count(healthy, 'plays', card.id), count(healthy, 'draws', card.id)),
-    runsPlayed: healthy.filter((r) => (r.plays[card.id] ?? 0) > 0).length / Math.max(1, healthy.length),
-    offered: count(healthy, 'offered', card.id),
-    drafted: count(healthy, 'drafted', card.id),
-    draftRate: ratio(count(healthy, 'drafted', card.id), count(healthy, 'offered', card.id)),
+    playRate: card.playable === false ? null : ratio(count(healthyPlayers, 'plays', card.id), count(healthyPlayers, 'draws', card.id)),
+    runsPlayed: healthyPlayers.filter((r) => (r.plays[card.id] ?? 0) > 0).length / Math.max(1, healthyPlayers.length),
+    offered: count(healthyPlayers, 'offered', card.id),
+    drafted: count(healthyPlayers, 'drafted', card.id),
+    draftRate: ratio(count(healthyPlayers, 'drafted', card.id), count(healthyPlayers, 'offered', card.id)),
     byPersona: Object.fromEntries(
       personas.map((p) => {
         const rs = healthy.filter((r) => r.persona === p);
@@ -397,12 +404,9 @@ export function buildReport(batch: BatchResult): Report {
 
   // Bands
   const pct = (x: number | null) => (x === null ? 'n/a' : `${(x * 100).toFixed(1)}%`);
-  const pooledShare = share.pooled;
   const bands: BandCheck[] = [];
   const topEnding = (p: PersonaId) =>
     endingIds.map((id) => ({ id, share: share[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
-  const ignores = Object.fromEntries(personas.map((p) => [p, ignoredAxes(p)])) as Record<PersonaId, readonly ProbeAxis[]>;
-  const players = personas.filter((p) => ignores[p].length === 0);
   const concentrated = players.filter((p) => topEnding(p).share > BANDS.personaEndingMax);
   bands.push({
     target: `player-like personas: no single ending > ${pct(BANDS.personaEndingMax)} of its runs`,
@@ -457,22 +461,22 @@ export function buildReport(batch: BatchResult): Report {
       (x) => x < BANDS.probeHypeTopMax,
     ),
   );
-  const med = scandalsHeld.pooled.median;
+  const med = scandalsHeld.players.median;
   bands.push({
-    target: `scandals held at run end: median ${BANDS.scandalMedian[0]}-${BANDS.scandalMedian[1]} (pooled)`,
-    pass: med >= BANDS.scandalMedian[0] && med <= BANDS.scandalMedian[1],
-    actual: `median ${med}; ` + personas.map((p) => `${p} ${scandalsHeld[p].median}`).join(', '),
+    target: `scandals held at run end: median ${BANDS.scandalMedian[0]}-${BANDS.scandalMedian[1]} (player-like, pooled)`,
+    pass: players.length === 0 ? null : med >= BANDS.scandalMedian[0] && med <= BANDS.scandalMedian[1],
+    actual: `median ${med}; ` + players.map((p) => `${p} ${scandalsHeld[p].median}`).join(', '),
   });
   const gateOut = gates.filter((g) => g.metRate === null || g.metRate < BANDS.gateMet[0] || g.metRate > BANDS.gateMet[1]);
   bands.push({
-    target: `gate difficulty: met% ${pct(BANDS.gateMet[0])}-${pct(BANDS.gateMet[1])} per gate (requirement satisfied when offered, pooled)`,
-    pass: gateOut.length === 0,
+    target: `gate difficulty: met% ${pct(BANDS.gateMet[0])}-${pct(BANDS.gateMet[1])} per gate (requirement satisfied when offered, player-like, pooled)`,
+    pass: players.length === 0 ? null : gateOut.length === 0,
     actual: gateOut.length === 0 ? 'all in band' : `out of band: ${gateOut.map((g) => `${g.id} ${pct(g.metRate)}`).join(', ')}`,
   });
   const cardsOut = cards.filter((c) => c.kind !== 'scandal' && (c.playRate === null || c.playRate <= BANDS.cardPlayRate));
   bands.push({
-    target: `every playable card play rate > ${pct(BANDS.cardPlayRate)} (played/drawn, pooled)`,
-    pass: cardsOut.length === 0,
+    target: `every playable card play rate > ${pct(BANDS.cardPlayRate)} (played/drawn, player-like, pooled)`,
+    pass: players.length === 0 ? null : cardsOut.length === 0,
     actual: cardsOut.length === 0 ? 'all above' : `at or below: ${cardsOut.map((c) => `${c.id} ${pct(c.playRate)}`).join(', ')}`,
   });
   bands.push({
@@ -483,20 +487,26 @@ export function buildReport(batch: BatchResult): Report {
   bands.push({ target: 'soft-locks: 0', pass: softLocks.length === 0, actual: String(softLocks.length) });
   bands.push({ target: 'crashes: 0', pass: crashes.length === 0, actual: String(crashes.length) });
 
-  const playerScandals = records.filter((r) => r.crash === null && players.includes(r.persona)).map((r) => r.scandalsAtEnd);
+  // Probes as diagnostics: the same aggregates with every persona counted, for comparison only.
+  const allScandals = records.filter((r) => r.crash === null).map((r) => r.scandalsAtEnd);
+  const allPlayRates = cards
+    .filter((c) => c.kind !== 'scandal')
+    .map((c) => ({ id: c.id, rate: ratio(count(healthy, 'plays', c.id), count(healthy, 'draws', c.id)) }))
+    .sort((a, b) => (a.rate ?? 0) - (b.rate ?? 0));
   const diagnostics = [
-    { label: 'ending distribution (pooled)', value: endingIds.map((id) => `${id} ${pct(pooledShare[id] ?? 0)}`).join(', ') },
-    { label: 'scandals held at run end, player-like personas only', value: playerScandals.length ? `median ${median(playerScandals)}` : 'n/a' },
+    { label: 'ending distribution (player-like, pooled)', value: endingIds.map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ') },
+    { label: 'gate pass% (passed when chosen, player-like, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
+    { label: 'scandals held at run end, all personas (probes included)', value: allScandals.length ? `median ${median(allScandals)}` : 'n/a' },
     {
-      label: 'gate met%, player-like personas only',
+      label: 'gate met%, all personas (probes included)',
       value: gates
         .map((g) => {
-          const checks = healthy.filter((r) => players.includes(r.persona)).flatMap((r) => r.gateChecks).filter((c) => c.gateId === g.id);
+          const checks = healthy.flatMap((r) => r.gateChecks).filter((c) => c.gateId === g.id);
           return `${g.id} ${pct(ratio(checks.filter((c) => c.met).length, checks.length))}`;
         })
         .join(', '),
     },
-    { label: 'gate pass% (passed when chosen, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
+    { label: 'lowest card play rate, all personas (probes included)', value: allPlayRates[0] ? `${allPlayRates[0].id} ${pct(allPlayRates[0].rate)}` : 'n/a' },
   ];
 
   return {
@@ -568,6 +578,7 @@ export function formatReport(r: Report): string {
   out.push(
     `persona classes: player-like ${P.filter((p) => !isProbe(p)).join(', ') || '-'}; ` +
       `probes ${probes.map((p) => `${p} (ignores ${(r.meta.ignores[p] ?? []).join(' and ')})`).join(', ') || '-'}`,
+    `'players' columns pool the player-like personas: the band population. Probes appear only in their own columns.`,
   );
   if (r.meta.comebackLimit !== null) {
     out.push(`comeback switches from spike to clean-up at ${r.meta.comebackLimit} scandals held (fixed persona parameter)`);
@@ -576,13 +587,13 @@ export function formatReport(r: Report): string {
   for (const s of r.health.softLocks.slice(0, 10)) out.push(`  SOFT-LOCK  --replay=${s.seed} --persona=${s.persona}  ${s.reason}`);
 
   h('ENDING DISTRIBUTION');
-  out.push(table(['ending', ...P, 'pooled'], r.endings.ids.map((id) => [id, ...[...P, 'pooled' as const].map((g) => pc(r.endings.share[g][id] ?? 0))])));
+  out.push(table(['ending', ...P, 'players'], r.endings.ids.map((id) => [id, ...[...P, 'players' as const].map((g) => pc(r.endings.share[g][id] ?? 0))])));
 
   h('SCANDALS  (held at run end; crystallised per run; turns per run that crystallised 2+ at once; most in one turn)');
   out.push(
     table(
       ['group', 'median', 'mean', 'p90', 'max', 'crystallised', 'by tag', '2+ turns', 'max/turn'],
-      [...P, 'pooled' as const].map((g) => {
+      [...P, 'players' as const].map((g) => {
         const s = r.scandalsHeld[g];
         return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max), n1(s.crystallised), pc(s.byTag), n1(s.multiTurns), n0(s.maxInTurn)];
       }),
@@ -593,18 +604,18 @@ export function formatReport(r: Report): string {
   out.push(
     table(
       ['group', '0', '1', '2', '3+'],
-      [...P, 'pooled' as const].map((g) => [g, ...r.crystalTurns[g].map((x) => pc(x))]),
+      [...P, 'players' as const].map((g) => [g, ...r.crystalTurns[g].map((x) => pc(x))]),
     ),
   );
 
   h('SCANDAL KINDS  (crystallised per run / share of runs it crystallised in)');
   out.push(
     table(
-      ['scandal', 'kind', ...P, 'pooled'],
+      ['scandal', 'kind', ...P, 'players'],
       r.scandalKinds.map((s) => [
         s.id,
         s.kinds.join('+') || '-',
-        ...[...P, 'pooled' as const].map((g) => {
+        ...[...P, 'players' as const].map((g) => {
           const x = s.byGroup[g];
           return x ? `${n1(x.perRun)} / ${pc(x.runs)}` : '-';
         }),
@@ -617,7 +628,7 @@ export function formatReport(r: Report): string {
   out.push(
     table(
       ['group', ...Array.from({ length: r.meta.acts }, (_, i) => `act ${i + 1}`), 'peak'],
-      [...P, 'pooled' as const].map((g) => {
+      [...P, 'players' as const].map((g) => {
         const byAct = r.cascadeByAct[g] ?? [];
         const peak = byAct.reduce((best, a, i) => (a.perTurn > (byAct[best]?.perTurn ?? -1) ? i : best), 0);
         const quiet = byAct.every((a) => a.perTurn === 0);
@@ -626,7 +637,7 @@ export function formatReport(r: Report): string {
     ),
   );
 
-  h('GATES  (met% = requirement held when offered; pick% = chosen when offered; pass% = passed when chosen)');
+  h('GATES  (player-like, pooled: met% = requirement held when offered; pick% = chosen when offered; pass% = passed when chosen)');
   out.push(
     table(
       ['gate', 'act', 'offered', 'met%', 'pick%', 'pass%', ...P.map((p) => `${p} pass%`)],
@@ -648,21 +659,21 @@ export function formatReport(r: Report): string {
   h('FLAGS HELD AT RUN END  (share of runs)');
   out.push(
     table(
-      ['flag', ...P, 'pooled'],
-      Object.keys(r.flagsHeld).map((f) => [f, ...[...P, 'pooled' as const].map((g) => pc(r.flagsHeld[f]?.[g] ?? 0))]),
+      ['flag', ...P, 'players'],
+      Object.keys(r.flagsHeld).map((f) => [f, ...[...P, 'players' as const].map((g) => pc(r.flagsHeld[f]?.[g] ?? 0))]),
     ),
   );
 
   h('FLAG SOURCES  (of the runs that set the flag: share set by each card or gate; runs setting it in brackets)');
   out.push(
     table(
-      ['flag', 'source', ...P, 'pooled'],
+      ['flag', 'source', ...P, 'players'],
       Object.entries(r.flagSources).flatMap(([flag, byGroup]) => {
         const sources = [...new Set(Object.values(byGroup).flatMap((x) => Object.keys(x.bySource)))].sort();
         return sources.map((src) => [
           flag,
           src,
-          ...[...P, 'pooled' as const].map((g) => {
+          ...[...P, 'players' as const].map((g) => {
             const x = byGroup[g];
             return x && x.runs > 0 ? `${pc(x.bySource[src] ?? 0)} (${x.runs})` : '-';
           }),
@@ -696,10 +707,10 @@ export function formatReport(r: Report): string {
     ),
   );
 
-  h('CARDS  (per persona: plays per run / play rate = played / drawn; draft% = taken when offered)');
+  h('CARDS  (per persona: plays per run / play rate = played / drawn; players = player-like pooled; draft% = taken when offered)');
   out.push(
     table(
-      ['card', 'kind', ...P, 'pooled play%', 'runs played', 'draft%'],
+      ['card', 'kind', ...P, 'players play%', 'runs played', 'draft%'],
       r.cards.map((c) => [
         c.id,
         c.kind,
