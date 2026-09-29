@@ -55,6 +55,8 @@
   "card.award_campaign.text": "Opportunity. Needs 40 Craft. Gain 7 Hype. Lose 2 Heat.",
   "card.legal_team.name": "Legal Team",
   "card.legal_team.text": "Opportunity. Needs a Scandal and 6 Capital. Pay 6 Capital: remove 2 Scandals for good.",
+  "card.indie_label.name": "Indie Label",
+  "card.indie_label.text": "Opportunity. Needs 40 Hype and 6 Capital, and no deal yet. Pay 6 Capital: you're signed.",
   "card.bad_press.name": "Bad Press",
   "card.bad_press.text": "Scandal. Unplayable. Takes up a slot in your hand.",
   "card.burnout.name": "Burnout",

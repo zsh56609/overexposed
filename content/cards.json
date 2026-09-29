@@ -403,6 +403,20 @@
     ]
   },
   {
+    "id": "indie_label",
+    "kind": "opportunity",
+    "cost": 1,
+    "nameKey": "card.indie_label.name",
+    "textKey": "card.indie_label.text",
+    "tags": ["money", "recording"],
+    "actMin": 2,
+    "requires": { "hype": { "min": 40 }, "capital": { "min": 6 }, "flags": { "not": ["signed_label"] } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -6 },
+      { "op": "setFlag", "flag": "signed_label" }
+    ]
+  },
+  {
     "id": "bad_press",
     "kind": "scandal",
     "cost": 0,
