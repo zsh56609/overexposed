@@ -6,6 +6,30 @@ rules).
 
 ---
 
+## 2026-09-30 — The seven pending items from the layer 1 handoff
+
+Full text in docs/ui-plan.md §13 (decisions 1, 2, 4 and 18–20).
+
+1. The heat display counts no scandals: "N TO GO", or once over, "LINE
+   CROSSED · N TO THE NEXT". The scandal count lives only in the END
+   TURN preview — two surfaces cannot disagree if only one counts.
+2. The END TURN preview reports every scandal card month end will add,
+   from any cause, Copycat copies included, with each one's cause on
+   hover.
+3. "Next line" is the integer heat value at which the next scandal would
+   crystallise. /core computes it and how far it moved; /ui displays a
+   movement it is given and never diffs state.
+4. The heat display shows current state; the explanation attaches to the
+   event that caused the change (season transition, gate result,
+   month-end residue). No separate warning panel.
+5. "No art before 10/26" means illustration only — the four ending
+   illustrations. Layer 2 visual craft proceeds once the meaning layer is
+   in; the loop is already tuned.
+6. Awards are a separate list capped at 8, outside the 46-item cap: the
+   cap bounds gameplay content, and awards change no play.
+7. First-run mechanic exposure stays open, as a manual test for the
+   author's next playtest.
+
 ## 2026-09-30 — A fixed 1280×720 stage
 
 On the itch draft the embed rendered at 800×450, smaller than the
@@ -18,6 +42,27 @@ change. Nothing inside the stage may overflow it at any viewport size: a
 screen that needs more room gets a new layout, never a scrollbar. The
 itch embed's viewport dimensions are 1280×720, with the fullscreen button
 on.
+
+## 2026-09-29 — The player's role: a singer (decided)
+
+The role was never explicitly decided; it drifted into music because the
+star ending requires signing a record deal, and later cards followed. The
+author has now decided: the player is a young singer — second person,
+unnamed, ungendered, never shown. Crossover work (brand deals, ads,
+press) stays, because it is how real pop careers work. Actor and host
+paths are full-version scope, not jam scope.
+
+## 2026-09-29 — Writing pass and disclosure
+
+Player-facing prose was drafted with AI assistance in conversation and
+accepted by the author, who will revise it during playtesting. The draft
+is docs/writing/draft-v1.md. The public AI disclosure now states that
+player-facing text was drafted with AI assistance. Feed voice uses three
+registers mapped to resources: LOUD (hype/heat, tabloid headline), quiet
+(craft, diary voice), Money (capital, business page). Craft is meant to
+be nearly invisible on the front page — the layout itself states the
+game's thesis. Target run length stays under 20 minutes; prose adds
+meaning, not reading time.
 
 ## 2026-09-29 — Layer 2 direction
 

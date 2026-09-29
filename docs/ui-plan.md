@@ -69,18 +69,21 @@ A fixed 1280×720 logical stage, scaled to fit the viewport (§9).
 ```
 
 The stat strip shows heat as integers only (§5): the heat value, then
-"N TO GO", or "1 SCANDAL DUE · N TO THE NEXT" once a scandal is due. There is no
-proportional heat bar: a bar needs a denominator, which is the effective
+"N TO GO", or "LINE CROSSED · N TO THE NEXT" once heat is over a line.
+It counts no scandals; the count lives only in the END TURN preview.
+There is no proportional heat bar: a bar needs a denominator, which is the effective
 threshold, which the frozen rules forbid displaying.
 
-The END TURN button carries the end-of-month preview (§4). There is no
-separate "if the month ended now" status line.
+The END TURN button carries the end-of-month preview (§4), the one
+place scandals are counted. There is no separate "if the month ended
+now" status line.
 
 The centre panel is the event feed, set as this turn's front page. It
 consumes the frozen event list directly, aggregated per action: one
 headline per card played, its resource deltas beneath it, draws merged
-into a single line, and scandals set as the red lead story. Headlines are hand-written content, read from the card's
-headline field (§13, decisions 5 and 15). Pure typography, no
+into a single line, and scandals set as the red lead story. Headlines
+are the author's content, read from the card's headline variants (§13,
+decisions 5 and 15). Pure typography, no
 illustration.
 
 The card preview is not a rail panel: it floats beside the hovered card
@@ -106,6 +109,9 @@ before it is played, in a floating panel attached to the hovered card
 
 Ending the month is the preview that matters most, and it is shown on
 the END TURN button itself, e.g. "1 scandal will print" (decision 2).
+It counts every scandal card month end will add, from any cause —
+crystallised, or copied by a Copycat Story — and shows each one's cause
+on hover.
 
 Implementation: run the reducer on the hypothetical action (PLAY_CARD or
 END_TURN) and read the outcome from the events it returns. A card that
@@ -130,20 +136,27 @@ unmet, plus pass and fail consequences.
 ## 5. Heat display
 
 Follow the display rule frozen in AGENTS.md ("Displayed heat"). Integers
-only (decision 1):
+only, and it counts no scandals (decision 1):
 
-- normally **"N TO GO"** — points of heat until the next scandal
-- once a scandal is already due: **"1 SCANDAL DUE"** (the number due),
-  then **"N TO THE NEXT"**
+- normally **"N TO GO"** — points of heat until the next line
+- once heat is over a line: **"LINE CROSSED · N TO THE NEXT"**
+- the scandal count lives in exactly one place, the END TURN preview
+  (§4, decision 2)
 - never show the effective threshold; a player must never see a
   fractional number — so no proportional bar
 - the line can move: toward the player when held scandals lower the
   threshold or a new season tightens it, away from the player when a
-  scandal is removed. That movement is itself information. /core provides a
-  read-only query returning the integer position of the next line; /ui
-  diffs it before and after (decision 4). The frozen GameEvent list is
-  not touched. The season transition states how far the line moved this
-  season (decision 13).
+  scandal is removed. That movement is itself information. "Next line" is the
+  integer heat value at which the next scandal would crystallise; /core
+  computes it and reports how far it moved, and /ui displays the
+  movement it is given, never diffing state itself (decision 4). The
+  frozen GameEvent list is not touched.
+- the display always shows current state, whatever caused it. The
+  explanation attaches to the event that caused the change: the season
+  transition says the line tightened, the gate result says heat was
+  added, the month-end resolution says what residue carried over. No
+  separate warning panel (decision 18). The season transition also
+  states how far the line moved this season (decision 13).
 
 Crossing the line and crystallisation are two separate moments
 (decision 3):
@@ -189,12 +202,14 @@ Crossing the line and crystallisation are two separate moments
 legalActions, with cost shown on the button. Cards support preview,
 through /core's "as if this card were in hand" query (decision 8).
 
-**Gate** — 2 offered, pick 1. Every requirement live as met / unmet.
+**Gate** — 2 offered, pick 1. Each shows its flavour line (flavorKey)
+and every requirement live as met / unmet.
 The final gate is an informed choice: each option shows which ending it
 leads to (decision 11).
 
-**Goals board** — visible from the first turn: the four endings and what
-each requires, live via explainCondition. The player must always know
+**Goals board** — visible from the first turn: the four endings, each
+with its name, its goal line (goalKey) and what it requires, live via
+explainCondition. The player must always know
 what they are steering toward (decision 10).
 
 **Deck viewer** — read-only deck and discard lists, sorted by name, never
@@ -204,11 +219,11 @@ revealing draw order (decision 12).
 docs/decisions.md). The ending decides the headline; below it, the
 categories the player was nominated in, won, or lost.
 - ending name and text, from the ending's nameKey and textKey
-  (decision 9), written by hand by the author (decision 15)
+  (decisions 9 and 15)
 - run summary (peak hype, scandals held, milestone flags such as signed,
   ...)
 - **the other endings shown as locked**, each with its name and a
-  one-line hint — "3 other endings remain"
+  one-line hint (its goal line) — "3 other endings remain"
 - **"Play again" is the largest element on the screen and restarts in
   one click** once the screen has settled; a click during an animation
   only fast-forwards (decision 7)
@@ -304,20 +319,29 @@ it.
 
 ### Decisions
 
-1. Heat display — integers only. When a scandal is already due, show
-   "1 SCANDAL DUE", then "N TO THE NEXT". Otherwise "N TO GO".
+1. Heat display — integers only, and it counts no scandals. It shows
+   only where heat sits against the line: "N TO GO", or once over,
+   "LINE CROSSED · N TO THE NEXT". The scandal count lives in exactly
+   one place, the END TURN preview. Two surfaces cannot disagree if only
+   one of them counts. (Amended 2026-09-30.)
 2. End-of-month preview is first-class, shown on the END TURN button
    (e.g. "1 scandal will print"). Remove the "If the month ended now"
    status line: two numbers that can disagree are worse than one.
+   The END TURN preview reports every scandal card that will enter the
+   deck at month end, from any cause, Copycat copies included — it
+   answers "what will actually happen". Show each one's cause on hover.
+   (Amended 2026-09-30.)
 3. Two beats, not one. A card that crosses the line gets a light warning
    only. The major beat is month-end crystallisation, and its animation
    ends at the discard pile.
-4. Line movement: /core adds a read-only query returning the integer
-   position of the next line. /ui diffs before and after. The frozen
-   GameEvent list is not touched.
+4. Line movement: "next line" is the integer heat value at which the
+   next scandal would crystallise. /core computes it and also reports
+   how far it moved since the previous turn, so /ui displays a movement
+   it is given and never diffs state itself. The frozen GameEvent list
+   is not touched. (Amended 2026-09-30.)
 5. Feed: aggregate per action. One headline per card played, resource
    deltas beneath it, draws merged into a single line, scandals set as
-   the lead story. Headlines are hand-written content — see decision 15.
+   the lead story. Headlines are author-controlled content — see decision 15.
 6. Preview is a floating panel attached to the hovered card, replacing
    the fixed right-rail panel, which truncates in winter and forces the
    eye to travel between hand and corner.
@@ -340,11 +364,46 @@ it.
     season, plus a one-line season opener.
 14. Move the seed off the main screen into an unobtrusive corner; keep
     it available for bug reports.
-15. Card schema gains a headline field (e.g. headlineKey) for the feed.
-    All player-facing prose — card headlines, ending names and text,
-    season openers, the opening premise — is written BY HAND by the
-    human author. Agents build the fields, keys and placeholders; they
-    do not write the shipping prose. The public AI disclosure states
-    that all text is hand-written, and it must stay true.
+15. Player-facing prose — schema:
+    - cards: headlineKeys (an array of variants) and register
+      (loud | quiet | money), which drives feed typography
+    - scandals: headlineKey (printed on crystallisation) and textKey
+      (shown while in hand)
+    - endings: nameKey, goalKey (goals-board line), textKey
+    - gates: flavorKey; seasons: an opener key; the opening premise
+    - awards: name and citation keys
+
+    Variant choice must NOT consume the game RNG stream — that would
+    change every sim result and break replays. Use a separate
+    deterministic choice, e.g. a hash of run seed, turn and card id.
+    All player-facing prose is controlled by the human author. Agents
+    build fields, keys and placeholders, import prose the author has
+    approved, and never invent shipping prose. The public AI
+    disclosure must accurately describe how the prose was produced.
 16. The awards ceremony (see docs/decisions.md) is the form of the
-    ending screen in layer 2.
+    ending screen in layer 2. The comeback award needs the peak number
+    of scandals held during the run — derive it from the run's event
+    history rather than adding GameState fields where possible. Every
+    run receives at least one award.
+17. Stage: the UI renders into one fixed logical 1280x720 stage,
+    scaled uniformly to fit the viewport (contain, letterboxed, never
+    cropped). Nothing overflows the stage. Layer 2 designs for exactly
+    this one canvas.
+18. The heat display always shows current state, whatever caused it.
+    The explanation attaches to the event that caused the change: the
+    season transition says the line tightened, the gate result says heat
+    was added, the month-end resolution says what residue carried over.
+    No separate warning panel. (2026-09-30)
+19. "No art before 10/26" means illustration only — the four ending
+    illustrations. Layer 2 visual craft (type, palette, layout, texture)
+    proceeds once the meaning layer is in; the loop is already tuned.
+    (2026-09-30)
+20. Awards do not count toward the 46-item cap. The cap bounds gameplay
+    content because it bounds balance and scope. Awards present an
+    outcome and change no play. They are a separate list, capped at 8.
+    (2026-09-30)
+
+### Still open
+
+- First-run mechanic exposure (docs/decisions.md, 2026-09-29): a manual
+  test for the author's next playtest.

@@ -99,51 +99,28 @@ craft alongside it, never ahead. Agents build the fields, keys and
 placeholders; the author writes the prose (D15).
 
 Notes for whoever builds it:
-- Read-only /core queries layer 2 needs: the next line's position (D4,
-  once defined — see the open questions), "as if this card were in hand"
+- Read-only /core queries layer 2 needs: the next line and how far it
+  moved (D4: the integer heat value at which the next scandal would
+  crystallise), "as if this card were in hand"
   for the draft preview (D8), and the awards on final state
   (decisions.md, 2026-09-29). The goals board (D10) can show every
   ending's clauses through explainCondition. Saying which ending the run
   is heading for needs /core, though: endings resolve by priority, and a
   priority walk in /ui would be rule logic.
 - New fields and keys go into the AGENTS.md §2 schemas, the §3 key
-  convention and validate as they are built. That covers the ending
-  nameKey (D9), a hint key per ending (D9 names no field for it), the
-  card headline field (D15), the season openers (D13) and the opening
-  premise. Agents create the keys with placeholders; the author writes
-  the text.
+  convention and validate as they are built: the D15 schema (card
+  headline variants and register; scandal headline and in-hand text;
+  ending name, goal line and text; gate flavour; season openers; the
+  opening premise; award names and citations). The ending's goal line
+  doubles as D9's one-line hint for a locked ending. Agents build
+  fields, keys and placeholders and import approved prose; they never
+  invent it.
 
 ## Open questions for the author
 
-- **D1 vs D2.** The "1 SCANDAL DUE" count comes from heatOutlook (the
-  state as it stands, per the frozen display rule). The END TURN count
-  comes from the reducer and includes onEndOfTurn effects, so the two can
-  disagree. With today's content that happens in autumn with exactly one
-  scandal held and Copycat Story in hand at heat ≥ 4. Copycat adds a copy
-  of itself before the heat check, which drops the threshold from 5.5 to
-  5. Decide what the heat display shows in that case.
-- **Copycat copies.** The copy a Copycat Story adds at month end is a
-  new scandal card, but not a crystallisation. Decide whether "N
-  scandals will print" (D2) and the lead story (D5) count it. Otherwise
-  it lands unannounced.
-- **D4's "next line".** The position of the next line above current heat
-  also jumps when heat crosses a line (7 → 14 after a big play), and a
-  failed gate's heat can hide a line that came closer. Define the query
-  so its before/after diff shows only the line moving. Also confirm D4 is
-  a sanctioned exception to AGENTS.md's "the UI … never diffs states".
-- **Crossing without a card.** Heat can end up over a line with no card
-  played: a gate's failure penalty, a new season's tighter line, or the
-  vent's residue. Decide where the light warning (D3) goes then.
-- **Art date.** AGENTS.md §6 says "Do not start art before 2026-10-26",
-  but layer 2 puts visual craft alongside the meaning layer now. The plan
-  reads the date as applying to illustration (layer 4) only. Please
-  confirm.
-- **Awards and the content budget.** 6–8 awards are a new content type
-  outside the 46-piece ceiling in AGENTS.md §2. Please confirm the
-  budget.
-- **First-run mechanic exposure** (decisions.md, 2026-09-29): verify by
-  hand whether a cautious first run can finish without ever seeing a
-  scandal.
+None. The seven raised at the layer 1 handoff were decided on 2026-09-30
+(ui-plan §13, decisions 1, 2, 4 and 18–20); the one left open is a manual
+test, listed below.
 
 ## Waiting on the author
 
@@ -154,13 +131,16 @@ Notes for whoever builds it:
   it in Safari on a Mac and, if possible, on an iPad in landscape. To build: `npm run build`, then zip the contents of `dist/`
   with `index.html` at the root and forward-slash paths. From `dist/`:
   `C:/Windows/System32/tar.exe -a -cf ../overexposed.zip index.html assets`.
-- **The player-facing prose (D15).** Everything in `i18n/en.json` today
-  was written in agent sessions: every commit that touched it carries a
-  Claude co-author trailer. That covers card names and rules text; gate,
-  season and flag names; the 128 `ui.*` labels; and the placeholder
-  ending texts. The disclosure "all text is hand-written" holds only once
-  the author has written all of it, or once the disclosure is narrowed.
+- **The player-facing prose (D15, amended 2026-09-29).** The author
+  accepted an AI-assisted writing draft, `docs/writing/draft-v1.md`; the
+  public disclosure says player-facing text was drafted with AI
+  assistance (AGENTS.md §10). The draft is imported into `i18n/en.json`,
+  which is then the canonical home of the prose. The author revises it
+  during playtesting and writes what the draft leaves pending.
 - **A hand-timed first run.** The target is 10–15 minutes (ui-plan §12).
+- **First-run mechanic exposure** (decisions.md, 2026-09-29): in the next
+  playtest, play a cautious first run and note whether a scandal ever
+  appears.
 
 ## Schedule
 
@@ -168,7 +148,7 @@ Notes for whoever builds it:
 |---|---|
 | 2026-10-15 | Internal feature freeze: tuning, polish and fixes only after this |
 | ~2026-10-18 | Early build submitted to itch as insurance |
-| 2026-10-26 | Art may start (AGENTS.md §6) |
+| 2026-10-26 | Illustration may start (the four ending illustrations; AGENTS.md §6) |
 | 2026-11-05 04:00 JST | Deadline. Treat 2026-11-04 as the real one |
 
 ## Commands

@@ -15,7 +15,7 @@
 - **Session end:** update `docs/status.md`, commit, push.
 - A design decision made in conversation is written to [`docs/decisions.md`](docs/decisions.md) in the same session.
 - Every AI-assisted commit identifies the tool. Claude Code adds its Co-Authored-By trailer automatically; any other tool adds a Co-Authored-By trailer naming itself.
-- Agents never write player-facing prose (see [`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15).
+- Agents never invent player-facing prose: they build fields, keys and placeholders and import prose the author has approved (see [`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15).
 - Keep this file under ~28 KiB: some agents read only its first 32 KiB and drop the rest silently. Past that, move reference material (the per-event GameEvent spec, band definitions) to `docs/` and link to it; hard rules and FROZEN items stay near the top.
 
 ---
@@ -67,7 +67,7 @@ The UI is built around the items below. Changing any of them now means reworking
 | Starting deck | 11 cards: `vocal_coaching` ×2, `side_gig` ×2, `open_mic`, `cover_single`, `press_junket`, `viral_stunt`, `lay_low`, `networking`, `crisis_pr` |
 | Heat formula | the formula in "The Heat → Scandal loop", with `heatThreshold` [7, 6, 6, 5], `thresholdFloor` [7, 6, 5, 4.5], `degradePerScandal` 0.5, `vent` 4. No further changes to any of the four |
 | Heat display | whole numbers only: points until the next scandal (see "Displayed heat") — never the effective threshold |
-| GameEvent list | the events and fields in "GameEvents" below |
+| GameEvent list | the events and fields in [`docs/game-events.md`](docs/game-events.md) ("GameEvents" below) |
 
 ### Premise
 
@@ -98,29 +98,7 @@ End-of-turn resolution, in order:
 
 Every action returns the new state with `events`: what happened, in order, ids and numbers only. The UI animates from these and never diffs states. Defined in `core/state.ts`.
 
-| Event | Fields | Emitted when |
-|---|---|---|
-| `turnStart` | `act`, `turn` | A turn opens, after its draft if it has one: slots refresh (no `slots` event), then the draw |
-| `shuffle` | `count` | The deck ran out: the discard pile (`count` cards) is shuffled into it |
-| `draw` | `uid`, `cardId` | A card moves from the deck to the hand — the turn's draw or a `draw` effect. Its `onDraw` events follow |
-| `play` | `uid`, `cardId`, `cost` | A card is played and `cost` slots are spent (no `slots` event). Its effect events follow; then `exhaust` if it was an opportunity, otherwise it silently goes to the discard pile |
-| `resource` | `target`, `delta`, `value` | A resource changed: `delta` is the real change after flooring at 0, `value` the new total. Never emitted for a change of 0 |
-| `slots` | `delta`, `value` | A `slots` effect changed this turn's slots |
-| `flag` | `flag`, `source` | A flag is set for the first time. `source`: the card whose effect set it; null = a gate or the engine |
-| `addCard` | `uid`, `cardId`, `to` | A new card instance enters `deck`, `discard` or `hand`: a draft pick, an effect, a gate reward, or a crystallised scandal |
-| `exhaust` | `uid`, `cardId` | A card leaves the run for good: `exhaustTag` removal, or a played opportunity |
-| `scandal` | `uid`, `cardId`, `cause`, `byTag` | A scandal crystallised at end of turn; follows the `addCard` of the same `uid`. `cause`: the card blamed for pushing heat over the line (null = nothing to blame); `byTag`: it matched the cause's kind tag (false = seeded fallback) |
-| `turnEnd` | `act`, `turn`, `resources`, `scandalCount`, `threshold`, `crystallised` | End-of-turn resolution finished and the hand is discarded (no event of its own). `resources` after the vent; `threshold`: the effective threshold the check used — for tools, never shown; `crystallised`: scandals made |
-| `draftOffer` | `act`, `cardIds` | A draft opens with these cards, or a reroll replaced them |
-| `draftPick` | `uid`, `cardId` | A card is taken from the offer; follows its `addCard` (to the deck) |
-| `draftExtraPick` | `cost` | An extra pick was bought; follows the capital `resource` event |
-| `draftReroll` | `cost` | The offer was rerolled; follows the capital `resource` event, followed by a new `draftOffer` |
-| `gateOffer` | `gateIds` | The season is over: its gates are offered |
-| `gate` | `gateId`, `passed` | A gate was chosen and resolved; its onPass / onFail events follow |
-| `ending` | `endingId` | The run is over |
-| `warning` | `code`, `ref` | Shipped (lenient) build only: bad content or an illegal action was skipped instead of thrown |
-
-Typical sequences: **END_TURN** → onEndOfTurn effect events → per scandal `addCard` + `scandal` → heat `resource` (the vent) → `turnEnd` → the next turn (`draftOffer`, or `turnStart` + `draw`s) or `gateOffer`. **CHOOSE_GATE** → `gate` → its effect events → the next season's first turn, or `ending`. **DRAFT_PICK** → `addCard` + `draftPick` → `turnStart` + `draw`s once no picks are left.
+The per-event spec — every event, its fields, when it is emitted, and the typical sequences — is in [`docs/game-events.md`](docs/game-events.md), frozen with this section.
 
 ### Resources
 
@@ -145,7 +123,7 @@ heat -= vent * count                          // vent < every thresholdFloor, so
 
 All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFloor` hold one entry per act. The floor tightens season by season, so degradation cannot exhaust itself early: late in the run the same pile of scandals drags the threshold lower than it could in spring. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
 
-**Displayed heat (frozen).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from `heatOutlook(state)` in /core: `heatToNextScandal` — points of heat until the end-of-turn check makes one more scandal — and `scandalsIfTurnEndedNow`. Both come from the state as it stands; onEndOfTurn effects still to fire this turn (e.g. a Copycat Story adding a scandal) can move them.
+**Displayed heat (frozen; amended 2026-09-30).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from /core, for the state as it stands: points of heat to the next line ("N TO GO"), or once heat is over a line, "LINE CROSSED · N TO THE NEXT". It counts no scandals. The count lives only in the END TURN preview, which runs the reducer and so includes onEndOfTurn effects such as a Copycat Story copying itself ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decisions 1 and 2).
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
@@ -331,7 +309,7 @@ Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections,
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
 
-**Do not start art before 2026-10-26.** Painting a loop that isn't tuned is wasted work.
+**Do not start illustration before 2026-10-26** — the four ending illustrations. Layer 2 visual craft (type, palette, layout, texture) proceeds once the meaning layer is in; the loop is already tuned.
 
 ---
 
@@ -345,7 +323,7 @@ Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections,
 | **10/15** | **Internal feature freeze — tuning and polish only after this** |
 | 10/16–10/25 | Early build to jam Discord; iterate on feedback |
 | **~10/18** | **Submit an early build to itch as insurance** (see §10) |
-| 10/26–11/2 | Art layer + motion polish |
+| 10/26–11/2 | Illustration + motion polish |
 | 11/3–11/4 | Buffer, itch page, submission materials |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
@@ -397,7 +375,7 @@ There is **no official repo** — itch.io does not host code. Build on itch as a
 - [ ] One-line statement of intent — what it simulates and who it's for. Raters use it to judge the game on its own terms; write it deliberately.
 - [ ] Discord username matching the account in the server (**required**)
 - [ ] Credits for every third-party asset
-- [ ] AI content disclosure
+- [ ] AI content disclosure: code written with AI assistance (Claude Code and OpenAI Codex); player-facing text drafted with AI assistance; art public-domain/CC0; no generated images or audio
 
 **Content standard: ESRB Teen or lower.** Build consequence systems around reputation and public fallout, never explicit content.
 
