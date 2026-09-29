@@ -1,10 +1,10 @@
 {
-  // Node-side tooling: /sim and /validate. Node APIs come from sim/node-shim.d.ts, not @types/node.
+  // Node-side tooling: /sim and /validate.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tools.tsbuildinfo",
     "lib": ["ES2022"],
-    "types": []
+    "types": ["node"]
   },
   "include": ["sim", "validate"]
 }

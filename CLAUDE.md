@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Game Gauntlet SIM Jam entry. Read this at the start of every session.
+**Overexposed** — Game Gauntlet SIM Jam entry. Read this at the start of every session.
 
 **Jam window:** 2026-09-24 03:00 JST → **2026-11-05 04:00 JST** (submission).
 **Ship language:** English. **Target:** browser build on itch.io.
@@ -59,6 +59,11 @@ The player plants the seeds of their own collapse. Failure is never random.
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After act 3: ending resolution. **A run always completes.**
 
+End-of-turn resolution, in order:
+1. `onEndOfTurn` effects of every card still in hand, in hand order.
+2. The Heat → Scandal check (below).
+3. The whole hand, Scandals included, goes to the discard pile. The next turn draws back up to hand size.
+
 ### Resources
 
 | Key | Role |
@@ -77,6 +82,7 @@ At end of turn, if `heat >= heatThreshold(act)`, add one Scandal card to the dis
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
 - Removal is deliberately expensive: only a few cards exhaust a Scandal, and they cost `capital`.
+- Which Scandal crystallises: a seeded-random pick among scandal cards whose `actMin` has been reached. A tuning knob, not a rule.
 
 **This is the one mechanic the design bets on. Tune it before anything else.**
 
@@ -101,6 +107,7 @@ At end of turn, if `heat >= heatThreshold(act)`, add one Scandal card to the dis
 `kind`: `action` | `opportunity` | `scandal`
 `actMin`: earliest act this card may be offered. Omit for act 1.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
+`requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 
 ### Effect ops (closed set — extend the set, never special-case a card)
 
@@ -114,7 +121,11 @@ At end of turn, if `heat >= heatThreshold(act)`, add one Scandal card to the dis
 | `setFlag` | `flag` |
 | `conditional` | `if` (condition), `then` (effects), `else` (effects) |
 
-An unknown op throws in dev.
+Engine rules content can rely on:
+- Resources and slots floor at 0.
+- `exhaustTag` searches hand → discard → deck.
+- `addCard` with `to: "deck"` shuffles the card in at a seeded random position.
+- Strict mode (dev and `/sim`): an unknown op, bad content or an illegal action throws. Lenient mode (shipped build): it is skipped and recorded as a `warning` event.
 
 Conditions use one shape everywhere:
 `{ "craft": { "min": 20 }, "flags": { "not": ["went_tabloid"] } }`
