@@ -69,8 +69,9 @@ Checks (2026-09-30, end of this round):
   game RNG and move no band.
 - `npm run check:preview`: 0 mismatches over 18,931 states — 35,983 card
   previews, each headline identical to the one the feed prints; 5,451
-  month-end scandal cards (1,001 copies); 600 final gates, each option's
-  ending and awards identical to the real finished year's.
+  month-end scandal cards (1,001 copies); 300 final gates (600 options),
+  each option's predicted ending and awards identical to the real
+  finished year's.
 - `npm run validate`: 0 errors, 0 warnings (326 i18n keys, no prose gaps).
 - `npm run sim:awards`: every award inside its target on seeds 20260929,
   1 and 424242; no run without an award (rates in decisions.md).
@@ -134,8 +135,11 @@ designs for the one 1280×720 canvas (D17) and keeps everything inside it.
     BREAKS SILENCE — AND IT'S EVERYWHERE BY LUNCH" (the 2+ scandals
     branch); Cover Single's "FANS SAY THE COVER BEATS THE ORIGINAL"
     (leans to the Craft 15+ branch).
-  - "DEBUT" headlines (e.g. Late Night Show's "LATE-NIGHT DEBUT: NEWCOMER
-    STEALS THE SHOW") print on the second and third play too.
+  - Headlines that assume an early career print in any month, however
+    famous the player is by then: Open Mic's "LOCAL CROWD FALLS SILENT FOR
+    NEWCOMER" (a starting card, seen in month 11 at Hype ~75), Late Night
+    Show's "LATE-NIGHT DEBUT: NEWCOMER STEALS THE SHOW" (on every play,
+    not only the first), Fan Meetup's "… NEW FAVOURITE".
   - Nobody Yet's text ("No headlines, good or bad") sits above People's
     Choice in 13% and Breakthrough of the Year in 18% of player-like
     Nobody Yet runs.
