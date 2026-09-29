@@ -48,7 +48,7 @@ Title → new run
 
 ## 3. Main screen layout
 
-Reference resolution 1280×720, fluid.
+A fixed 1280×720 logical stage, scaled to fit the viewport (§9).
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -220,10 +220,21 @@ The ending screen exists to make that zero-friction.
 
 ## 9. Viewport
 
-- Reference 1280×720, fluid layout
-- itch embed around 1280×720 with the fullscreen button on
+- The whole UI renders into one fixed 1280×720 logical stage
+  (ui/Stage.tsx), scaled uniformly to fit the available viewport —
+  contain, never crop — centred and letterboxed in the page background
+  colour. The fit is recomputed on resize and on fullscreen change.
+- Nothing inside the stage may overflow it at any viewport size. A
+  screen that needs more room than 1280×720 gets a new layout, never a
+  scrollbar. (Layer 1's feed, a log of the whole run, scrolls inside its
+  own column.)
+- itch embed: viewport dimensions 1280×720, fullscreen button on. At
+  800×450 the stage runs at 62.5%.
+- `/check/embed.html` on the dev server shows the game in an
+  itch-style frame at the sizes that matter, with a fullscreen button.
 - Desktop first — raters are overwhelmingly on desktop
-- Mobile landscape must work; portrait may degrade
+- Mobile landscape must work; portrait may degrade (the stage letterboxes
+  to a narrow band)
 
 ---
 
@@ -255,7 +266,9 @@ playtest are listed in docs/status.md.
       18,931 states, 0 mismatches)
 - [x] No rule logic in /ui (`npm run validate`, code boundaries)
 - [ ] Production build deploys to an itch draft page and runs in Safari
-      — waiting on the author
+      — deployed to a draft 2026-09-30, where the embed rendered at
+      800×450 and clipped; the fixed stage (§9) fixes that. Safari not
+      yet tested
 - [x] Cold load under 10s — measured locally (83.6 KB of gzipped JS,
       DOMContentLoaded 35 ms); re-check on the itch draft
 

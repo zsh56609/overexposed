@@ -20,13 +20,28 @@ scope: [ui-plan.md](ui-plan.md). Design decisions:
 | Sim | 7 personas, headless, seeded; 10 bands | `npm run sim` |
 | Balance | Rounds 1–5 done. All 10 bands pass on seeds 20260929, 1 and 424242 | `sim/out/tuning-log.md` |
 | Frozen for UI | Run structure, gates, endings, resources, starting deck, heat formula, heat display, GameEvent list | AGENTS.md §2 |
-| UI layer 1 | A complete run in the browser; previews checked against the reducer. Commit dcf231e | `/ui`, `/check` |
+| UI layer 1 | A complete run in the browser; previews checked against the reducer (commit dcf231e). A fixed 1280×720 stage scaled to fit any viewport (2026-09-30) | `/ui`, `/check` |
 
 ## UI layer 1 — actual state
 
 Functional and plain: system fonts, no animation. The screen comes from
 `state.phase`, what is clickable from `legalActions`, every number from
 /core.
+
+- Stage (`ui/Stage.tsx`): the whole UI is laid out at 1280×720 and
+  scaled to fit the viewport (contain, never crop), centred and
+  letterboxed. It re-fits on resize and fullscreen, and no screen
+  scrolls, except that the feed, a log of the whole run, scrolls inside
+  its column. Body text is 20px on the stage: 16px at 1024×576, 12.5px at
+  800×450, 10.4–10.8px at phone landscape. A hand of 6 or more cards
+  (draw effects; 8 is the most seen) shrinks card text to 16px on the
+  stage, 10px at 800×450.
+- Stage tests (2026-09-30): an overflow audit over every state of 40+
+  seeded runs at 1280×720, with every card preview opened, plus an
+  8-card hand. The production build was audited over 3 runs each at
+  800×450 and at 667×375 with mobile emulation. The re-fit was checked
+  through real resize and fullscreen events in headless Chrome. All
+  clean.
 
 - Screens: title, draft (with extra pick and reroll), play, gate, ending,
   play again. `?seed=N` in the URL replays a run.
@@ -39,7 +54,7 @@ Functional and plain: system fonts, no animation. The screen comes from
   bracketed and warns in the console.
 - Checks: `npm run check:preview` — 300 seeded runs, 18,931 states,
   0 mismatches. `npm run validate` flags rule logic in /ui.
-- Build: 274.6 KB of JS (83.6 KB gzipped). Local cold load: 35 ms to
+- Build: 275.7 KB of JS (83.9 KB gzipped). Local cold load: 35 ms to
   DOMContentLoaded. Vite `base: './'` is set.
 - Acceptance (ui-plan §11): 5 of 6 met. The itch draft and Safari item
   waits on the author.
@@ -59,11 +74,11 @@ Most are addressed by a layer 2 decision (ui-plan §13; D = decision).
 | 5 | Heat carrying over between months is never explained (6 → 2 after a scandal, then carried into the next month) | open |
 | 6 | The line moves at a season change with no notice: "5 to go" became "4 to go" at summer with heat unchanged | D4, D13 |
 | 7 | The feed is too long: one line per event, 263 lines a run, a median of 21 a month, 54% of them resource and draw bookkeeping. About 14 lines are visible at 1280×720 | D5 |
-| 8 | The preview sits in the right rail, far from the hand, and is cut off in winter when the season's gates list more requirements | D6 |
+| 8 | The preview sat in the right rail, far from the hand, and was cut off in winter when the season's gates listed more requirements | Cut-off fixed by the stage layout (the preview has its own column); D6 still moves it beside the card |
 | 9 | The final gate decides the ending, but nothing on screen links them, and no ending conditions are visible all run. A Star run that also met Craftsman is never told | D10, D11 |
 | 10 | The ending screen has no ending names, placeholder text, and three bare "Locked ending" lines | D9, D16 |
 | 11 | The heat forecast stays on screen during gates, including the final one, when no month is left to end | open (small) |
-| 12 | The draft's Take buttons sit at different heights because card texts differ in length | layer 2 layout |
+| 12 | The draft's Take buttons sat at different heights because card texts differ in length | Fixed by the stage layout: buttons sit at the bottom of each card |
 | 13 | Requirement wording is awkward: "✓ not: Signed to a label" | layer 2 UI text (D15) |
 | 14 | A hover preview once stayed on a card while the pointer was on END TURN. Seen under automated input only; confirm with a real mouse | to verify |
 
@@ -132,10 +147,11 @@ Notes for whoever builds it:
 
 ## Waiting on the author
 
-- **itch draft and Safari/iPad test.** Upload the layer 1 build to an
-  itch draft page (HTML project, 1280×720 embed, fullscreen button on)
-  and play it in Safari on a Mac and, if possible, on an iPad in
-  landscape. To build: `npm run build`, then zip the contents of `dist/`
+- **itch draft and Safari/iPad test.** The layer 1 build is on an itch
+  draft (2026-09-30). It rendered at 800×450 and clipped, which the fixed
+  stage fixes. Still to do: set the embed's viewport dimensions to
+  1280×720 with the fullscreen button on, upload the new build, and play
+  it in Safari on a Mac and, if possible, on an iPad in landscape. To build: `npm run build`, then zip the contents of `dist/`
   with `index.html` at the root and forward-slash paths. From `dist/`:
   `C:/Windows/System32/tar.exe -a -cf ../overexposed.zip index.html assets`.
 - **The player-facing prose (D15).** Everything in `i18n/en.json` today
@@ -165,3 +181,7 @@ npm run validate         # content, i18n keys, code boundaries
 npm run typecheck
 npm run check:preview    # every UI preview against the real reducer outcome
 ```
+
+With `npm run dev` running, `/check/embed.html` shows the game in an
+itch-style frame at 1280×720, 1024×576, 800×450 and two phone sizes, with
+a fullscreen button and the stage scale and text size read out.

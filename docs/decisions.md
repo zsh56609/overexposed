@@ -6,6 +6,19 @@ rules).
 
 ---
 
+## 2026-09-30 — A fixed 1280×720 stage
+
+On the itch draft the embed rendered at 800×450, smaller than the
+1280×720 the layout assumed, and the layout overflowed: on the draft
+screen the bottom row of buttons was cut off. Decision: the whole UI
+renders into one fixed 1280×720 logical stage, scaled uniformly to fit
+the available viewport (contain, never crop), centred, and letterboxed in
+the page background colour. It is re-fitted on resize and on fullscreen
+change. Nothing inside the stage may overflow it at any viewport size: a
+screen that needs more room gets a new layout, never a scrollbar. The
+itch embed's viewport dimensions are 1280×720, with the fullscreen button
+on.
+
 ## 2026-09-29 — Layer 2 direction
 
 Layer 1 playtest by the author: the logic is understandable but the run

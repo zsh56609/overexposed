@@ -2,7 +2,7 @@
 // the screen comes from state.phase, what is clickable from legalActions, every preview from the
 // reducer run on a hypothetical, every number from /core. No rule is computed here.
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import {
   createInitialState,
   explainCondition,
@@ -103,7 +103,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       <Masthead s={s} />
       <StatStrip s={s} />
       {error && (
-        <p className="error">
+        <p className="error overlay">
           {t('ui.error.title')}: {error}
         </p>
       )}
@@ -111,6 +111,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         <Feed c={c} feed={snap.feed} />
         <aside className="side">
           <Side s={s} />
+        </aside>
+        <aside className="preview-col">
           {focused ? <PlayPreviewView c={c} p={focused} /> : endPreview && <EndTurnPreviewView c={c} p={endPreview} />}
         </aside>
       </div>
@@ -131,6 +133,7 @@ function Masthead({ s }: { s: GameState }) {
   return (
     <header className="masthead">
       <span className="name">{t('ui.masthead.name')}</span>
+      <span className="seed muted">{t('ui.side.seed', { seed: s.seed })}</span>
       <span className="when">{t('ui.masthead.when', { season: seasonName(s.content, s.act), turn: s.turn, total: r.acts * r.turnsPerAct })}</span>
     </header>
   );
@@ -206,7 +209,6 @@ function Side({ s }: { s: GameState }) {
         {t('ui.side.deck', { n: s.deck.length })} · {t('ui.side.discard', { n: s.discard.length })} ·{' '}
         {t('ui.side.scandals', { n: scandalCount(s) })}
       </p>
-      <p className="muted">{t('ui.side.seed', { seed: s.seed })}</p>
     </div>
   );
 }
@@ -290,8 +292,15 @@ function Hand({ s, legal, act, setFocus }: { s: GameState; legal: Legal; act: (a
   const longPressed = useRef(false);
   return (
     <div className="hand">
-      <h2>{t('ui.hand.title')}</h2>
-      <div className="cards">
+      <div className="row">
+        <h2>{t('ui.hand.title')}</h2>
+        <span className="muted grow">{t('ui.hand.hint')}</span>
+        <button className="end" disabled={!legal.endTurn} onClick={() => act({ type: 'END_TURN' })}>
+          {t('ui.hand.endTurn')}
+        </button>
+      </div>
+      {/* Draw effects can grow the hand past five; the row shrinks its type to keep one line of cards. */}
+      <div className="cards" style={{ '--n': s.hand.length } as CSSProperties}>
         {s.hand.map((card) => {
           const def = getCard(c, card.cardId);
           const scandal = def?.kind === 'scandal';
@@ -327,18 +336,14 @@ function Hand({ s, legal, act, setFocus }: { s: GameState; legal: Legal; act: (a
                 } else setFocus(card.uid); // tapping a card you can't play shows why
               }}
             >
-              <strong>{cardName(c, card.cardId)}</strong>
-              <span className="muted">{scandal ? t('ui.hand.dead') : t('ui.hand.cost', { n: def?.cost ?? 0 })}</span>
+              <span className="card-head">
+                <strong>{cardName(c, card.cardId)}</strong>
+                <span className="muted">{scandal ? t('ui.hand.dead') : t('ui.hand.cost', { n: def?.cost ?? 0 })}</span>
+              </span>
               <span>{cardText(c, card.cardId)}</span>
             </button>
           );
         })}
-      </div>
-      <div className="row">
-        <button className="end" disabled={!legal.endTurn} onClick={() => act({ type: 'END_TURN' })}>
-          {t('ui.hand.endTurn')}
-        </button>
-        <span className="muted">{t('ui.hand.hint')}</span>
       </div>
     </div>
   );
@@ -353,41 +358,45 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
   if (!s.draft) return null;
   return (
     <div className="draft">
-      <h2>{t('ui.draft.title', { n: s.draft.picksLeft })}</h2>
-      <div className="cards">
-        {s.draft.offer.map((id) => {
-          const clauses = previewDraftCard(s, id);
-          return (
-            <div key={id} className="card offer">
-              <strong>{cardName(c, id)}</strong>
-              <span className="muted">{t('ui.hand.cost', { n: getCard(c, id)?.cost ?? 0 })}</span>
-              <span>{cardText(c, id)}</span>
-              <span className="muted">{t('ui.draft.requires')}</span>
-              {clauses.length ? (
-                <ul>
-                  {clauses.map((clause, i) => (
-                    <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                      {clauseLine(clause)}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span>{t('ui.draft.free')}</span>
-              )}
-              <button disabled={!legal.picks.has(id)} onClick={() => act({ type: 'DRAFT_PICK', cardId: id })}>
-                {t('ui.draft.take')}
-              </button>
-            </div>
-          );
-        })}
-      </div>
       <div className="row">
+        <h2 className="grow">{t('ui.draft.title', { n: s.draft.picksLeft })}</h2>
         <button disabled={!legal.extraPick} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
           {t('ui.draft.extraPick', { cost: cfg.extraPickCost })}
         </button>
         <button disabled={!legal.reroll} onClick={() => act({ type: 'DRAFT_REROLL' })}>
           {t('ui.draft.reroll', { cost: cfg.rerollCost })}
         </button>
+      </div>
+      <div className="cards">
+        {s.draft.offer.map((id) => {
+          const clauses = previewDraftCard(s, id);
+          return (
+            <div key={id} className="card offer">
+              <span className="card-head">
+                <strong>{cardName(c, id)}</strong>
+                <span className="muted">{t('ui.hand.cost', { n: getCard(c, id)?.cost ?? 0 })}</span>
+              </span>
+              <span>{cardText(c, id)}</span>
+              <div className="req">
+                <span className="muted">{t('ui.draft.requires')}</span>
+                {clauses.length ? (
+                  <ul>
+                    {clauses.map((clause, i) => (
+                      <li key={i} className={clause.met ? 'met' : 'unmet'}>
+                        {clauseLine(clause)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span>{t('ui.draft.free')}</span>
+                )}
+              </div>
+              <button className="take" disabled={!legal.picks.has(id)} onClick={() => act({ type: 'DRAFT_PICK', cardId: id })}>
+                {t('ui.draft.take')}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -408,14 +417,16 @@ function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Act
           return (
             <div key={id} className="gate">
               <h3>{gateName(c, id)}</h3>
-              <span className="muted">{t('ui.gate.requires')}</span>
-              <ul>
-                {p.clauses.map((clause, i) => (
-                  <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                    {clauseLine(clause)}
-                  </li>
-                ))}
-              </ul>
+              <div className="req">
+                <span className="muted">{t('ui.gate.requires')}</span>
+                <ul>
+                  {p.clauses.map((clause, i) => (
+                    <li key={i} className={clause.met ? 'met' : 'unmet'}>
+                      {clauseLine(clause)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <p className={p.passes ? 'pass' : 'alarm'}>{t(p.passes ? 'ui.gate.nowPass' : 'ui.gate.nowFail')}</p>
               <p>
                 {t('ui.gate.onPass')}: {effectsText(c, gate?.onPass ?? [])}
@@ -423,7 +434,7 @@ function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Act
               <p>
                 {t('ui.gate.onFail')}: {effectsText(c, gate?.onFail ?? [])}
               </p>
-              <button disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
+              <button className="take" disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
                 {t('ui.gate.choose', { gate: gateName(c, id) })}
               </button>
             </div>

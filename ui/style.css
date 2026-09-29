@@ -1,56 +1,84 @@
-/* Layer 1: functional and plain. Layer 2 replaces all of this (CLAUDE.md §6). System fonts only. */
+/* Layer 1: functional and plain. Layer 2 replaces all of this (CLAUDE.md §6). System fonts only.
+   Everything is laid out on the fixed 1280×720 stage (ui/Stage.tsx): sizes are stage pixels, never
+   viewport units, and no screen scrolls. The one exception is the feed, a log of the whole run,
+   which scrolls inside its column. */
+
+:root {
+  --page: #f4f1ea;
+  --ink: #15120e;
+  --rule: #b9b2a3;
+  --muted: #6b6457;
+  --red: #b3160a;
+}
 
 * { box-sizing: border-box; }
-html, body { margin: 0; }
-body { font: 14px/1.35 system-ui, sans-serif; background: #f4f1ea; color: #15120e; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--page); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* The stage: 1280×720, scaled to fit and centred by ui/Stage.tsx; the frame letterboxes it. */
+.frame { position: fixed; inset: 0; overflow: hidden; background: var(--page); }
+.stage {
+  position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+  transform: translate(-50%, -50%); transform-origin: center; overflow: hidden;
+  background: var(--page); color: var(--ink); font: 20px/1.3 system-ui, sans-serif;
+}
+
 button { font: inherit; cursor: pointer; }
 button:disabled, button[aria-disabled='true'] { cursor: not-allowed; }
-h1, h2, h3 { margin: 0.2em 0; }
-h2 { font-size: 1rem; }
-ul, ol { margin: 0.25em 0; padding-left: 1.2em; }
-.muted { color: #6b6457; font-size: 0.9em; }
-.error { background: #ffd6d2; color: #7a0c02; padding: 0.4em 0.6em; margin: 0.4em; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 1.6em; }
+h2, h3 { font-size: 1em; }
+ul, ol { margin: 0; padding-left: 1.1em; }
+.muted { color: var(--muted); font-size: 0.85em; }
+.grow { flex: 1; }
+.error { background: #ffd6d2; color: #7a0c02; padding: 0.3em 0.6em; }
+.error.overlay { position: absolute; top: 80px; left: 16px; right: 16px; z-index: 10; font-size: 0.85em; }
 .met { color: #1f6b2a; }
 .unmet { color: #a3150b; }
 .pass { color: #1f6b2a; font-weight: bold; }
-.alarm { color: #b3160a; font-weight: bold; }
-.lead { color: #b3160a; font-weight: bold; }
+.alarm, .lead { color: var(--red); font-weight: bold; }
 
-.title { max-width: 40em; margin: 15vh auto; text-align: center; }
-.title h1 { font-size: 3rem; letter-spacing: 0.08em; }
-.big { font-size: 1.6rem; padding: 0.5em 2em; margin: 1em; }
+/* Title */
+.title { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6em; text-align: center; }
+.title h1 { font-size: 3em; letter-spacing: 0.08em; }
+.big { font-size: 1.4em; padding: 0.4em 2em; }
 
-.app { display: flex; flex-direction: column; height: 100vh; max-width: 1400px; margin: 0 auto; }
-.masthead { display: flex; justify-content: space-between; align-items: baseline; padding: 0.4em 0.8em; border-bottom: 2px solid #15120e; }
+/* Run: masthead, stats, middle (feed | this season | preview), bottom (hand, draft or gate) */
+.app { height: 100%; display: flex; flex-direction: column; }
+.masthead { flex: none; display: flex; align-items: baseline; gap: 1em; padding: 0.3em 0.8em; border-bottom: 2px solid var(--ink); }
 .masthead .name { font-weight: bold; letter-spacing: 0.1em; }
-.stats { display: flex; flex-wrap: wrap; gap: 0.3em 1.2em; padding: 0.4em 0.8em; border-bottom: 1px solid #b9b2a3; }
+.masthead .seed { flex: 1; text-align: right; }
+.stats { flex: none; display: flex; gap: 1em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 .stat-heat, .togo { font-weight: bold; }
 
-.middle { flex: 1; display: flex; min-height: 0; }
-.feed { flex: 1; overflow-y: auto; padding: 0.4em 0.8em; border-right: 1px solid #b9b2a3; }
+.middle { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px 430px; }
+.middle > * { min-height: 0; overflow: hidden; padding: 0.4em 0.8em; }
+.feed { overflow-y: auto; border-right: 1px solid var(--rule); }
 .feed ol { list-style: none; padding: 0; }
-.feed .month { margin-top: 0.6em; font-weight: bold; }
-.side { width: 22em; overflow-y: auto; padding: 0.4em 0.8em; }
-.mini-gate { margin-bottom: 0.4em; }
-.preview { border: 1px solid #15120e; padding: 0.4em; margin-top: 0.6em; background: #fff; }
-.preview.danger { border: 3px solid #b3160a; }
+.feed .month { margin-top: 0.4em; font-weight: bold; }
+.side { border-right: 1px solid var(--rule); }
+.side-box { display: flex; flex-direction: column; gap: 0.3em; }
+.mini-gate ul { font-size: 0.85em; }
+.preview { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
+.preview.danger { border: 3px solid var(--red); }
 .preview.blocked { border-style: dashed; }
 
-.bottom { border-top: 2px solid #15120e; padding: 0.4em 0.8em; }
-.cards { display: flex; flex-wrap: wrap; gap: 0.5em; }
-.card { display: flex; flex-direction: column; gap: 0.2em; width: 12em; min-height: 8em; padding: 0.4em; text-align: left; background: #fff; border: 1px solid #15120e; }
+.bottom { flex: none; border-top: 2px solid var(--ink); padding: 0.4em 0.8em 0.6em; }
+.row { display: flex; align-items: center; gap: 0.8em; margin-bottom: 0.4em; }
+.cards { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.5em; }
+/* Five cards take the full type size; a bigger hand (draw effects) shrinks it to stay one row. */
+.hand .cards { font-size: clamp(0.8em, calc(5em / var(--n, 5)), 1em); }
+.card { display: flex; flex-direction: column; gap: 0.2em; min-width: 0; padding: 0.3em 0.4em; text-align: left; color: inherit; background: #fff; border: 1px solid var(--ink); }
+.card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 0.4em; }
 .card.off { opacity: 0.55; }
-.card.scandal { background: #fbe1dd; border: 2px dashed #b3160a; font-style: italic; opacity: 1; }
-.row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8em; margin-top: 0.5em; }
-.end { font-size: 1.1rem; padding: 0.3em 1.2em; }
-.gate-row { display: flex; flex-wrap: wrap; gap: 1em; }
-.gate { flex: 1; min-width: 16em; border: 1px solid #15120e; padding: 0.4em; background: #fff; }
+.card.scandal { background: #fbe1dd; border: 2px dashed var(--red); font-style: italic; opacity: 1; }
+.end { font-size: 1.1em; padding: 0.2em 1.2em; }
+.take { margin-top: auto; }
+.req { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.4em; font-size: 0.85em; }
+.req .muted { font-size: 1em; }
+.req ul { list-style: none; padding: 0; }
+.gate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+.gate { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
 
-.ending { max-width: 44em; margin: 2em auto; padding: 0 1em; }
-.play-again { display: block; width: 100%; font-size: 3rem; padding: 0.4em; margin-bottom: 0.6em; }
-
-@media (max-width: 800px) {
-  .middle { flex-direction: column; }
-  .side { width: auto; }
-  .card { width: 10em; }
-}
+/* Ending */
+.ending { height: 100%; display: flex; flex-direction: column; gap: 0.3em; padding: 1em 12em; }
+.play-again { width: 100%; font-size: 2.4em; padding: 0.2em; margin-bottom: 0.3em; }
