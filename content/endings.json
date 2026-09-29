@@ -8,13 +8,13 @@
   {
     "id": "star",
     "priority": 200,
-    "conditions": { "hype": { "min": 70 }, "flags": { "all": ["signed_label"] }, "scandalCount": { "max": 4 } },
+    "conditions": { "hype": { "min": 60 }, "flags": { "all": ["signed_label"] }, "scandalCount": { "max": 5 } },
     "textKey": "ending.star.text"
   },
   {
     "id": "craftsman",
     "priority": 100,
-    "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
+    "conditions": { "craft": { "min": 55 }, "hype": { "min": 12 }, "scandalCount": { "max": 2 } },
     "textKey": "ending.craftsman.text"
   },
   {

@@ -22,7 +22,7 @@
     "id": "gate_a2_label_deal",
     "act": 2,
     "nameKey": "gate.a2_label_deal.name",
-    "requires": { "hype": { "min": 50 }, "capital": { "min": 4 } },
+    "requires": { "hype": { "min": 45 }, "capital": { "min": 4 } },
     "onPass": [
       { "op": "setFlag", "flag": "signed_label" },
       { "op": "resource", "target": "capital", "value": 6 }
@@ -33,7 +33,7 @@
     "id": "gate_a2_residency",
     "act": 2,
     "nameKey": "gate.a2_residency.name",
-    "requires": { "craft": { "min": 36 }, "hype": { "min": 15 }, "scandalCount": { "max": 2 } },
+    "requires": { "craft": { "min": 30 }, "hype": { "min": 15 }, "scandalCount": { "max": 6 } },
     "onPass": [
       { "op": "resource", "target": "craft", "value": 6 },
       { "op": "addCard", "cardId": "studio_session", "to": "deck", "count": 1 }
@@ -52,7 +52,7 @@
     "id": "gate_a3_award_show",
     "act": 3,
     "nameKey": "gate.a3_award_show.name",
-    "requires": { "craft": { "min": 55 }, "hype": { "min": 30 }, "scandalCount": { "max": 3 } },
+    "requires": { "craft": { "min": 40 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
     "onPass": [{ "op": "resource", "target": "craft", "value": 10 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -6 }]
   }
