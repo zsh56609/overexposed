@@ -617,11 +617,20 @@ function checkStructure(v: Ctx, rules: Obj | null, cards: readonly Obj[], gates:
   for (const [flag, where] of v.flagsSet) {
     if (!v.flagsRead.has(flag)) v.warn('structure', where, `flag ${q(flag)} is set but no condition reads it`);
   }
+  // Every flag reads two ways (draft v3): once set, and while it is not. Both labels are required — a
+  // missing one fails the i18n check; there is no general template to fall back on.
+  for (const flag of flagsIn(v)) {
+    v.key(`flag.${flag}.positive`, `flag ${flag}`);
+    v.key(`flag.${flag}.negative`, `flag ${flag}`);
+  }
   const allTags = new Set(cards.flatMap((c) => (Array.isArray(c.tags) ? c.tags : [])));
   for (const [tag, where] of v.exhaustTags) {
     if (!allTags.has(tag)) v.warn('structure', where, `no card carries tag ${q(tag)}: exhausts nothing`);
   }
 }
+
+/** Every flag content sets or reads. */
+const flagsIn = (v: Ctx): Set<string> => new Set([...v.flagsSet.keys(), ...v.flagsRead.keys()]);
 
 function checkI18n(v: Ctx, i18n: unknown): number {
   if (!isObj(i18n)) {
@@ -636,7 +645,7 @@ function checkI18n(v: Ctx, i18n: unknown): number {
     else if (i18n[key] === '') v.error('i18n', where, `key ${q(key)} is empty in i18n/en.json`);
   }
   for (const key of Object.keys(i18n)) {
-    if (/^(card|gate|ending|act|award)\./.test(key) && !v.keysUsed.has(key)) {
+    if (/^(card|gate|ending|act|award|flag)\./.test(key) && !v.keysUsed.has(key)) {
       v.warn('i18n', `i18n/en.json ${q(key)}`, 'no content uses this key');
     }
   }
@@ -652,7 +661,8 @@ export const OPENING_KEY = 'story.opening';
 /**
  * Missing player-facing prose, reported as warnings: every card with no headline, every scandal missing its
  * headline or in-hand line, every ending missing its name, goal line or text, every gate missing its
- * flavour, every season missing its opener, and the opening. Missing prose must be visible, not silent.
+ * flavour, every season missing its opener, the opening, and a flag label still a placeholder (a missing
+ * one is an i18n error). Missing prose must be visible, not silent.
  */
 function checkProse(
   v: Ctx,
@@ -691,6 +701,10 @@ function checkProse(
   for (const a of awards) {
     const missing = (['nameKey', 'citationKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
     if (missing.length > 0) v.warn('prose', `award ${String(a.id)}`, `no ${missing.join(', ')}`);
+  }
+  for (const flag of flagsIn(v)) {
+    const unwritten = (['positive', 'negative'] as const).filter((f) => Object.hasOwn(i18n, `flag.${flag}.${f}`) && !written(`flag.${flag}.${f}`));
+    if (unwritten.length > 0) v.warn('prose', `flag ${flag}`, `no ${unwritten.join(', ')} label`);
   }
 }
 

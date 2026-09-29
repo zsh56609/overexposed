@@ -40,7 +40,15 @@ networking is private, so quiet, even though it builds a career.
   by which branch of the card fired. So when a card has a condition
   ("Craft 15+: …, otherwise …"), each of its variants must be true of
   every branch: a variant that only fits the strong branch will print
-  over the weak one too.
+  over the weak one too. Reporting an opinion ("fans say …") is true in
+  either branch.
+- **Time-neutral headlines.** A card can be played in any month and at
+  any fame, so its headlines assume neither: no "newcomer", no "debut".
+  Fame-aware press labels are planned for content expansion, where
+  "newcomer" can return as the low-fame form (draft v3).
+- **Every flag reads two ways.** A flag has a positive label (once set)
+  and a negative label (while it is not), both written as prose; the
+  interface never builds one from a template (draft v3).
 - **Rating: ESRB Teen.** Scandals are breakups, feuds, bad reviews, old photos, rumours — nothing sexual, no drugs, no violence.
 
 ## Length budget (keeps a run under 20 minutes)

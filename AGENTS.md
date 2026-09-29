@@ -229,7 +229,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` · `ending.<id>.text` · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` · `ending.<id>.text` · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
 - Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
@@ -250,6 +250,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
 - awards: fields, conditions, ending ids, a fallback award, at most 8
+- every flag set or read has both labels, positive and negative (an error, never a template)
 - player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, an ending without name, goal line or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
