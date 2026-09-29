@@ -154,13 +154,14 @@ Two gates offered per act. Failing a Gate is a setback, never a run-ender.
 {
   "id": "craftsman",
   "priority": 100,
-  "conditions": { "craft": { "min": 55 }, "scandalCount": { "max": 2 } },
+  "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
   "textKey": "ending.craftsman.text"
 }
 ```
 
 Resolved after turn 12 by descending `priority`; first match wins.
 **`priority: 0` is an unconditional fallback. It must always exist.**
+**No other ending may be a single-axis threshold:** at least two condition keys (validate enforces). A lone threshold makes one resource a dominant strategy. Star rewards surviving the spiral (hype + signed + a scandal ceiling); meltdown's scandal bar sits above star's ceiling so it never preempts a controlled hype run.
 
 Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
 

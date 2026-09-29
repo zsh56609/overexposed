@@ -387,6 +387,12 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
       }
     }
   }
+  // No single-axis endings: a lone threshold makes one resource a dominant strategy (CLAUDE.md §2).
+  for (const e of endings) {
+    if (e.priority === 0 || !isObj(e.conditions)) continue;
+    const axes = Object.keys(e.conditions).length;
+    if (axes < 2) v.error('structure', `ending ${String(e.id)}.conditions`, `single-axis ending (${axes} condition key); endings need at least two`);
+  }
   return endings;
 }
 
