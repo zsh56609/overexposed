@@ -288,17 +288,23 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
 
   // Cascade: effective threshold = max(thresholdFloor[act], base[act] - scandalsHeld * degradePerScandal);
   // each scandal vents `vent` heat, which must stay below every floor so a residue carries over.
+  // Floors only ever divide heat, so they may be fractional (e.g. 4.5 above a vent of 4); vent moves
+  // heat itself and stays an integer.
+  const isNum = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
   const floors: readonly unknown[] = Array.isArray(raw.thresholdFloor) ? raw.thresholdFloor : [];
   if (!Array.isArray(raw.thresholdFloor)) v.error('schema', 'rules.thresholdFloor', 'must be an array: one floor per act');
   else if (floors.length !== v.acts) v.error('ranges', 'rules.thresholdFloor', `has ${floors.length} entries for ${v.acts} acts`);
-  floors.forEach((f, i) => v.int(f, `rules.thresholdFloor[${i}]`, LIMIT.heat));
+  floors.forEach((f, i) => {
+    const [lo, hi] = LIMIT.heat;
+    if (!isNum(f) || f < lo || f > hi) v.error('ranges', `rules.thresholdFloor[${i}]`, `must be a number in ${lo}..${hi}, got ${q(f)}`);
+  });
   const ventOk = v.int(raw.vent, 'rules.vent', LIMIT.heat);
   const degrade = raw.degradePerScandal;
-  if (typeof degrade !== 'number' || !Number.isFinite(degrade) || degrade < 0 || degrade > 100) {
+  if (!isNum(degrade) || degrade < 0 || degrade > 100) {
     v.error('ranges', 'rules.degradePerScandal', `must be a number in 0..100, got ${q(degrade)}`);
   }
   floors.forEach((f, i) => {
-    if (!isInt(f)) return;
+    if (!isNum(f)) return;
     if (ventOk && (raw.vent as number) >= f) {
       v.error('ranges', 'rules.vent', `vent ${String(raw.vent)} must be below thresholdFloor[${i}] ${f}: vent < effective threshold always`);
     }

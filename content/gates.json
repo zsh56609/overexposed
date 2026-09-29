@@ -3,7 +3,7 @@
     "id": "gate_audition",
     "act": 1,
     "nameKey": "gate.audition.name",
-    "requires": { "craft": { "min": 24 } },
+    "requires": { "craft": { "min": 18 } },
     "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
   },
@@ -11,7 +11,7 @@
     "id": "gate_showcase",
     "act": 1,
     "nameKey": "gate.showcase.name",
-    "requires": { "hype": { "min": 26 } },
+    "requires": { "hype": { "min": 20 } },
     "onPass": [
       { "op": "addCard", "cardId": "studio_session", "to": "discard", "count": 1 },
       { "op": "resource", "target": "hype", "value": 4 }

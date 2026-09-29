@@ -104,9 +104,9 @@
     "textKey": "card.crisis_pr.text",
     "playable": true,
     "tags": ["recovery", "fixer"],
-    "requires": { "capital": { "min": 6 }, "scandalCount": { "min": 1 } },
+    "requires": { "capital": { "min": 4 }, "scandalCount": { "min": 1 } },
     "effects": [
-      { "op": "resource", "target": "capital", "value": -6 },
+      { "op": "resource", "target": "capital", "value": -4 },
       { "op": "exhaustTag", "tag": "scandal", "count": 1 }
     ]
   },
@@ -428,7 +428,6 @@
     "nameKey": "card.indie_label.name",
     "textKey": "card.indie_label.text",
     "tags": ["money", "recording"],
-    "actMin": 2,
     "requires": { "hype": { "min": 40 }, "capital": { "min": 4 }, "flags": { "not": ["signed_label"] } },
     "effects": [
       { "op": "resource", "target": "capital", "value": -4 },

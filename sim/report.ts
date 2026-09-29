@@ -487,6 +487,15 @@ export function buildReport(batch: BatchResult): Report {
   const diagnostics = [
     { label: 'ending distribution (pooled)', value: endingIds.map((id) => `${id} ${pct(pooledShare[id] ?? 0)}`).join(', ') },
     { label: 'scandals held at run end, player-like personas only', value: playerScandals.length ? `median ${median(playerScandals)}` : 'n/a' },
+    {
+      label: 'gate met%, player-like personas only',
+      value: gates
+        .map((g) => {
+          const checks = healthy.filter((r) => players.includes(r.persona)).flatMap((r) => r.gateChecks).filter((c) => c.gateId === g.id);
+          return `${g.id} ${pct(ratio(checks.filter((c) => c.met).length, checks.length))}`;
+        })
+        .join(', '),
+    },
     { label: 'gate pass% (passed when chosen, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
   ];
 

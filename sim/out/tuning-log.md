@@ -1,6 +1,6 @@
 # Tuning log
 
-Round 3 is at the end of this file.
+Rounds 3 and 4 follow round 2, newest last.
 
 ## Round 2 — Step 7 (2026-09-29)
 
@@ -100,3 +100,60 @@ hypechaser only drops under 70% once random and comeback are pushed far over it.
 
 - Scandal median 5 on all three seeds: the band's top edge.
 - crafter nobody 68.2% (64.1 and 66.9 on the other seeds): 2–6 points under the cap.
+
+## Round 4 — Step 7 (2026-09-29)
+
+Tuned against the round-4 bands (CLAUDE.md §5): player-like personas carry the concentration band, the
+control probes carry the thesis assertions. 6 personas × 1000 runs on seed 20260929, one variable per run.
+Priority: soft-locks → player-like concentration → probe assertions → scandal median → gate met% → card play rate.
+The scandal median sat at 5, the band's top edge, in round 3; the aim here was the middle.
+Soft-locks and crashes were 0 in every run; player-like concentration, both probe assertions, card play
+rate and the minmaxer-vs-random divergence passed in every run.
+
+Columns: player-like personas over 70% · probe assertions (heat, hype) · pooled median scandals held at run end ·
+gates outside met% 35–65% · lowest card play rate (played ÷ drawn) · bands passing, of 9.
+
+| # | change | player-like over 70% | probes | scandal median | gates out (met%) | lowest play rate | bands | what moved |
+|---|---|---|---|---|---|---|---|---|
+| 0 | none: end of round-4 step 6 | none | pass, pass | 5 | audition 17.0, showcase 32.6, award_show 33.0 | crisis_pr 14.8% | 8/9 | Starting point. 43.2% of runs hold 4 or fewer scandals; the median needs 50%. |
+| 1 | `heatThreshold` [7, 6, 6, 5] → [8, 7, 6, 5] | none | pass, pass | 5 | same three | crisis_pr 14.1% | 8/9 | No effect on the median: heat left uncrystallised in spring carries over and crystallises at the season boundary. **Reverted.** |
+| 2 | `thresholdFloor` [7, 6, 5, 4] → [7, 6, 5, 4.5] | none | pass, pass | 5 | audition 17.0, showcase 32.6, award_show 32.8 | crisis_pr 14.7% | 8/9 | Winter crystallisation 0.54 → 0.46 per turn. Makes room for vent 4 (vent must stay below every floor); validate now accepts fractional floors. |
+| 3 | `vent` 3 → 4 | none | pass, pass | 5 | audition 17.0, showcase 32.6 | crisis_pr 14.3% | 8/9 | random median 7 → 5, hypechaser 25 → 20; runs at 4 or fewer 43 → 49%. award_show met 38.3 (fewer runs over its scandal ceiling). |
+| 4 | crisis_pr price 6 → 4 capital (`requires` and cost) | none | pass, pass | 4 | audition 16.9, showcase 32.6 | crisis_pr 19.7% | 8/9 | Median 4: the surplus capital buys scandals off (minmaxer and dealseeker medians 2). |
+| 5 | gate_audition craft 24 → 18 | none | pass, pass | 4 | showcase 32.6 | lay_low 19.1% | 8/9 | audition met 16.9 → 42.4. Spring gates now come after 3 turns, not 4: 24 × 3/4 = 18. |
+| 6 | gate_showcase hype 26 → 20 | none | pass, pass | 4 | none | lay_low 18.8% | 9/9 | showcase met 32.6 → 46.0 (26 × 3/4 ≈ 20). All bands pass. |
+| 7 | indie_label actMin 2 → 1 (spring) | none | pass, pass | 4 | none | indie_label 14.9% | 9/9 | Not a band: restores step 5's target. Step 6's honest draft valuation had cut indie_label's share of signings to 13.6%; at run 6 it read 15.0 / 16.3 / 14.7% on the three seeds. Now 21.6%. |
+
+### Considered in memory, not taken
+
+Each alone left the pooled median at 5: viral_stunt heat 5 → 4 (runs at 4 or fewer 43 → 47%) or → 3;
+press_junket's low-craft heat 4 → 3; degradePerScandal 0.5 → 0.25; crisis_pr at 5, 4 or 3 capital alone
+(up to 47%); legal_team 6 → 4; apology_tour hype cost 6 → 4. For indie_label, a price of 3 worked as well as
+spring (21%) but undercuts the 4 that an extra pick and label_deal cost.
+
+Why the median is sticky: three of the six personas sit at fixed points by construction — crafter at 0,
+hypechaser above 20, comeback at 6 (it only starts cleaning up at 5 scandals). The median is decided by
+minmaxer, random and dealseeker, which together need about 64% of their runs at 4 or fewer.
+
+### Robustness check (no change, other batch seeds)
+
+| seed | player-like over 70% | probes | scandal median | runs at ≤ 4 | gates out | bands | indie share of signings |
+|---|---|---|---|---|---|---|---|
+| 20260929 | none | pass, pass | 4 | 53.1% | none | 9/9 | 21.6% |
+| 1 | none | pass, pass | 4 | 52.8% | none | 9/9 | 21.8% |
+| 424242 | none | pass, pass | 4 | 52.0% | none | 9/9 | 23.4% |
+
+### Values changed in this pass
+
+- `content/rules.json` — `thresholdFloor` [7, 6, 5, 4] → [7, 6, 5, 4.5] · `vent` 3 → 4
+- `content/cards.json` — crisis_pr: requires capital 6 → 4, pays 6 → 4 (en.json text updated) · indie_label: actMin 2 → 1
+- `content/gates.json` — gate_audition craft 24 → 18 · gate_showcase hype 26 → 20
+- `validate/validate.ts` — thresholdFloor entries may be fractional (vent stays an integer)
+
+### Fragile edges
+
+- Scandal median 4: 52.0–53.1% of runs hold 4 or fewer (median 5 below 50%); 46.4–47.1% hold 3 or fewer.
+- Probes drag the pooled gate met% down: over player-like personas only, residency is at 67.7–68.5% and
+  award_show at 62.9–63.5%, so excluding probes from pooled bands would put residency out of band.
+- The crystallisation peak is still summer, and vent 4 made winter the quietest act (pooled 0.43 / 0.67 / 0.49 /
+  0.37 per turn). The hand choke still peaks in winter. The spiral's shape is not a band, so it was not tuned.
