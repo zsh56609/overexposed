@@ -11,7 +11,7 @@
     "id": "gate_showcase",
     "act": 1,
     "nameKey": "gate.showcase.name",
-    "requires": { "hype": { "min": 20 } },
+    "requires": { "hype": { "min": 17 } },
     "onPass": [
       { "op": "addCard", "cardId": "studio_session", "to": "discard", "count": 1 },
       { "op": "resource", "target": "hype", "value": 4 }
@@ -33,7 +33,7 @@
     "id": "gate_session_work",
     "act": 2,
     "nameKey": "gate.session_work.name",
-    "requires": { "craft": { "min": 27 } },
+    "requires": { "craft": { "min": 33 } },
     "onPass": [
       { "op": "resource", "target": "capital", "value": 4 },
       { "op": "resource", "target": "craft", "value": 3 }
@@ -55,7 +55,7 @@
     "id": "gate_residency",
     "act": 3,
     "nameKey": "gate.residency.name",
-    "requires": { "craft": { "min": 30 }, "hype": { "min": 15 }, "scandalCount": { "max": 6 } },
+    "requires": { "craft": { "min": 30 }, "hype": { "min": 15 }, "scandalCount": { "max": 4 } },
     "onPass": [
       { "op": "resource", "target": "craft", "value": 6 },
       { "op": "addCard", "cardId": "studio_session", "to": "deck", "count": 1 }

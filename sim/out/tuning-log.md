@@ -157,3 +157,43 @@ minmaxer, random and dealseeker, which together need about 64% of their runs at 
   award_show at 62.9–63.5%, so excluding probes from pooled bands would put residency out of band.
 - The crystallisation peak is still summer, and vent 4 made winter the quietest act (pooled 0.43 / 0.67 / 0.49 /
   0.37 per turn). The hand choke still peaks in winter. The spiral's shape is not a band, so it was not tuned.
+
+## Round 5 — Step 4 (2026-09-29)
+
+Tuned against the round-5 bands: aggregate bands over player-like personas only (now including the new
+`artisan`), plus the clogging band. 7 personas × 1000 runs on seed 20260929, one variable per run.
+Priority: soft-locks → concentration → probe assertions → clogging monotonicity → scandal median → gate met% → play rate.
+Heat-formula values (per-act base, per-act floor, degradePerScandal, vent) were left alone: they freeze in step 5.
+Soft-locks and crashes were 0 in every run; both probe assertions, the clogging band, the scandal median,
+card play rate and the minmaxer-vs-random divergence passed in every run.
+
+Columns: player-like personas over 70% · probe assertions (heat, hype) · clogging, dead cards drawn per turn by
+act (player-like, pooled) · scandal median (player-like) · gates outside met% 35–65% · lowest play rate · bands of 10.
+
+| # | change | player-like over 70% | probes | clogging by act | scandal median | gates out (met%) | lowest play rate | bands | what moved |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | none: end of round-5 step 3 | artisan craftsman 85.9 | pass, pass | 0.03 / 0.26 / 0.46 / 0.52 | 2 | session_work 66.5, residency 69.4 | indie_label 12.7% | 8/10 | Starting point. artisan's only craftsman bar was hype ≥ 12. |
+| 1 | craftsman hype floor 12 → 25 | none | pass, pass | same | 2 | same two | indie_label 12.7% | 9/10 | artisan craftsman 85.9 → 53.4 (nobody 43.0). minmaxer and dealseeker unaffected: their hype is far above 25. 25 is the value round 3 lowered for crafter, now a probe. |
+| 2 | gate_residency scandal ceiling 6 → 4 | none | pass, pass | same | 2 | session_work 66.5 | indie_label 12.7% | 9/10 | residency met 69.4 → 56.3. Craft stays 30, under award_show's 40. |
+| 3 | gate_session_work craft 27 → 33 | none | pass, pass | same | 2 | none | world_tour 12.3% | 10/10 | session_work met 66.5 → 50.4. |
+| 4 | gate_showcase hype 20 → 17 | none | pass, pass | 0.03 / 0.26 / 0.46 / 0.52 | 2 | none | world_tour 12.0% | 10/10 | showcase met 36.5 → 46.0; it had been 35.4–36.8 on the three seeds since artisan (hype ~6 at T3) joined the population. |
+
+### Robustness check (no change, other batch seeds)
+
+| seed | player-like over 70% | probes | clogging by act | scandal median | gates out | bands | note |
+|---|---|---|---|---|---|---|---|
+| 20260929 | none | pass, pass | 0.03 / 0.26 / 0.46 / 0.52 | 2 | none | 10/10 | dealseeker star 66.2% |
+| 1 | none | pass, pass | 0.04 / 0.26 / 0.46 / 0.52 | 2 | none | 10/10 | dealseeker star 64.5% |
+| 424242 | none | pass, pass | 0.04 / 0.26 / 0.46 / 0.53 | 3 | none | 10/10 | dealseeker star 66.0% |
+
+### Values changed in this pass
+
+- `content/endings.json` — craftsman hype 12 → 25
+- `content/gates.json` — gate_residency scandal ceiling 6 → 4 · gate_session_work craft 27 → 33 · gate_showcase hype 20 → 17
+
+### Fragile edges
+
+- dealseeker star 64.5–66.2%: 4–5.5 points under the 70% cap. Ending condition numbers stay tunable after the freeze.
+- Scandal median 2 on two seeds, 3 on the third: 48–50% of player-like runs hold 2 or fewer. Failing (median 1)
+  would need 50% at 1 or fewer; that share is 40–43%.
+- comeback's clogging peaks in autumn (1.21 → 1.05 in winter) because it cleans up late; the pooled band still rises.

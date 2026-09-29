@@ -14,7 +14,7 @@
   {
     "id": "craftsman",
     "priority": 100,
-    "conditions": { "craft": { "min": 55 }, "hype": { "min": 12 }, "scandalCount": { "max": 2 } },
+    "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
     "textKey": "ending.craftsman.text"
   },
   {
