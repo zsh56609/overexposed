@@ -2,6 +2,7 @@ export * from './content.ts';
 export * from './rng.ts';
 export * from './state.ts';
 export { awardHolds, yearAwards, yearStats, type YearStats } from './awards.ts';
+export { statTiers, TIER_STATS, type StatTier, type TierStat } from './tiers.ts';
 export {
   effectiveHeatThreshold,
   endingIfYearEndedNow,

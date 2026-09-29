@@ -55,8 +55,15 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .masthead .seed { flex: 1; text-align: right; }
 .masthead .counts { font-size: 0.85em; }
 .masthead .deck-open { font-size: 0.8em; padding: 0 0.5em; }
-.stats { flex: none; display: flex; gap: 1em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-.stat-heat, .togo { font-weight: bold; }
+/* Sized for the widest bar a run can show — "Household name", "Finding your voice", "A story is breaking",
+   "LINE CROSSED · N TO THE NEXT" at once — with room to spare on the 1280px stage. */
+.stats { flex: none; display: flex; align-items: baseline; gap: 0.75em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; font-size: 0.9em; }
+/* Decision 25: the tier word leads; the number is small beside it, and in full on hover (title). */
+.stat-name { color: var(--muted); font-size: 0.85em; }
+.stat .tier { font-weight: bold; }
+.stat .num { color: var(--muted); font-size: 0.75em; }
+.togo { font-weight: bold; font-size: 0.9em; }
+.pips { letter-spacing: 0.1em; }
 
 .body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
 /* The play area is the floating preview's frame: its offsets are the anchors' coordinates. */

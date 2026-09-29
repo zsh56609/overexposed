@@ -220,6 +220,32 @@ export interface Rules {
   /** Opportunity cards may not appear here: they are draft-only. */
   readonly startingDeck: readonly { readonly cardId: string; readonly count: number }[];
   readonly draft: DraftRules;
+  /** The stat bar's words (decision 25): boundaries only — /core picks the tier (core/tiers.ts). */
+  readonly tiers?: StatTierRules;
+}
+
+/** Tiers of a value, lowest first. `from[i]` is the lowest value of tier i: 0 first, then ascending. */
+export interface ValueTiers {
+  readonly nameKeys: readonly string[];
+  readonly from: readonly number[];
+}
+
+/**
+ * Heat's pressure tiers, lowest first, read from the distance to the line — never from the threshold, so
+ * the frozen heat display holds. Below the first line, tier i is the first whose `toGoAtLeast[i]` the
+ * points still to go reach (none: the last of these). Over a line, the tiers after them: the last whose
+ * `linesCrossed` minimum is met. nameKeys: toGoAtLeast.length + 1 + linesCrossed.length.
+ */
+export interface HeatTiers {
+  readonly nameKeys: readonly string[];
+  readonly toGoAtLeast: readonly number[];
+  readonly linesCrossed: readonly number[];
+}
+
+export interface StatTierRules {
+  readonly hype?: ValueTiers;
+  readonly craft?: ValueTiers;
+  readonly heat?: HeatTiers;
 }
 
 export interface Content {

@@ -30,5 +30,20 @@
     "maxExtraPicks": 1,
     "rerollCost": 2,
     "maxRerolls": 1
+  },
+  "tiers": {
+    "hype": {
+      "nameKeys": ["tier.hype.1", "tier.hype.2", "tier.hype.3", "tier.hype.4", "tier.hype.5"],
+      "from": [0, 15, 30, 60, 105]
+    },
+    "heat": {
+      "nameKeys": ["tier.heat.1", "tier.heat.2", "tier.heat.3", "tier.heat.4", "tier.heat.5", "tier.heat.6"],
+      "toGoAtLeast": [5, 3, 2],
+      "linesCrossed": [1, 2]
+    },
+    "craft": {
+      "nameKeys": ["tier.craft.1", "tier.craft.2", "tier.craft.3", "tier.craft.4", "tier.craft.5", "tier.craft.6"],
+      "from": [0, 10, 20, 40, 55, 90]
+    }
   }
 }

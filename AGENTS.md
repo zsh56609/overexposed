@@ -123,7 +123,7 @@ heat -= vent * count                          // vent < every thresholdFloor, so
 
 All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFloor` hold one entry per act. The floor tightens season by season, so degradation cannot exhaust itself early: late in the run the same pile of scandals drags the threshold lower than it could in spring. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
 
-**Displayed heat (frozen; amended 2026-09-30).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from /core, for the state as it stands: points of heat to the next line ("N TO GO"), or once heat is over a line, "LINE CROSSED · N TO THE NEXT". It counts no scandals. The count lives only in the END TURN preview, which runs the reducer and so includes onEndOfTurn effects such as a Copycat Story copying itself ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decisions 1 and 2).
+**Displayed heat (frozen; amended 2026-09-30).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from /core, for the state as it stands: points of heat to the next line ("N TO GO"), or once heat is over a line, "LINE CROSSED · N TO THE NEXT". It counts no scandals. A pressure tier word may lead it (decision 25). The count lives only in the END TURN preview, which runs the reducer and so includes onEndOfTurn effects such as a Copycat Story copying itself ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decisions 1 and 2).
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
@@ -215,6 +215,10 @@ Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
 
 `content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — the condition shape plus `ending` (`any`/`not` ending ids) and year stats — `peakScandals`, `scandalDrop` (peak minus end), `bestMonthHype`, from `turnEnd` events — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state and the event history, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
 
+### Stat tiers
+
+`rules.tiers` (decision 25): per stat, `nameKeys` lowest first plus boundaries — `from` for hype and craft; for heat `toGoAtLeast` and `linesCrossed`, from the distance to the line, never the threshold. /core's `statTiers` picks; /ui never computes a boundary.
+
 ### Content budget
 
 21 action · 7 opportunity · 6 scandal · 8 gate (two per season) · 4 ending = 46 pieces.
@@ -251,6 +255,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - opportunity cards in the starting deck; an act with an empty draft pool
 - awards: fields, conditions, ending ids, a fallback award, at most 8
 - every flag set or read has both labels, positive and negative (an error, never a template)
+- `rules.tiers`: a word per tier, boundaries in order
 - player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, an ending without name, goal line or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
@@ -407,6 +412,7 @@ npm run validate       # content schema + i18n key check
 npm run typecheck
 npm run check:preview  # every UI preview against the real reducer outcome
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
+npm run sim:tiers      # stat tiers reached in play, per persona
 ```
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

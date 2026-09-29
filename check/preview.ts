@@ -23,6 +23,7 @@ import {
   reduce,
   RESOURCE_KEYS,
   seedRng,
+  statTiers,
   yearAwards,
   type Action,
   type Content,
@@ -45,7 +46,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0 };
+const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -168,6 +169,31 @@ function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[
   }
 }
 
+/**
+ * The stat bar's tiers (decision 25), at every state: hype's and craft's tier brackets the value, and heat's
+ * pressure tier agrees with the heat display on whether a line is crossed — two surfaces, one answer.
+ */
+function checkTiers(s: GameState, seed: number): void {
+  counts.tierStates++;
+  const tiers = statTiers(s);
+  const rules = s.content.rules.tiers;
+  for (const stat of ['hype', 'craft'] as const) {
+    const bounds = rules?.[stat]?.from;
+    const tier = tiers[stat];
+    if (!bounds || !tier) {
+      report('tier', seed, s.turn, `${stat}: no tier`);
+      continue;
+    }
+    const value = s.resources[stat];
+    if (value < (bounds[tier.index] ?? 0) || value >= (bounds[tier.index + 1] ?? Infinity)) report('tier', seed, s.turn, `${stat} ${value} shown as tier ${tier.index + 1}`);
+  }
+  const heat = tiers.heat;
+  const below = rules?.heat?.toGoAtLeast.length;
+  if (!heat || below === undefined) return report('tier', seed, s.turn, 'heat: no tier');
+  const line = heatLine(s);
+  if ((heat.index > below) !== line.crossed) report('heat tier', seed, s.turn, `tier ${heat.index + 1} but the display says crossed=${line.crossed}`);
+}
+
 function checkDraftPhase(s: GameState, seed: number): void {
   for (const cardId of s.draft?.offer ?? []) {
     counts.draftCards++;
@@ -193,6 +219,7 @@ for (let i = 0; i < RUNS; i++) {
   const history: GameEvent[] = [...s.events];
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
+    checkTiers(s, seed);
     if (s.phase === 'play') checkPlayPhase(s, seed);
     else if (s.phase === 'gate') checkGatePhase(s, seed, history);
     else if (s.phase === 'draft') checkDraftPhase(s, seed);
@@ -206,7 +233,7 @@ console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending and its awards; ${counts.eitherWay} final gates said "either way", ` +
-    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers ` +
+    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers at ${counts.tierStates} states ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

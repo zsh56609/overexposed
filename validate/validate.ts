@@ -74,7 +74,7 @@ const MAX_AWARDS = 8;
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft',
+  'startingResources', 'startingDeck', 'draft', 'tiers',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -348,7 +348,70 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.int(raw.draft.extraPickCost, 'rules.draft.extraPickCost', LIMIT.price);
     v.int(raw.draft.rerollCost, 'rules.draft.rerollCost', LIMIT.price);
   }
+  checkTiers(v, raw.tiers);
   return raw;
+}
+
+/**
+ * The stat bar's tiers (docs/ui-plan.md §13, decision 25): a word per tier, lowest first, and boundaries
+ * that let every tier apply. hype and craft: `from` starts at 0 and rises. heat, read from the distance to
+ * the line: points to go falling, lines crossed rising from 1, a word for each tier the two make.
+ */
+function checkTiers(v: Ctx, raw: unknown): void {
+  const where = 'rules.tiers';
+  if (raw === undefined) return v.error('schema', where, 'missing: the stat bar needs tiers for hype, heat and craft');
+  if (!isObj(raw)) return v.error('schema', where, 'must be an object: { hype, heat, craft }');
+  v.fields(raw, ['hype', 'heat', 'craft'], where);
+  const words = (t: Obj, at: string): number => {
+    if (!Array.isArray(t.nameKeys) || t.nameKeys.length === 0) {
+      v.error('schema', `${at}.nameKeys`, 'must be a non-empty array of i18n keys, lowest tier first');
+      return 0;
+    }
+    t.nameKeys.forEach((k, i) => v.key(k, `${at}.nameKeys[${i}]`));
+    return t.nameKeys.length;
+  };
+  const ints = (list: unknown, at: string, lo: number): number[] | null => {
+    if (!Array.isArray(list) || list.length === 0) {
+      v.error('schema', at, 'must be a non-empty array of integers');
+      return null;
+    }
+    return list.every((n, i) => v.int(n, `${at}[${i}]`, [lo, LIMIT.conditionBound[1]])) ? (list as number[]) : null;
+  };
+  const strictly = (list: readonly number[], at: string, rise: boolean) => {
+    if (list.some((n, i) => i > 0 && (rise ? n <= (list[i - 1] as number) : n >= (list[i - 1] as number)))) {
+      v.error('ranges', at, rise ? 'must rise strictly' : 'must fall strictly');
+    }
+  };
+  for (const stat of ['hype', 'craft'] as const) {
+    const t = raw[stat];
+    const at = `${where}.${stat}`;
+    if (!isObj(t)) {
+      v.error('schema', at, 'must be { nameKeys, from }');
+      continue;
+    }
+    v.fields(t, ['nameKeys', 'from'], at);
+    const n = words(t, at);
+    const from = ints(t.from, `${at}.from`, 0);
+    if (!from) continue;
+    if (from[0] !== 0) v.error('ranges', `${at}.from`, 'must start at 0, so some tier always applies');
+    strictly(from, `${at}.from`, true);
+    if (n > 0 && from.length !== n) v.error('ranges', at, `${from.length} boundaries for ${n} tier words`);
+  }
+  const heat = raw.heat;
+  const at = `${where}.heat`;
+  if (!isObj(heat)) return v.error('schema', at, 'must be { nameKeys, toGoAtLeast, linesCrossed }');
+  v.fields(heat, ['nameKeys', 'toGoAtLeast', 'linesCrossed'], at);
+  const n = words(heat, at);
+  const toGo = ints(heat.toGoAtLeast, `${at}.toGoAtLeast`, 1);
+  const lines = ints(heat.linesCrossed, `${at}.linesCrossed`, 1);
+  if (toGo) strictly(toGo, `${at}.toGoAtLeast`, false);
+  if (lines) {
+    if (lines[0] !== 1) v.error('ranges', `${at}.linesCrossed`, 'must start at 1: the first tier over a line');
+    strictly(lines, `${at}.linesCrossed`, true);
+  }
+  if (n > 0 && toGo && lines && n !== toGo.length + 1 + lines.length) {
+    v.error('ranges', at, `${n} tier words for ${toGo.length + 1} tiers below the line and ${lines.length} over it`);
+  }
 }
 
 const draftOn = (rules: Obj | null) =>
@@ -646,7 +709,7 @@ function checkI18n(v: Ctx, i18n: unknown): number {
     else if (i18n[key] === '') v.error('i18n', where, `key ${q(key)} is empty in i18n/en.json`);
   }
   for (const key of Object.keys(i18n)) {
-    if (/^(card|gate|ending|act|award|flag)\./.test(key) && !v.keysUsed.has(key)) {
+    if (/^(card|gate|ending|act|award|flag|tier)\./.test(key) && !v.keysUsed.has(key)) {
       v.warn('i18n', `i18n/en.json ${q(key)}`, 'no content uses this key');
     }
   }
@@ -706,6 +769,13 @@ function checkProse(
   for (const flag of flagsIn(v)) {
     const unwritten = (['positive', 'negative'] as const).filter((f) => Object.hasOwn(i18n, `flag.${flag}.${f}`) && !written(`flag.${flag}.${f}`));
     if (unwritten.length > 0) v.warn('prose', `flag ${flag}`, `no ${unwritten.join(', ')} label`);
+  }
+  const tiers = rules && isObj(rules.tiers) ? rules.tiers : {};
+  for (const [stat, t] of Object.entries(tiers)) {
+    const keys: unknown[] = isObj(t) && Array.isArray(t.nameKeys) ? t.nameKeys : [];
+    keys.forEach((k, i) => {
+      if (isStr(k) && Object.hasOwn(i18n, k) && !written(k)) v.warn('prose', `${stat} tier ${i + 1}`, 'no tier word');
+    });
   }
 }
 

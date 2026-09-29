@@ -55,21 +55,24 @@ A fixed 1280×720 logical stage, scaled to fit the viewport (§9).
 ┌────────────────────────────────────────────────────────────┐
 │ OVEREXPOSED   seed · deck 8 · discard 4   SPRING · M2      │  masthead
 ├────────────────────────────────────────────────────────────┤
-│ HYPE 34  CRAFT 21  CAPITAL 6  HEAT 4 · 3 TO GO             │  stat strip
+│ Hype Rising  Craft Solid  Cap 6  Heat Quiet  5 TO GO  ●●○  │  stat strip
 ├─────────────────────────────┬──────────────┬───────────────┤
 │ This turn's front page      │ THIS SEASON  │ GOALS         │
 │ one headline per card       │  gates, live │  Headliner    │
 │ scandal = red lead story    │              │  Musician's   │
 ├─────────────────────────────┴──────────────┤  Cautionary   │
-│ [card] [card] [card] [dead] [card] SLOTS   │  Nobody Yet   │  hand
+│ [card] [card] [card] [dead] [card]         │  Nobody Yet   │  hand
 │       [ END TURN · 1 scandal will print ]  │  (in view     │
 │                                            │   always)     │
 └────────────────────────────────────────────┴───────────────┘
 ```
 
-The stat strip shows heat as integers only (§5): the heat value, then
-"N TO GO", or "LINE CROSSED · N TO THE NEXT" once heat is over a line.
-It counts no scandals; the count lives only in the END TURN preview.
+The stat strip is words first (decision 25): hype, craft and heat show
+their tier — fame, skill, pressure — with the number small beside it and
+in full on hover; capital stays a number; slots are pips (●●○). Heat
+keeps its integers (§5): after its tier, "N TO GO", or "LINE CROSSED · N
+TO THE NEXT" once heat is over a line. It counts no scandals; the count
+lives only in the END TURN preview.
 There is no proportional heat bar: a bar needs a denominator, which is the effective
 threshold, which the frozen rules forbid displaying.
 
@@ -167,6 +170,12 @@ only, and it counts no scandals (decision 1):
   monthsLeft). No
   separate warning panel (decision 18). The season transition also
   states how far the line moved this season (decision 13).
+- before the numbers, a pressure tier word (decision 25): Quiet,
+  Whispers, People are talking, They're circling from the points still
+  to go; A story is breaking once one line is crossed, Out of control at
+  two or more. /core reads it off heatOutlook — the distance to the line,
+  never the threshold — and it states pressure only, never a scandal
+  count. It and "LINE CROSSED" always agree (check:preview).
 
 Crossing the line and crystallisation are two separate moments
 (decision 3):
@@ -464,6 +473,31 @@ it.
     Signing, apologising on camera and reinventing an image are public;
     networking is private. The rule and its table live in
     docs/writing/voice.md. (2026-09-30)
+25. Numbers recede. Ambient state is words; decisions are numbers. The
+    stat bar tells the player how things stand; precise values appear
+    where a choice depends on them.
+    - Stat bar: each tier word prominent, the number small beside it
+      and in full on hover. hype — fame tier; heat — pressure tier,
+      keeping "N TO GO" beside it; craft — skill tier; capital stays a
+      number, money is naturally numeric; slots are icons (●●○).
+    - Numbers remain in full wherever a decision uses them: previews,
+      gate requirements, goals-board conditions, hover.
+    - Tiers come from /core as a read-only query (`statTiers`); /ui
+      displays them and never computes a boundary. Boundaries live in
+      content (`rules.tiers`) and are tuned so each tier is actually
+      reached in play (`npm run sim:tiers`).
+    - Heat tiers are computed from distance to the current line (via
+      heatOutlook), never from the threshold, so the frozen heat display
+      rule holds. "A story is breaking" = one line crossed; "Out of
+      control" = two or more. The tier describes pressure only — it
+      never states a scandal count, so decision 1 holds.
+    - A tier word must never imply a requirement is met when it is not.
+      Requirement lines keep their exact numbers; no requirement is ever
+      written as a tier. Where it can, a boundary sits on a goal's own
+      threshold (Known at Headliner's 60 hype, Accomplished at The
+      Musician's Musician's 55 craft), so a word never runs ahead of a
+      goal the player can see.
+    (2026-09-30)
 
 ### Still open
 

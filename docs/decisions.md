@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-09-30 — Numbers recede (decision 25)
+
+Ambient state is words; decisions are numbers. The stat bar tells the
+player how things stand — hype, craft and heat as tier words (draft v3),
+the number small beside each and in full on hover; capital stays a
+number; slots are pips. Precise values stay wherever a choice depends on
+them: previews, gate requirements, goals-board conditions, hover. Full
+text in docs/ui-plan.md §13, decision 25.
+
+Tiers come from /core (`statTiers`), boundaries from content
+(`rules.tiers`); /ui never computes a boundary. Heat's tier is read from
+the distance to the line (heatOutlook), never the threshold, and states
+pressure only, never a scandal count. Boundaries sit on the goals' own
+thresholds where they can, so a word never runs ahead of a goal:
+
+| Stat | Tiers, lowest first, with where each starts |
+|---|---|
+| hype | Unknown 0 · Local buzz 15 · Rising 30 (Cautionary Tale's hype) · Known 60 (Headliner's) · Household name 105 (People's Choice's) |
+| craft | Raw 0 · Finding your voice 10 · Solid 20 · Seasoned 40 · Accomplished 55 (The Musician's Musician's) · Remarkable 90 (Critics' Choice's) |
+| heat | below the line, by points to go: Quiet 5+ · Whispers 3–4 · People are talking 2 · They're circling 1; over it, by lines crossed: A story is breaking 1 · Out of control 2+ |
+
+Target: every tier actually reached in play — in at least 5% of
+player-like runs, counted over every state a player sees. Reached
+(`npm run sim:tiers`, 1000 runs per persona, seed 20260929): hype 100,
+98.8, 89.9, 66.9, 26.9%; heat 100, 96.3, 89.0, 85.7, 81.7, 37.2%; craft
+100, 100, 98.8, 83.3, 65.8, 30.8%. Seeds 1 and 424242 agree within 1.5
+points.
+
 ## 2026-09-30 — Round 6d165fe answered: the seven questions
 
 The author reviewed and played round 6d165fe. The headline leading the

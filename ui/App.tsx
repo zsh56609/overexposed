@@ -15,11 +15,13 @@ import {
   reduce,
   RESOURCE_KEYS,
   scandalCount,
+  statTiers,
   yearAwards,
   type Action,
   type CardInstance,
   type ContentIndex,
   type GameState,
+  type ResourceKey,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { feedLines, type FeedLine } from './feed.ts';
@@ -249,17 +251,46 @@ function Masthead({ s, onDeck }: { s: GameState; onDeck: () => void }) {
   );
 }
 
+/**
+ * The stat bar (decision 25): ambient state is words, decisions are numbers. Hype, craft and heat show the
+ * tier /core picks, the number small beside it and in full on hover; capital stays a number; slots are
+ * pips. Heat keeps its "N TO GO" (decision 1): the tier states pressure, never a scandal count.
+ */
 function StatStrip({ s }: { s: GameState }) {
-  // The heat display (decision 1): where heat sits against the line, from /core. It counts no scandals.
+  const tiers = statTiers(s);
+  const slots = s.content.rules.slotsPerTurn;
+  const stat = (k: ResourceKey) => {
+    const exact = t('ui.stat.value', { name: resourceName(k), value: s.resources[k] });
+    const tier = k === 'capital' ? null : tiers[k];
+    return (
+      <span className={`stat stat-${k}`} title={exact}>
+        {tier === null ? (
+          exact
+        ) : (
+          <>
+            <span className="stat-name">{resourceName(k)}</span> <strong className="tier">{t(tier.nameKey)}</strong>{' '}
+            <small className="num">{s.resources[k]}</small>
+          </>
+        )}
+      </span>
+    );
+  };
   return (
     <div className="stats">
-      {RESOURCE_KEYS.map((k) => (
-        <span key={k} className={`stat stat-${k}`}>
-          {t('ui.stat.value', { name: resourceName(k), value: s.resources[k] })}
-        </span>
-      ))}
+      {stat('hype')}
+      {stat('craft')}
+      {stat('capital')}
+      {stat('heat')}
       <span className="stat togo">{heatText(heatLine(s))}</span>
-      {s.phase === 'play' && <span className="stat">{t('ui.stat.slots', { n: s.slots })}</span>}
+      {s.phase === 'play' && (
+        <span className="stat slots" title={t('ui.stat.slots', { n: s.slots })}>
+          <span className="stat-name">{t('ui.stat.slotsName')}</span>{' '}
+          <span className="pips" aria-label={t('ui.stat.slots', { n: s.slots })}>
+            {t('ui.stat.slotOn').repeat(s.slots)}
+            {t('ui.stat.slotOff').repeat(Math.max(0, slots - s.slots))}
+          </span>
+        </span>
+      )}
     </div>
   );
 }
