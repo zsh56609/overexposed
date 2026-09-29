@@ -1,0 +1,25 @@
+[
+  {
+    "id": "meltdown",
+    "priority": 300,
+    "conditions": { "scandalCount": { "min": 5 } },
+    "textKey": "ending.meltdown.text"
+  },
+  {
+    "id": "star",
+    "priority": 200,
+    "conditions": { "hype": { "min": 70 }, "flags": { "all": ["signed_label"], "not": ["flopped_tour"] } },
+    "textKey": "ending.star.text"
+  },
+  {
+    "id": "craftsman",
+    "priority": 100,
+    "conditions": { "craft": { "min": 55 }, "scandalCount": { "max": 2 } },
+    "textKey": "ending.craftsman.text"
+  },
+  {
+    "id": "nobody",
+    "priority": 0,
+    "textKey": "ending.nobody.text"
+  }
+]

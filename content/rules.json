@@ -1,0 +1,20 @@
+{
+  "acts": 3,
+  "turnsPerAct": 4,
+  "handSize": 5,
+  "slotsPerTurn": 3,
+  "gatesOffered": 2,
+  "heatThreshold": [10, 9, 8],
+  "heatVent": 6,
+  "startingResources": { "hype": 0, "craft": 0, "capital": 3, "heat": 0 },
+  "startingDeck": [
+    { "cardId": "vocal_coaching", "count": 2 },
+    { "cardId": "open_mic", "count": 2 },
+    { "cardId": "side_gig", "count": 2 },
+    { "cardId": "press_junket", "count": 1 },
+    { "cardId": "viral_stunt", "count": 1 },
+    { "cardId": "lay_low", "count": 1 },
+    { "cardId": "networking", "count": 1 },
+    { "cardId": "crisis_pr", "count": 1 }
+  ]
+}

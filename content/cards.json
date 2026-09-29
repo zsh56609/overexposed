@@ -1,0 +1,149 @@
+[
+  {
+    "id": "vocal_coaching",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.vocal_coaching.name",
+    "textKey": "card.vocal_coaching.text",
+    "playable": true,
+    "tags": ["craft", "training"],
+    "effects": [{ "op": "resource", "target": "craft", "value": 6 }]
+  },
+  {
+    "id": "open_mic",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.open_mic.name",
+    "textKey": "card.open_mic.text",
+    "playable": true,
+    "tags": ["hype", "gig"],
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 4 },
+      { "op": "resource", "target": "capital", "value": 1 },
+      { "op": "resource", "target": "heat", "value": 2 }
+    ]
+  },
+  {
+    "id": "viral_stunt",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.viral_stunt.name",
+    "textKey": "card.viral_stunt.text",
+    "playable": true,
+    "tags": ["hype", "stunt"],
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 9 },
+      { "op": "resource", "target": "heat", "value": 5 },
+      { "op": "setFlag", "flag": "went_viral" }
+    ]
+  },
+  {
+    "id": "press_junket",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.press_junket.name",
+    "textKey": "card.press_junket.text",
+    "playable": true,
+    "tags": ["hype", "press"],
+    "effects": [
+      {
+        "op": "conditional",
+        "if": { "craft": { "min": 20 } },
+        "then": [
+          { "op": "resource", "target": "hype", "value": 7 },
+          { "op": "resource", "target": "heat", "value": 1 }
+        ],
+        "else": [
+          { "op": "resource", "target": "hype", "value": 4 },
+          { "op": "resource", "target": "heat", "value": 4 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "side_gig",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.side_gig.name",
+    "textKey": "card.side_gig.text",
+    "playable": true,
+    "tags": ["money", "gig"],
+    "effects": [
+      { "op": "resource", "target": "capital", "value": 3 },
+      { "op": "resource", "target": "craft", "value": 1 }
+    ]
+  },
+  {
+    "id": "lay_low",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.lay_low.name",
+    "textKey": "card.lay_low.text",
+    "playable": true,
+    "tags": ["recovery"],
+    "effects": [
+      { "op": "resource", "target": "heat", "value": -5 },
+      { "op": "resource", "target": "hype", "value": -3 }
+    ]
+  },
+  {
+    "id": "networking",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.networking.name",
+    "textKey": "card.networking.text",
+    "playable": true,
+    "tags": ["social"],
+    "effects": [{ "op": "draw", "count": 2 }]
+  },
+  {
+    "id": "crisis_pr",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.crisis_pr.name",
+    "textKey": "card.crisis_pr.text",
+    "playable": true,
+    "tags": ["recovery", "fixer"],
+    "requires": { "capital": { "min": 4 }, "scandalCount": { "min": 1 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -4 },
+      { "op": "exhaustTag", "tag": "scandal", "count": 1 }
+    ]
+  },
+  {
+    "id": "studio_session",
+    "kind": "action",
+    "cost": 2,
+    "nameKey": "card.studio_session.name",
+    "textKey": "card.studio_session.text",
+    "playable": true,
+    "tags": ["craft", "recording"],
+    "actMin": 2,
+    "effects": [
+      { "op": "resource", "target": "craft", "value": 8 },
+      { "op": "resource", "target": "hype", "value": 3 }
+    ]
+  },
+  {
+    "id": "tabloid_story",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.tabloid_story.name",
+    "textKey": "card.tabloid_story.text",
+    "playable": false,
+    "tags": ["scandal"],
+    "onEndOfTurn": [{ "op": "resource", "target": "hype", "value": -4 }]
+  },
+  {
+    "id": "public_feud",
+    "kind": "scandal",
+    "cost": 0,
+    "nameKey": "card.public_feud.name",
+    "textKey": "card.public_feud.text",
+    "playable": false,
+    "tags": ["scandal"],
+    "actMin": 2,
+    "onDraw": [{ "op": "slots", "value": -1 }],
+    "onEndOfTurn": [{ "op": "resource", "target": "capital", "value": -2 }]
+  }
+]
