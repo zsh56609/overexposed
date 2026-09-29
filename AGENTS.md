@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 **Overexposed** — Game Gauntlet SIM Jam entry. Read this at the start of every session.
 **UI scope and layer plan:** [`docs/ui-plan.md`](docs/ui-plan.md) — build one layer at a time.
@@ -6,6 +6,17 @@
 **Jam window:** 2026-09-24 03:00 JST → **2026-11-05 04:00 JST** (submission).
 **Ship language:** English. **Target:** browser build on itch.io.
 **Started late — as of 2026-09-29 there are 36 days left. Schedule in §7 is already compressed.**
+
+---
+
+## Session rules — every agent, every tool
+
+- **Session start:** read [`docs/status.md`](docs/status.md) before doing anything.
+- **Session end:** update `docs/status.md`, commit, push.
+- A design decision made in conversation is written to [`docs/decisions.md`](docs/decisions.md) in the same session.
+- Every AI-assisted commit identifies the tool. Claude Code adds its Co-Authored-By trailer automatically; any other tool adds a Co-Authored-By trailer naming itself.
+- Agents never write player-facing prose (see [`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15).
+- Keep this file under ~28 KiB: some agents read only its first 32 KiB and drop the rest silently. Past that, move reference material (the per-event GameEvent spec, band definitions) to `docs/` and link to it; hard rules and FROZEN items stay near the top.
 
 ---
 
@@ -60,7 +71,7 @@ The UI is built around the items below. Changing any of them now means reworking
 
 ### Premise
 
-A career simulation. One run compresses an entertainment career into ~20 minutes.
+A career simulation. One run compresses an entertainment career into 10–15 minutes — the target; do not lengthen it ([`docs/ui-plan.md`](docs/ui-plan.md) §12).
 Your deck is your résumé.
 
 **Primary engine: deck construction.** The player builds a set of moves and exploits their interactions.
@@ -338,6 +349,8 @@ Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections,
 | 11/3–11/4 | Buffer, itch page, submission materials |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
+Progress runs ahead of this table: UI layer 1 was built on 2026-09-29. The current task is in [`docs/status.md`](docs/status.md).
+
 ### Scope control
 
 The failure mode is not running out of time; it's spending week five adding a system instead of tuning the loop.
@@ -404,6 +417,7 @@ npm run build          # production browser build
 npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
+npm run check:preview  # every UI preview against the real reducer outcome
 ```
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

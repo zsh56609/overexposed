@@ -1,8 +1,8 @@
 # Overexposed — UI plan
 
-Scope and structure for the browser UI. Read alongside CLAUDE.md.
-This document does not redefine anything CLAUDE.md marks FROZEN — it
-references it. Visual direction lives in CLAUDE.md §6.
+Scope and structure for the browser UI. Read alongside AGENTS.md.
+This document does not redefine anything AGENTS.md marks FROZEN — it
+references it. Visual direction lives in AGENTS.md §6.
 
 **Build one layer at a time. Only the current layer is in scope.**
 
@@ -129,7 +129,7 @@ unmet, plus pass and fail consequences.
 
 ## 5. Heat display
 
-Follow the display rule frozen in CLAUDE.md ("Displayed heat"). Integers
+Follow the display rule frozen in AGENTS.md ("Displayed heat"). Integers
 only (decision 1):
 
 - normally **"N TO GO"** — points of heat until the next scandal
@@ -232,7 +232,7 @@ The ending screen exists to make that zero-friction.
 | Layer | Scope |
 |---|---|
 | **1 — Function** | A complete run playable in the browser. Every screen exists. Preview works. Ugly is fine. Built 2026-09-29. |
-| **2 — Meaning and art** | The meaning layer first — goals board, feed headlines and headline fields, ending names, season openers, deck viewer. Visual craft alongside it, never ahead: type, palette, halftone, card layout, front-page setting, season transitions, per CLAUDE.md §6 — not illustration, which is layer 4. Decisions in §13. |
+| **2 — Meaning and art** | The meaning layer first — goals board, feed headlines and headline fields, ending names, season openers, deck viewer. Visual craft alongside it, never ahead: type, palette, halftone, card layout, front-page setting, season transitions, per AGENTS.md §6 — not illustration, which is layer 4. Decisions in §13. |
 | 3 — Motion | Card flight, number roll-up, crystallisation hit-stop and shake, winter crowding. |
 | 4 — Illustration | The four ending illustrations (public-domain collage). Not before 2026-10-26. |
 | — Onboarding | After layer 2. Contextual hints, not a tutorial level. |
