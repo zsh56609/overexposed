@@ -2,6 +2,7 @@
 // Nothing here decides anything — a clause arrives already marked met or unmet by /core.
 
 import {
+  deriveSeed,
   getCard,
   getGate,
   type AddCardZone,
@@ -9,9 +10,9 @@ import {
   type Condition,
   type ContentIndex,
   type Effect,
-  type GameEvent,
   type PlayBlocker,
   type Range,
+  type Register,
   type ResourceKey,
 } from '../core/index.ts';
 import { t } from './i18n.ts';
@@ -21,6 +22,7 @@ const signedFormat = new Intl.NumberFormat('en', { signDisplay: 'exceptZero' });
 export const signed = (n: number): string => signedFormat.format(n);
 
 export const cardName = (c: ContentIndex, id: string): string => t(getCard(c, id)?.nameKey ?? `card.${id}.name`);
+/** A card's text: its rules, or for a scandal the line shown while it sits in hand. */
 export const cardText = (c: ContentIndex, id: string): string => t(getCard(c, id)?.textKey ?? `card.${id}.text`);
 export const gateName = (c: ContentIndex, id: string): string => t(getGate(c, id)?.nameKey ?? `gate.${id}.name`);
 export const seasonName = (c: ContentIndex, act: number): string => t(c.rules.actNameKeys[act - 1] ?? `act.${act}.name`);
@@ -28,6 +30,43 @@ export const resourceName = (k: ResourceKey): string => t(`ui.resource.${k}`);
 export const flagName = (flag: string): string => t(`ui.flag.${flag}`);
 export const zoneName = (zone: AddCardZone): string => t(`ui.zone.${zone}`);
 export const tagName = (tag: string): string => t(`ui.tag.${tag}`);
+
+// ---------------------------------------------------------------------------
+// Player-facing prose (docs/ui-plan.md §13, decision 15). The author controls every line; a value
+// starting with the placeholder marker has not been written yet and is shown as such, never hidden.
+
+const PLACEHOLDER = 'TODO(prose)';
+export const isPlaceholder = (text: string): boolean => text.startsWith(PLACEHOLDER);
+
+export const gateFlavor = (c: ContentIndex, id: string): string => t(getGate(c, id)?.flavorKey ?? `gate.${id}.flavor`);
+export const seasonOpener = (c: ContentIndex, act: number): string => t(c.rules.actOpenerKeys?.[act - 1] ?? `act.${act}.opener`);
+export const endingName = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.nameKey ?? `ending.${id}.name`);
+export const endingGoal = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.goalKey ?? `ending.${id}.goal`);
+export const endingText = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.textKey ?? `ending.${id}.text`);
+/** The headline a scandal prints when it crystallises. */
+export const scandalHeadline = (c: ContentIndex, id: string): string => t(getCard(c, id)?.headlineKey ?? `card.${id}.headline`);
+
+/**
+ * The feed headline for a card played. The variant is a pure hash of the run seed, the month and the card
+ * instance — never the game RNG, so prose can't move a sim result or break a replay (decision 15).
+ */
+export function playHeadline(c: ContentIndex, seed: number, turn: number, uid: number, cardId: string): { text: string; register: Register | null } {
+  const card = getCard(c, cardId);
+  const keys = card?.headlineKeys ?? [];
+  const register = card?.register ?? null;
+  if (keys.length === 0) return { text: t('ui.feed.noHeadline', { card: cardName(c, cardId) }), register };
+  const pick = deriveSeed(deriveSeed(seed, turn), uid) % keys.length;
+  return { text: t(keys[pick] as string), register };
+}
+
+// ---------------------------------------------------------------------------
+// The heat display (decision 1): where heat sits against the line. It counts no scandals.
+
+export const heatText = (line: { readonly toNext: number; readonly crossed: boolean }): string =>
+  t(line.crossed ? 'ui.stat.crossed' : 'ui.stat.toGo', { n: line.toNext });
+
+// ---------------------------------------------------------------------------
+// Conditions and effects
 
 const whatName = (key: string): string =>
   key === 'hype' || key === 'craft' || key === 'capital' || key === 'heat' ? resourceName(key) : t(`ui.what.${key}`);
@@ -38,6 +77,16 @@ function rangeText(prefix: 'ui.clause' | 'ui.cond', key: string, range: Range, v
   if (range.min !== undefined && range.max !== undefined) return t(`${prefix}.between`, vars);
   if (range.min !== undefined) return t(`${prefix}.min`, vars);
   return t(`${prefix}.max`, vars);
+}
+
+/** A season window in words — "in Winter", "from Summer on" — since the player knows seasons, not act numbers. */
+function actText(c: ContentIndex, range: Range): string {
+  const last = c.rules.acts;
+  const { min, max } = range;
+  if (min !== undefined && (min === max || (max === undefined && min === last))) return t('ui.cond.actIn', { season: seasonName(c, min) });
+  if (min !== undefined && max !== undefined) return t('ui.cond.actBetween', { from: seasonName(c, min), to: seasonName(c, max) });
+  if (min !== undefined) return t('ui.cond.actFrom', { season: seasonName(c, min) });
+  return t('ui.cond.actUntil', { season: seasonName(c, max ?? last) });
 }
 
 function flagsText(test: { readonly all?: readonly string[]; readonly any?: readonly string[]; readonly not?: readonly string[] }): string {
@@ -60,9 +109,9 @@ export const clauseLine = (clause: ClauseReport): string =>
   t(clause.met ? 'ui.clause.met' : 'ui.clause.unmet', { text: clauseText(clause) });
 
 /** A condition as static words (for conditional effects), no verdict. */
-export function conditionText(cond: Condition): string {
+export function conditionText(c: ContentIndex, cond: Condition): string {
   return Object.entries(cond)
-    .map(([key, v]) => (key === 'flags' ? flagsText(v as object) : rangeText('ui.cond', key, v as Range)))
+    .map(([key, v]) => (key === 'flags' ? flagsText(v as object) : key === 'act' ? actText(c, v as Range) : rangeText('ui.cond', key, v as Range)))
     .join(', ');
 }
 
@@ -96,7 +145,7 @@ export function effectText(c: ContentIndex, e: Effect): string {
     case 'setFlag':
       return t('ui.effect.setFlag', { flag: flagName(e.flag) });
     case 'conditional': {
-      const vars = { cond: conditionText(e.if), then: effectsText(c, e.then), else: effectsText(c, e.else ?? []) };
+      const vars = { cond: conditionText(c, e.if), then: effectsText(c, e.then), else: effectsText(c, e.else ?? []) };
       return t(e.else?.length ? 'ui.effect.conditionalElse' : 'ui.effect.conditional', vars);
     }
   }
@@ -105,48 +154,14 @@ export function effectText(c: ContentIndex, e: Effect): string {
 export const effectsText = (c: ContentIndex, effects: readonly Effect[]): string =>
   effects.length ? effects.map((e) => effectText(c, e)).join(', ') : t('ui.effect.none');
 
-/** One headline per GameEvent (docs/ui-plan.md §3). Layer 1: a plain line of text. */
-export function eventText(c: ContentIndex, e: GameEvent): string {
-  switch (e.type) {
-    case 'turnStart':
-      return t('ui.event.turnStart', { season: seasonName(c, e.act), turn: e.turn });
-    case 'shuffle':
-      return t('ui.event.shuffle', { count: e.count });
-    case 'draw':
-      return t('ui.event.draw', { card: cardName(c, e.cardId) });
-    case 'play':
-      return t('ui.event.play', { card: cardName(c, e.cardId) });
-    case 'resource':
-      return t('ui.event.resource', { resource: resourceName(e.target), delta: signed(e.delta), value: e.value });
-    case 'slots':
-      return t('ui.event.slots', { delta: signed(e.delta), value: e.value });
-    case 'flag':
-      return t('ui.event.flag', { flag: flagName(e.flag) });
-    case 'addCard':
-      return t('ui.event.addCard', { card: cardName(c, e.cardId), zone: zoneName(e.to) });
-    case 'exhaust':
-      return t('ui.event.exhaust', { card: cardName(c, e.cardId) });
-    case 'scandal':
-      return e.cause === null
-        ? t('ui.event.scandalUnblamed', { card: cardName(c, e.cardId) })
-        : t('ui.event.scandal', { card: cardName(c, e.cardId), cause: cardName(c, e.cause) });
-    case 'turnEnd':
-      return t('ui.event.turnEnd', { turn: e.turn, n: e.crystallised });
-    case 'draftOffer':
-      return t('ui.event.draftOffer', { cards: e.cardIds.map((id) => cardName(c, id)).join(' · ') });
-    case 'draftPick':
-      return t('ui.event.draftPick', { card: cardName(c, e.cardId) });
-    case 'draftExtraPick':
-      return t('ui.event.draftExtraPick', { cost: e.cost });
-    case 'draftReroll':
-      return t('ui.event.draftReroll', { cost: e.cost });
-    case 'gateOffer':
-      return t('ui.event.gateOffer', { season: seasonName(c, c.gates[e.gateIds[0] ?? '']?.act ?? 1) });
-    case 'gate':
-      return t(e.passed ? 'ui.event.gatePass' : 'ui.event.gateFail', { gate: gateName(c, e.gateId) });
-    case 'ending':
-      return t('ui.event.ending');
-    case 'warning':
-      return t('ui.event.warning', { code: e.code, ref: e.ref });
-  }
+/**
+ * A card's rules, told by the interface from its effects — for a scandal, whose text is prose (its in-hand
+ * line): what it does when drawn and at month end. Empty for a card with neither.
+ */
+export function cardRuleLines(c: ContentIndex, id: string): string[] {
+  const card = getCard(c, id);
+  const lines: string[] = [];
+  if (card?.onDraw?.length) lines.push(t('ui.card.whenDrawn', { effects: effectsText(c, card.onDraw) }));
+  if (card?.onEndOfTurn?.length) lines.push(t('ui.card.atMonthEnd', { effects: effectsText(c, card.onEndOfTurn) }));
+  return lines;
 }

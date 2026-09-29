@@ -2,24 +2,32 @@
   {
     "id": "meltdown",
     "priority": 300,
+    "nameKey": "ending.meltdown.name",
+    "goalKey": "ending.meltdown.goal",
     "conditions": { "scandalCount": { "min": 7 }, "hype": { "min": 30 } },
     "textKey": "ending.meltdown.text"
   },
   {
     "id": "star",
     "priority": 200,
+    "nameKey": "ending.star.name",
+    "goalKey": "ending.star.goal",
     "conditions": { "hype": { "min": 60 }, "flags": { "all": ["signed_label"] }, "scandalCount": { "max": 5 } },
     "textKey": "ending.star.text"
   },
   {
     "id": "craftsman",
     "priority": 100,
+    "nameKey": "ending.craftsman.name",
+    "goalKey": "ending.craftsman.goal",
     "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
     "textKey": "ending.craftsman.text"
   },
   {
     "id": "nobody",
     "priority": 0,
+    "nameKey": "ending.nobody.name",
+    "goalKey": "ending.nobody.goal",
     "textKey": "ending.nobody.text"
   }
 ]

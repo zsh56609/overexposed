@@ -13,6 +13,7 @@ import {
   EFFECT_OPS,
   FLAG_TEST_KEYS,
   isEffectOp,
+  REGISTERS,
   RESOURCE_KEYS,
 } from '../core/index.ts';
 
@@ -20,6 +21,7 @@ export const CHECKS = {
   unknownOp: 'unknown effect ops',
   references: 'references to card / gate / ending ids',
   i18n: 'missing i18n keys',
+  prose: 'player-facing prose not yet written (warnings)',
   reachability: 'cards unreachable in any act',
   fallback: 'priority-0 fallback ending',
   ranges: 'numeric ranges',
@@ -58,11 +60,14 @@ const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInt
 const ID = /^[a-z][a-z0-9_]*$/;
 const q = (v: unknown) => JSON.stringify(v);
 
-const CARD_FIELDS = ['id', 'kind', 'cost', 'nameKey', 'textKey', 'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn'];
-const GATE_FIELDS = ['id', 'act', 'nameKey', 'requires', 'onPass', 'onFail'];
-const ENDING_FIELDS = ['id', 'priority', 'conditions', 'textKey'];
+const CARD_FIELDS = [
+  'id', 'kind', 'cost', 'nameKey', 'textKey', 'headlineKeys', 'register', 'headlineKey',
+  'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn',
+];
+const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKey', 'requires', 'onPass', 'onFail'];
+const ENDING_FIELDS = ['id', 'priority', 'nameKey', 'goalKey', 'conditions', 'textKey'];
 const RULES_FIELDS = [
-  'acts', 'turnsPerAct', 'actNameKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
+  'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft',
 ];
@@ -253,6 +258,15 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     }
     raw.actNameKeys.forEach((k, i) => v.key(k, `rules.actNameKeys[${i}]`));
   }
+  if (raw.actOpenerKeys !== undefined) {
+    if (!Array.isArray(raw.actOpenerKeys)) v.error('schema', 'rules.actOpenerKeys', 'must be an array: one i18n key per act');
+    else {
+      if (raw.actOpenerKeys.length !== v.acts) {
+        v.error('ranges', 'rules.actOpenerKeys', `has ${raw.actOpenerKeys.length} entries for ${v.acts} acts`);
+      }
+      raw.actOpenerKeys.forEach((k, i) => v.key(k, `rules.actOpenerKeys[${i}]`));
+    }
+  }
   v.int(raw.handSize, 'rules.handSize', LIMIT.handSize);
   v.int(raw.slotsPerTurn, 'rules.slotsPerTurn', LIMIT.slotsPerTurn);
   v.int(raw.gatesOffered, 'rules.gatesOffered', LIMIT.count);
@@ -386,6 +400,19 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     } else if (c.playable === false) {
       v.warn('schema', `${where}.playable`, `an unplayable ${String(c.kind)} card only clogs the hand`);
     }
+    // Prose keys (decision 15). Whether the prose itself is written is the 'prose' check.
+    if (c.headlineKeys !== undefined) {
+      if (!Array.isArray(c.headlineKeys)) v.error('schema', `${where}.headlineKeys`, 'must be an array of i18n keys');
+      else c.headlineKeys.forEach((k, i) => v.key(k, `${where}.headlineKeys[${i}]`));
+      if (c.kind === 'scandal') v.warn('schema', `${where}.headlineKeys`, 'scandals print one headline on crystallisation: use headlineKey');
+    }
+    if (c.register !== undefined && !(REGISTERS as readonly unknown[]).includes(c.register)) {
+      v.error('schema', `${where}.register`, `must be one of ${REGISTERS.join(', ')}, got ${q(c.register)}`);
+    }
+    if (c.headlineKey !== undefined) {
+      v.key(c.headlineKey, `${where}.headlineKey`);
+      if (c.kind !== 'scandal') v.warn('schema', `${where}.headlineKey`, 'only scandals have a single headline: use headlineKeys');
+    }
   });
   for (const c of cards) if (isStr(c.id)) v.cardIds.add(c.id);
   return cards;
@@ -397,6 +424,7 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
     const act = v.int(g.act, `${where}.act`, [1, v.acts]) ? g.act : 0;
     const owner: Owner = { kind: 'gate', id: String(g.id), act };
     v.key(g.nameKey, `${where}.nameKey`);
+    if (g.flavorKey !== undefined) v.key(g.flavorKey, `${where}.flavorKey`);
     if (g.requires === undefined) v.error('schema', `${where}.requires`, 'gates need "requires"');
     else checkCondition(v, g.requires, `${where}.requires`);
     for (const field of ['onPass', 'onFail'] as const) {
@@ -411,6 +439,7 @@ function checkEndings(v: Ctx, raw: unknown): Obj[] {
     v.fields(e, ENDING_FIELDS, where);
     v.int(e.priority, `${where}.priority`, LIMIT.priority);
     if (e.conditions !== undefined) checkCondition(v, e.conditions, `${where}.conditions`);
+    for (const field of ['nameKey', 'goalKey'] as const) if (e[field] !== undefined) v.key(e[field], `${where}.${field}`);
     v.key(e.textKey, `${where}.textKey`);
   });
 
@@ -567,7 +596,46 @@ function checkI18n(v: Ctx, i18n: unknown): number {
   return Object.keys(i18n).length;
 }
 
-/** Validate parsed content. Pass i18n to check keys (the sim doesn't: it never touches /i18n). */
+/** A prose value the author has not written yet (decision 15: agents leave placeholders, never prose). */
+export const PROSE_PLACEHOLDER = 'TODO(prose)';
+
+/** The opening premise, shown on the title screen. Prose without a content home. */
+export const OPENING_KEY = 'story.opening';
+
+/**
+ * Missing player-facing prose, reported as warnings: every card with no headline, every scandal missing its
+ * headline or in-hand line, every ending missing its name, goal line or text, every gate missing its
+ * flavour, every season missing its opener, and the opening. Missing prose must be visible, not silent.
+ */
+function checkProse(v: Ctx, i18n: Obj, rules: Obj | null, cards: readonly Obj[], gates: readonly Obj[], endings: readonly Obj[]): void {
+  const written = (key: unknown) =>
+    isStr(key) && typeof i18n[key] === 'string' && i18n[key] !== '' && !String(i18n[key]).startsWith(PROSE_PLACEHOLDER);
+  const nameOf = (o: Obj) => (isStr(o.nameKey) && typeof i18n[o.nameKey] === 'string' ? ` (${String(i18n[o.nameKey])})` : '');
+  for (const c of cards) {
+    const where = `card ${String(c.id)}${nameOf(c)}`;
+    if (c.kind === 'scandal') {
+      if (!written(c.headlineKey)) v.warn('prose', where, 'no crystallisation headline');
+      if (!written(c.textKey)) v.warn('prose', where, 'no in-hand text');
+      continue;
+    }
+    const headlines = Array.isArray(c.headlineKeys) ? c.headlineKeys.filter(written) : [];
+    if (headlines.length === 0) v.warn('prose', where, c.register === undefined ? 'no headline and no register' : 'no headline');
+    else if (c.register === undefined) v.warn('prose', where, 'headline has no register');
+  }
+  for (const e of endings) {
+    const where = `ending ${String(e.id)}`;
+    const missing = (['nameKey', 'goalKey', 'textKey'] as const).filter((f) => !written(e[f])).map((f) => f.replace('Key', ''));
+    if (missing.length > 0) v.warn('prose', where, `no ${missing.join(', ')}`);
+  }
+  for (const g of gates) if (!written(g.flavorKey)) v.warn('prose', `gate ${String(g.id)}${nameOf(g)}`, 'no flavour');
+  const openers = rules && Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
+  for (let act = 1; act <= v.acts; act++) {
+    if (!written(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
+  }
+  if (!written(OPENING_KEY)) v.warn('prose', OPENING_KEY, 'no opening premise');
+}
+
+/** Validate parsed content. Pass i18n to check keys and prose (the sim doesn't: it never touches /i18n). */
 export function validateContent(raw: RawContent, i18n?: unknown): ValidationResult {
   const v = new Ctx();
   const rules = checkRules(v, raw.rules);
@@ -578,6 +646,7 @@ export function validateContent(raw: RawContent, i18n?: unknown): ValidationResu
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);
+  if (isObj(i18n)) checkProse(v, i18n, rules, cards, gates, endings);
   return { issues: v.issues, earliestAct, counts: { cards: cards.length, gates: gates.length, endings: endings.length, i18nKeys } };
 }
 

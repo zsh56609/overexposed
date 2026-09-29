@@ -1,6 +1,7 @@
-/* Layer 1: functional and plain. Layer 2 replaces all of this (CLAUDE.md §6). System fonts only.
-   Everything is laid out on the fixed 1280×720 stage (ui/Stage.tsx): sizes are stage pixels, never
-   viewport units, and no screen scrolls. The one exception is the feed, a log of the whole run,
+/* Layer 2 part 1: the meaning layer, still unstyled — legibility only (docs/ui-plan.md §13). Visual craft
+   (AGENTS.md §6) comes next and replaces all of this. System fonts only.
+   Everything is laid out on the fixed 1280×720 stage (ui/Stage.tsx, decision 17): sizes are stage pixels,
+   never viewport units, and no screen scrolls. The one exception is the feed, a log of the whole run,
    which scrolls inside its column. */
 
 :root {
@@ -36,28 +37,49 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .unmet { color: #a3150b; }
 .pass { color: #1f6b2a; font-weight: bold; }
 .alarm, .lead { color: var(--red); font-weight: bold; }
+.warn { font-weight: bold; }
+/* Prose the author has not written yet: visible, never silent (decision 15). */
+.placeholder { color: var(--muted); font-style: normal; font-weight: normal; outline: 1px dashed var(--muted); outline-offset: 1px; }
 
-/* Title */
-.title { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6em; text-align: center; }
+/* Title: the opening premise */
+.title { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8em; text-align: center; }
 .title h1 { font-size: 3em; letter-spacing: 0.08em; }
+.opening { max-width: 36em; display: flex; flex-direction: column; gap: 0.6em; font-size: 1.05em; }
 .big { font-size: 1.4em; padding: 0.4em 2em; }
 
-/* Run: masthead, stats, middle (feed | this season | preview), bottom (hand, draft or gate) */
-.app { height: 100%; display: flex; flex-direction: column; }
+/* Run: masthead, stats, middle (feed | this season | preview or goals), bottom (hand, draft or gate) */
+.app { position: relative; height: 100%; display: flex; flex-direction: column; }
 .masthead { flex: none; display: flex; align-items: baseline; gap: 1em; padding: 0.3em 0.8em; border-bottom: 2px solid var(--ink); }
 .masthead .name { font-weight: bold; letter-spacing: 0.1em; }
 .masthead .seed { flex: 1; text-align: right; }
 .stats { flex: none; display: flex; gap: 1em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 .stat-heat, .togo { font-weight: bold; }
 
-.middle { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px 430px; }
+.middle { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px 500px; }
 .middle > * { min-height: 0; overflow: hidden; padding: 0.4em 0.8em; }
-.feed { overflow-y: auto; border-right: 1px solid var(--rule); }
-.feed ol { list-style: none; padding: 0; }
-.feed .month { margin-top: 0.4em; font-weight: bold; }
 .side { border-right: 1px solid var(--rule); }
 .side-box { display: flex; flex-direction: column; gap: 0.3em; }
 .mini-gate ul { font-size: 0.85em; }
+.deck-open { align-self: flex-start; }
+
+/* The feed: aggregated per action, the card's register sets its headline (decisions 5, 15). */
+.feed { overflow-y: auto; border-right: 1px solid var(--rule); }
+.feed ol { list-style: none; padding: 0; }
+.feed li { margin-top: 0.1em; }
+.feed-month { margin-top: 0.5em !important; font-weight: bold; }
+.feed-opener { margin-top: 0.4em !important; font-style: italic; }
+.feed-headline { margin-top: 0.35em !important; }
+.feed-detail, .feed-note { color: var(--muted); font-size: 0.85em; }
+.feed-lead { margin-top: 0.35em !important; color: var(--red); font-weight: bold; }
+.reg-loud { font-weight: bold; }
+.reg-quiet { font-style: italic; }
+.reg-money { font-weight: normal; }
+
+/* Goals (decision 10) */
+.goals { display: flex; flex-direction: column; gap: 0.25em; font-size: 0.85em; }
+.goals h2 { font-size: 1.15em; }
+.goal .clauses { display: flex; flex-wrap: wrap; column-gap: 0.8em; font-size: 0.9em; }
+
 .preview { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
 .preview.danger { border: 3px solid var(--red); }
 .preview.blocked { border-style: dashed; }
@@ -70,15 +92,32 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .card { display: flex; flex-direction: column; gap: 0.2em; min-width: 0; padding: 0.3em 0.4em; text-align: left; color: inherit; background: #fff; border: 1px solid var(--ink); }
 .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 0.4em; }
 .card.off { opacity: 0.55; }
-.card.scandal { background: #fbe1dd; border: 2px dashed var(--red); font-style: italic; opacity: 1; }
+.card.scandal { background: #fbe1dd; border: 2px dashed var(--red); opacity: 1; }
+.card.scandal .card-head strong, .in-hand { font-style: italic; }
+.card .rules { font-size: 0.8em; }
 .end { font-size: 1.1em; padding: 0.2em 1.2em; }
+.end.printing { border: 2px solid var(--red); color: var(--red); font-weight: bold; }
 .take { margin-top: auto; }
 .req { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.4em; font-size: 0.85em; }
 .req .muted { font-size: 1em; }
 .req ul { list-style: none; padding: 0; }
 .gate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
-.gate { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
+.gate { display: flex; flex-direction: column; gap: 0.15em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
+.gate-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6em; }
+.gate .flavor { font-style: italic; font-size: 0.85em; }
+.req ul.inline { display: flex; flex-wrap: wrap; column-gap: 0.8em; }
+.gate .branches { font-size: 0.85em; }
+.gate .leads { font-weight: bold; }
+
+/* Deck viewer (decision 12): over the play area, below the masthead and stats */
+.deck-viewer { position: absolute; top: 76px; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; flex-direction: column; padding: 0.6em 1em; background: var(--page); border-top: 2px solid var(--ink); }
+.deck-lists { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5em; font-size: 0.9em; }
+.deck-lists ul { list-style: none; padding: 0; column-count: 2; column-gap: 1.5em; }
 
 /* Ending */
-.ending { height: 100%; display: flex; flex-direction: column; gap: 0.3em; padding: 1em 12em; }
-.play-again { width: 100%; font-size: 2.4em; padding: 0.2em; margin-bottom: 0.3em; }
+.ending { height: 100%; display: flex; flex-direction: column; gap: 0.6em; padding: 1em 4em; }
+.play-again { width: 100%; font-size: 2.4em; padding: 0.2em; flex: none; }
+.ending-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.2fr 1fr; gap: 2em; }
+.ending-story { display: flex; flex-direction: column; gap: 0.5em; }
+.ending-text { line-height: 1.45; }
+.ending-facts { display: flex; flex-direction: column; gap: 0.3em; font-size: 0.9em; }

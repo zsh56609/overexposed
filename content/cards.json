@@ -5,6 +5,8 @@
     "cost": 1,
     "nameKey": "card.vocal_coaching.name",
     "textKey": "card.vocal_coaching.text",
+    "headlineKeys": ["card.vocal_coaching.headline.1", "card.vocal_coaching.headline.2", "card.vocal_coaching.headline.3"],
+    "register": "quiet",
     "playable": true,
     "tags": ["craft", "training"],
     "effects": [{ "op": "resource", "target": "craft", "value": 6 }]
@@ -15,6 +17,8 @@
     "cost": 1,
     "nameKey": "card.open_mic.name",
     "textKey": "card.open_mic.text",
+    "headlineKeys": ["card.open_mic.headline.1", "card.open_mic.headline.2"],
+    "register": "loud",
     "playable": true,
     "tags": ["hype", "gig"],
     "effects": [
@@ -29,6 +33,8 @@
     "cost": 1,
     "nameKey": "card.viral_stunt.name",
     "textKey": "card.viral_stunt.text",
+    "headlineKeys": ["card.viral_stunt.headline.1", "card.viral_stunt.headline.2"],
+    "register": "loud",
     "playable": true,
     "tags": ["hype", "stunt"],
     "effects": [
@@ -43,6 +49,8 @@
     "cost": 1,
     "nameKey": "card.press_junket.name",
     "textKey": "card.press_junket.text",
+    "headlineKeys": ["card.press_junket.headline.1"],
+    "register": "loud",
     "playable": true,
     "tags": ["hype", "press"],
     "effects": [
@@ -66,6 +74,8 @@
     "cost": 1,
     "nameKey": "card.side_gig.name",
     "textKey": "card.side_gig.text",
+    "headlineKeys": ["card.side_gig.headline.1", "card.side_gig.headline.2"],
+    "register": "money",
     "playable": true,
     "tags": ["money", "gig"],
     "effects": [
@@ -79,6 +89,8 @@
     "cost": 1,
     "nameKey": "card.lay_low.name",
     "textKey": "card.lay_low.text",
+    "headlineKeys": ["card.lay_low.headline.1", "card.lay_low.headline.2"],
+    "register": "quiet",
     "playable": true,
     "tags": ["recovery"],
     "effects": [
@@ -92,6 +104,8 @@
     "cost": 1,
     "nameKey": "card.networking.name",
     "textKey": "card.networking.text",
+    "headlineKeys": ["card.networking.headline.1", "card.networking.headline.2"],
+    "register": "quiet",
     "playable": true,
     "tags": ["social"],
     "effects": [{ "op": "draw", "count": 2 }]
@@ -102,6 +116,8 @@
     "cost": 1,
     "nameKey": "card.crisis_pr.name",
     "textKey": "card.crisis_pr.text",
+    "headlineKeys": ["card.crisis_pr.headline.1"],
+    "register": "money",
     "playable": true,
     "tags": ["recovery", "fixer"],
     "requires": { "capital": { "min": 4 }, "scandalCount": { "min": 1 } },
@@ -116,6 +132,8 @@
     "cost": 2,
     "nameKey": "card.studio_session.name",
     "textKey": "card.studio_session.text",
+    "headlineKeys": ["card.studio_session.headline.1", "card.studio_session.headline.2"],
+    "register": "quiet",
     "playable": true,
     "tags": ["craft", "recording"],
     "actMin": 2,
@@ -130,6 +148,7 @@
     "cost": 0,
     "nameKey": "card.tabloid_story.name",
     "textKey": "card.tabloid_story.text",
+    "headlineKey": "card.tabloid_story.headline",
     "playable": false,
     "tags": ["scandal", "press"],
     "onEndOfTurn": [{ "op": "resource", "target": "hype", "value": -4 }]
@@ -140,6 +159,7 @@
     "cost": 0,
     "nameKey": "card.public_feud.name",
     "textKey": "card.public_feud.text",
+    "headlineKey": "card.public_feud.headline",
     "playable": false,
     "tags": ["scandal", "gig"],
     "actMin": 2,
@@ -152,6 +172,7 @@
     "cost": 1,
     "nameKey": "card.ghostwriter.name",
     "textKey": "card.ghostwriter.text",
+    "headlineKeys": ["card.ghostwriter.headline.1"],
     "tags": ["money", "recording"],
     "requires": { "capital": { "min": 3 } },
     "effects": [
@@ -165,6 +186,8 @@
     "cost": 1,
     "nameKey": "card.meditation_retreat.name",
     "textKey": "card.meditation_retreat.text",
+    "headlineKeys": ["card.meditation_retreat.headline.1"],
+    "register": "quiet",
     "tags": ["recovery", "training"],
     "requires": { "craft": { "min": 10 } },
     "effects": [
@@ -178,6 +201,8 @@
     "cost": 1,
     "nameKey": "card.apology_tour.name",
     "textKey": "card.apology_tour.text",
+    "headlineKeys": ["card.apology_tour.headline.1"],
+    "register": "loud",
     "tags": ["recovery", "press"],
     "requires": { "scandalCount": { "min": 1 } },
     "effects": [
@@ -191,6 +216,8 @@
     "cost": 1,
     "nameKey": "card.collab_single.name",
     "textKey": "card.collab_single.text",
+    "headlineKeys": ["card.collab_single.headline.1"],
+    "register": "loud",
     "tags": ["hype", "recording"],
     "effects": [
       {
@@ -213,6 +240,7 @@
     "cost": 1,
     "nameKey": "card.tabloid_bait.name",
     "textKey": "card.tabloid_bait.text",
+    "headlineKeys": ["card.tabloid_bait.headline.1"],
     "tags": ["hype", "stunt"],
     "effects": [
       {
@@ -235,6 +263,8 @@
     "cost": 1,
     "nameKey": "card.reinvent_image.name",
     "textKey": "card.reinvent_image.text",
+    "headlineKeys": ["card.reinvent_image.headline.1"],
+    "register": "loud",
     "tags": ["recovery"],
     "effects": [
       { "op": "exhaustTag", "tag": "stunt", "count": 1 },
@@ -248,6 +278,8 @@
     "cost": 1,
     "nameKey": "card.sellout_ad.name",
     "textKey": "card.sellout_ad.text",
+    "headlineKeys": ["card.sellout_ad.headline.1"],
+    "register": "money",
     "tags": ["money", "stunt"],
     "effects": [
       { "op": "resource", "target": "capital", "value": 6 },
@@ -261,6 +293,7 @@
     "cost": 1,
     "nameKey": "card.street_team.name",
     "textKey": "card.street_team.text",
+    "headlineKeys": ["card.street_team.headline.1"],
     "tags": ["hype", "social"],
     "requires": { "capital": { "min": 2 } },
     "effects": [
@@ -275,6 +308,7 @@
     "cost": 1,
     "nameKey": "card.demo_tape.name",
     "textKey": "card.demo_tape.text",
+    "headlineKeys": ["card.demo_tape.headline.1"],
     "tags": ["craft", "recording"],
     "requires": { "craft": { "min": 15 } },
     "effects": [
@@ -288,6 +322,8 @@
     "cost": 1,
     "nameKey": "card.fan_meetup.name",
     "textKey": "card.fan_meetup.text",
+    "headlineKeys": ["card.fan_meetup.headline.1"],
+    "register": "loud",
     "tags": ["hype", "social"],
     "effects": [
       {
@@ -310,6 +346,7 @@
     "cost": 1,
     "nameKey": "card.late_night_show.name",
     "textKey": "card.late_night_show.text",
+    "headlineKeys": ["card.late_night_show.headline.1"],
     "tags": ["hype", "press"],
     "actMin": 2,
     "requires": { "hype": { "min": 25 } },
@@ -325,6 +362,8 @@
     "cost": 1,
     "nameKey": "card.cover_single.name",
     "textKey": "card.cover_single.text",
+    "headlineKeys": ["card.cover_single.headline.1"],
+    "register": "loud",
     "playable": true,
     "tags": ["hype", "recording", "money"],
     "effects": [
@@ -344,6 +383,8 @@
     "cost": 1,
     "nameKey": "card.brand_deal.name",
     "textKey": "card.brand_deal.text",
+    "headlineKeys": ["card.brand_deal.headline.1"],
+    "register": "money",
     "tags": ["money", "stunt"],
     "requires": { "hype": { "min": 20 } },
     "effects": [
@@ -357,6 +398,7 @@
     "cost": 1,
     "nameKey": "card.film_cameo.name",
     "textKey": "card.film_cameo.text",
+    "headlineKeys": ["card.film_cameo.headline.1"],
     "tags": ["hype", "press"],
     "actMin": 2,
     "requires": { "hype": { "min": 35 } },
@@ -372,6 +414,8 @@
     "cost": 1,
     "nameKey": "card.mentorship.name",
     "textKey": "card.mentorship.text",
+    "headlineKeys": ["card.mentorship.headline.1"],
+    "register": "quiet",
     "tags": ["craft", "training"],
     "effects": [
       { "op": "resource", "target": "craft", "value": 4 },
@@ -384,6 +428,8 @@
     "cost": 2,
     "nameKey": "card.world_tour.name",
     "textKey": "card.world_tour.text",
+    "headlineKeys": ["card.world_tour.headline.1"],
+    "register": "loud",
     "tags": ["hype", "gig"],
     "actMin": 4,
     "requires": { "capital": { "min": 5 } },
@@ -399,6 +445,7 @@
     "cost": 1,
     "nameKey": "card.award_campaign.name",
     "textKey": "card.award_campaign.text",
+    "headlineKeys": ["card.award_campaign.headline.1"],
     "tags": ["craft", "press"],
     "actMin": 3,
     "requires": { "craft": { "min": 40 } },
@@ -413,6 +460,8 @@
     "cost": 1,
     "nameKey": "card.legal_team.name",
     "textKey": "card.legal_team.text",
+    "headlineKeys": ["card.legal_team.headline.1"],
+    "register": "money",
     "tags": ["recovery", "fixer"],
     "actMin": 3,
     "requires": { "capital": { "min": 6 }, "scandalCount": { "min": 1 } },
@@ -427,6 +476,8 @@
     "cost": 1,
     "nameKey": "card.indie_label.name",
     "textKey": "card.indie_label.text",
+    "headlineKeys": ["card.indie_label.headline.1"],
+    "register": "loud",
     "tags": ["money", "recording"],
     "requires": { "hype": { "min": 40 }, "capital": { "min": 4 }, "flags": { "not": ["signed_label"] } },
     "effects": [
@@ -440,6 +491,7 @@
     "cost": 0,
     "nameKey": "card.bad_press.name",
     "textKey": "card.bad_press.text",
+    "headlineKey": "card.bad_press.headline",
     "playable": false,
     "tags": ["scandal", "recording"]
   },
@@ -449,6 +501,7 @@
     "cost": 0,
     "nameKey": "card.burnout.name",
     "textKey": "card.burnout.text",
+    "headlineKey": "card.burnout.headline",
     "playable": false,
     "tags": ["scandal", "gig"],
     "onEndOfTurn": [{ "op": "resource", "target": "craft", "value": -3 }]
@@ -459,6 +512,7 @@
     "cost": 0,
     "nameKey": "card.copycat_story.name",
     "textKey": "card.copycat_story.text",
+    "headlineKey": "card.copycat_story.headline",
     "playable": false,
     "tags": ["scandal", "stunt"],
     "onEndOfTurn": [
@@ -475,6 +529,7 @@
     "cost": 0,
     "nameKey": "card.old_rumor.name",
     "textKey": "card.old_rumor.text",
+    "headlineKey": "card.old_rumor.headline",
     "playable": false,
     "tags": ["scandal", "money"],
     "actMin": 2,

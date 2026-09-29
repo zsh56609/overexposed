@@ -12,6 +12,10 @@ export type CardKind = (typeof CARD_KINDS)[number];
 export const ADD_CARD_ZONES = ['deck', 'discard', 'hand'] as const;
 export type AddCardZone = (typeof ADD_CARD_ZONES)[number];
 
+/** The feed's three voices (docs/ui-plan.md §13, decision 15): which typography a card's headline gets. */
+export const REGISTERS = ['loud', 'quiet', 'money'] as const;
+export type Register = (typeof REGISTERS)[number];
+
 // ---------------------------------------------------------------------------
 // Conditions — one shape everywhere:
 //   { "craft": { "min": 20 }, "scandalCount": { "max": 2 }, "flags": { "not": ["went_tabloid"] } }
@@ -103,12 +107,21 @@ export interface CardDef {
   readonly onDraw?: readonly Effect[];
   /** Fires at end of turn while the card is in hand. */
   readonly onEndOfTurn?: readonly Effect[];
+  // Player-facing prose (decision 15): keys only. For a scandal, textKey is the line shown while it is in hand.
+  /** Non-scandals: feed headline variants for playing the card. The UI picks one by hash, never by the game RNG. */
+  readonly headlineKeys?: readonly string[];
+  /** Non-scandals: the voice the feed prints the headline in. */
+  readonly register?: Register;
+  /** Scandals: the headline printed when it crystallises. */
+  readonly headlineKey?: string;
 }
 
 export interface GateDef {
   readonly id: string;
   readonly act: number;
   readonly nameKey: string;
+  /** Player-facing prose (decision 15): the gate's flavour line. */
+  readonly flavorKey?: string;
   readonly requires: Condition;
   readonly onPass: readonly Effect[];
   readonly onFail: readonly Effect[];
@@ -119,6 +132,9 @@ export interface EndingDef {
   /** Resolved in descending priority; first match wins. Priority 0 is the unconditional fallback. */
   readonly priority: number;
   readonly conditions?: Condition;
+  // Player-facing prose (decision 15): the ending's name, its goals-board line, and its text.
+  readonly nameKey?: string;
+  readonly goalKey?: string;
   readonly textKey: string;
 }
 
@@ -144,6 +160,8 @@ export interface Rules {
   readonly turnsPerAct: number;
   /** i18n key naming each act, in order (the seasons). One per act. */
   readonly actNameKeys: readonly string[];
+  /** i18n key of each act's season opener (decision 15). One per act. */
+  readonly actOpenerKeys?: readonly string[];
   readonly handSize: number;
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */

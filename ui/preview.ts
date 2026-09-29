@@ -9,20 +9,22 @@ import {
   explainCondition,
   getCard,
   getGate,
-  heatOutlook,
+  heatLine,
   legalActions,
   playCheck,
   reduce,
   RESOURCE_KEYS,
   type AddCardZone,
   type ClauseReport,
+  type Effect,
   type GameEvent,
   type GameState,
   type PlayBlocker,
   type ResourceKey,
 } from '../core/index.ts';
 
-export type HeatOutlook = ReturnType<typeof heatOutlook>;
+/** Where heat sits against the line, as /core reports it (decision 1). */
+export type HeatLine = ReturnType<typeof heatLine>;
 
 /** What a slice of events changed, in player terms. */
 export interface Outcome {
@@ -69,11 +71,32 @@ function through(events: readonly GameEvent[], type: GameEvent['type']): readonl
 // ---------------------------------------------------------------------------
 // End of turn
 
+/** Why a scandal card joins the deck at month end. */
+export type ScandalCause =
+  /** Crystallised from heat; `cardId` is the card blamed for pushing heat over the line, null when none is. */
+  | { readonly kind: 'crystallised'; readonly cardId: string | null }
+  /** Added by an end-of-month effect of a card in hand (a Copycat Story copying itself); null if none is found. */
+  | { readonly kind: 'added'; readonly byCardId: string | null };
+
 export interface EndTurnPreview {
-  /** Exactly what the end-of-turn check would crystallise if the turn ended now. */
+  /** Scandals the end-of-turn heat check would crystallise if the turn ended now. */
   readonly crystallised: number;
+  /**
+   * Every scandal card month end would add, from any cause, in order: the one scandal count the player sees
+   * (docs/ui-plan.md §13, decision 2).
+   */
+  readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause }[];
+  /** Heat left after the vent: it carries into the next month. */
+  readonly heatAfter: number;
   /** onEndOfTurn effects, the scandals and the vent — up to turnEnd, never the next turn's draw. */
   readonly outcome: Outcome;
+}
+
+/** The first card in hand whose end-of-month effects add `cardId` — who to name for a scandal copy. */
+export function addedBy(state: GameState, cardId: string): string | null {
+  const adds = (effects: readonly Effect[] | undefined): boolean =>
+    (effects ?? []).some((e) => (e.op === 'addCard' && e.cardId === cardId) || (e.op === 'conditional' && (adds(e.then) || adds(e.else))));
+  return state.hand.find((card) => adds(getCard(state.content, card.cardId)?.onEndOfTurn))?.cardId ?? null;
 }
 
 /** END_TURN on a hypothetical, cut at the turnEnd event. Only meaningful in the play phase. */
@@ -81,7 +104,20 @@ export function previewEndTurn(state: GameState): EndTurnPreview | null {
   if (state.phase !== 'play') return null;
   const events = through(reduce(state, { type: 'END_TURN' }).events, 'turnEnd');
   const end = events.find((e) => e.type === 'turnEnd');
-  return { crystallised: end?.type === 'turnEnd' ? end.crystallised : 0, outcome: outcomeOf(events) };
+  const blamed = new Map(events.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
+  const scandalCards = events.flatMap((e) => {
+    if (e.type !== 'addCard' || getCard(state.content, e.cardId)?.kind !== 'scandal') return [];
+    const cause: ScandalCause = blamed.has(e.uid)
+      ? { kind: 'crystallised', cardId: blamed.get(e.uid) ?? null }
+      : { kind: 'added', byCardId: addedBy(state, e.cardId) };
+    return [{ cardId: e.cardId, cause }];
+  });
+  return {
+    crystallised: end?.type === 'turnEnd' ? end.crystallised : 0,
+    scandalCards,
+    heatAfter: end?.type === 'turnEnd' ? end.resources.heat : state.resources.heat,
+    outcome: outcomeOf(events),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -93,14 +129,14 @@ export interface PlayPreview {
   readonly ok: boolean;
   /** Every reason it can't be played (empty when ok). */
   readonly blockers: readonly PlayBlocker[];
-  readonly outlookBefore: HeatOutlook;
+  readonly lineBefore: HeatLine;
   readonly endTurnNow: EndTurnPreview | null;
   /** The rest describe the card played; null when it can't be. */
   readonly outcome: Outcome | null;
   readonly heatBefore: number;
   readonly heatAfter: number | null;
   readonly slotsAfter: number | null;
-  readonly outlookAfter: HeatOutlook | null;
+  readonly lineAfter: HeatLine | null;
   /** Exactly what ending the turn right after this card would crystallise. */
   readonly endTurnAfter: EndTurnPreview | null;
   /** endTurnAfter − endTurnNow: lines this card pushes heat over (negative: lines it cools back under). */
@@ -116,11 +152,11 @@ export function previewPlay(state: GameState, uid: number): PlayPreview {
     cardId: card?.cardId ?? '',
     ok: check.ok,
     blockers: check.blockers,
-    outlookBefore: heatOutlook(state),
+    lineBefore: heatLine(state),
     endTurnNow,
     heatBefore: state.resources.heat,
   };
-  if (!check.ok) return { ...base, outcome: null, heatAfter: null, slotsAfter: null, outlookAfter: null, endTurnAfter: null, linesCrossed: 0 };
+  if (!check.ok) return { ...base, outcome: null, heatAfter: null, slotsAfter: null, lineAfter: null, endTurnAfter: null, linesCrossed: 0 };
   const after = reduce(state, { type: 'PLAY_CARD', uid });
   const endTurnAfter = previewEndTurn(after);
   return {
@@ -128,7 +164,7 @@ export function previewPlay(state: GameState, uid: number): PlayPreview {
     outcome: outcomeOf(after.events),
     heatAfter: after.resources.heat,
     slotsAfter: after.slots,
-    outlookAfter: heatOutlook(after),
+    lineAfter: heatLine(after),
     endTurnAfter,
     linesCrossed: (endTurnAfter?.crystallised ?? 0) - (endTurnNow?.crystallised ?? 0),
   };
@@ -145,6 +181,8 @@ export interface GatePreview {
   readonly passes: boolean;
   /** The branch that would fire now: the gate's effects, up to the next turn or the ending. */
   readonly outcome: Outcome;
+  /** The ending this choice leads to, when it is the run's last choice (decision 11); otherwise null. */
+  readonly endingId: string | null;
 }
 
 export function previewGate(state: GameState, gateId: string): GatePreview {
@@ -153,11 +191,13 @@ export function previewGate(state: GameState, gateId: string): GatePreview {
   const rest = events.slice(at + 1);
   const stop = rest.findIndex((e) => e.type === 'draftOffer' || e.type === 'turnStart' || e.type === 'ending' || e.type === 'gateOffer');
   const gate = events[at];
+  const ending = events.find((e) => e.type === 'ending');
   return {
     gateId,
     clauses: explainCondition(getGate(state.content, gateId)?.requires, state),
     passes: gate?.type === 'gate' ? gate.passed : false,
     outcome: outcomeOf(stop === -1 ? rest : rest.slice(0, stop)),
+    endingId: ending?.type === 'ending' ? ending.endingId : null,
   };
 }
 

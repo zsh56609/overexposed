@@ -30,6 +30,10 @@ for (const check of Object.keys(CHECKS) as CheckId[]) {
     const acts = Object.values(result.earliestAct).filter(Number.isFinite);
     note = `${acts.length} reachable, earliest act ${Math.min(...acts)}..${Math.max(...acts)}`;
   }
+  if (check === 'prose') {
+    const gaps = warnings.filter((i) => i.check === 'prose').length;
+    note = gaps === 0 ? 'all written' : `${gaps} piece(s) still to write, listed below`;
+  }
   lines.push(`  ${n === 0 ? 'ok  ' : 'FAIL'}  ${CHECKS[check].padEnd(52)}${n > 0 ? `${n} error(s)` : note}`);
 }
 const show = (i: Issue) => `  ${i.level === 'error' ? 'ERROR' : 'warn '} [${i.check}] ${i.where}: ${i.message}`;

@@ -2,6 +2,7 @@
   "acts": 4,
   "turnsPerAct": 3,
   "actNameKeys": ["act.spring.name", "act.summer.name", "act.autumn.name", "act.winter.name"],
+  "actOpenerKeys": ["act.spring.opener", "act.summer.opener", "act.autumn.opener", "act.winter.opener"],
   "handSize": 5,
   "slotsPerTurn": 3,
   "gatesOffered": 2,

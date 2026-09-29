@@ -81,7 +81,7 @@ The player plants the seeds of their own collapse. Failure is never random.
 
 ### Run structure
 
-- 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — and the UI names them by season, never by number. Act count, turns per act and the season name keys (`actNameKeys`) live in `content/rules.json`, never as constants.
+- 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — and the UI names them by season, never by number. Act count, turns per act, the season name keys (`actNameKeys`) and the season opener keys (`actOpenerKeys`) live in `content/rules.json`, never as constants.
 - Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 2 of every act, 8 per run — never the last turn of a season, whose pick would rarely be drawn), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
@@ -154,6 +154,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
+Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): `headlineKeys` (non-scandals) are the feed headline variants for playing the card — the UI picks one by a hash of run seed, month and card instance, never the game RNG — and `register` (`loud` | `quiet` | `money`) is the voice it is printed in. A scandal has `headlineKey`, printed when it crystallises, and its `textKey` is its in-hand line: the interface shows its rules from its effects.
 
 ### Effect ops (closed set — extend the set, never special-case a card)
 
@@ -189,7 +190,7 @@ Conditions use one shape everywhere:
 }
 ```
 
-Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
+`flavorKey`: the gate's flavour line (prose). Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ### Ending schema
@@ -203,6 +204,7 @@ Requirements are evaluated at resolution. Prefer conditions on state at that mom
 }
 ```
 
+Prose keys: `nameKey`, `goalKey` (its goals-board line, also the hint for a locked ending), `textKey`.
 Resolved after turn 12 by descending `priority`; first match wins.
 **`priority: 0` is an unconditional fallback. It must always exist.**
 **No other ending may be a single-axis threshold:** at least two condition keys (validate enforces). A lone threshold makes one resource a dominant strategy. Star rewards surviving the spiral (hype + signed + a scandal ceiling); meltdown's scandal bar sits above star's ceiling so it never preempts a controlled hype run.
@@ -223,7 +225,8 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `gate.<id>.name` · `ending.<id>.text` · `act.<season>.name` · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` · `ending.<id>.text` · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `ui.<area>.<label>`
+- Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
 
@@ -242,6 +245,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - **missing `priority: 0` fallback ending**
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
+- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, an ending without name, goal line or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
 

@@ -16,7 +16,7 @@ import {
   explainCondition,
   getCard,
   getGate,
-  heatOutlook,
+  heatLine,
   legalActions,
   nextInt,
   reduce,
@@ -29,7 +29,7 @@ import {
 } from '../core/index.ts';
 import { validateContent } from '../validate/validate.ts';
 import { loadRawContent } from '../validate/load.ts';
-import { outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
+import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -40,7 +40,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0 };
+const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -74,7 +74,7 @@ function checkPlayPhase(s: GameState, seed: number): void {
     }
     if (p.heatAfter !== real.resources.heat) report('heat', seed, s.turn, `${card.cardId}: preview ${p.heatAfter}, real ${real.resources.heat}`);
     if (p.slotsAfter !== real.slots) report('slots', seed, s.turn, `${card.cardId}: preview ${p.slotsAfter}, real ${real.slots}`);
-    if (!same(p.outlookAfter, heatOutlook(real))) report('outlook', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(p.outlookAfter)}, real ${JSON.stringify(heatOutlook(real))}`);
+    if (!same(p.lineAfter, heatLine(real))) report('heat line', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(p.lineAfter)}, real ${JSON.stringify(heatLine(real))}`);
     // The whole outcome — draws, cards added and removed, flags — as the real play's events tell it.
     if (!same(o, outcomeOf(real.events))) report('outcome', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(o)}, real ${JSON.stringify(outcomeOf(real.events))}`);
     const newFlags = Object.keys(real.flags).filter((f) => !Object.hasOwn(s.flags, f));
@@ -101,6 +101,18 @@ function checkPlayPhase(s: GameState, seed: number): void {
   }
   const scandals = real.events.flatMap((e) => (e.type === 'scandal' ? [e.cardId] : []));
   if (!same(pe.outcome.scandals, scandals)) report('endTurn scandals', seed, s.turn, `preview ${pe.outcome.scandals}, real ${scandals}`);
+  // Every scandal card month end adds, from any cause, with its cause (decision 2): read off the real events.
+  const head = real.events.slice(0, real.events.indexOf(end) + 1);
+  const blamed = new Map(head.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
+  const realCards = head.flatMap((e) =>
+    e.type === 'addCard' && getCard(s.content, e.cardId)?.kind === 'scandal'
+      ? [{ cardId: e.cardId, cause: blamed.has(e.uid) ? { kind: 'crystallised', cardId: blamed.get(e.uid) ?? null } : { kind: 'added', byCardId: addedBy(s, e.cardId) } }]
+      : [],
+  );
+  if (!same(pe.scandalCards, realCards)) report('endTurn scandal cards', seed, s.turn, `preview ${JSON.stringify(pe.scandalCards)}, real ${JSON.stringify(realCards)}`);
+  if (pe.heatAfter !== end.resources.heat) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${end.resources.heat}`);
+  counts.monthEndScandals += realCards.length;
+  counts.copies += realCards.filter((x) => x.cause.kind === 'added').length;
   // The preview never reveals the next turn's draw.
   if (pe.outcome.drawn !== 0) report('endTurn leak', seed, s.turn, `preview reports ${pe.outcome.drawn} next-turn draws`);
 }
@@ -113,6 +125,11 @@ function checkGatePhase(s: GameState, seed: number): void {
     const gate = real.events.find((e) => e.type === 'gate');
     const passed = gate?.type === 'gate' && gate.passed;
     if (p.passes !== passed) report('gate', seed, s.turn, `${gateId}: preview passes=${p.passes}, real ${passed}`);
+    // The final gate names the ending it leads to (decision 11); every other gate leads to none.
+    const ending = real.events.find((e) => e.type === 'ending');
+    const realEnding = ending?.type === 'ending' ? ending.endingId : null;
+    if (p.endingId !== realEnding) report('gate ending', seed, s.turn, `${gateId}: preview ${p.endingId}, real ${realEnding}`);
+    if (realEnding !== null) counts.finalGates++;
     if (p.clauses.every((c) => c.met) !== evaluate(getGate(s.content, gateId)?.requires, s)) report('gate clauses', seed, s.turn, `${gateId}: clauses disagree with evaluate`);
     // Independent of the events: the next season opens on its draft (or the run ends) before anything
     // else can touch resources, so the real state diff is exactly the gate's branch.
@@ -159,7 +176,8 @@ for (let i = 0; i < RUNS; i++) {
 
 console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line), ` +
-    `${counts.blocked} unplayable cards, ${counts.endTurns} end turns, ${counts.gates} gate choices, ${counts.draftCards} draft offers ` +
+    `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
+    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending), ${counts.draftCards} draft offers ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

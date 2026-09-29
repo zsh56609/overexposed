@@ -4,11 +4,11 @@ As of 2026-09-30. **Read this first; update it at the end of every
 session** (AGENTS.md → Session rules).
 
 Overexposed is a deck-building career sim for the Game Gauntlet SIM Jam,
-played in the browser. A run is 12 months (4 seasons × 3). Fast hype
-builds heat, heat crystallises into scandal cards, and scandals clog the
-hand by winter. Rules and architecture: [AGENTS.md](../AGENTS.md). UI
-scope: [ui-plan.md](ui-plan.md). Design decisions:
-[decisions.md](decisions.md).
+played in the browser. You are a young singer with one year: 12 months
+(4 seasons × 3). Fast hype builds heat, heat crystallises into scandal
+cards, and scandals clog the hand by winter. Rules and architecture:
+[AGENTS.md](../AGENTS.md). UI scope: [ui-plan.md](ui-plan.md). Design
+decisions: [decisions.md](decisions.md).
 
 ## Done
 
@@ -16,131 +16,142 @@ scope: [ui-plan.md](ui-plan.md). Design decisions:
 |---|---|---|
 | Engine | Pure TypeScript reducer, seeded RNG, 19 frozen GameEvents; strict mode in dev and sim, lenient in the shipped build | `/core` |
 | Content | 34 cards (21 action, 7 opportunity, 6 scandal), 8 gates, 4 endings; JSON with i18n keys only | `/content`, `i18n/en.json` |
-| Validation | Schema, ids, i18n keys, reachability, code boundaries (including no rule logic in /ui) | `npm run validate` |
+| Validation | Schema, ids, i18n keys, reachability, code boundaries (including no rule logic in /ui); missing prose as warnings | `npm run validate` |
 | Sim | 7 personas, headless, seeded; 10 bands | `npm run sim` |
 | Balance | Rounds 1–5 done. All 10 bands pass on seeds 20260929, 1 and 424242 | `sim/out/tuning-log.md` |
 | Frozen for UI | Run structure, gates, endings, resources, starting deck, heat formula, heat display, GameEvent list | AGENTS.md §2 |
-| UI layer 1 | A complete run in the browser; previews checked against the reducer (commit dcf231e). A fixed 1280×720 stage scaled to fit any viewport (2026-09-30) | `/ui`, `/check` |
+| UI layer 1 | A complete run in the browser; previews checked against the reducer (dcf231e). A fixed 1280×720 stage scaled to fit any viewport | `/ui`, `/check` |
+| UI layer 2, part 1 | The meaning layer, unstyled: the writing draft imported, goals board, deck viewer, the new heat display and END TURN preview (2026-09-30) | `/ui`, `i18n/en.json` |
 
-## UI layer 1 — actual state
+## The UI as it stands
 
-Functional and plain: system fonts, no animation. The screen comes from
-`state.phase`, what is clickable from `legalActions`, every number from
-/core.
+Legibility only: system fonts, no palette, no animation. The screen comes
+from `state.phase`, what is clickable from `legalActions`, every number
+from /core. Everything sits on the fixed 1280×720 stage (`ui/Stage.tsx`,
+decision 17), scaled to fit any viewport.
 
-- Stage (`ui/Stage.tsx`): the whole UI is laid out at 1280×720 and
-  scaled to fit the viewport (contain, never crop), centred and
-  letterboxed. It re-fits on resize and fullscreen, and no screen
-  scrolls, except that the feed, a log of the whole run, scrolls inside
-  its column. Body text is 20px on the stage: 16px at 1024×576, 12.5px at
-  800×450, 10.4–10.8px at phone landscape. A hand of 6 or more cards
-  (draw effects; 8 is the most seen) shrinks card text to 16px on the
-  stage, 10px at 800×450.
-- Stage tests (2026-09-30): an overflow audit over every state of 40+
-  seeded runs at 1280×720, with every card preview opened, plus an
-  8-card hand. The production build was audited over 3 runs each at
-  800×450 and at 667×375 with mobile emulation. The re-fit was checked
-  through real resize and fullscreen events in headless Chrome. All
-  clean.
+What each screen answers (ui-plan §13 priority):
+- **What am I doing.** The title screen shows the opening premise. The
+  feed aggregates per action (D5): one headline per card played, chosen
+  from its variants by a hash of seed, month and card instance (never the
+  game RNG), set in its register (LOUD bold, quiet italic, Money plain),
+  with its deltas beneath; draws merged into one line; each scandal as a
+  red lead line with its headline and who is blamed; a season opener when
+  a season starts. Explanations attach to their cause (D18): the month
+  end says what heat carries over, a gate's line shows the heat it added,
+  and the line's movement (a number from /core, `lineMoved`) is told
+  where it happened. Scandals in hand show their in-hand line, with their
+  rules told by the interface from their effects. Gates show their
+  flavour.
+- **What am I aiming for.** The goals board (D10): the four endings, each
+  with its name, goal line and live requirements via explainCondition,
+  shown in the right-hand column whenever nothing is being previewed. The
+  ending screen shows the ending's name and text, and the other three with
+  their goal lines. The final gate names the ending each option leads to
+  (D11).
+- **What can I do.** The deck viewer (D12): deck and discard pile, grouped
+  and sorted by name, never in draw order. Opened from the side column in
+  every phase, the first draft included.
+- **Clarity.** The heat display (D1) counts no scandals: "N TO GO", or
+  "LINE CROSSED · N TO THE NEXT", from /core's `heatLine`. The END TURN
+  button carries the month-end count (D2) — every scandal card month end
+  will add, Copycat copies included — and hovering it lists each one with
+  its cause. The "if the month ended now" line is gone.
 
-- Screens: title, draft (with extra pick and reroll), play, gate, ending,
-  play again. `?seed=N` in the URL replays a run.
-- Previews (`ui/preview.ts`): card play, end of month, gate, and draft
-  requirements — each runs the reducer on a hypothetical action.
-- Event feed: one line per GameEvent, through an `EventQueue`
-  (`ui/queue.ts`) that drains at once. Layer 3's animation player slots
-  in there.
-- Strings: 128 `ui.*` keys in `i18n/en.json`. A missing key renders
-  bracketed and warns in the console.
-- Checks: `npm run check:preview` — 300 seeded runs, 18,931 states,
-  0 mismatches. `npm run validate` flags rule logic in /ui.
-- Build: 275.7 KB of JS (83.9 KB gzipped). Local cold load: 35 ms to
-  DOMContentLoaded. Vite `base: './'` is set.
-- Acceptance (ui-plan §11): 5 of 6 met. The itch draft and Safari item
-  waits on the author.
-- One run driven by the agent took 57 decisions: 32 card plays, 12 month
-  ends, 9 draft picks, 4 gates. Human play time is not measured yet.
+Checks (2026-09-30):
+- `npm run sim`: identical to the pre-import baseline apart from the
+  wall-clock time — the prose and its variant choice touch no game RNG.
+- `npm run check:preview`: 0 mismatches over 18,931 states, including
+  5,451 month-end scandal cards (1,001 copies) and 600 final gates naming
+  their ending.
+- `npm run validate`: 0 errors; 10 prose warnings (the gap list below).
+- Stage: an overflow audit in headless Chrome over 16 seeded-random runs
+  (852 states, every card and END TURN hovered, the deck viewer opened
+  132 times) and a replay of a run to each of the four endings. All clean
+  at 1280×720.
 
-## Known issues from the layer 1 playtest
+## Gap list: prose still to write
 
-Most are addressed by a layer 2 decision (ui-plan §13; D = decision).
+Each has a visible `TODO(prose)` placeholder in `i18n/en.json`; validate
+lists them. The register column is a suggestion from the card's main
+resource, for the author to confirm.
 
-| # | Issue | Addressed by |
-|---|---|---|
-| 1 | "N to go" misleads once a line is crossed: it counts to the next scandal while one is already due. A card preview showed "Heat 2 → 7 · 3 to go" beside "crosses the line" | D1 |
-| 2 | Two scandal counts can disagree: the status strip's "if the month ended now" (heatOutlook, the state as it stands) and the END TURN preview (the reducer, including onEndOfTurn effects such as Copycat Story) | D2 |
-| 3 | The first screen of a run is a draft, and the deck is never visible, only counted | D12, D8 |
-| 4 | The card preview presents crossing a line as the card's consequence, but scandals only print at month end | D3 |
-| 5 | Heat carrying over between months is never explained (6 → 2 after a scandal, then carried into the next month) | open |
-| 6 | The line moves at a season change with no notice: "5 to go" became "4 to go" at summer with heat unchanged | D4, D13 |
-| 7 | The feed is too long: one line per event, 263 lines a run, a median of 21 a month, 54% of them resource and draw bookkeeping. About 14 lines are visible at 1280×720 | D5 |
-| 8 | The preview sat in the right rail, far from the hand, and was cut off in winter when the season's gates listed more requirements | Cut-off fixed by the stage layout (the preview has its own column); D6 still moves it beside the card |
-| 9 | The final gate decides the ending, but nothing on screen links them, and no ending conditions are visible all run. A Star run that also met Craftsman is never told | D10, D11 |
-| 10 | The ending screen has no ending names, placeholder text, and three bare "Locked ending" lines | D9, D16 |
-| 11 | The heat forecast stays on screen during gates, including the final one, when no month is left to end | open (small) |
-| 12 | The draft's Take buttons sat at different heights because card texts differ in length | Fixed by the stage layout: buttons sit at the bottom of each card |
-| 13 | Requirement wording is awkward: "✓ not: Signed to a label" | layer 2 UI text (D15) |
-| 14 | A hover preview once stayed on a card while the pointer was on END TURN. Seen under automated input only; confirm with a real mouse | to verify |
+| Id | Name | Kind | Effect | Missing | Suggested register |
+|---|---|---|---|---|---|
+| ghostwriter | Ghostwriter | action | Needs 3 Capital. Pay 3 Capital: gain 7 Craft. | headline, register | Money or quiet |
+| tabloid_bait | Tabloid Bait | action | 2+ Scandals: gain 10 Hype, 4 Heat. Otherwise: gain 3 Hype, 2 Heat. | headline, register | LOUD |
+| street_team | Street Team | action | Needs 2 Capital. Pay 2 Capital: gain 5 Hype, draw 1. | headline, register | LOUD |
+| demo_tape | Demo Tape | action | Needs 15 Craft. Add a Studio Session to your discard pile. Gain 2 Craft. | headline, register | quiet |
+| late_night_show | Late Night Show | action | Needs 25 Hype. Gain 8 Hype, 3 Heat. Craft 30+: lose 3 Heat. | headline, register | LOUD |
+| film_cameo | Film Cameo | opportunity | Needs 35 Hype. Gain 12 Hype, 2 Craft, 4 Heat. | headline, register | LOUD |
+| award_campaign | Award Campaign | opportunity | Needs 40 Craft. Gain 7 Hype. Lose 2 Heat. | headline, register | LOUD or quiet |
+| burnout | Burnout | scandal (gig) | In hand at month end: lose 3 Craft. | crystallisation headline, in-hand line (name kept; the draft's "Lip-Sync Claims" was only a suggestion) | — |
+| gate_festival | Festival Slot | summer gate | Needs Hype 35+. Pass: +6 Hype, +3 Capital. Fail: +3 Heat. | flavour | — |
 
-Also:
+## Known issues
+
+Fixed by layer 2 part 1: layer 1 issues 1 ("N to go" once a line is
+crossed), 2 (two scandal counts), 3 (no deck view), 4 (crossing presented
+as the card's consequence), 5 (heat carry-over unexplained), 7 (feed too
+long), 9 (final gate and endings unlinked), 10 (ending names and text) and
+11 (a heat forecast during gates). Issues 8 and 12 were fixed by the stage
+layout.
+
+Still open:
+- The line's movement is told in the feed, but the season transition beat
+  itself (D13) is not built.
+- Requirement wording is awkward: "✓ not: Signed to a label".
+- A hover preview once stayed on a card while the pointer was on END TURN.
+  Seen under automated input only; confirm with a real mouse.
+- Both final-gate options can lead to the same ending (seen: a Headliner
+  run where both said "This ends the year as: Headliner"), so the last
+  choice can be moot for the ending.
+- The goals board lists endings in resolution order, so Cautionary Tale
+  comes first. When two endings are fully met, it doesn't say which wins
+  until the final gate.
+- Interface labels that now sit beside the author's prose and may read
+  badly: "Your career is over" on the ending screen (the endings speak of
+  a year, and Nobody Yet of a career still going), and the feed's title
+  "The story so far". Both are interface text for the author to judge.
+- "Heat N carries into next month" prints at every month end with heat
+  left: accurate, but frequent.
 - `act()` in `ui/App.tsx` fast-forwards the queue and then executes the
-  click. That is harmless while nothing animates, but it must change to
-  D7 (a click only fast-forwards) before any animation lands.
+  click. Harmless while nothing animates; it must change to D7 (a click
+  only fast-forwards) before any animation lands.
 - Code comments still cite "CLAUDE.md §N". They resolve, because
-  CLAUDE.md imports AGENTS.md. Update them when those files are next
-  touched.
+  CLAUDE.md imports AGENTS.md.
 
 ## Next task
 
-Layer 2, per [ui-plan.md](ui-plan.md) §13. Build the meaning layer first
-— goals board (D10), feed headlines and the headline field (D5, D15),
-ending names (D9), season openers (D13), deck viewer (D12) — with visual
-craft alongside it, never ahead. Agents build the fields, keys and
-placeholders; the author writes the prose (D15).
-
-Notes for whoever builds it:
-- Read-only /core queries layer 2 needs: the next line and how far it
-  moved (D4: the integer heat value at which the next scandal would
-  crystallise), "as if this card were in hand"
-  for the draft preview (D8), and the awards on final state
-  (decisions.md, 2026-09-29). The goals board (D10) can show every
-  ending's clauses through explainCondition. Saying which ending the run
-  is heading for needs /core, though: endings resolve by priority, and a
-  priority walk in /ui would be rule logic.
-- New fields and keys go into the AGENTS.md §2 schemas, the §3 key
-  convention and validate as they are built: the D15 schema (card
-  headline variants and register; scandal headline and in-hand text;
-  ending name, goal line and text; gate flavour; season openers; the
-  opening premise; award names and citations). The ending's goal line
-  doubles as D9's one-line hint for a locked ending. Agents build
-  fields, keys and placeholders and import approved prose; they never
-  invent it.
-
-## Open questions for the author
-
-None. The seven raised at the layer 1 handoff were decided on 2026-09-30
-(ui-plan §13, decisions 1, 2, 4 and 18–20); the one left open is a manual
-test, listed below.
+**Layer 2 part 2: visual craft**, after the author has playtested this
+build — type, palette, halftone, card layout, the front-page setting of
+the feed, season transitions (AGENTS.md §6; ui-plan §10 and §13). It
+designs for the one 1280×720 canvas (D17) and keeps everything inside it.
+Still to build in layer 2: the floating card preview (D6), the draft
+preview from /core (D8), the awards ceremony (D16; award names and
+citations are already in `i18n/en.json`, the conditions are not written),
+and the season transition beat (D13).
 
 ## Waiting on the author
 
-- **itch draft and Safari/iPad test.** The layer 1 build is on an itch
-  draft (2026-09-30). It rendered at 800×450 and clipped, which the fixed
-  stage fixes. Still to do: set the embed's viewport dimensions to
-  1280×720 with the fullscreen button on, upload the new build, and play
-  it in Safari on a Mac and, if possible, on an iPad in landscape. To build: `npm run build`, then zip the contents of `dist/`
-  with `index.html` at the root and forward-slash paths. From `dist/`:
+- **Playtest this build** (the meaning layer): does the run now say what
+  you are doing, what you are aiming for and what you can do?
+- **Write the gap list** above, and revise the imported prose in
+  `i18n/en.json` (now its canonical home; `docs/writing/draft-v1.md` is a
+  historical record).
+- **itch and Safari/iPad.** Set the embed's viewport dimensions to
+  1280×720 with the fullscreen button on, upload a new build, and play it
+  in Safari on a Mac and, if possible, an iPad in landscape. To build:
+  `npm run build`, then from `dist/`:
   `C:/Windows/System32/tar.exe -a -cf ../overexposed.zip index.html assets`.
-- **The player-facing prose (D15, amended 2026-09-29).** The author
-  accepted an AI-assisted writing draft, `docs/writing/draft-v1.md`; the
-  public disclosure says player-facing text was drafted with AI
-  assistance (AGENTS.md §10). The draft is imported into `i18n/en.json`,
-  which is then the canonical home of the prose. The author revises it
-  during playtesting and writes what the draft leaves pending.
 - **A hand-timed first run.** The target is 10–15 minutes (ui-plan §12).
 - **First-run mechanic exposure** (decisions.md, 2026-09-29): in the next
   playtest, play a cautious first run and note whether a scandal ever
   appears.
+
+## Open questions for the author
+
+None beyond the manual test above.
 
 ## Schedule
 
@@ -157,7 +168,7 @@ test, listed below.
 npm run dev              # Vite dev server
 npm run build            # typecheck + production build into dist/
 npm run sim              # headless balance run (bands in AGENTS.md §5)
-npm run validate         # content, i18n keys, code boundaries
+npm run validate         # content, i18n keys, prose gaps, code boundaries
 npm run typecheck
 npm run check:preview    # every UI preview against the real reducer outcome
 ```

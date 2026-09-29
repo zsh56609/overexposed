@@ -58,6 +58,34 @@ export function heatOutlook(s: ConditionSubject): { readonly scandalsIfTurnEnded
   return { scandalsIfTurnEndedNow, heatToNextScandal: Math.max(1, Math.ceil(nextLine - 1e-9) - heat) };
 }
 
+/**
+ * Where heat sits against the line: the heat display (docs/ui-plan.md §13, decisions 1 and 4). Whole
+ * numbers only, and it counts no scandals — the count lives in the END TURN preview alone. The next line
+ * is the integer heat value at which the next scandal would crystallise; `crossed` says heat is already
+ * over a line.
+ */
+export function heatLine(s: ConditionSubject): {
+  readonly heat: number;
+  readonly nextLine: number;
+  readonly toNext: number;
+  readonly crossed: boolean;
+} {
+  const { scandalsIfTurnEndedNow, heatToNextScandal } = heatOutlook(s);
+  const heat = s.resources.heat;
+  return { heat, nextLine: heat + heatToNextScandal, toNext: heatToNextScandal, crossed: scandalsIfTurnEndedNow > 0 };
+}
+
+/**
+ * How far the line moved from one state to another, in whole heat (decision 4): negative = closer to the
+ * player (it tightened), positive = further away (it eased). It measures the first line — the integer heat
+ * at which a first scandal would crystallise — so heat passing a line never counts as the line moving;
+ * every later line moves with the first. The UI shows this number and never compares states itself.
+ */
+export function lineMoved(before: ConditionSubject, after: ConditionSubject): number {
+  const firstLine = (s: ConditionSubject) => Math.ceil(effectiveHeatThreshold(s) - 1e-9);
+  return firstLine(after) - firstLine(before);
+}
+
 function inRange(value: number, range: Range): boolean {
   return (range.min === undefined || value >= range.min) && (range.max === undefined || value <= range.max);
 }
