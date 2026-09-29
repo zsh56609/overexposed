@@ -315,6 +315,7 @@ Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections,
 **Type:** two families only, Google Fonts — the cover is set in Playfair Display and the game matches it; fewer font files also serves the cold-load budget.
 - Playfair Display — masthead, headlines, card titles
 - Libre Franklin — UI, numbers, body
+
 **Texture:** halftone dot overlay, hard drop shadows, slight card rotation
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
