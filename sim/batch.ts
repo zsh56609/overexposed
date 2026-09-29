@@ -14,6 +14,7 @@ import {
   seedRng,
   type Action,
   type Content,
+  type Effect,
   type GameState,
   type GateRecord,
   type Resources,
@@ -23,6 +24,19 @@ import { PERSONA_IDS, PERSONA_SALT, PERSONAS, type PersonaId } from './personas.
 
 /** A run that needs more actions than this is counted as soft-locked. A normal run takes ~60. */
 export const MAX_ACTIONS = 1_000;
+
+/** Where a run's capital went, by what caused each change. */
+export interface CapitalFlow {
+  readonly earned: number;
+  /** Extra picks and rerolls. */
+  readonly draft: number;
+  /** Playing cards that exhaust scandals. */
+  readonly removal: number;
+  /** Playing any other card with a capital price. */
+  readonly cards: number;
+  /** Drained by scandals at end of turn, or by failed gates. */
+  readonly lost: number;
+}
 
 export interface TurnSnapshot {
   readonly turn: number;
@@ -65,6 +79,7 @@ export interface RunRecord {
   readonly rerolls: number;
   /** Capital spent on extra picks and rerolls. */
   readonly draftSpend: number;
+  readonly capital: CapitalFlow;
   readonly final: Resources | null;
   /** Flags held when the run ended. */
   readonly flags: readonly string[];
@@ -101,6 +116,23 @@ function checkInvariants(s: GameState): void {
 
 export type TraceFn = (state: GameState, action: Action | null) => void;
 
+const removalCache = new WeakMap<Content, ReadonlySet<string>>();
+
+/** Cards whose effects exhaust scandals (by a tag some scandal carries), found from content. */
+function removalCards(content: Content): ReadonlySet<string> {
+  let ids = removalCache.get(content);
+  if (!ids) {
+    const scandalTags = new Set(content.cards.filter((c) => c.kind === 'scandal').flatMap((c) => c.tags ?? []));
+    const exhaustsScandal = (effects: readonly Effect[] | undefined): boolean =>
+      (effects ?? []).some((e) =>
+        e.op === 'exhaustTag' ? scandalTags.has(e.tag) : e.op === 'conditional' ? exhaustsScandal(e.then) || exhaustsScandal(e.else) : false,
+      );
+    ids = new Set(content.cards.filter((c) => exhaustsScandal(c.effects)).map((c) => c.id));
+    removalCache.set(content, ids);
+  }
+  return ids;
+}
+
 export function runOne(content: Content, persona: PersonaId, seed: number, trace?: TraceFn): RunRecord {
   const policy = PERSONAS[persona];
   const decisions = cursor(seedRng(deriveSeed(seed, PERSONA_SALT[persona])));
@@ -123,8 +155,20 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let softLock: string | null = null;
   let crash: string | null = null;
   let state: GameState | null = null;
+  const capital = { earned: 0, draft: 0, removal: 0, cards: 0, lost: 0 };
+  const removal = removalCards(content);
 
-  const tally = (s: GameState) => {
+  const tally = (s: GameState, action: Action | null) => {
+    const played = s.events.find((e) => e.type === 'play');
+    for (const e of s.events) {
+      if (e.type !== 'resource' || e.target !== 'capital') continue;
+      if (e.delta > 0) capital.earned += e.delta;
+      else if (action?.type === 'DRAFT_EXTRA_PICK' || action?.type === 'DRAFT_REROLL') capital.draft -= e.delta;
+      else if (action?.type === 'PLAY_CARD' && played?.type === 'play') {
+        if (removal.has(played.cardId)) capital.removal -= e.delta;
+        else capital.cards -= e.delta;
+      } else capital.lost -= e.delta;
+    }
     const crystallisedNow = s.events.filter((e) => e.type === 'scandal').length;
     if (crystallisedNow >= 2) multiScandalTurns++;
     maxScandalsInTurn = Math.max(maxScandalsInTurn, crystallisedNow);
@@ -156,7 +200,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
 
   try {
     state = createInitialState(seed, content, { strict: true });
-    tally(state);
+    tally(state, null);
     checkInvariants(state);
     trace?.(state, null);
     while (state.phase !== 'ended') {
@@ -175,7 +219,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
       const action = policy.choose(state, legal, decisions);
       state = reduce(state, action);
       actions++;
-      tally(state);
+      tally(state, action);
       checkInvariants(state);
       trace?.(state, action);
     }
@@ -207,6 +251,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     extraPicks,
     rerolls,
     draftSpend,
+    capital,
     final: state?.resources ?? null,
     flags: state ? Object.keys(state.flags) : [],
     softLock,

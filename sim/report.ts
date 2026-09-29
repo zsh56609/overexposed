@@ -83,7 +83,18 @@ export interface Report {
   readonly flagsHeld: Readonly<Record<string, Readonly<Record<Group, number>>>>;
   /** Per persona, per run: cards acquired in drafts, extra picks bought, rerolls, capital spent on them. */
   readonly draft: Readonly<
-    Record<string, { acquired: { mean: number; min: number; max: number }; extraPicks: number; rerolls: number; spend: number; capitalAtEnd: number }>
+    Record<
+      string,
+      {
+        acquired: { mean: number; min: number; max: number };
+        extraPicks: number;
+        rerolls: number;
+        spend: number;
+        capitalAtEnd: number;
+        /** Per-run means of the capital flow. */
+        capital: { earned: number; draft: number; removal: number; cards: number; lost: number };
+      }
+    >
   >;
   readonly cards: readonly {
     id: string;
@@ -215,6 +226,13 @@ export function buildReport(batch: BatchResult): Report {
           rerolls: mean(rs.map((r) => r.rerolls)),
           spend: mean(rs.map((r) => r.draftSpend)),
           capitalAtEnd: mean(rs.map((r) => r.final?.capital ?? 0)),
+          capital: {
+            earned: mean(rs.map((r) => r.capital.earned)),
+            draft: mean(rs.map((r) => r.capital.draft)),
+            removal: mean(rs.map((r) => r.capital.removal)),
+            cards: mean(rs.map((r) => r.capital.cards)),
+            lost: mean(rs.map((r) => r.capital.lost)),
+          },
         },
       ];
     }),
@@ -456,6 +474,19 @@ export function formatReport(r: Report): string {
         const d = r.draft[p];
         if (!d) return [p, '-', '-', '-', '-', '-', '-', '-'];
         return [p, n1(d.acquired.mean), n0(d.acquired.min), n0(d.acquired.max), n1(d.extraPicks), n1(d.rerolls), n1(d.spend), n1(d.capitalAtEnd)];
+      }),
+    ),
+  );
+
+  h('CAPITAL FLOW  (per run: starting stake + earned = spent on draft extras + removal cards + other cards + lost to scandals/gates + left)');
+  out.push(
+    table(
+      ['persona', 'earned', 'draft', 'removal', 'other cards', 'lost', 'left'],
+      P.map((p) => {
+        const d = r.draft[p];
+        if (!d) return [p, '-', '-', '-', '-', '-', '-'];
+        const c = d.capital;
+        return [p, n1(c.earned), n1(c.draft), n1(c.removal), n1(c.cards), n1(c.lost), n1(d.capitalAtEnd)];
       }),
     ),
   );
