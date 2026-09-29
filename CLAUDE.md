@@ -80,7 +80,15 @@ End-of-turn resolution, in order:
 
 ### The Heat → Scandal loop (the core coupling)
 
-At end of turn: `count = floor(heat / heatThreshold(act))`; add `count` Scandal cards to the discard pile and reduce heat by `heatThreshold(act) × count`. No per-turn cap: excess heat is never free, so a huge hype turn costs more than a small one.
+At end of turn:
+
+```
+effectiveThreshold = max(thresholdFloor, heatThreshold(act) - scandalsHeld * degradePerScandal)
+count = floor(heat / effectiveThreshold)      // add `count` Scandal cards to the discard pile
+heat -= vent * count                          // vent < thresholdFloor, so a residue always carries over
+```
+
+All four numbers live in `content/rules.json`. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.

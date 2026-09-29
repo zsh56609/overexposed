@@ -61,7 +61,11 @@ const q = (v: unknown) => JSON.stringify(v);
 const CARD_FIELDS = ['id', 'kind', 'cost', 'nameKey', 'textKey', 'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn'];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'requires', 'onPass', 'onFail'];
 const ENDING_FIELDS = ['id', 'priority', 'conditions', 'textKey'];
-const RULES_FIELDS = ['acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered', 'heatThreshold', 'startingResources', 'startingDeck', 'draft'];
+const RULES_FIELDS = [
+  'acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered',
+  'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
+  'startingResources', 'startingDeck', 'draft',
+];
 const DRAFT_FIELDS = ['offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
 /** Hard numeric bounds. Values outside them are errors, not taste. */
@@ -273,6 +277,23 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     if (isInt(raw.handSize) && total < raw.handSize) {
       v.warn('structure', 'rules.startingDeck', `${total} cards can't fill a hand of ${raw.handSize}`);
     }
+  }
+
+  // Cascade: effective threshold = max(thresholdFloor, base - scandalsHeld * degradePerScandal);
+  // each scandal vents `vent` heat, which must stay below every threshold so a residue carries over.
+  const floorOk = v.int(raw.thresholdFloor, 'rules.thresholdFloor', LIMIT.heat);
+  const ventOk = v.int(raw.vent, 'rules.vent', LIMIT.heat);
+  const degrade = raw.degradePerScandal;
+  if (typeof degrade !== 'number' || !Number.isFinite(degrade) || degrade < 0 || degrade > 100) {
+    v.error('ranges', 'rules.degradePerScandal', `must be a number in 0..100, got ${q(degrade)}`);
+  }
+  if (floorOk && ventOk && (raw.vent as number) >= (raw.thresholdFloor as number)) {
+    v.error('ranges', 'rules.vent', `vent ${String(raw.vent)} must be below thresholdFloor ${String(raw.thresholdFloor)}: vent < effective threshold always`);
+  }
+  if (floorOk && Array.isArray(raw.heatThreshold)) {
+    raw.heatThreshold.forEach((t, i) => {
+      if (isInt(t) && t < (raw.thresholdFloor as number)) v.error('ranges', `rules.heatThreshold[${i}]`, `${t} is below thresholdFloor ${String(raw.thresholdFloor)}`);
+    });
   }
 
   if (!isObj(raw.draft)) v.error('schema', 'rules.draft', 'must be an object: { offerSize, picks, extraPickCost, maxExtraPicks, rerollCost, maxRerolls }');

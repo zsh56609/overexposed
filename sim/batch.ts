@@ -31,6 +31,9 @@ export interface TurnSnapshot {
   readonly capital: number;
   readonly heat: number;
   readonly scandals: number;
+  /** Effective heat threshold this turn's check used, and the scandals it crystallised. */
+  readonly threshold: number;
+  readonly crystallised: number;
 }
 
 export interface RunRecord {
@@ -128,7 +131,9 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
         plays[e.cardId] = (plays[e.cardId] ?? 0) + 1;
         cardsPlayed++;
       } else if (e.type === 'scandal') scandalsCrystallised++;
-      else if (e.type === 'turnEnd') curve.push({ turn: e.turn, ...e.resources, scandals: e.scandalCount });
+      else if (e.type === 'turnEnd') {
+        curve.push({ turn: e.turn, ...e.resources, scandals: e.scandalCount, threshold: e.threshold, crystallised: e.crystallised });
+      }
       else if (e.type === 'draftOffer') for (const id of e.cardIds) offered[id] = (offered[id] ?? 0) + 1;
       else if (e.type === 'draftPick') {
         drafted[e.cardId] = (drafted[e.cardId] ?? 0) + 1;

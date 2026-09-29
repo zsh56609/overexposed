@@ -48,6 +48,9 @@ export type GameEvent =
       readonly turn: number;
       readonly resources: Resources;
       readonly scandalCount: number;
+      /** Effective heat threshold used by this turn's check, and the scandals it crystallised. */
+      readonly threshold: number;
+      readonly crystallised: number;
     }
   | { readonly type: 'draftOffer'; readonly act: number; readonly cardIds: readonly string[] }
   | { readonly type: 'draftPick'; readonly uid: number; readonly cardId: string }

@@ -1,4 +1,4 @@
-import { CoreError, getCard, type Condition, type ContentIndex, type FlagTest, type Range, type Resources } from './content.ts';
+import { CoreError, getCard, heatThreshold, type Condition, type ContentIndex, type FlagTest, type Range, type Resources } from './content.ts';
 import type { CardInstance } from './state.ts';
 
 /** The read-only slice of state a condition can see. GameState and the reducer's Draft both satisfy it. */
@@ -21,6 +21,15 @@ export function scandalCount(s: ConditionSubject): number {
     for (const card of zone) if (getCard(s.content, card.cardId)?.kind === 'scandal') n++;
   }
   return n;
+}
+
+/**
+ * The heat threshold in force right now: the act's base minus degradePerScandal for every scandal
+ * held, never below thresholdFloor. Removing a scandal buys the threshold back.
+ */
+export function effectiveHeatThreshold(s: ConditionSubject): number {
+  const rules = s.content.rules;
+  return Math.max(rules.thresholdFloor, heatThreshold(rules, s.act) - scandalCount(s) * rules.degradePerScandal);
 }
 
 function inRange(value: number, range: Range): boolean {

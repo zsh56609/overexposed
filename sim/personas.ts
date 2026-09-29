@@ -15,10 +15,10 @@
 // `flagScores` overrides that per flag id.
 
 import {
+  effectiveHeatThreshold,
   evaluate,
   getCard,
   getGate,
-  heatThreshold,
   nextInt,
   reduce,
   scandalCount,
@@ -144,7 +144,7 @@ function dealPull(s: GameState, w: Weights): number {
 
 function score(s: GameState, w: Weights): number {
   const r = s.resources;
-  const threshold = heatThreshold(s.content.rules, s.act);
+  const threshold = effectiveHeatThreshold(s);
   const atRisk = s.phase === 'play' && threshold > 0 ? Math.floor(r.heat / threshold) : 0;
   let flags = 0;
   for (const flag of Object.keys(s.flags)) flags += flagValue(flag, s.content, w);

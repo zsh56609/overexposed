@@ -8,8 +8,8 @@
 //                  → next turn, or the act's Gate after its last turn
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
 
-import { CoreError, getCard, getGate, heatThreshold, type GateDef } from './content.ts';
-import { evaluate, scandalCount } from './conditions.ts';
+import { CoreError, getCard, getGate, type GateDef } from './content.ts';
+import { effectiveHeatThreshold, evaluate, scandalCount } from './conditions.ts';
 import { nextInt } from './rng.ts';
 import {
   addCard,
@@ -188,8 +188,9 @@ function endTurn(state: GameState): GameState {
     applyEffects(d, getCard(d.content, card.cardId)?.onEndOfTurn);
   }
 
-  // 2. Heat → Scandal: one scandal per full threshold of heat.
-  crystallise(d);
+  // 2. Heat → Scandal: one scandal per full effective threshold of heat; a residue carries over.
+  const threshold = effectiveHeatThreshold(d);
+  const crystallised = crystallise(d, threshold);
 
   // 3. The hand goes to the discard pile, scandals included.
   d.discard.push(...d.hand);
@@ -200,6 +201,8 @@ function endTurn(state: GameState): GameState {
     turn: d.turn,
     resources: { ...d.resources },
     scandalCount: scandalCount(d),
+    threshold,
+    crystallised,
   });
 
   // 4. Next turn, or this act's Gate.
@@ -266,23 +269,27 @@ export function startTurn(d: Draft): void {
 }
 
 /**
- * count = floor(heat / heatThreshold(act)): add `count` Scandals to the discard pile and remove
- * threshold × count heat. No per-turn cap — a huge hype turn costs more than a small one.
+ * count = floor(heat / threshold): add `count` Scandals to the discard pile and remove vent × count
+ * heat. vent < threshold, so a residue always carries into the next turn — the cascade's medium —
+ * and each new scandal lowers the next turn's threshold. Returns the count.
  * Each scandal is a seeded pick among those whose actMin has been reached.
  */
-function crystallise(d: Draft): void {
-  const threshold = heatThreshold(d.content.rules, d.act);
-  if (!(threshold > 0)) return;
+function crystallise(d: Draft, threshold: number): number {
+  if (!(threshold > 0)) return 0;
   const count = Math.floor(d.resources.heat / threshold);
-  if (count === 0) return;
+  if (count === 0) return 0;
   const pool = d.content.scandalIds.filter((id) => (getCard(d.content, id)?.actMin ?? 1) <= d.act);
-  if (pool.length === 0) return fault(d, 'noScandalForAct', String(d.act));
+  if (pool.length === 0) {
+    fault(d, 'noScandalForAct', String(d.act));
+    return 0;
+  }
   for (let i = 0; i < count; i++) {
     const cardId = pool[nextInt(d.rng, pool.length)] as string;
     const card = addCard(d, cardId, 'discard');
     d.events.push({ type: 'scandal', uid: card.uid, cardId });
   }
-  addResource(d, 'heat', -threshold * count);
+  addResource(d, 'heat', -d.content.rules.vent * count);
+  return count;
 }
 
 function offerGates(d: Draft): void {

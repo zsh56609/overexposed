@@ -144,8 +144,14 @@ export interface Rules {
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */
   readonly gatesOffered: number;
-  /** heatThreshold(act) = heatThreshold[act - 1]. Each full threshold of heat at end of turn crystallises one Scandal. */
+  /** Base threshold per act: heatThreshold(act) = heatThreshold[act - 1]. See effectiveHeatThreshold. */
   readonly heatThreshold: readonly number[];
+  /** Threshold lost per scandal held: tolerance falls as scandals pile up. */
+  readonly degradePerScandal: number;
+  /** The effective threshold never drops below this. */
+  readonly thresholdFloor: number;
+  /** Heat removed per scandal crystallised. Must stay below thresholdFloor so a residue always carries over. */
+  readonly vent: number;
   readonly startingResources: Resources;
   /** Opportunity cards may not appear here: they are draft-only. */
   readonly startingDeck: readonly { readonly cardId: string; readonly count: number }[];

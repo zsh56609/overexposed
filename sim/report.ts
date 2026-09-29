@@ -24,7 +24,9 @@ export const BANDS = {
   skillTvd: 0.2,
 } as const;
 
-const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals'] as const;
+const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised'] as const;
+/** Metrics printed with one decimal in the curve tables. */
+const FINE: readonly string[] = ['scandals', 'threshold', 'crystallised'];
 type Metric = (typeof METRICS)[number];
 type Group = PersonaId | 'pooled';
 
@@ -60,6 +62,8 @@ export interface Report {
   readonly scandalsHeld: Readonly<
     Record<Group, { median: number; mean: number; p90: number; max: number; crystallised: number; multiTurns: number; maxInTurn: number }>
   >;
+  /** Share of turns ending with 0, 1, 2, 3+ scandals crystallised. */
+  readonly crystalTurns: Readonly<Record<Group, readonly [number, number, number, number]>>;
   readonly gates: readonly {
     id: string;
     act: number;
@@ -139,6 +143,20 @@ export function buildReport(batch: BatchResult): Report {
       ];
     }),
   ) as Report['scandalsHeld'];
+
+  const crystalTurns = {} as Record<Group, readonly [number, number, number, number]>;
+  for (const [g, rs] of groups) {
+    const counts: [number, number, number, number] = [0, 0, 0, 0];
+    let turns = 0;
+    for (const r of rs) {
+      for (const s of r.curve) {
+        const k = Math.min(3, s.crystallised) as 0 | 1 | 2 | 3;
+        counts[k] += 1;
+        turns++;
+      }
+    }
+    crystalTurns[g] = [counts[0] / Math.max(1, turns), counts[1] / Math.max(1, turns), counts[2] / Math.max(1, turns), counts[3] / Math.max(1, turns)];
+  }
 
   // Gates
   const gates = content.gates.map((gate) => {
@@ -331,6 +349,7 @@ export function buildReport(batch: BatchResult): Report {
     health: { crashes, softLocks, replay: batch.replay },
     endings: { ids: endingIds, share },
     scandalsHeld,
+    crystalTurns,
     gates,
     flagsHeld,
     draft,
@@ -387,6 +406,14 @@ export function formatReport(r: Report): string {
         const s = r.scandalsHeld[g];
         return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max), n1(s.crystallised), n1(s.multiTurns), n0(s.maxInTurn)];
       }),
+    ),
+  );
+
+  h('CRYSTALLISATION PER TURN  (share of turns that ended with this many scandals crystallised)');
+  out.push(
+    table(
+      ['group', '0', '1', '2', '3+'],
+      [...P, 'pooled' as const].map((g) => [g, ...r.crystalTurns[g].map((x) => pc(x))]),
     ),
   );
 
@@ -468,7 +495,7 @@ export function formatReport(r: Report): string {
     out.push(
       table(
         ['', ...rows.map((row) => `T${row.turn}`)],
-        METRICS.map((m) => [m, ...rows.map((row) => (m === 'scandals' ? n1(row[m].mean) : n0(row[m].mean)))]),
+        METRICS.map((m) => [m, ...rows.map((row) => (FINE.includes(m) ? n1(row[m].mean) : n0(row[m].mean)))]),
         '    ',
       ),
     );
