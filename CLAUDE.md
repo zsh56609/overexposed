@@ -147,6 +147,7 @@ Conditions use one shape everywhere:
 ```
 
 Two gates offered per act. Failing a Gate is a setback, never a run-ender.
+Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ### Ending schema
 

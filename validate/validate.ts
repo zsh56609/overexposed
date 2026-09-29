@@ -460,10 +460,14 @@ function checkReachability(v: Ctx, rules: Obj | null, cards: readonly Obj[]): Re
 
 function checkStructure(v: Ctx, rules: Obj | null, cards: readonly Obj[], gates: readonly Obj[]): void {
   const gatesOffered = rules && isInt(rules.gatesOffered) ? rules.gatesOffered : 2;
+  const requiresHype = (g: Obj) => isObj(g.requires) && isObj(g.requires.hype) && isInt(g.requires.hype.min) && g.requires.hype.min > 0;
   for (let act = 1; act <= v.acts; act++) {
-    const n = gates.filter((g) => g.act === act).length;
+    const actGates = gates.filter((g) => g.act === act);
+    const n = actGates.length;
     if (n === 0) v.error('structure', `act ${act}`, 'has no gate');
     else if (n < gatesOffered) v.warn('structure', `act ${act}`, `has ${n} gate(s); ${gatesOffered} are offered per act`);
+    // From act 2 on, visibility is required: a pure-craft deck must not pass everything.
+    if (act >= 2 && n > 0 && !actGates.some(requiresHype)) v.error('structure', `act ${act}`, 'no gate requires hype; from act 2 on at least one must');
 
     const scandals = cards.filter((c) => c.kind === 'scandal' && actMinOf(c) <= act);
     if (scandals.length === 0) v.error('structure', `act ${act}`, 'no scandal card can crystallise from heat in this act');
@@ -473,6 +477,12 @@ function checkStructure(v: Ctx, rules: Obj | null, cards: readonly Obj[], gates:
       const offerSize = isInt(rules.draft.offerSize) ? rules.draft.offerSize : 0;
       if (pool === 0) v.error('structure', `act ${act}`, 'the draft pool is empty: no non-scandal card has actMin <= this act');
       else if (pool < offerSize) v.warn('structure', `act ${act}`, `draft pool has ${pool} card(s); offers are ${offerSize}`);
+    }
+  }
+  for (const g of gates) {
+    const not = isObj(g.requires) && isObj(g.requires.flags) && Array.isArray(g.requires.flags.not) ? g.requires.flags.not : [];
+    if (not.length > 0) {
+      v.warn('structure', `gate ${String(g.id)}.requires.flags.not`, 'a permanent flag lock: once set, the player can never respond; prefer a condition on state at resolution');
     }
   }
   for (const [flag, where] of v.flagsRead) {
