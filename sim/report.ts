@@ -27,6 +27,12 @@ export const BANDS = {
   /** "Significantly different" made concrete: chi-square p below this AND total variation distance at least… */
   skillP: 0.01,
   skillTvd: 0.2,
+  /**
+   * Player-like, pooled: dead cards (scandals) drawn per turn, averaged per act, must rise act by act —
+   * lowest in the first act, highest in the last. What the player feels is how many of the hand's cards
+   * are dead this turn, so "the spiral lands in winter" is measured as clogging, not crystallisation.
+   */
+  clogging: 'rising',
 } as const;
 
 const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised', 'scandalsDrawn'] as const;
@@ -461,6 +467,19 @@ export function buildReport(batch: BatchResult): Report {
       (x) => x < BANDS.probeHypeTopMax,
     ),
   );
+  // Clogging: dead cards drawn per turn, by act, must rise act by act (lowest first, highest last).
+  const rising = (xs: readonly number[]) => xs.every((x, i) => i === 0 || x > (xs[i - 1] as number));
+  const clog = (g: Group) => (cascadeByAct[g] ?? []).map((a) => a.drawn);
+  const clogPlayers = clog('players');
+  const flat = players.filter((p) => !rising(clog(p)));
+  bands.push({
+    target: 'clogging: dead cards drawn per turn rise act by act, lowest in act 1, highest in the last act (player-like, pooled)',
+    pass: players.length === 0 ? null : rising(clogPlayers),
+    actual:
+      clogPlayers.map((x) => x.toFixed(2)).join(' < ') +
+      (flat.length ? `; not rising for ${flat.map((p) => `${p} (${clog(p).map((x) => x.toFixed(2)).join('/')})`).join(', ')}` : '; rising for every player-like persona'),
+  });
+
   const med = scandalsHeld.players.median;
   bands.push({
     target: `scandals held at run end: median ${BANDS.scandalMedian[0]}-${BANDS.scandalMedian[1]} (player-like, pooled)`,
@@ -633,6 +652,19 @@ export function formatReport(r: Report): string {
         const peak = byAct.reduce((best, a, i) => (a.perTurn > (byAct[best]?.perTurn ?? -1) ? i : best), 0);
         const quiet = byAct.every((a) => a.perTurn === 0);
         return [g, ...byAct.map((a) => `${a.threshold.toFixed(1)} / ${a.perTurn.toFixed(2)} / ${pc(a.multi)} / ${a.drawn.toFixed(2)}`), quiet ? '-' : `act ${peak + 1}`];
+      }),
+    ),
+  );
+
+  h('CLOGGING BY ACT  (dead cards — scandals — drawn per turn, averaged over each act; the band wants them rising act by act)');
+  out.push(
+    table(
+      ['group', ...Array.from({ length: r.meta.acts }, (_, i) => `act ${i + 1}`), 'rising'],
+      [...P, 'players' as const].map((g) => {
+        const xs = (r.cascadeByAct[g] ?? []).map((a) => a.drawn);
+        const up = xs.every((x, i) => i === 0 || x > (xs[i - 1] as number));
+        const none = xs.every((x) => x === 0);
+        return [g, ...xs.map((x) => x.toFixed(2)), none ? '-' : up ? 'yes' : 'no'];
       }),
     ),
   );

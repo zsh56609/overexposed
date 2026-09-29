@@ -22,7 +22,7 @@
     { "cardId": "crisis_pr", "count": 1 }
   ],
   "draft": {
-    "atTurns": [1, 3],
+    "atTurns": [1, 2],
     "offerSize": 3,
     "picks": 1,
     "extraPickCost": 4,

@@ -55,7 +55,7 @@ The player plants the seeds of their own collapse. Failure is never random.
 ### Run structure
 
 - 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — and the UI names them by season, never by number. Act count, turns per act and the season name keys (`actNameKeys`) live in `content/rules.json`, never as constants.
-- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 3 of every act, 8 per run), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
+- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 2 of every act, 8 per run — never the last turn of a season, whose pick would rarely be drawn), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After the last act (winter): ending resolution. **A run always completes.**
@@ -236,12 +236,15 @@ The primary QA instrument, not an extra. Build it in week one.
 | Ending concentration | each player-like persona separately | no single ending above 70% of that persona's runs |
 | Thesis: ignoring heat collapses | each probe that ignores heat | the collapse ending (meltdown) in more than 80% of its runs |
 | Thesis: ignoring hype never makes a star | each probe that ignores hype | the top-hype ending (star) in fewer than 5% of its runs |
+| Clogging: dead cards (scandals) drawn per turn, averaged per act | player-like runs, pooled | rising act by act — lowest in spring, highest in winter |
 | Scandals held at run end | player-like runs, pooled | median 2–5 |
 | Gate difficulty: met% (requirement already satisfied when offered) | offers to player-like personas, pooled | 35–65% per gate |
 | Card play rate (played ÷ drawn) | player-like runs, pooled | every playable card > 2% |
 | minmaxer vs random ending distribution | those two personas | significantly different (χ² p < 0.01 and total variation ≥ 0.2) |
 | Soft-locks | all runs | 0 |
 | Crashes | all runs | 0 |
+
+"The spiral lands in winter" means clogging: the player never sees a crystallisation rate, they see how many of their five cards are dead this turn. Where crystallisation peaks is not a target.
 
 Diagnostics, reported but not bands: the pooled ending distribution and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.
 
