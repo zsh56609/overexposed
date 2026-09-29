@@ -61,7 +61,7 @@ const q = (v: unknown) => JSON.stringify(v);
 const CARD_FIELDS = ['id', 'kind', 'cost', 'nameKey', 'textKey', 'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn'];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'requires', 'onPass', 'onFail'];
 const ENDING_FIELDS = ['id', 'priority', 'conditions', 'textKey'];
-const RULES_FIELDS = ['acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered', 'heatThreshold', 'heatVent', 'startingResources', 'startingDeck', 'draft'];
+const RULES_FIELDS = ['acts', 'turnsPerAct', 'handSize', 'slotsPerTurn', 'gatesOffered', 'heatThreshold', 'startingResources', 'startingDeck', 'draft'];
 const DRAFT_FIELDS = ['offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
 /** Hard numeric bounds. Values outside them are errors, not taste. */
@@ -245,7 +245,6 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
   v.int(raw.handSize, 'rules.handSize', LIMIT.handSize);
   v.int(raw.slotsPerTurn, 'rules.slotsPerTurn', LIMIT.slotsPerTurn);
   v.int(raw.gatesOffered, 'rules.gatesOffered', LIMIT.count);
-  v.int(raw.heatVent, 'rules.heatVent', LIMIT.heat);
 
   if (!Array.isArray(raw.heatThreshold)) v.error('schema', 'rules.heatThreshold', 'must be an array: one threshold per act');
   else {

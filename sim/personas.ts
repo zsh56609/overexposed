@@ -47,7 +47,7 @@ interface Weights {
   readonly heat: number;
   /** Per scandal owned. */
   readonly scandal: number;
-  /** Heat at or over this act's threshold: a scandal crystallises at end of turn. */
+  /** Per scandal the current heat will crystallise at end of turn: floor(heat / threshold). */
   readonly risk: number;
   /** Per card in hand: what draw effects are worth. */
   readonly hand: number;
@@ -144,7 +144,8 @@ function dealPull(s: GameState, w: Weights): number {
 
 function score(s: GameState, w: Weights): number {
   const r = s.resources;
-  const atRisk = s.phase === 'play' && r.heat >= heatThreshold(s.content.rules, s.act) ? 1 : 0;
+  const threshold = heatThreshold(s.content.rules, s.act);
+  const atRisk = s.phase === 'play' && threshold > 0 ? Math.floor(r.heat / threshold) : 0;
   let flags = 0;
   for (const flag of Object.keys(s.flags)) flags += flagValue(flag, s.content, w);
   if (w.dealDrive !== 0 && s.phase !== 'ended') flags += w.dealDrive * dealPull(s, w);

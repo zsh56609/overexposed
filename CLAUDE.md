@@ -80,7 +80,7 @@ End-of-turn resolution, in order:
 
 ### The Heat → Scandal loop (the core coupling)
 
-At end of turn, if `heat >= heatThreshold(act)`, add one Scandal card to the discard pile and reduce heat by `heatVent`.
+At end of turn: `count = floor(heat / heatThreshold(act))`; add `count` Scandal cards to the discard pile and reduce heat by `heatThreshold(act) × count`. No per-turn cap: excess heat is never free, so a huge hype turn costs more than a small one.
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.

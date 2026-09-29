@@ -49,7 +49,9 @@ export interface Report {
     readonly replay: BatchResult['replay'];
   };
   readonly endings: { readonly ids: readonly string[]; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
-  readonly scandalsHeld: Readonly<Record<Group, { median: number; mean: number; p90: number; max: number }>>;
+  readonly scandalsHeld: Readonly<
+    Record<Group, { median: number; mean: number; p90: number; max: number; crystallised: number; multiTurns: number; maxInTurn: number }>
+  >;
   readonly gates: readonly {
     id: string;
     act: number;
@@ -111,10 +113,22 @@ export function buildReport(batch: BatchResult): Report {
   // Scandals held at the end of the run
   const scandalsHeld = Object.fromEntries(
     groups.map(([g, rs]) => {
-      const xs = rs.filter((r) => r.crash === null).map((r) => r.scandalsAtEnd);
-      return [g, { median: median(xs), mean: mean(xs), p90: quantile(xs, 0.9), max: Math.max(...xs) }];
+      const ok = rs.filter((r) => r.crash === null);
+      const xs = ok.map((r) => r.scandalsAtEnd);
+      return [
+        g,
+        {
+          median: median(xs),
+          mean: mean(xs),
+          p90: quantile(xs, 0.9),
+          max: Math.max(...xs),
+          crystallised: mean(ok.map((r) => r.scandalsCrystallised)),
+          multiTurns: mean(ok.map((r) => r.multiScandalTurns)),
+          maxInTurn: Math.max(...ok.map((r) => r.maxScandalsInTurn)),
+        },
+      ];
     }),
-  ) as Record<Group, { median: number; mean: number; p90: number; max: number }>;
+  ) as Report['scandalsHeld'];
 
   // Gates
   const gates = content.gates.map((gate) => {
@@ -339,13 +353,13 @@ export function formatReport(r: Report): string {
   h('ENDING DISTRIBUTION');
   out.push(table(['ending', ...P, 'pooled'], r.endings.ids.map((id) => [id, ...[...P, 'pooled' as const].map((g) => pc(r.endings.share[g][id] ?? 0))])));
 
-  h('SCANDALS HELD AT RUN END');
+  h('SCANDALS  (held at run end; crystallised per run; turns per run that crystallised 2+ at once; most in one turn)');
   out.push(
     table(
-      ['group', 'median', 'mean', 'p90', 'max'],
+      ['group', 'median', 'mean', 'p90', 'max', 'crystallised', '2+ turns', 'max/turn'],
       [...P, 'pooled' as const].map((g) => {
         const s = r.scandalsHeld[g];
-        return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max)];
+        return [g, n1(s.median), n1(s.mean), n1(s.p90), n0(s.max), n1(s.crystallised), n1(s.multiTurns), n0(s.maxInTurn)];
       }),
     ),
   );

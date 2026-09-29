@@ -144,10 +144,8 @@ export interface Rules {
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */
   readonly gatesOffered: number;
-  /** heatThreshold(act) = heatThreshold[act - 1]. */
+  /** heatThreshold(act) = heatThreshold[act - 1]. Each full threshold of heat at end of turn crystallises one Scandal. */
   readonly heatThreshold: readonly number[];
-  /** Heat removed each time heat crystallises into a Scandal. */
-  readonly heatVent: number;
   readonly startingResources: Resources;
   /** Opportunity cards may not appear here: they are draft-only. */
   readonly startingDeck: readonly { readonly cardId: string; readonly count: number }[];

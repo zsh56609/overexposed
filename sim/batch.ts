@@ -39,6 +39,9 @@ export interface RunRecord {
   readonly endingId: string | null;
   readonly scandalsAtEnd: number;
   readonly scandalsCrystallised: number;
+  /** Turns whose end crystallised 2+ scandals at once, and the most in any one turn. */
+  readonly multiScandalTurns: number;
+  readonly maxScandalsInTurn: number;
   readonly turnsCompleted: number;
   readonly actions: number;
   readonly cardsPlayed: number;
@@ -107,6 +110,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let rerolls = 0;
   let draftSpend = 0;
   let scandalsCrystallised = 0;
+  let multiScandalTurns = 0;
+  let maxScandalsInTurn = 0;
   let cardsPlayed = 0;
   let actions = 0;
   let softLock: string | null = null;
@@ -114,6 +119,9 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let state: GameState | null = null;
 
   const tally = (s: GameState) => {
+    const crystallisedNow = s.events.filter((e) => e.type === 'scandal').length;
+    if (crystallisedNow >= 2) multiScandalTurns++;
+    maxScandalsInTurn = Math.max(maxScandalsInTurn, crystallisedNow);
     for (const e of s.events) {
       if (e.type === 'draw') draws[e.cardId] = (draws[e.cardId] ?? 0) + 1;
       else if (e.type === 'play') {
@@ -171,6 +179,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     endingId: state?.endingId ?? null,
     scandalsAtEnd: state ? scandalCount(state) : 0,
     scandalsCrystallised,
+    multiScandalTurns,
+    maxScandalsInTurn,
     turnsCompleted: curve.length,
     actions,
     cardsPlayed,

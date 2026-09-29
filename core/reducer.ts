@@ -188,7 +188,7 @@ function endTurn(state: GameState): GameState {
     applyEffects(d, getCard(d.content, card.cardId)?.onEndOfTurn);
   }
 
-  // 2. Heat → Scandal: at most one crystallisation per turn.
+  // 2. Heat → Scandal: one scandal per full threshold of heat.
   crystallise(d);
 
   // 3. The hand goes to the discard pile, scandals included.
@@ -266,18 +266,23 @@ export function startTurn(d: Draft): void {
 }
 
 /**
- * If heat >= heatThreshold(act): add one Scandal to the discard pile and vent heat.
- * The scandal comes from those whose actMin has been reached; which one is a seeded pick.
+ * count = floor(heat / heatThreshold(act)): add `count` Scandals to the discard pile and remove
+ * threshold × count heat. No per-turn cap — a huge hype turn costs more than a small one.
+ * Each scandal is a seeded pick among those whose actMin has been reached.
  */
 function crystallise(d: Draft): void {
-  const rules = d.content.rules;
-  if (d.resources.heat < heatThreshold(rules, d.act)) return;
+  const threshold = heatThreshold(d.content.rules, d.act);
+  if (!(threshold > 0)) return;
+  const count = Math.floor(d.resources.heat / threshold);
+  if (count === 0) return;
   const pool = d.content.scandalIds.filter((id) => (getCard(d.content, id)?.actMin ?? 1) <= d.act);
   if (pool.length === 0) return fault(d, 'noScandalForAct', String(d.act));
-  const cardId = pool[nextInt(d.rng, pool.length)] as string;
-  const card = addCard(d, cardId, 'discard');
-  d.events.push({ type: 'scandal', uid: card.uid, cardId });
-  addResource(d, 'heat', -rules.heatVent);
+  for (let i = 0; i < count; i++) {
+    const cardId = pool[nextInt(d.rng, pool.length)] as string;
+    const card = addCard(d, cardId, 'discard');
+    d.events.push({ type: 'scandal', uid: card.uid, cardId });
+  }
+  addResource(d, 'heat', -threshold * count);
 }
 
 function offerGates(d: Draft): void {
