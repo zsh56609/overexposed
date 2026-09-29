@@ -147,6 +147,12 @@ ui-plan §10 and §13). Visual craft designs for the one 1280×720 canvas
 ## Waiting on the author
 
 - **The content expansion design document.**
+- **Three headlines still name a career stage** (the time-neutral rule,
+  draft v3): Press Junket's "ON THE RECORD: RISING SINGER TALKS FAME AND
+  FAMILY" (a starting card, played all year; "Rising" is now also a hype
+  tier word), Indie Label's "SIGNED: SMALL LABEL BETS ON NEWCOMER", and
+  the scandal Public Feud's "WAR OF WORDS: NEWCOMER FIRES BACK AT RIVAL".
+  Rewrite, or keep for the fame-aware labels of content expansion.
 - **Playtest this build**: do the tier words tell you how things stand
   at a glance, and are the numbers still there when a choice needs them?
 - **itch and Safari/iPad.** Set the embed's viewport dimensions to
