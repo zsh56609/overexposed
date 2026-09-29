@@ -152,9 +152,12 @@ export interface Rules {
   readonly heatThreshold: readonly number[];
   /** Threshold lost per scandal held: tolerance falls as scandals pile up. */
   readonly degradePerScandal: number;
-  /** The effective threshold never drops below this. */
-  readonly thresholdFloor: number;
-  /** Heat removed per scandal crystallised. Must stay below thresholdFloor so a residue always carries over. */
+  /**
+   * Per act: the effective threshold never drops below thresholdFloor[act - 1]. Tightening season by
+   * season keeps degradation from exhausting itself early, so the spiral lands late.
+   */
+  readonly thresholdFloor: readonly number[];
+  /** Heat removed per scandal crystallised. Must stay below every floor so a residue always carries over. */
   readonly vent: number;
   readonly startingResources: Resources;
   /** Opportunity cards may not appear here: they are draft-only. */
@@ -216,6 +219,12 @@ export function getGate(index: ContentIndex, id: string): GateDef | undefined {
 export function heatThreshold(rules: Rules, act: number): number {
   const t = rules.heatThreshold;
   return t[Math.min(act, t.length) - 1] ?? Number.POSITIVE_INFINITY;
+}
+
+/** The act's floor under the effective threshold. */
+export function thresholdFloor(rules: Rules, act: number): number {
+  const f = rules.thresholdFloor;
+  return f[Math.min(act, f.length) - 1] ?? 0;
 }
 
 /** Errors thrown by /core carry a machine-readable code and the offending id — never prose. */

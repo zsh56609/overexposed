@@ -7,7 +7,7 @@
   "gatesOffered": 2,
   "heatThreshold": [7, 6, 6, 5],
   "degradePerScandal": 0.5,
-  "thresholdFloor": 4,
+  "thresholdFloor": [7, 6, 5, 4],
   "vent": 3,
   "startingResources": { "hype": 0, "craft": 0, "capital": 3, "heat": 0 },
   "startingDeck": [

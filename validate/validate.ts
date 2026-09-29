@@ -286,22 +286,25 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     }
   }
 
-  // Cascade: effective threshold = max(thresholdFloor, base - scandalsHeld * degradePerScandal);
-  // each scandal vents `vent` heat, which must stay below every threshold so a residue carries over.
-  const floorOk = v.int(raw.thresholdFloor, 'rules.thresholdFloor', LIMIT.heat);
+  // Cascade: effective threshold = max(thresholdFloor[act], base[act] - scandalsHeld * degradePerScandal);
+  // each scandal vents `vent` heat, which must stay below every floor so a residue carries over.
+  const floors: readonly unknown[] = Array.isArray(raw.thresholdFloor) ? raw.thresholdFloor : [];
+  if (!Array.isArray(raw.thresholdFloor)) v.error('schema', 'rules.thresholdFloor', 'must be an array: one floor per act');
+  else if (floors.length !== v.acts) v.error('ranges', 'rules.thresholdFloor', `has ${floors.length} entries for ${v.acts} acts`);
+  floors.forEach((f, i) => v.int(f, `rules.thresholdFloor[${i}]`, LIMIT.heat));
   const ventOk = v.int(raw.vent, 'rules.vent', LIMIT.heat);
   const degrade = raw.degradePerScandal;
   if (typeof degrade !== 'number' || !Number.isFinite(degrade) || degrade < 0 || degrade > 100) {
     v.error('ranges', 'rules.degradePerScandal', `must be a number in 0..100, got ${q(degrade)}`);
   }
-  if (floorOk && ventOk && (raw.vent as number) >= (raw.thresholdFloor as number)) {
-    v.error('ranges', 'rules.vent', `vent ${String(raw.vent)} must be below thresholdFloor ${String(raw.thresholdFloor)}: vent < effective threshold always`);
-  }
-  if (floorOk && Array.isArray(raw.heatThreshold)) {
-    raw.heatThreshold.forEach((t, i) => {
-      if (isInt(t) && t < (raw.thresholdFloor as number)) v.error('ranges', `rules.heatThreshold[${i}]`, `${t} is below thresholdFloor ${String(raw.thresholdFloor)}`);
-    });
-  }
+  floors.forEach((f, i) => {
+    if (!isInt(f)) return;
+    if (ventOk && (raw.vent as number) >= f) {
+      v.error('ranges', 'rules.vent', `vent ${String(raw.vent)} must be below thresholdFloor[${i}] ${f}: vent < effective threshold always`);
+    }
+    const base = Array.isArray(raw.heatThreshold) ? raw.heatThreshold[i] : undefined;
+    if (isInt(base) && base < f) v.error('ranges', `rules.heatThreshold[${i}]`, `${base} is below thresholdFloor[${i}] ${f}`);
+  });
 
   if (!isObj(raw.draft)) v.error('schema', 'rules.draft', 'must be an object: { offerSize, picks, extraPickCost, maxExtraPicks, rerollCost, maxRerolls }');
   else {

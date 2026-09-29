@@ -29,9 +29,9 @@ export const BANDS = {
   skillTvd: 0.2,
 } as const;
 
-const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised'] as const;
+const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised', 'scandalsDrawn'] as const;
 /** Metrics printed with one decimal in the curve tables. */
-const FINE: readonly string[] = ['scandals', 'threshold', 'crystallised'];
+const FINE: readonly string[] = ['scandals', 'threshold', 'crystallised', 'scandalsDrawn'];
 type Metric = (typeof METRICS)[number];
 type Group = PersonaId | 'pooled';
 
@@ -79,6 +79,12 @@ export interface Report {
   >;
   /** Share of turns ending with 0, 1, 2, 3+ scandals crystallised. */
   readonly crystalTurns: Readonly<Record<Group, readonly [number, number, number, number]>>;
+  /**
+   * Per act (index 0 = act 1), over every turn of that act: mean effective threshold at the heat
+   * check, scandals crystallised per turn, the share of turns that crystallised 2+ at once, and
+   * scandal cards drawn per turn (the choke: hand room lost to scandals).
+   */
+  readonly cascadeByAct: Readonly<Record<Group, readonly { threshold: number; perTurn: number; multi: number; drawn: number }[]>>;
   readonly gates: readonly {
     id: string;
     act: number;
@@ -183,6 +189,20 @@ export function buildReport(batch: BatchResult): Report {
       }
     }
     crystalTurns[g] = [counts[0] / Math.max(1, turns), counts[1] / Math.max(1, turns), counts[2] / Math.max(1, turns), counts[3] / Math.max(1, turns)];
+  }
+
+  const { acts, turnsPerAct } = content.rules;
+  const cascadeByAct = {} as Record<Group, { threshold: number; perTurn: number; multi: number; drawn: number }[]>;
+  for (const [g, rs] of groups) {
+    cascadeByAct[g] = Array.from({ length: acts }, (_, i) => {
+      const snaps = rs.filter((r) => r.crash === null).flatMap((r) => r.curve.filter((s) => Math.ceil(s.turn / turnsPerAct) === i + 1));
+      return {
+        threshold: mean(snaps.map((s) => s.threshold)),
+        perTurn: mean(snaps.map((s) => s.crystallised)),
+        multi: snaps.filter((s) => s.crystallised >= 2).length / Math.max(1, snaps.length),
+        drawn: mean(snaps.map((s) => s.scandalsDrawn)),
+      };
+    });
   }
 
   // Gates
@@ -436,6 +456,7 @@ export function buildReport(batch: BatchResult): Report {
     endings: { ids: endingIds, share },
     scandalsHeld,
     crystalTurns,
+    cascadeByAct,
     gates,
     flagsHeld,
     draft,
@@ -509,6 +530,19 @@ export function formatReport(r: Report): string {
     table(
       ['group', '0', '1', '2', '3+'],
       [...P, 'pooled' as const].map((g) => [g, ...r.crystalTurns[g].map((x) => pc(x))]),
+    ),
+  );
+
+  h('CASCADE BY ACT  (per turn: mean effective threshold / scandals crystallised / share of turns with 2+ / scandal cards drawn (choke); peak = act crystallising most per turn)');
+  out.push(
+    table(
+      ['group', ...Array.from({ length: r.meta.acts }, (_, i) => `act ${i + 1}`), 'peak'],
+      [...P, 'pooled' as const].map((g) => {
+        const byAct = r.cascadeByAct[g] ?? [];
+        const peak = byAct.reduce((best, a, i) => (a.perTurn > (byAct[best]?.perTurn ?? -1) ? i : best), 0);
+        const quiet = byAct.every((a) => a.perTurn === 0);
+        return [g, ...byAct.map((a) => `${a.threshold.toFixed(1)} / ${a.perTurn.toFixed(2)} / ${pc(a.multi)} / ${a.drawn.toFixed(2)}`), quiet ? '-' : `act ${peak + 1}`];
+      }),
     ),
   );
 

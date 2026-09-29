@@ -48,6 +48,8 @@ export interface TurnSnapshot {
   /** Effective heat threshold this turn's check used, and the scandals it crystallised. */
   readonly threshold: number;
   readonly crystallised: number;
+  /** Scandal cards drawn this turn: hand room they took (the choke). */
+  readonly scandalsDrawn: number;
 }
 
 export interface RunRecord {
@@ -157,6 +159,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let state: GameState | null = null;
   const capital = { earned: 0, draft: 0, removal: 0, cards: 0, lost: 0 };
   const removal = removalCards(content);
+  const scandalIds = new Set(content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id));
+  let scandalsDrawnThisTurn = 0;
 
   const tally = (s: GameState, action: Action | null) => {
     const played = s.events.find((e) => e.type === 'play');
@@ -172,9 +176,13 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     const crystallisedNow = s.events.filter((e) => e.type === 'scandal').length;
     if (crystallisedNow >= 2) multiScandalTurns++;
     maxScandalsInTurn = Math.max(maxScandalsInTurn, crystallisedNow);
+    // Events arrive in order, so a turn's draws sit between its turnStart and its turnEnd.
     for (const e of s.events) {
-      if (e.type === 'draw') draws[e.cardId] = (draws[e.cardId] ?? 0) + 1;
-      else if (e.type === 'play') {
+      if (e.type === 'turnStart') scandalsDrawnThisTurn = 0;
+      else if (e.type === 'draw') {
+        draws[e.cardId] = (draws[e.cardId] ?? 0) + 1;
+        if (scandalIds.has(e.cardId)) scandalsDrawnThisTurn++;
+      } else if (e.type === 'play') {
         plays[e.cardId] = (plays[e.cardId] ?? 0) + 1;
         cardsPlayed++;
       } else if (e.type === 'scandal') {
@@ -182,7 +190,14 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
         if (e.byTag) scandalsByTag++;
       }
       else if (e.type === 'turnEnd') {
-        curve.push({ turn: e.turn, ...e.resources, scandals: e.scandalCount, threshold: e.threshold, crystallised: e.crystallised });
+        curve.push({
+          turn: e.turn,
+          ...e.resources,
+          scandals: e.scandalCount,
+          threshold: e.threshold,
+          crystallised: e.crystallised,
+          scandalsDrawn: scandalsDrawnThisTurn,
+        });
       }
       else if (e.type === 'draftOffer') for (const id of e.cardIds) offered[id] = (offered[id] ?? 0) + 1;
       else if (e.type === 'draftPick') {

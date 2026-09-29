@@ -83,12 +83,12 @@ End-of-turn resolution, in order:
 At end of turn:
 
 ```
-effectiveThreshold = max(thresholdFloor, heatThreshold(act) - scandalsHeld * degradePerScandal)
+effectiveThreshold = max(thresholdFloor(act), heatThreshold(act) - scandalsHeld * degradePerScandal)
 count = floor(heat / effectiveThreshold)      // add `count` Scandal cards to the discard pile
-heat -= vent * count                          // vent < thresholdFloor, so a residue always carries over
+heat -= vent * count                          // vent < every thresholdFloor, so a residue always carries over
 ```
 
-All four numbers live in `content/rules.json`. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
+All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFloor` hold one entry per act. The floor tightens season by season, so degradation cannot exhaust itself early: late in the run the same pile of scandals drags the threshold lower than it could in spring. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
@@ -218,7 +218,7 @@ The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
 - Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on. N is a fixed persona parameter (`COMEBACK_SWITCH_AT` in `sim/personas.ts`, 5), deliberately not derived from content: an instrument that shifts when you tune the system it measures is not an instrument.
-- Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
+- Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, the cascade by act (effective threshold, crystallisations per turn, scandal cards drawn), gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
 
