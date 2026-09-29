@@ -2,7 +2,8 @@
 // Ids and numbers only; no content display strings.
 
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
-import type { PersonaId } from './personas.ts';
+import { indexContent } from '../core/index.ts';
+import { comebackLimit, type PersonaId } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
@@ -47,6 +48,8 @@ export interface Report {
     readonly personas: readonly PersonaId[];
     readonly totalRuns: number;
     readonly seconds: number;
+    /** Scandals held at which comeback switches from spiking to cleaning up (derived from content). */
+    readonly comebackLimit: number | null;
   };
   readonly health: {
     readonly crashes: readonly { seed: number; persona: PersonaId; error: string }[];
@@ -323,6 +326,7 @@ export function buildReport(batch: BatchResult): Report {
       personas,
       totalRuns: records.length,
       seconds: batch.ms / 1000,
+      comebackLimit: personas.includes('comeback') ? comebackLimit(indexContent(content)) : null,
     },
     health: { crashes, softLocks, replay: batch.replay },
     endings: { ids: endingIds, share },
@@ -368,6 +372,7 @@ export function formatReport(r: Report): string {
     `crashes: ${r.health.crashes.length}   soft-locks: ${r.health.softLocks.length} (limit ${MAX_ACTIONS} actions)   ` +
       `replay check: ${r.health.replay.checked - r.health.replay.mismatches.length}/${r.health.replay.checked} identical`,
   );
+  if (r.meta.comebackLimit !== null) out.push(`comeback switches from spike to clean-up at ${r.meta.comebackLimit} scandals held`);
   for (const c of r.health.crashes.slice(0, 10)) out.push(`  CRASH  --replay=${c.seed} --persona=${c.persona}  ${c.error}`);
   for (const s of r.health.softLocks.slice(0, 10)) out.push(`  SOFT-LOCK  --replay=${s.seed} --persona=${s.persona}  ${s.reason}`);
 

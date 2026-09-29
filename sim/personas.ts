@@ -31,7 +31,7 @@ import {
   type RngCursor,
 } from '../core/index.ts';
 
-export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker'] as const;
+export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker', 'comeback'] as const;
 export type PersonaId = (typeof PERSONA_IDS)[number];
 
 export interface Persona {
@@ -233,45 +233,86 @@ function draftChoice(state: GameState, legal: readonly Action[], w: Weights): Ac
 
 // ---------------------------------------------------------------------------
 
-function greedy(id: PersonaId, w: Weights): Persona {
-  return {
-    id,
-    choose(state, legal) {
-      if (state.phase === 'draft') return draftChoice(state, legal, w);
-      if (state.phase === 'gate') {
-        let best = legal[0] as Action;
-        let bestScore = Number.NEGATIVE_INFINITY;
-        for (const action of legal) {
-          if (action.type !== 'CHOOSE_GATE') continue;
-          const gate = getGate(state.content, action.gateId);
-          const passes = gate !== undefined && evaluate(gate.requires, state);
-          const s = score(reduce(state, action), w) + (passes ? w.gatePass : 0);
-          if (s > bestScore) [best, bestScore] = [action, s];
-        }
-        return best;
-      }
+function greedyChoose(state: GameState, legal: readonly Action[], w: Weights): Action {
+  if (state.phase === 'draft') return draftChoice(state, legal, w);
+  if (state.phase === 'gate') {
+    let best = legal[0] as Action;
+    let bestScore = Number.NEGATIVE_INFINITY;
+    for (const action of legal) {
+      if (action.type !== 'CHOOSE_GATE') continue;
+      const gate = getGate(state.content, action.gateId);
+      const passes = gate !== undefined && evaluate(gate.requires, state);
+      const s = score(reduce(state, action), w) + (passes ? w.gatePass : 0);
+      if (s > bestScore) [best, bestScore] = [action, s];
+    }
+    return best;
+  }
 
-      const base = score(state, w);
-      const seen = new Set<string>();
-      let best: Action = END_TURN;
-      let bestGain = 0;
-      for (const action of legal) {
-        if (action.type !== 'PLAY_CARD') continue;
-        const cardId = state.hand.find((c) => c.uid === action.uid)?.cardId ?? '';
-        if (seen.has(cardId)) continue; // duplicates in hand score the same
-        seen.add(cardId);
-        const cost = getCard(state.content, cardId)?.cost ?? 0;
-        const next = reduce(state, action);
-        // The played card leaving the hand isn't a loss, and neither are the slots it cost:
-        // only extra cards drawn and extra slots gained count.
-        const gain = score(next, w) - base + w.hand + w.slots * (next.slots - state.slots + cost);
-        const perSlot = gain / Math.max(1, cost);
-        if (perSlot > bestGain + 1e-9) [best, bestGain] = [action, perSlot];
-      }
-      return best;
-    },
-  };
+  const base = score(state, w);
+  const seen = new Set<string>();
+  let best: Action = END_TURN;
+  let bestGain = 0;
+  for (const action of legal) {
+    if (action.type !== 'PLAY_CARD') continue;
+    const cardId = state.hand.find((c) => c.uid === action.uid)?.cardId ?? '';
+    if (seen.has(cardId)) continue; // duplicates in hand score the same
+    seen.add(cardId);
+    const cost = getCard(state.content, cardId)?.cost ?? 0;
+    const next = reduce(state, action);
+    // The played card leaving the hand isn't a loss, and neither are the slots it cost:
+    // only extra cards drawn and extra slots gained count.
+    const gain = score(next, w) - base + w.hand + w.slots * (next.slots - state.slots + cost);
+    const perSlot = gain / Math.max(1, cost);
+    if (perSlot > bestGain + 1e-9) [best, bestGain] = [action, perSlot];
+  }
+  return best;
 }
+
+function greedy(id: PersonaId, w: Weights): Persona {
+  return { id, choose: (state, legal) => greedyChoose(state, legal, w) };
+}
+
+// ---------------------------------------------------------------------------
+// comeback: spike hype, then pay to clean up — the route the design says exists.
+
+const comebackLimitCache = new WeakMap<ContentIndex, number>();
+
+/**
+ * The scandal count at which comeback stops spiking and starts cleaning up: the scandal ceiling of
+ * the ending that demands the most hype (today star's). Fallback: one below the lowest scandal floor
+ * any ending sets (the meltdown line). Derived from content; no ids.
+ */
+export function comebackLimit(content: ContentIndex): number {
+  const cached = comebackLimitCache.get(content);
+  if (cached !== undefined) return cached;
+  let best: { hypeMin: number; ceiling: number } | null = null;
+  for (const e of content.endings) {
+    const hypeMin = e.conditions?.hype?.min;
+    const ceiling = e.conditions?.scandalCount?.max;
+    if (hypeMin !== undefined && ceiling !== undefined && (!best || hypeMin > best.hypeMin)) best = { hypeMin, ceiling };
+  }
+  const floors = content.endings.map((e) => e.conditions?.scandalCount?.min).filter((m): m is number => m !== undefined);
+  const limit = best?.ceiling ?? (floors.length > 0 ? Math.min(...floors) - 1 : 3);
+  comebackLimitCache.set(content, limit);
+  return limit;
+}
+
+/** Below the limit: all-in on hype, heat ignored, capital banked for later. */
+const COMEBACK_SPIKE: Weights = {
+  hype: 1.5, craft: 0.5, capital: 0.6, heat: 0, scandal: -2, risk: 0, hand: 1, slots: 1.5, gatePass: 6,
+  flagUnlock: 20, flagLock: 10, dealDrive: 1,
+};
+/** At or above the limit: buy scandals off and stop feeding heat. */
+const COMEBACK_CLEANUP: Weights = {
+  hype: 0.8, craft: 0.5, capital: 0.8, heat: -1, scandal: -15, risk: -10, hand: 1, slots: 1.5, gatePass: 6,
+  flagUnlock: 20, flagLock: 10, dealDrive: 1,
+};
+
+const comeback: Persona = {
+  id: 'comeback',
+  choose: (state, legal) =>
+    greedyChoose(state, legal, scandalCount(state) < comebackLimit(state.content) ? COMEBACK_SPIKE : COMEBACK_CLEANUP),
+};
 
 /**
  * Plays a uniformly random playable card until none is playable. Gates and drafts: a uniformly
@@ -297,6 +338,8 @@ export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   hypechaser: greedy('hypechaser', { hype: 1.5, craft: 0.25, capital: 0.3, heat: 0, scandal: 0, risk: 0, hand: 1, slots: 1.5, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0 }),
   // Balanced resources, but weights flags heavily and plays toward the gates that grant them.
   dealseeker: greedy('dealseeker', { ...BALANCED, flagUnlock: 40, flagLock: 20, dealDrive: 1 }),
+  // Spikes hype until it holds comebackLimit() scandals, then switches to paying them off.
+  comeback,
 };
 
 /** Salt that separates each persona's decision stream from the game's own RNG. */
@@ -306,4 +349,5 @@ export const PERSONA_SALT: { readonly [K in PersonaId]: number } = {
   crafter: 0x63726166,
   hypechaser: 0x68797065,
   dealseeker: 0x6465616c,
+  comeback: 0x636f6d65,
 };

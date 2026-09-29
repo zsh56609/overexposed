@@ -209,7 +209,7 @@ Load failures are loud in dev, graceful in the shipped build.
 The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
-- Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`. The greedy personas value flags: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock` (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily.
+- Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`. The greedy personas value flags: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock` (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on, where N is derived from content (the scandal ceiling of the ending that demands the most hype).
 - Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
