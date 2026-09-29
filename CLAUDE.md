@@ -1,6 +1,7 @@
 # CLAUDE.md
 
 **Overexposed** — Game Gauntlet SIM Jam entry. Read this at the start of every session.
+**UI scope and layer plan:** [`docs/ui-plan.md`](docs/ui-plan.md) — build one layer at a time.
 
 **Jam window:** 2026-09-24 03:00 JST → **2026-11-05 04:00 JST** (submission).
 **Ship language:** English. **Target:** browser build on itch.io.
@@ -311,7 +312,9 @@ Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections,
 **Objects and scenes only — never recognisable faces.** Microphones, flashbulbs, stage lights, crowd silhouettes, newsprint stacks, spotlights. Two reasons: PD photos of identifiable people still carry personality rights, and an unseen protagonist lets the player project themselves in.
 
 **Palette:** newsprint cream `#EDE6D6` · ink `#15120E` · tabloid red `#D92B1F`
-**Type:** Anton (display/numerals) · Newsreader (card headlines) · Archivo (UI) — Google Fonts
+**Type:** two families only, Google Fonts — the cover is set in Playfair Display and the game matches it; fewer font files also serves the cold-load budget.
+- Playfair Display — masthead, headlines, card titles
+- Libre Franklin — UI, numbers, body
 **Texture:** halftone dot overlay, hard drop shadows, slight card rotation
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
