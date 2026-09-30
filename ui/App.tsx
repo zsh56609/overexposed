@@ -14,6 +14,7 @@ import {
   heatLine,
   majorOf,
   majorRequirements,
+  readLines,
   reduce,
   RESOURCE_KEYS,
   scandalCount,
@@ -23,6 +24,7 @@ import {
   type CardInstance,
   type ContentIndex,
   type GameState,
+  type LineShow,
   type ResourceKey,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
@@ -49,15 +51,15 @@ import {
   gateName,
   heatText,
   isPlaceholder,
+  amount,
+  lineText,
+  money,
+  openingText,
   resourceName,
-  scandalHeadline,
   seasonName,
-  signed,
+  signedAmount,
   zoneName,
 } from './text.ts';
-
-/** The opening premise (decision 15): prose without a content home, shown on the title screen. */
-const OPENING_KEY = 'story.opening';
 
 /** Prose the author hasn't written yet is shown as a placeholder, never hidden (decision 15). */
 const prose = (text: string, base = ''): string => `${base}${isPlaceholder(text) ? ' placeholder' : ''}`.trim();
@@ -100,7 +102,9 @@ export function App() {
 
 function Title({ onStart, error }: { onStart: (seed: number) => void; error: string | null }) {
   const urlSeed = seedFromUrl();
-  const opening = t(OPENING_KEY);
+  // The run to come is chosen now, so the opening premise is that run's variant (decision 15, revised).
+  const [seed] = useState(() => urlSeed ?? freshSeed());
+  const opening = openingText(content, seed);
   return (
     <div className="title">
       <h1>{t('ui.title.name')}</h1>
@@ -109,7 +113,7 @@ function Title({ onStart, error }: { onStart: (seed: number) => void; error: str
           <p key={i}>{para}</p>
         ))}
       </div>
-      <button className="big" onClick={() => onStart(urlSeed ?? freshSeed())}>
+      <button className="big" onClick={() => onStart(seed)}>
         {t('ui.title.newRun')}
       </button>
       {urlSeed !== null && <p className="muted">{t('ui.title.seed', { seed: urlSeed })}</p>}
@@ -173,6 +177,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const s = snap.state;
   const c = s.content;
   const legal = useMemo(() => legalOf(s), [s]);
+  // Every line printed so far, and the counter the next ones follow from (decision 15, revised).
+  const lines = useMemo(() => readLines(snap.steps), [snap.steps]);
 
   const act = (action: Action) => {
     if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
@@ -187,8 +193,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   if (s.phase === 'ended') return <Ending s={s} steps={snap.steps} onRestart={onRestart} />;
 
-  const endPreview = s.phase === 'play' ? previewEndTurn(s) : null;
-  const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid) : null;
+  const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter) : null;
+  const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
     <div className="app">
@@ -211,7 +217,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
             )}
           </div>
           <section className="bottom">
-            {s.phase === 'play' && <Hand s={s} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
+            {s.phase === 'play' && <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
             {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
             {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
           </section>
@@ -264,7 +270,7 @@ function StatStrip({ s }: { s: GameState }) {
   const tiers = statTiers(s);
   const slots = s.content.rules.slotsPerTurn;
   const stat = (k: ResourceKey) => {
-    const exact = t('ui.stat.value', { name: resourceName(k), value: s.resources[k] });
+    const exact = t('ui.stat.value', { name: resourceName(k), value: amount(k, s.resources[k]) });
     const tier = k === 'capital' ? null : tiers[k];
     return (
       <span className={`stat stat-${k}`} title={exact}>
@@ -386,7 +392,7 @@ function GoalsBoard({ s }: { s: GameState }) {
 
 function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outcome; skipScandals?: boolean }) {
   const lines: string[] = [];
-  for (const k of RESOURCE_KEYS) if (o.deltas[k] !== 0) lines.push(t('ui.effect.resource', { delta: signed(o.deltas[k]), resource: resourceName(k) }));
+  for (const k of RESOURCE_KEYS) if (o.deltas[k] !== 0) lines.push(t('ui.effect.resource', { delta: signedAmount(k, o.deltas[k]), resource: resourceName(k) }));
   if (o.drawn) lines.push(tp('ui.preview.drawn', o.drawn, { n: o.drawn }));
   for (const a of o.added) {
     if (skipScandals && getCard(c, a.cardId)?.kind === 'scandal') continue; // listed with their causes above
@@ -406,14 +412,14 @@ function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outc
 
 /** The headline a card would print, in its register: the preview's first line (decision 21). */
 function PreviewHeadline({ c, p }: { c: ContentIndex; p: PlayPreview }) {
-  const text = p.headlineKey === null ? t('ui.feed.noHeadline', { card: cardName(c, p.cardId) }) : t(p.headlineKey);
+  const text = lineText(c, p.headline, p.cardId);
   return <p className={prose(text, `preview-headline${p.register ? ` reg-${p.register}` : ''}`)}>{text}</p>;
 }
 
 function PlayPreviewView({ c, p }: { c: ContentIndex; p: PlayPreview }) {
   if (!p.ok || !p.outcome || !p.lineAfter) {
     const scandal = getCard(c, p.cardId)?.kind === 'scandal';
-    const text = cardText(c, p.cardId);
+    const text = scandal ? lineText(c, p.inHand, p.cardId) : cardText(c, p.cardId);
     return (
       <div className="preview blocked">
         {/* A scandal prints nothing when held: its in-hand line and rules. Any other card: the story it would print. */}
@@ -457,7 +463,7 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
           <ul className="scandal-list">
             {p.scandalCards.map((sc, i) => {
               const card = cardName(c, sc.cardId);
-              const headline = scandalHeadline(c, sc.cardId);
+              const headline = lineText(c, sc.line, sc.cardId);
               const line =
                 sc.cause.kind === 'crystallised'
                   ? sc.cause.cardId === null
@@ -489,12 +495,15 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
 
 function Hand({
   s,
+  inHand,
   legal,
   act,
   setFocus,
   endPreview,
 }: {
   s: GameState;
+  /** Each scandal's in-hand line, as the run's history picked it. */
+  inHand: ReadonlyMap<number, LineShow>;
   legal: Legal;
   act: (a: Action) => void;
   setFocus: (f: Focus) => void;
@@ -535,7 +544,7 @@ function Hand({
           const def = getCard(c, card.cardId);
           const scandal = def?.kind === 'scandal';
           const playable = legal.play.has(card.uid);
-          const text = cardText(c, card.cardId);
+          const text = scandal ? lineText(c, inHand.get(card.uid), card.cardId) : cardText(c, card.cardId);
           return (
             <button
               key={card.uid}
@@ -601,10 +610,10 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
       <div className="row">
         <h2 className="grow">{tp('ui.draft.title', s.draft.picksLeft, { n: s.draft.picksLeft })}</h2>
         <button disabled={!legal.extraPick} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
-          {t('ui.draft.extraPick', { cost: cfg.extraPickCost })}
+          {t('ui.draft.extraPick', { cost: money(cfg.extraPickCost) })}
         </button>
         <button disabled={!legal.reroll} onClick={() => act({ type: 'DRAFT_REROLL' })}>
-          {t('ui.draft.reroll', { cost: cfg.rerollCost })}
+          {t('ui.draft.reroll', { cost: money(cfg.rerollCost) })}
         </button>
       </div>
       <div className="cards">
@@ -665,7 +674,7 @@ function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Act
         {previews.map((p) => {
           const id = p.gateId;
           const gate = getGate(c, id);
-          const flavor = gateFlavor(c, id);
+          const flavor = gateFlavor(c, s.seed, id);
           return (
             <div key={id} className="gate">
               <div className="gate-head">
@@ -821,7 +830,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
   const flags = Object.keys(s.flags);
   const category = majorName(c, majorId);
   const name = minorName(c, id);
-  const text = minorText(c, id);
+  const text = minorText(c, s.seed, id);
   const awards = yearAwards(s);
   return (
     <div className="ending">
@@ -851,7 +860,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
           <h2>{t('ui.ending.summary')}</h2>
           <ul>
             <li>{t('ui.ending.peakHype', { n: peakHype })}</li>
-            <li>{t('ui.ending.final', { ...s.resources })}</li>
+            <li>{t('ui.ending.final', { ...s.resources, capital: money(s.resources.capital) })}</li>
             <li>{t('ui.ending.scandals', { n: scandalCount(s) })}</li>
             <li>{flags.length ? t('ui.ending.flags', { flags: flags.map(flagName).join(', ') }) : t('ui.ending.noFlags')}</li>
             <li>{t('ui.ending.gates', { passed, total: s.gateHistory.length })}</li>

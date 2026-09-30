@@ -4,7 +4,7 @@
 // event that caused it: the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
-import { getCard, lineMoved, monthsLeft, RESOURCE_KEYS, type GameEvent, type Register, type ResourceKey } from '../core/index.ts';
+import { getCard, lineMoved, monthsLeft, readLines, RESOURCE_KEYS, type GameEvent, type PrintedLine, type Register, type ResourceKey } from '../core/index.ts';
 import { t, tp } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
@@ -13,12 +13,13 @@ import {
   flagName,
   gateName,
   isPlaceholder,
-  playHeadline,
+  lineText,
   resourceName,
-  scandalHeadline,
   seasonName,
+  money,
   seasonOpener,
   signed,
+  signedAmount,
   zoneName,
 } from './text.ts';
 
@@ -44,16 +45,24 @@ const emptyBlock = (): Block => ({ deltas: { hype: 0, craft: 0, capital: 0, heat
 
 const deltasText = (d: Readonly<Record<ResourceKey, number>>): string =>
   RESOURCE_KEYS.filter((k) => d[k] !== 0)
-    .map((k) => t('ui.feed.delta', { resource: resourceName(k), delta: signed(d[k]) }))
+    .map((k) => t('ui.feed.delta', { resource: resourceName(k), delta: signedAmount(k, d[k]) }))
     .join(' · ');
 
 export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
   const out: FeedLine[] = [];
   let lastAct = 0;
   let lastMonth = 0;
+  if (steps.length === 0) return out;
+  // Every printed line's variant, counted through the whole run (decision 15, revised).
+  const printed = readLines(steps).printed;
+  let next = 0;
 
-  for (const step of steps) {
+  for (const [index, step] of steps.entries()) {
     const c = step.after.content;
+    // This step's printed lines: a play by its card instance, a scandal by its card instance.
+    const mine: PrintedLine[] = [];
+    while (next < printed.length && printed[next]?.step === index) mine.push(printed[next++] as PrintedLine);
+    const printedFor = (kind: PrintedLine['kind'], uid: number) => mine.find((l) => l.kind === kind && l.uid === uid);
     let n = 0;
     const push = (kind: FeedLineKind, text: string, register: Register | null = null) =>
       out.push({ id: `${step.id}.${n++}`, kind, text, register, placeholder: isPlaceholder(text) });
@@ -83,7 +92,7 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     const enterMonth = (act: number, turn: number) => {
       if (act !== lastAct) {
         flush();
-        push('opener', seasonOpener(c, act));
+        push('opener', seasonOpener(c, step.after.seed, act));
         lastAct = act;
         if (step.action?.type === 'CHOOSE_GATE') tellLine(); // the season transition says the line tightened
       }
@@ -98,11 +107,11 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     const isScandal = (cardId: string) => getCard(c, cardId)?.kind === 'scandal';
     const leadFor = (e: GameEvent) => {
       if (e.type === 'scandal') {
-        push('lead', scandalHeadline(c, e.cardId));
+        push('lead', lineText(c, printedFor('scandal', e.uid), e.cardId));
         push('detail', e.cause === null ? t('ui.feed.unblamed', { card: cardName(c, e.cardId) }) : t('ui.feed.blamed', { card: cardName(c, e.cardId), cause: cardName(c, e.cause) }));
       } else if (e.type === 'addCard') {
         const by = step.action?.type === 'CHOOSE_GATE' || !step.before ? null : addedBy(step.before, e.cardId);
-        push('lead', scandalHeadline(c, e.cardId));
+        push('lead', lineText(c, printedFor('scandal', e.uid), e.cardId));
         push('detail', by === null ? t('ui.feed.addedScandal', { card: cardName(c, e.cardId) }) : by === e.cardId ? t('ui.feed.copiedSelf', { card: cardName(c, e.cardId) }) : t('ui.feed.copied', { card: cardName(c, e.cardId), source: cardName(c, by) }));
       }
     };
@@ -150,8 +159,7 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
           break;
         case 'play': {
           flush();
-          const h = playHeadline(c, step.after.seed, step.after.turn, e.uid, e.cardId);
-          push('headline', h.text, h.register);
+          push('headline', lineText(c, printedFor('play', e.uid), e.cardId), getCard(c, e.cardId)?.register ?? null);
           block = emptyBlock();
           break;
         }
@@ -193,11 +201,11 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
           break;
         case 'draftExtraPick':
           flush();
-          push('note', t('ui.event.draftExtraPick', { cost: e.cost }));
+          push('note', t('ui.event.draftExtraPick', { cost: money(e.cost) }));
           break;
         case 'draftReroll':
           flush();
-          push('note', t('ui.event.draftReroll', { cost: e.cost }));
+          push('note', t('ui.event.draftReroll', { cost: money(e.cost) }));
           break;
         case 'gateOffer':
           flush();

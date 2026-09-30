@@ -36,8 +36,9 @@ networking is private, so quiet, even though it builds a career.
 - **No stat words in prose.** Never "hype", "craft", "+6". Numbers belong to the interface.
 - **Prose carries meaning; the interface carries rules.** Never explain a mechanic in prose.
 - **Every variant reads correctly in every branch.** A card's headline
-  variant is chosen by a hash of run seed, month and card instance — not
-  by which branch of the card fired. So when a card has a condition
+  variant is chosen by a shuffle bag over the run (every variant once
+  before any repeats) — not by which branch of the card fired. So when a
+  card has a condition
   ("Craft 15+: …, otherwise …"), each of its variants must be true of
   every branch: a variant that only fits the strong branch will print
   over the weak one too. Reporting an opinion ("fans say …") is true in
@@ -49,6 +50,16 @@ networking is private, so quiet, even though it builds a career.
 - **Every flag reads two ways.** A flag has a positive label (once set)
   and a negative label (while it is not), both written as prose; the
   interface never builds one from a template (draft v3).
+- **Tier words are single words of at most 10 characters.** The stat
+  bar's cells are one equal width; a phrase does not fit them, and a
+  word reads at a glance (phase 2a: Unknown · Noticed · Rising · Known ·
+  Famous; Quiet · Whispers · Chatter · Circling · Breaking · Frenzy;
+  Raw · Learning · Solid · Seasoned · Skilled · Masterful). Validate
+  enforces it.
+- **Variants follow how often a line is seen.** A group the player sees
+  four or more times a run needs at least four variants; two to four
+  times, three; less, two; an item shown once per run, two — so
+  different runs read differently. `npm run sim:variants` lists the gaps.
 - **Rating: ESRB Teen.** Scandals are breakups, feuds, bad reviews, old photos, rumours — nothing sexual, no drugs, no violence.
 
 ## Length budget (keeps a run under 20 minutes)

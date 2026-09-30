@@ -6,22 +6,37 @@ import {
   getGate,
   getMajor,
   getMinor,
+  onceItem,
+  onceKey,
   type AddCardZone,
   type ClauseReport,
   type Condition,
   type ContentIndex,
   type Effect,
+  type LineShow,
   type PlayBlocker,
   type Range,
-  type Register,
   type ResourceKey,
 } from '../core/index.ts';
 import { t, tp } from './i18n.ts';
-import { playHeadlineKey } from './preview.ts';
 
 const signedFormat = new Intl.NumberFormat('en', { signDisplay: 'exceptZero' });
 /** "+3", "-2", "0". */
 export const signed = (n: number): string => signedFormat.format(n);
+
+/**
+ * Money as the player reads it (phase 2a): capital × £1,000 — capital 4 is "£4,000". Display only: every
+ * value and rule stays in capital. A turn is a month, so the figures read true; money is for spending, not
+ * status, so it has no tier word.
+ */
+const MONEY_UNIT = 1000;
+const moneyFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
+const signedMoneyFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0, signDisplay: 'exceptZero' });
+export const money = (capital: number): string => moneyFormat.format(capital * MONEY_UNIT);
+export const signedMoney = (capital: number): string => signedMoneyFormat.format(capital * MONEY_UNIT);
+/** An amount of a resource or condition key as the player reads it: money for capital, a number otherwise. */
+export const amount = (key: string, n: number): string => (key === 'capital' ? money(n) : String(n));
+export const signedAmount = (key: string, n: number): string => (key === 'capital' ? signedMoney(n) : signed(n));
 
 export const cardName = (c: ContentIndex, id: string): string => t(getCard(c, id)?.nameKey ?? `card.${id}.name`);
 /** A card's text: its rules, or for a scandal the line shown while it sits in hand. */
@@ -42,31 +57,33 @@ export const tagName = (tag: string): string => t(`ui.tag.${tag}`);
 const PLACEHOLDER = 'TODO(prose)';
 export const isPlaceholder = (text: string): boolean => text.startsWith(PLACEHOLDER);
 
-export const gateFlavor = (c: ContentIndex, id: string): string => t(getGate(c, id)?.flavorKey ?? `gate.${id}.flavor`);
-export const seasonOpener = (c: ContentIndex, act: number): string => t(c.rules.actOpenerKeys?.[act - 1] ?? `act.${act}.opener`);
+// Items shown once per run pick their variant by a hash of the run seed and the item's id (core/variants.ts),
+// so different runs read differently.
+export const gateFlavor = (c: ContentIndex, seed: number, id: string): string =>
+  t(onceKey(getGate(c, id)?.flavorKeys, seed, onceItem.gate(id)) ?? `gate.${id}.flavor`);
+export const seasonOpener = (c: ContentIndex, seed: number, act: number): string =>
+  t(onceKey(c.rules.actOpenerKeys?.[act - 1], seed, onceItem.opener(act)) ?? `act.${act}.opener`);
+/** The opening premise, for the run this seed starts. */
+export const openingText = (c: { readonly rules: { readonly openingKeys?: readonly string[] } }, seed: number): string =>
+  t(onceKey(c.rules.openingKeys, seed, onceItem.opening) ?? 'story.opening');
 // Endings, two levels (docs/design/content-expansion.md §1): a major has a name and a goal line, a minor a
 // name and its text.
 export const majorName = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.nameKey ?? `ending.${id}.name`);
 export const majorGoal = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.goalKey ?? `ending.${id}.goal`);
 export const minorName = (c: ContentIndex, id: string): string => t(getMinor(c, id)?.nameKey ?? `ending.${id}.name`);
-export const minorText = (c: ContentIndex, id: string): string => t(getMinor(c, id)?.textKey ?? `ending.${id}.text`);
+export const minorText = (c: ContentIndex, seed: number, id: string): string =>
+  t(onceKey(getMinor(c, id)?.textKeys, seed, onceItem.ending(id)) ?? `ending.${id}.text`);
 /** A year's ending in full: "The Breakthrough · Leading Role". */
 export const endingPair = (c: ContentIndex, majorId: string, minorId: string): string =>
   t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });
 export const awardName = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
 export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
-/** The headline a scandal prints when it crystallises. */
-export const scandalHeadline = (c: ContentIndex, id: string): string => t(getCard(c, id)?.headlineKey ?? `card.${id}.headline`);
-
 /**
- * The feed headline for a card played. The variant is a pure hash of the run seed, the month and the card
- * instance — never the game RNG, so prose can't move a sim result or break a replay (decision 15).
+ * A line group's showing as words: the variant /core's shuffle bag picked from the run's history (decision 15,
+ * revised) — the same in the preview and the feed. A group with no variants shows the card's name, loudly.
  */
-export function playHeadline(c: ContentIndex, seed: number, turn: number, uid: number, cardId: string): { text: string; register: Register | null } {
-  const key = playHeadlineKey(c, seed, turn, uid, cardId);
-  const register = getCard(c, cardId)?.register ?? null;
-  return { text: key === null ? t('ui.feed.noHeadline', { card: cardName(c, cardId) }) : t(key), register };
-}
+export const lineText = (c: ContentIndex, show: LineShow | null | undefined, cardId: string): string =>
+  show?.key ? t(show.key) : t('ui.feed.noHeadline', { card: cardName(c, cardId) });
 
 // ---------------------------------------------------------------------------
 // The heat display (decision 1): where heat sits against the line. It counts no scandals.
@@ -82,7 +99,8 @@ const whatName = (key: string): string =>
 
 /** A range as words: "Craft 18+", "Scandals 4 or fewer". `prefix` picks the clause (live) or cond (static) keys. */
 function rangeText(prefix: 'ui.clause' | 'ui.cond', key: string, range: Range, value?: number): string {
-  const vars = { what: whatName(key), min: range.min ?? '', max: range.max ?? '', value: value ?? '' };
+  const shown = (n: number | undefined) => (n === undefined ? '' : amount(key, n));
+  const vars = { what: whatName(key), min: shown(range.min), max: shown(range.max), value: shown(value) };
   if (range.min !== undefined && range.max !== undefined) return t(`${prefix}.between`, vars);
   if (range.min !== undefined) return t(`${prefix}.min`, vars);
   return t(`${prefix}.max`, vars);
@@ -144,7 +162,7 @@ export function blockerText(b: PlayBlocker): string {
 export function effectText(c: ContentIndex, e: Effect, self?: string): string {
   switch (e.op) {
     case 'resource':
-      return t('ui.effect.resource', { delta: signed(e.value), resource: resourceName(e.target) });
+      return t('ui.effect.resource', { delta: signedAmount(e.target, e.value), resource: resourceName(e.target) });
     case 'draw':
       return t('ui.effect.draw', { count: e.count });
     case 'addCard':

@@ -13,6 +13,7 @@
 // Exit code 1 on any mismatch.
 
 import {
+  bagIndex,
   createInitialState,
   cursor,
   deriveSeed,
@@ -26,6 +27,7 @@ import {
   majorOf,
   majorRequirements,
   nextInt,
+  readLines,
   reduce,
   RESOURCE_KEYS,
   seedRng,
@@ -40,8 +42,8 @@ import { validateContent } from '../validate/validate.ts';
 import { loadRawContent } from '../validate/load.ts';
 import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
 import { feedLines } from '../ui/feed.ts';
-import { t } from '../ui/i18n.ts';
-import { cardName } from '../ui/text.ts';
+import type { PlayedStep } from '../ui/queue.ts';
+import { lineText } from '../ui/text.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -60,10 +62,20 @@ const report = (what: string, seed: number, turn: number, detail: string) => {
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 const turnEndOf = (events: readonly GameEvent[]) => events.find((e) => e.type === 'turnEnd');
 
-function checkPlayPhase(s: GameState, seed: number): void {
+/**
+ * What the real feed code prints for a hypothetical next step, read off the whole history as the UI's queue
+ * holds it: a line's variant depends on every showing before it (decision 15, revised).
+ */
+function feedFor(history: readonly PlayedStep[], action: Action, s: GameState, real: GameState) {
+  const id = (history.at(-1)?.id ?? 0) + 1;
+  return feedLines([...history, { id, action, before: s, after: real, events: real.events }]).filter((l) => l.id.startsWith(`${id}.`));
+}
+
+function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep[]): void {
   const legal = new Set(legalActions(s).flatMap((a) => (a.type === 'PLAY_CARD' ? [a.uid] : [])));
+  const lines = readLines(history);
   for (const card of s.hand) {
-    const p = previewPlay(s, card.uid);
+    const p = previewPlay(s, card.uid, lines);
     if (p.ok !== legal.has(card.uid)) report('playable', seed, s.turn, `${card.cardId}: preview ok=${p.ok}, legal=${legal.has(card.uid)}`);
     if (!p.ok) {
       counts.blocked++;
@@ -97,15 +109,15 @@ function checkPlayPhase(s: GameState, seed: number): void {
     if (p.endTurnAfter?.crystallised !== realAfter) report('crossing', seed, s.turn, `${card.cardId}: preview ${p.endTurnAfter?.crystallised}, real ${realAfter}`);
     if (p.linesCrossed !== 0) counts.crossings++;
     // Decision 21: the headline the preview leads with is the one the feed prints once the card is played —
-    // the real feed code, run on the real step.
-    const shown = p.headlineKey === null ? t('ui.feed.noHeadline', { card: cardName(s.content, card.cardId) }) : t(p.headlineKey);
-    const printed = feedLines([{ id: 1, action: { type: 'PLAY_CARD', uid: card.uid }, before: s, after: real, events: real.events }]).find((l) => l.kind === 'headline')?.text;
+    // the real feed code, run on the whole history and the real step, so the variant is the same too.
+    const shown = lineText(s.content, p.headline, card.cardId);
+    const printed = feedFor(history, { type: 'PLAY_CARD', uid: card.uid }, s, real).find((l) => l.kind === 'headline')?.text;
     if (shown !== printed) report('headline', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(shown)}, feed ${JSON.stringify(printed)}`);
     counts.headlines++;
   }
   // END_TURN
   counts.endTurns++;
-  const pe = previewEndTurn(s);
+  const pe = previewEndTurn(s, lines.counter);
   const real = reduce(s, { type: 'END_TURN' });
   const end = turnEndOf(real.events);
   if (!pe || end?.type !== 'turnEnd') {
@@ -127,7 +139,12 @@ function checkPlayPhase(s: GameState, seed: number): void {
       ? [{ cardId: e.cardId, cause: blamed.has(e.uid) ? { kind: 'crystallised', cardId: blamed.get(e.uid) ?? null } : { kind: 'added', byCardId: addedBy(s, e.cardId) } }]
       : [],
   );
-  if (!same(pe.scandalCards, realCards)) report('endTurn scandal cards', seed, s.turn, `preview ${JSON.stringify(pe.scandalCards)}, real ${JSON.stringify(realCards)}`);
+  const previewed = pe.scandalCards.map(({ cardId, cause }) => ({ cardId, cause }));
+  if (!same(previewed, realCards)) report('endTurn scandal cards', seed, s.turn, `preview ${JSON.stringify(previewed)}, real ${JSON.stringify(realCards)}`);
+  // Each scandal's headline in the preview is the one the feed leads the month end with, variant and all.
+  const leads = feedFor(history, { type: 'END_TURN' }, s, real).filter((l) => l.kind === 'lead').map((l) => l.text);
+  const previewLeads = pe.scandalCards.map((x) => lineText(s.content, x.line, x.cardId));
+  if (!same(previewLeads, leads)) report('endTurn headlines', seed, s.turn, `preview ${JSON.stringify(previewLeads)}, feed ${JSON.stringify(leads)}`);
   if (pe.heatAfter !== end.resources.heat) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${end.resources.heat}`);
   // Heat carries into a next month unless this month end leads straight to the year's end.
   const yearEnds = real.phase === 'gate' && reduce(real, { type: 'CHOOSE_GATE', gateId: real.gateOffer[0] ?? '' }).phase === 'ended';
@@ -230,19 +247,47 @@ function choose(s: GameState, rng: ReturnType<typeof cursor>): Action {
   return pool[nextInt(rng, pool.length)] as Action;
 }
 
+/**
+ * The shuffle bag's promises (decision 15, revised), for every group size content can have: within a cycle
+ * every variant once; across a reshuffle never the same line twice in a row.
+ */
+function checkBags(): number {
+  let sequences = 0;
+  for (let size = 1; size <= 8; size++) {
+    for (let k = 0; k < 200; k++) {
+      const seed = deriveSeed(SEED, k);
+      const group = `check:${size}:${k}`;
+      const seq = Array.from({ length: size * 6 }, (_, n) => bagIndex(seed, group, n, size));
+      for (let c = 0; c < 6; c++) {
+        const cycle = seq.slice(c * size, (c + 1) * size);
+        if (new Set(cycle).size !== size) report('bag cycle', seed, 0, `size ${size}: cycle ${c} is ${cycle.join(',')}`);
+      }
+      if (size > 1 && seq.some((x, n) => n > 0 && x === seq[n - 1])) report('bag repeat', seed, 0, `size ${size}: the same variant twice in a row in ${seq.join(',')}`);
+      sequences++;
+    }
+  }
+  return sequences;
+}
+
 const t0 = performance.now();
+const bagSequences = checkBags();
 for (let i = 0; i < RUNS; i++) {
   const seed = deriveSeed(SEED, i);
   const rng = cursor(seedRng(deriveSeed(seed, 0x75693121)));
   let s = createInitialState(seed, content, { strict: true });
+  // The run's history as the UI's queue holds it: every step, oldest first.
+  const history: PlayedStep[] = [{ id: 1, action: null, before: null, after: s, events: s.events }];
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
     checkTiers(s, seed);
     checkGoals(s, seed);
-    if (s.phase === 'play') checkPlayPhase(s, seed);
+    if (s.phase === 'play') checkPlayPhase(s, seed, history);
     else if (s.phase === 'gate') checkGatePhase(s, seed);
     else if (s.phase === 'draft') checkDraftPhase(s, seed);
-    s = reduce(s, choose(s, rng));
+    const action = choose(s, rng);
+    const next = reduce(s, action);
+    history.push({ id: history.length + 1, action, before: s, after: next, events: next.events });
+    s = next;
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
 }
@@ -251,7 +296,8 @@ console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
-    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states ` +
+    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
+    `${bagSequences} shuffle-bag sequences ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

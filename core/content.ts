@@ -101,7 +101,8 @@ export interface CardDef {
   /** Slots spent to play it. */
   readonly cost: number;
   readonly nameKey: string;
-  readonly textKey: string;
+  /** Non-scandals: the card's rules. Scandals have none: the interface tells their rules from their effects. */
+  readonly textKey?: string;
   /** Default true. Scandals are false: they only take up room in the hand. */
   readonly playable?: boolean;
   readonly tags?: readonly string[];
@@ -113,13 +114,14 @@ export interface CardDef {
   readonly onDraw?: readonly Effect[];
   /** Fires at end of turn while the card is in hand. */
   readonly onEndOfTurn?: readonly Effect[];
-  // Player-facing prose (decision 15): keys only. For a scandal, textKey is the line shown while it is in hand.
-  /** Non-scandals: feed headline variants for playing the card. The UI picks one by hash, never by the game RNG. */
+  // Player-facing prose (decision 15): keys only. Every line group is a list of variants, shown through a
+  // shuffle bag (core/variants.ts), never by the game RNG.
+  /** Headline variants: a non-scandal's for playing it, a scandal's for crystallising (or being copied). */
   readonly headlineKeys?: readonly string[];
   /** Non-scandals: the voice the feed prints the headline in. */
   readonly register?: Register;
-  /** Scandals: the headline printed when it crystallises. */
-  readonly headlineKey?: string;
+  /** Scandals: the lines shown while it sits in the hand. */
+  readonly inHandKeys?: readonly string[];
   /**
    * Non-scandals: the career lane playing it builds (core/lanes.ts) — one of rules.lanes, or NEUTRAL_LANE.
    * Scandals are never played and carry none.
@@ -131,8 +133,8 @@ export interface GateDef {
   readonly id: string;
   readonly act: number;
   readonly nameKey: string;
-  /** Player-facing prose (decision 15): the gate's flavour line. */
-  readonly flavorKey?: string;
+  /** Player-facing prose (decision 15): the gate's flavour line, one variant per run (core/variants.ts). */
+  readonly flavorKeys?: readonly string[];
   readonly requires: Condition;
   readonly onPass: readonly Effect[];
   readonly onFail: readonly Effect[];
@@ -215,7 +217,8 @@ export interface MinorDef {
   /** The major's catch-all: taken when none of its other minors holds. One per major, last, unconditional. */
   readonly fallback?: boolean;
   readonly nameKey: string;
-  readonly textKey: string;
+  /** Its text, one variant per run (core/variants.ts). */
+  readonly textKeys: readonly string[];
   /** The goal line it had as a flat ending; kept, no longer shown (the goals board shows majors). */
   readonly goalKey?: string;
 }
@@ -262,8 +265,10 @@ export interface Rules {
   readonly turnsPerAct: number;
   /** i18n key naming each act, in order (the seasons). One per act. */
   readonly actNameKeys: readonly string[];
-  /** i18n key of each act's season opener (decision 15). One per act. */
-  readonly actOpenerKeys?: readonly string[];
+  /** Each act's season opener variants (decision 15), one list per act; one variant per run. */
+  readonly actOpenerKeys?: readonly (readonly string[])[];
+  /** The opening premise's variants, shown on the title screen; one per run. */
+  readonly openingKeys?: readonly string[];
   readonly handSize: number;
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */

@@ -13,10 +13,14 @@ import {
   EFFECT_FIELDS,
   EFFECT_OPS,
   FLAG_TEST_KEYS,
+  inHandGroup,
   isEffectOp,
   NEUTRAL_LANE,
+  onceItem,
+  playGroup,
   REGISTERS,
   RESOURCE_KEYS,
+  scandalGroup,
   YEAR_ONLY_KEYS,
   YEAR_STAT_KEYS,
 } from '../core/index.ts';
@@ -26,6 +30,8 @@ export const CHECKS = {
   references: 'references to card / gate / ending / lane ids',
   i18n: 'missing i18n keys',
   prose: 'player-facing prose not yet written (warnings)',
+  variants: 'variants per line group (warnings)',
+  tierWords: 'tier words: one word, at most 10 characters',
   reachability: 'cards unreachable in any act',
   fallback: 'endings exhaustive: a major per corner, a fallback per major',
   ranges: 'numeric ranges',
@@ -74,14 +80,14 @@ const ID = /^[a-z][a-z0-9_]*$/;
 const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
-  'id', 'kind', 'cost', 'nameKey', 'textKey', 'headlineKeys', 'register', 'headlineKey',
+  'id', 'kind', 'cost', 'nameKey', 'textKey', 'headlineKeys', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
-const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKey', 'requires', 'onPass', 'onFail'];
+const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
 const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
 const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey'];
-const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKey', 'goalKey'];
+const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKeys', 'goalKey'];
 const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
 /** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
 const MAX_AWARDS = 8;
@@ -91,7 +97,7 @@ const MAX_AWARDS = 8;
  */
 const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 14 } as const;
 const RULES_FIELDS = [
-  'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
+  'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished',
 ];
@@ -156,6 +162,13 @@ class Ctx {
   key(value: unknown, where: string): void {
     if (!isStr(value)) return this.error('schema', where, 'must be a non-empty i18n key');
     if (!this.keysUsed.has(value)) this.keysUsed.set(value, where);
+  }
+
+  /** A line group's variants: a non-empty list of i18n keys, no key twice. */
+  keys(value: unknown, where: string): void {
+    if (!Array.isArray(value) || value.length === 0) return this.error('schema', where, 'must be a non-empty array of i18n keys (the variants)');
+    value.forEach((k, i) => this.key(k, `${where}[${i}]`));
+    if (new Set(value).size !== value.length) this.error('schema', where, 'lists a variant twice');
   }
 
   id(value: unknown, where: string): value is string {
@@ -284,14 +297,15 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     raw.actNameKeys.forEach((k, i) => v.key(k, `rules.actNameKeys[${i}]`));
   }
   if (raw.actOpenerKeys !== undefined) {
-    if (!Array.isArray(raw.actOpenerKeys)) v.error('schema', 'rules.actOpenerKeys', 'must be an array: one i18n key per act');
+    if (!Array.isArray(raw.actOpenerKeys)) v.error('schema', 'rules.actOpenerKeys', 'must be an array: one list of opener variants per act');
     else {
       if (raw.actOpenerKeys.length !== v.acts) {
         v.error('ranges', 'rules.actOpenerKeys', `has ${raw.actOpenerKeys.length} entries for ${v.acts} acts`);
       }
-      raw.actOpenerKeys.forEach((k, i) => v.key(k, `rules.actOpenerKeys[${i}]`));
+      raw.actOpenerKeys.forEach((k, i) => v.keys(k, `rules.actOpenerKeys[${i}]`));
     }
   }
+  if (raw.openingKeys !== undefined) v.keys(raw.openingKeys, 'rules.openingKeys');
   v.int(raw.handSize, 'rules.handSize', LIMIT.handSize);
   v.int(raw.slotsPerTurn, 'rules.slotsPerTurn', LIMIT.slotsPerTurn);
   v.int(raw.gatesOffered, 'rules.gatesOffered', LIMIT.count);
@@ -489,7 +503,10 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     }
     v.int(c.cost, `${where}.cost`, LIMIT.cost);
     v.key(c.nameKey, `${where}.nameKey`);
-    v.key(c.textKey, `${where}.textKey`);
+    // A card's rules text; a scandal has none — the interface tells its rules from its effects.
+    if (c.kind === 'scandal') {
+      if (c.textKey !== undefined) v.error('schema', `${where}.textKey`, 'a scandal has no rules text: its in-hand lines are inHandKeys');
+    } else v.key(c.textKey, `${where}.textKey`);
     if (c.playable !== undefined && typeof c.playable !== 'boolean') v.error('schema', `${where}.playable`, 'must be a boolean');
     if (c.tags !== undefined && (!Array.isArray(c.tags) || !c.tags.every(isStr))) {
       v.error('schema', `${where}.tags`, 'must be an array of strings');
@@ -505,19 +522,16 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     } else if (c.playable === false) {
       v.warn('schema', `${where}.playable`, `an unplayable ${String(c.kind)} card only clogs the hand`);
     }
-    // Prose keys (decision 15). Whether the prose itself is written is the 'prose' check.
-    if (c.headlineKeys !== undefined) {
-      if (!Array.isArray(c.headlineKeys)) v.error('schema', `${where}.headlineKeys`, 'must be an array of i18n keys');
-      else c.headlineKeys.forEach((k, i) => v.key(k, `${where}.headlineKeys[${i}]`));
-      if (c.kind === 'scandal') v.warn('schema', `${where}.headlineKeys`, 'scandals print one headline on crystallisation: use headlineKey');
-    }
+    // Prose keys (decision 15): every line group is a list of variants. Whether the prose itself is written is
+    // the 'prose' check; whether there are enough variants for how often it is seen, the 'variants' check.
+    if (c.headlineKeys !== undefined) v.keys(c.headlineKeys, `${where}.headlineKeys`);
     if (c.register !== undefined && !(REGISTERS as readonly unknown[]).includes(c.register)) {
       v.error('schema', `${where}.register`, `must be one of ${REGISTERS.join(', ')}, got ${q(c.register)}`);
     }
-    if (c.headlineKey !== undefined) {
-      v.key(c.headlineKey, `${where}.headlineKey`);
-      if (c.kind !== 'scandal') v.warn('schema', `${where}.headlineKey`, 'only scandals have a single headline: use headlineKeys');
-    }
+    if (c.kind === 'scandal') {
+      if (c.inHandKeys !== undefined) v.keys(c.inHandKeys, `${where}.inHandKeys`);
+      if (c.register !== undefined) v.error('schema', `${where}.register`, 'a scandal always prints in The Daily Flash: it has no register');
+    } else if (c.inHandKeys !== undefined) v.error('schema', `${where}.inHandKeys`, 'only a scandal shows lines while it sits in the hand');
     // The career lane playing it builds (docs/design/content-expansion.md §2). Scandals are never played.
     if (c.kind === 'scandal') {
       if (c.lane !== undefined) v.error('schema', `${where}.lane`, 'a scandal is never played: it has no lane');
@@ -535,7 +549,7 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
     const act = v.int(g.act, `${where}.act`, [1, v.acts]) ? g.act : 0;
     const owner: Owner = { kind: 'gate', id: String(g.id), act };
     v.key(g.nameKey, `${where}.nameKey`);
-    if (g.flavorKey !== undefined) v.key(g.flavorKey, `${where}.flavorKey`);
+    if (g.flavorKeys !== undefined) v.keys(g.flavorKeys, `${where}.flavorKeys`);
     if (g.requires === undefined) v.error('schema', `${where}.requires`, 'gates need "requires"');
     else checkCondition(v, g.requires, `${where}.requires`);
     for (const field of ['onPass', 'onFail'] as const) {
@@ -649,7 +663,7 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
     v.fields(m, MINOR_FIELDS, where);
     if (!majorIds.has(m.major as string)) v.error('references', `${where}.major`, `no major with id ${q(m.major)}`);
     v.key(m.nameKey, `${where}.nameKey`);
-    v.key(m.textKey, `${where}.textKey`);
+    v.keys(m.textKeys, `${where}.textKeys`);
     if (m.goalKey !== undefined) v.key(m.goalKey, `${where}.goalKey`);
     if (m.fallback !== undefined && typeof m.fallback !== 'boolean') v.error('schema', `${where}.fallback`, 'must be a boolean');
     if (m.fallback === true && m.conditions !== undefined) v.error('fallback', where, 'a major\'s fallback takes no conditions: it catches everything else');
@@ -838,9 +852,6 @@ function checkI18n(v: Ctx, i18n: unknown): number {
 /** A prose value the author has not written yet (decision 15: agents leave placeholders, never prose). */
 export const PROSE_PLACEHOLDER = 'TODO(prose)';
 
-/** The opening premise, shown on the title screen. Prose without a content home. */
-export const OPENING_KEY = 'story.opening';
-
 /**
  * Missing player-facing prose, reported as warnings: every card with no headline, every scandal missing its
  * headline or in-hand line, every major missing its name or goal line, every minor missing its name or
@@ -860,11 +871,12 @@ function checkProse(
   const written = (key: unknown) =>
     isStr(key) && typeof i18n[key] === 'string' && i18n[key] !== '' && !String(i18n[key]).startsWith(PROSE_PLACEHOLDER);
   const nameOf = (o: Obj) => (isStr(o.nameKey) && typeof i18n[o.nameKey] === 'string' ? ` (${String(i18n[o.nameKey])})` : '');
+  const anyWritten = (keys: unknown) => Array.isArray(keys) && keys.some(written);
   for (const c of cards) {
     const where = `card ${String(c.id)}${nameOf(c)}`;
     if (c.kind === 'scandal') {
-      if (!written(c.headlineKey)) v.warn('prose', where, 'no crystallisation headline');
-      if (!written(c.textKey)) v.warn('prose', where, 'no in-hand text');
+      if (!anyWritten(c.headlineKeys)) v.warn('prose', where, 'no crystallisation headline');
+      if (!anyWritten(c.inHandKeys)) v.warn('prose', where, 'no in-hand line');
       continue;
     }
     const headlines = Array.isArray(c.headlineKeys) ? c.headlineKeys.filter(written) : [];
@@ -877,15 +889,15 @@ function checkProse(
     if (missing.length > 0) v.warn('prose', `major ${String(m.id)}`, `no ${missing.join(', ')}`);
   }
   for (const m of endings.minors) {
-    const missing = (['nameKey', 'textKey'] as const).filter((f) => !written(m[f])).map((f) => f.replace('Key', ''));
+    const missing = [...(written(m.nameKey) ? [] : ['name']), ...(anyWritten(m.textKeys) ? [] : ['text'])];
     if (missing.length > 0) v.warn('prose', `minor ${String(m.id)}`, `no ${missing.join(', ')}`);
   }
-  for (const g of gates) if (!written(g.flavorKey)) v.warn('prose', `gate ${String(g.id)}${nameOf(g)}`, 'no flavour');
-  const openers = rules && Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
+  for (const g of gates) if (!anyWritten(g.flavorKeys)) v.warn('prose', `gate ${String(g.id)}${nameOf(g)}`, 'no flavour');
+  const openers: unknown[] = rules && Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
   for (let act = 1; act <= v.acts; act++) {
-    if (!written(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
+    if (!anyWritten(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
   }
-  if (!written(OPENING_KEY)) v.warn('prose', OPENING_KEY, 'no opening premise');
+  if (!anyWritten(rules?.openingKeys)) v.warn('prose', 'rules.openingKeys', 'no opening premise');
   for (const a of awards) {
     const missing = (['nameKey', 'citationKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
     if (missing.length > 0) v.warn('prose', `award ${String(a.id)}`, `no ${missing.join(', ')}`);
@@ -904,7 +916,106 @@ function checkProse(
 }
 
 /** Validate parsed content. Pass i18n to check keys and prose (the sim doesn't: it never touches /i18n). */
-export function validateContent(raw: RawContent, i18n?: unknown): ValidationResult {
+// ---------------------------------------------------------------------------
+// Variants (docs/ui-plan.md §13, decision 15, revised): how many a line group needs follows how often the
+// player sees it. Shortfalls are warnings — the writing still to come — never errors.
+
+/** How often the player sees each line group per run: sim/appearances.json, written by npm run sim:variants. */
+export interface Appearances {
+  /** How it was measured. */
+  readonly measured: string;
+  /** Average showings per run, player-like personas pooled, by line group id. */
+  readonly perRun: Readonly<Record<string, number>>;
+  /** The most showings in any one run, by line group id. */
+  readonly maxPerRun?: Readonly<Record<string, number>>;
+}
+
+/** Variants a line group needs, by its average showings per run: 4 or more → 4; 2 to 4 → 3; under 2 → 2. */
+export function variantsNeeded(perRun: number): number {
+  return perRun >= 4 ? 4 : perRun >= 2 ? 3 : 2;
+}
+
+/** An item shown once per run needs two, so different runs read differently. */
+export const ONCE_VARIANTS_NEEDED = 2;
+
+export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'once';
+
+/** A line group and its variants, as content lists them. */
+export interface VariantGroup {
+  /** The line group id (core/lines.ts) or the once-per-run item id (core/variants.ts onceItem). */
+  readonly id: string;
+  readonly kind: VariantGroupKind;
+  /** What it belongs to, for people: a card id, a gate id, a season. */
+  readonly owner: string;
+  readonly keys: readonly string[];
+  /** A card's register and lane, where it has them (what paper it prints in). */
+  readonly register: string | null;
+  readonly lane: string | null;
+}
+
+const keyList = (x: unknown): string[] => (Array.isArray(x) ? x.filter(isStr) : []);
+
+/** Every line group content defines, with its variants. */
+export function variantGroups(raw: RawContent): VariantGroup[] {
+  const groups: VariantGroup[] = [];
+  const list = (x: unknown): Obj[] => (Array.isArray(x) ? x.filter(isObj) : []);
+  for (const c of list(raw.cards)) {
+    if (!isStr(c.id)) continue;
+    const register = isStr(c.register) ? c.register : null;
+    const lane = isStr(c.lane) ? c.lane : null;
+    if (c.kind === 'scandal') {
+      groups.push({ id: scandalGroup(c.id), kind: 'scandal', owner: c.id, keys: keyList(c.headlineKeys), register: null, lane: null });
+      groups.push({ id: inHandGroup(c.id), kind: 'inHand', owner: c.id, keys: keyList(c.inHandKeys), register: null, lane: null });
+    } else groups.push({ id: playGroup(c.id), kind: 'card', owner: c.id, keys: keyList(c.headlineKeys), register, lane });
+  }
+  const rules = isObj(raw.rules) ? raw.rules : {};
+  const openers: unknown[] = Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
+  openers.forEach((keys, i) => groups.push({ id: onceItem.opener(i + 1), kind: 'once', owner: `season ${i + 1}`, keys: keyList(keys), register: null, lane: null }));
+  groups.push({ id: onceItem.opening, kind: 'once', owner: 'the opening', keys: keyList(rules.openingKeys), register: null, lane: null });
+  for (const g of list(raw.gates)) if (isStr(g.id)) groups.push({ id: onceItem.gate(g.id), kind: 'once', owner: g.id, keys: keyList(g.flavorKeys), register: null, lane: null });
+  const endings = isObj(raw.endings) ? raw.endings : {};
+  for (const m of list(endings.minors)) if (isStr(m.id)) groups.push({ id: onceItem.ending(m.id), kind: 'once', owner: m.id, keys: keyList(m.textKeys), register: null, lane: null });
+  return groups;
+}
+
+/** Variants a group needs: two for a once-per-run item, otherwise by how often it is seen. */
+export function groupNeeds(group: VariantGroup, appearances: Appearances | undefined): number {
+  if (group.kind === 'once') return ONCE_VARIANTS_NEEDED;
+  return variantsNeeded(appearances?.perRun[group.id] ?? 0);
+}
+
+function checkVariants(v: Ctx, raw: RawContent, i18n: Obj, appearances: Appearances | undefined): void {
+  const written = (key: string) => typeof i18n[key] === 'string' && i18n[key] !== '' && !String(i18n[key]).startsWith(PROSE_PLACEHOLDER);
+  if (!appearances) v.warn('variants', 'sim/appearances.json', 'no appearance data: run npm run sim:variants (every group is held to at least 2)');
+  for (const group of variantGroups(raw)) {
+    const have = group.keys.filter(written).length;
+    const need = groupNeeds(group, appearances);
+    if (have >= need) continue;
+    const seen = group.kind === 'once' ? 'shown once a run' : `seen ${(appearances?.perRun[group.id] ?? 0).toFixed(1)} times a run`;
+    v.warn('variants', group.id, `${have} variant${have === 1 ? '' : 's'}, ${seen}: needs at least ${need}`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tier words (docs/writing/voice.md): a single word of at most 10 characters — the stat bar's cells are one
+// equal width, and a phrase would not fit them.
+
+const TIER_WORD = /^\S{1,10}$/;
+
+function checkTierWords(v: Ctx, rules: Obj | null, i18n: Obj): void {
+  const tiers = rules && isObj(rules.tiers) ? rules.tiers : {};
+  for (const [stat, t] of Object.entries(tiers)) {
+    const keys: unknown[] = isObj(t) && Array.isArray(t.nameKeys) ? t.nameKeys : [];
+    keys.forEach((k, i) => {
+      const word = isStr(k) ? i18n[k] : undefined;
+      if (typeof word === 'string' && !word.startsWith(PROSE_PLACEHOLDER) && !TIER_WORD.test(word)) {
+        v.error('tierWords', `${stat} tier ${i + 1}`, `${q(word)} must be one word of at most 10 characters`);
+      }
+    });
+  }
+}
+
+export function validateContent(raw: RawContent, i18n?: unknown, appearances?: Appearances): ValidationResult {
   const v = new Ctx();
   const rules = checkRules(v, raw.rules);
   const cards = checkCards(v, raw.cards);
@@ -917,7 +1028,11 @@ export function validateContent(raw: RawContent, i18n?: unknown): ValidationResu
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);
-  if (isObj(i18n)) checkProse(v, i18n, rules, cards, gates, endings, awards);
+  if (isObj(i18n)) {
+    checkProse(v, i18n, rules, cards, gates, endings, awards);
+    checkVariants(v, raw, i18n, appearances);
+    checkTierWords(v, rules, i18n);
+  }
   return {
     issues: v.issues,
     earliestAct,

@@ -35,14 +35,14 @@
       "major": "breakthrough",
       "conditions": { "lane": { "any": ["screen"] } },
       "nameKey": "ending.leading_role.name",
-      "textKey": "ending.leading_role.text"
+      "textKeys": ["ending.leading_role.text.1"]
     },
     {
       "id": "household_name",
       "major": "breakthrough",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.household_name.name",
-      "textKey": "ending.household_name.text"
+      "textKeys": ["ending.household_name.text.1"]
     },
     {
       "id": "star",
@@ -50,28 +50,28 @@
       "conditions": { "lane": { "any": ["music"] }, "flags": { "all": ["signed_label"] } },
       "nameKey": "ending.star.name",
       "goalKey": "ending.star.goal",
-      "textKey": "ending.star.text"
+      "textKeys": ["ending.star.text.1"]
     },
     {
       "id": "the_independent",
       "major": "breakthrough",
       "fallback": true,
       "nameKey": "ending.the_independent.name",
-      "textKey": "ending.the_independent.text"
+      "textKeys": ["ending.the_independent.text.1"]
     },
     {
       "id": "redemption_arc",
       "major": "overexposed",
       "conditions": { "scandalDrop": { "min": 2 } },
       "nameKey": "ending.redemption_arc.name",
-      "textKey": "ending.redemption_arc.text"
+      "textKeys": ["ending.redemption_arc.text.1"]
     },
     {
       "id": "tabloid_royalty",
       "major": "overexposed",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.tabloid_royalty.name",
-      "textKey": "ending.tabloid_royalty.text"
+      "textKeys": ["ending.tabloid_royalty.text.1"]
     },
     {
       "id": "meltdown",
@@ -79,21 +79,21 @@
       "fallback": true,
       "nameKey": "ending.meltdown.name",
       "goalKey": "ending.meltdown.goal",
-      "textKey": "ending.meltdown.text"
+      "textKeys": ["ending.meltdown.text.1"]
     },
     {
       "id": "character_actor",
       "major": "long_game",
       "conditions": { "craft": { "min": 55 }, "lane": { "any": ["screen"] } },
       "nameKey": "ending.character_actor.name",
-      "textKey": "ending.character_actor.text"
+      "textKeys": ["ending.character_actor.text.1"]
     },
     {
       "id": "the_one_to_watch",
       "major": "long_game",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.the_one_to_watch.name",
-      "textKey": "ending.the_one_to_watch.text"
+      "textKeys": ["ending.the_one_to_watch.text.1"]
     },
     {
       "id": "craftsman",
@@ -101,7 +101,7 @@
       "conditions": { "craft": { "min": 55 } },
       "nameKey": "ending.craftsman.name",
       "goalKey": "ending.craftsman.goal",
-      "textKey": "ending.craftsman.text"
+      "textKeys": ["ending.craftsman.text.1"]
     },
     {
       "id": "nobody",
@@ -109,28 +109,28 @@
       "fallback": true,
       "nameKey": "ending.nobody.name",
       "goalKey": "ending.nobody.goal",
-      "textKey": "ending.nobody.text"
+      "textKeys": ["ending.nobody.text.1"]
     },
     {
       "id": "flash_in_the_pan",
       "major": "hard_way",
       "conditions": { "peakHype": { "min": 75 } },
       "nameKey": "ending.flash_in_the_pan.name",
-      "textKey": "ending.flash_in_the_pan.text"
+      "textKeys": ["ending.flash_in_the_pan.text.1"]
     },
     {
       "id": "running_on_empty",
       "major": "hard_way",
       "conditions": { "anyOf": [{ "holds": { "any": ["burnout"] } }, { "craft": { "max": 34 } }] },
       "nameKey": "ending.running_on_empty.name",
-      "textKey": "ending.running_on_empty.text"
+      "textKeys": ["ending.running_on_empty.text.1"]
     },
     {
       "id": "starting_over",
       "major": "hard_way",
       "fallback": true,
       "nameKey": "ending.starting_over.name",
-      "textKey": "ending.starting_over.text"
+      "textKeys": ["ending.starting_over.text.1"]
     }
   ]
 }

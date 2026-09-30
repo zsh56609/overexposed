@@ -6,7 +6,6 @@
 // draw reports how many cards, never which.
 
 import {
-  deriveSeed,
   explainCondition,
   getCard,
   getGate,
@@ -23,20 +22,22 @@ import {
   type Effect,
   type GameEvent,
   type GameState,
-  type ContentIndex,
+  type LineCounter,
+  type LineShow,
   type PlayBlocker,
   type Register,
   type ResourceKey,
 } from '../core/index.ts';
 
 /**
- * The headline variant a card prints when played (decision 15): a pure hash of run seed, month and card
- * instance — never the game RNG. The preview and the feed both call this, so the headline shown before the
- * decision is the one printed after it (decision 21). Null when the card has no headlines (a scandal).
+ * What the run has printed so far, as a preview needs it (core/lines.ts readLines): the counter the next
+ * showing of every line group follows from, and each scandal's in-hand line. The preview advances a fork of
+ * the counter over its hypothetical, exactly as the feed advances the real one over the real step — so the
+ * headline shown before a decision is the one printed after it (decision 21).
  */
-export function playHeadlineKey(c: ContentIndex, seed: number, turn: number, uid: number, cardId: string): string | null {
-  const keys = getCard(c, cardId)?.headlineKeys ?? [];
-  return keys.length === 0 ? null : (keys[deriveSeed(deriveSeed(seed, turn), uid) % keys.length] ?? null);
+export interface LinesSoFar {
+  readonly counter: LineCounter;
+  readonly inHand: ReadonlyMap<number, LineShow>;
 }
 
 /** Where heat sits against the line, as /core reports it (decision 1). */
@@ -99,9 +100,9 @@ export interface EndTurnPreview {
   readonly crystallised: number;
   /**
    * Every scandal card month end would add, from any cause, in order: the one scandal count the player sees
-   * (docs/ui-plan.md §13, decision 2).
+   * (docs/ui-plan.md §13, decision 2) — each with the headline it would print.
    */
-  readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause }[];
+  readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause; readonly line: LineShow }[];
   /** Heat left after the vent: it carries into the next month. */
   readonly heatAfter: number;
   /** Whether there is a next month to carry it into: not in the year's last month (/core's monthsLeft). */
@@ -117,18 +118,23 @@ export function addedBy(state: GameState, cardId: string): string | null {
   return state.hand.find((card) => adds(getCard(state.content, card.cardId)?.onEndOfTurn))?.cardId ?? null;
 }
 
-/** END_TURN on a hypothetical, cut at the turnEnd event. Only meaningful in the play phase. */
-export function previewEndTurn(state: GameState): EndTurnPreview | null {
+/**
+ * END_TURN on a hypothetical, cut at the turnEnd event. Only meaningful in the play phase. `counter`: the
+ * line counter as the run stands (it is forked, never advanced).
+ */
+export function previewEndTurn(state: GameState, counter: LineCounter): EndTurnPreview | null {
   if (state.phase !== 'play') return null;
   const events = through(reduce(state, { type: 'END_TURN' }).events, 'turnEnd');
   const end = events.find((e) => e.type === 'turnEnd');
   const blamed = new Map(events.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
+  const lines = counter.fork();
   const scandalCards = events.flatMap((e) => {
-    if (e.type !== 'addCard' || getCard(state.content, e.cardId)?.kind !== 'scandal') return [];
+    const printed = lines.take(e).find((x) => x.kind === 'scandal');
+    if (e.type !== 'addCard' || !printed) return [];
     const cause: ScandalCause = blamed.has(e.uid)
       ? { kind: 'crystallised', cardId: blamed.get(e.uid) ?? null }
       : { kind: 'added', byCardId: addedBy(state, e.cardId) };
-    return [{ cardId: e.cardId, cause }];
+    return [{ cardId: e.cardId, cause, line: printed.line }];
   });
   return {
     crystallised: end?.type === 'turnEnd' ? end.crystallised : 0,
@@ -145,8 +151,12 @@ export function previewEndTurn(state: GameState): EndTurnPreview | null {
 export interface PlayPreview {
   readonly uid: number;
   readonly cardId: string;
-  /** The headline this card prints if played now, and its voice: the preview's first line (decision 21). */
-  readonly headlineKey: string | null;
+  /**
+   * The headline this card prints if played now, and its voice: the preview's first line (decision 21).
+   * Null for a scandal, which prints nothing when held: its in-hand line is `inHand`.
+   */
+  readonly headline: LineShow | null;
+  readonly inHand: LineShow | null;
   readonly register: Register | null;
   readonly ok: boolean;
   /** Every reason it can't be played (empty when ok). */
@@ -165,15 +175,17 @@ export interface PlayPreview {
   readonly linesCrossed: number;
 }
 
-export function previewPlay(state: GameState, uid: number): PlayPreview {
+export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): PlayPreview {
   const card = state.hand.find((c) => c.uid === uid);
   const check = playCheck(state, uid);
-  const endTurnNow = previewEndTurn(state);
+  const endTurnNow = previewEndTurn(state, lines.counter);
   const cardId = card?.cardId ?? '';
+  const scandal = getCard(state.content, cardId)?.kind === 'scandal';
   const base = {
     uid,
     cardId,
-    headlineKey: playHeadlineKey(state.content, state.seed, state.turn, uid, cardId),
+    headline: scandal ? null : lines.counter.fork().play(cardId),
+    inHand: scandal ? (lines.inHand.get(uid) ?? null) : null,
     register: getCard(state.content, cardId)?.register ?? null,
     ok: check.ok,
     blockers: check.blockers,
@@ -183,7 +195,10 @@ export function previewPlay(state: GameState, uid: number): PlayPreview {
   };
   if (!check.ok) return { ...base, outcome: null, heatAfter: null, slotsAfter: null, lineAfter: null, endTurnAfter: null, linesCrossed: 0 };
   const after = reduce(state, { type: 'PLAY_CARD', uid });
-  const endTurnAfter = previewEndTurn(after);
+  // The month end after this card: counted from the run's lines plus this play's own (a copy it adds prints).
+  const counted = lines.counter.fork();
+  for (const e of after.events) counted.take(e);
+  const endTurnAfter = previewEndTurn(after, counted);
   return {
     ...base,
     outcome: outcomeOf(after.events),

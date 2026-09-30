@@ -3,7 +3,7 @@
     "id": "gate_audition",
     "act": 1,
     "nameKey": "gate.audition.name",
-    "flavorKey": "gate.audition.flavor",
+    "flavorKeys": ["gate.audition.flavor.1"],
     "requires": { "craft": { "min": 18 } },
     "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
@@ -12,7 +12,7 @@
     "id": "gate_showcase",
     "act": 1,
     "nameKey": "gate.showcase.name",
-    "flavorKey": "gate.showcase.flavor",
+    "flavorKeys": ["gate.showcase.flavor.1"],
     "requires": { "hype": { "min": 17 } },
     "onPass": [
       { "op": "addCard", "cardId": "studio_session", "to": "discard", "count": 1 },
@@ -24,7 +24,7 @@
     "id": "gate_festival",
     "act": 2,
     "nameKey": "gate.festival.name",
-    "flavorKey": "gate.festival.flavor",
+    "flavorKeys": ["gate.festival.flavor.1"],
     "requires": { "hype": { "min": 35 } },
     "onPass": [
       { "op": "resource", "target": "hype", "value": 6 },
@@ -36,7 +36,7 @@
     "id": "gate_session_work",
     "act": 2,
     "nameKey": "gate.session_work.name",
-    "flavorKey": "gate.session_work.flavor",
+    "flavorKeys": ["gate.session_work.flavor.1"],
     "requires": { "craft": { "min": 33 } },
     "onPass": [
       { "op": "resource", "target": "capital", "value": 4 },
@@ -48,7 +48,7 @@
     "id": "gate_label_deal",
     "act": 3,
     "nameKey": "gate.label_deal.name",
-    "flavorKey": "gate.label_deal.flavor",
+    "flavorKeys": ["gate.label_deal.flavor.1"],
     "requires": { "hype": { "min": 45 }, "capital": { "min": 4 } },
     "onPass": [
       { "op": "setFlag", "flag": "signed_label" },
@@ -60,7 +60,7 @@
     "id": "gate_residency",
     "act": 3,
     "nameKey": "gate.residency.name",
-    "flavorKey": "gate.residency.flavor",
+    "flavorKeys": ["gate.residency.flavor.1"],
     "requires": { "craft": { "min": 30 }, "hype": { "min": 15 }, "scandalCount": { "max": 4 } },
     "onPass": [
       { "op": "resource", "target": "craft", "value": 6 },
@@ -72,7 +72,7 @@
     "id": "gate_arena_tour",
     "act": 4,
     "nameKey": "gate.arena_tour.name",
-    "flavorKey": "gate.arena_tour.flavor",
+    "flavorKeys": ["gate.arena_tour.flavor.1"],
     "requires": { "hype": { "min": 64 }, "flags": { "all": ["signed_label"] } },
     "onPass": [{ "op": "resource", "target": "hype", "value": 15 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
@@ -81,7 +81,7 @@
     "id": "gate_award_show",
     "act": 4,
     "nameKey": "gate.award_show.name",
-    "flavorKey": "gate.award_show.flavor",
+    "flavorKeys": ["gate.award_show.flavor.1"],
     "requires": { "craft": { "min": 45 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
     "onPass": [{ "op": "resource", "target": "craft", "value": 10 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -6 }]

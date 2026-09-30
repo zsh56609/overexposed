@@ -12,6 +12,7 @@
     "sim": "node sim/run.ts",
     "sim:awards": "node sim/awards.ts",
     "sim:tiers": "node sim/tiers.ts",
+    "sim:variants": "node sim/variants.ts",
     "validate": "node validate/run.ts",
     "check:preview": "node check/preview.ts && node check/clicks.ts",
     "check:clicks": "node check/clicks.ts",

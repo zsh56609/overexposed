@@ -368,9 +368,11 @@ it.
 
 1. Heat display — integers only, and it counts no scandals. It shows
    only where heat sits against the line: "N TO GO", or once over,
-   "LINE CROSSED · N TO THE NEXT". The scandal count lives in exactly
-   one place, the END TURN preview. Two surfaces cannot disagree if only
-   one of them counts. (Amended 2026-09-30.)
+   "N TO NEXT" beside the tier word — "Breaking" and "Frenzy" only ever
+   appear once a line is crossed, so the word already says it and
+   "LINE CROSSED" is dropped (phase 2a). The scandal count lives in
+   exactly one place, the END TURN preview. Two surfaces cannot disagree
+   if only one of them counts. (Amended 2026-09-30, twice.)
 2. End-of-month preview is first-class, shown on the END TURN button
    (e.g. "1 scandal will print"). Remove the "If the month ended now"
    status line: two numbers that can disagree are worse than one.
@@ -415,15 +417,33 @@ it.
     - cards: headlineKeys (an array of variants) and register
       (loud | quiet | money), which drives feed typography; the register
       follows visibility, not resource (decision 24)
-    - scandals: headlineKey (printed on crystallisation) and textKey
+    - scandals: headlineKeys (printed on crystallisation) and inHandKeys
       (shown while in hand)
-    - endings: nameKey, goalKey (goals-board line), textKey
-    - gates: flavorKey; seasons: an opener key; the opening premise
+    - endings: nameKey, goalKey (goals-board line), textKeys
+    - gates: flavorKeys; seasons: opener keys; the opening premise
+      (rules.openingKeys)
     - awards: name and citation keys
 
     Variant choice must NOT consume the game RNG stream — that would
-    change every sim result and break replays. Use a separate
-    deterministic choice, e.g. a hash of run seed, turn and card id.
+    change every sim result and break replays. Revised in phase 2a
+    (core/variants.ts, core/lines.ts): within a run, a line group — a
+    card's headlines, a scandal's crystallisation headlines, a scandal's
+    in-hand lines, and from round 2b each manager trigger's lines — is a
+    shuffle bag: the variant shown is a seeded permutation of the group,
+    indexed by how many times the group has been shown this run; a used-
+    up cycle reshuffles with the cycle number in the hash, and a new
+    cycle never opens with the line that closed the last. Every variant
+    appears once before any repeats, and never the same line twice in a
+    row. The count comes from the run's history, never the game RNG, so
+    the preview and the feed count alike and the preview still shows
+    exactly what will print. Across runs, items shown once per run —
+    season openers, ending texts, gate flavour, the opening premise —
+    pick by a hash of the run seed and the item id. Why: the old hash of
+    seed, month and card instance picked each showing independently, so
+    one line could print three months running while another never
+    appeared; with a bag, every variant written is seen, and how many a
+    group needs follows how often the player sees it (validate's
+    'variants' check, from npm run sim:variants).
     All player-facing prose is controlled by the human author. Agents
     build fields, keys and placeholders, import prose the author has
     approved, and never invent shipping prose. The public AI

@@ -123,7 +123,7 @@ heat -= vent * count                          // vent < every thresholdFloor, so
 
 All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFloor` hold one entry per act. The floor tightens season by season, so degradation cannot exhaust itself early: late in the run the same pile of scandals drags the threshold lower than it could in spring. No per-turn cap: excess heat is never free. The residue is the cascade's transmission medium within and across turns, and the degrading threshold makes tolerance fall as scandals accumulate — so removing a scandal buys the threshold back, which is what makes "spike, then clean up" a real strategy.
 
-**Displayed heat (frozen; amended 2026-09-30).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from /core, for the state as it stands: points of heat to the next line ("N TO GO"), or once heat is over a line, "LINE CROSSED · N TO THE NEXT". It counts no scandals. A pressure tier word may lead it (decision 25). The count lives only in the END TURN preview, which runs the reducer and so includes onEndOfTurn effects such as a Copycat Story copying itself ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decisions 1 and 2).
+**Displayed heat (frozen; amended 2026-09-30).** The effective threshold can be fractional (4.5); a player never sees it. The heat meter shows whole numbers from /core, for the state as it stands: points of heat to the next line ("N TO GO"), or once heat is over a line, "N TO NEXT" beside the tier word ("Breaking", "Frenzy") that already says a line is crossed. It counts no scandals. A pressure tier word leads it (decision 25). The count lives only in the END TURN preview, which runs the reducer and so includes onEndOfTurn effects such as a Copycat Story copying itself ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decisions 1 and 2).
 
 - Scandal cards have `playable: false`. They occupy a hand slot when drawn.
 - Most carry an `onEndOfTurn` penalty.
@@ -156,7 +156,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 `lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLane` (display only: the press subject, later the managers) is the current lane once `rules.laneEstablished` holds, "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
-Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): `headlineKeys` (non-scandals) are the feed headline variants for playing the card — the UI picks one by a hash of run seed, month and card instance, never the game RNG — and `register` (`loud` | `quiet` | `money`) is the voice it is printed in. A scandal has `headlineKey`, printed when it crystallises, and its `textKey` is its in-hand line: the interface shows its rules from its effects.
+Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
 
 ### Effect ops (closed set — extend the set, never special-case a card)
 
@@ -223,7 +223,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text` (minors) · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
 - Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
@@ -248,6 +248,8 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 - awards: fields, conditions, ending ids, a fallback award, at most 8
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
+- variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)
+- tier words: one word of at most 10 characters
 - player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
@@ -387,6 +389,7 @@ npm run check:preview  # every UI preview against the real reducer outcome, then
 npm run check:clicks   # no click on a card or END TURN is swallowed (headless Chrome)
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
+npm run sim:variants   # appearances per line group → sim/appearances.json, and the variant gap list
 ```
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

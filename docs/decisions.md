@@ -6,6 +6,54 @@ rules).
 
 ---
 
+## 2026-09-30 — Phase 2a, Part C: variants, single-word tiers, money
+
+- **Decision 15 revised: variants by shuffle bag.** Within a run each
+  line group — a card's headlines, a scandal's crystallisation
+  headlines, a scandal's in-hand lines, and from round 2b each manager
+  trigger's lines — shows a seeded permutation of its variants, indexed
+  by how many times the group has been shown; a used-up cycle reshuffles
+  with the cycle number in the hash, and a new cycle never opens with the
+  line that closed the last. The count comes from the run's history,
+  never the game RNG, so the preview and the feed count alike. Across
+  runs, items shown once per run — season openers, ending texts, gate
+  flavour, the opening premise — pick by a hash of the run seed and the
+  item id. **Why:** the old hash of seed, month and card instance picked
+  each showing independently, so one line could print three months
+  running while another never appeared. With a bag every variant written
+  is seen, and how many a group needs follows how often it is seen.
+  A new check in `check:preview` proves the bag's two promises over every
+  group size up to 8; its first run caught a bug (a cycle's swap was
+  compared with the previous cycle's order before that cycle's own swap).
+- **Every prose field that can vary is a list** of numbered keys:
+  scandals `headlineKeys` and `inHandKeys` (a scandal has no rules text),
+  gates `flavorKeys`, minors `textKeys`, `rules.actOpenerKeys` a list per
+  act, and the opening premise `rules.openingKeys`. 39 i18n keys were
+  renamed to numbered variants (`….1`).
+- **Validate warns on too few variants**, by the sim's average showings
+  per run: 4 or more → at least 4; 2 to 4 → 3; under 2 → 2; once-per-run
+  items → 2. The measure is `npm run sim:variants` (player-like personas,
+  1000 runs each), written to `sim/appearances.json`; its gap list is
+  what round 2b's writing is drafted against.
+- **Single-word tiers** (draft v5): Unknown · Noticed · Rising · Known ·
+  Famous; Quiet · Whispers · Chatter · Circling · Breaking · Frenzy; Raw ·
+  Learning · Solid · Seasoned · Skilled · Masterful. A tier word is one
+  word of at most 10 characters (voice.md; validate enforces). "Famous"
+  also resolves the collision of "Household name" with the minor
+  Household Name.
+- **Decision 1's wording revised**: "Breaking" and "Frenzy" only ever
+  appear once a line is crossed, so the tier word already says it; the
+  stat bar drops "LINE CROSSED" and keeps "N TO NEXT" beside it. The
+  frozen rule — only the integer distance to the next scandal — is
+  unchanged.
+- **Money is shown as pounds, capital × £1,000**: capital 4 reads
+  "£4,000", with a thousands separator, everywhere money appears — the
+  stat bar, card text, requirements, previews, the feed. Values and rules
+  are unchanged; it is display only. Money has no tier word because in
+  this game money is for spending, not a mark of status; and a turn is a
+  month, so the figures read true — a month of side gigs is £3,000, a
+  brand deal £7,000, a publicist £4,000.
+
 ## 2026-09-30 — Phase 2a, Part B: endings and the established lane
 
 Measured with the sim, 1000 runs per persona on seeds 20260929, 1 and
