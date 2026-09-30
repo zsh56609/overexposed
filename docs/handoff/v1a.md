@@ -3,7 +3,7 @@
 Round V1a built the desk, static: the main screen as `docs/design/visual/README.md` §1–§7 describes it,
 every state, hover, tooltips and the simple interactions. Round V1b adds the motion on the desk — README §9
 "Playing a card" and "Month end". This note is what the V1b agent needs; the decisions behind each part are in
-`docs/decisions.md` (the six "Round V1a" entries of 2026-10-01).
+`docs/decisions.md` (the round's entries of 2026-10-01: "Round 308e7bb answered", then "Round V1a" Parts A–F and its acceptance).
 
 ## Where things are
 
