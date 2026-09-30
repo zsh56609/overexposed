@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part B: the stat bar
+
+- **As README §1 and the mockup set it**: the geometry (five cells of
+  114px from x=16, the actions cell fixed at 586–694 so the bulbs centre
+  on x=640), the order, the icons in their fixed colours, the tier word
+  with its small number, the countdown's four levels (from /core's
+  `countdownLevel`), money in pounds, the three bulbs, the current
+  season's three marks and the date, and the measured optical offsets.
+  The craft icon is the clapperboard exactly while the established lane
+  is screen.
+- **Actions used go dark from the left**, as the mockup's play does.
+  While drafting or at a gate every bulb is lit: the month's actions are
+  all still ahead.
+- **Tooltips**: on hover, on a long-press on touch, and on keyboard focus;
+  a tap does not open one (it only focuses the cell). The tooltip stands
+  above the plain screens of round V2, so it can be read while choosing —
+  in the mockup it would sit under the overlay's scrim.
+- **The deck opens from the stat bar**: a small "Deck & discard" button
+  after the actions cell. The README places no deck opener on the desk;
+  the deck is a V2 screen, and this keeps it reachable in every phase
+  until V2 decides where it lives.
+- `check:preview` now builds the desk's model at every state and holds
+  it to /core: every tier word and number, the icons, the countdown and
+  its level, money, the actions, the date and the season marks, each
+  tooltip, the season, and the crisis look (the issue's frenzy, recounted
+  from the month's scandal lines). Before each END TURN, the issue on the
+  desk must be the month END TURN prints.
+
 ## 2026-10-01 — Round V1a, Part A: the desk's foundations
 
 - **The stage** stays the one 1280×720 stage, scaled to fit, and now

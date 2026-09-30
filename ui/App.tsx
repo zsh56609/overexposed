@@ -39,7 +39,6 @@ import { feedLines, type FeedLine } from './feed.ts';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewDraftCard, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
-import { statCells } from './stats.ts';
 import {
   awardCitation,
   awardName,
@@ -224,6 +223,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).at(-1) ?? null }), [snap.steps]);
   // The desk: every word and number it shows, from /core (round V1a; ui/desk/model.ts).
   const model = useMemo(() => deskModel({ state: s, steps: snap.steps, lines }), [s, snap.steps, lines]);
+  // What the desk can ask for: stable, so a part that did not change does not render again.
+  const on = useMemo(() => ({ deck: () => setDeckOpen(true) }), []);
 
   const act = (action: Action) => {
     if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
@@ -243,15 +244,9 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
-    <Desk model={model}>
+    <Desk model={model} on={on}>
       {/* V1a scaffolding: the plain play area over the new scene, until the desk's parts replace it. */}
       <div className="plain dock">
-        <div className="dock-stats">
-          <StatStrip s={s} lane={lines.lane} />
-          <button className="deck-open" onClick={() => setDeckOpen(true)}>
-            {t('ui.deck.open')}
-          </button>
-        </div>
         <div className="dock-feed">
           <Feed c={c} steps={snap.steps} />
         </div>
@@ -299,84 +294,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
-// Frame: masthead, stat strip, feed, side panel
-
-/**
- * A tooltip (round 2c, A2): shown on hover, or on a long-press on touch until the next tap; a header, then
- * a line. It never takes a click: pointer events pass through it.
- */
-function HoverTip({ header, line, className, align = 'left', children }: { header: string; line: string; className?: string; align?: 'left' | 'right'; children: ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const timer = useRef<number | undefined>(undefined);
-  useEffect(() => {
-    if (!open) return;
-    const close = () => setOpen(false);
-    document.addEventListener('pointerdown', close);
-    return () => document.removeEventListener('pointerdown', close);
-  }, [open]);
-  return (
-    <span
-      className={`tipped${className ? ` ${className}` : ''}`}
-      tabIndex={0}
-      onPointerEnter={(e) => {
-        if (e.pointerType === 'mouse') setOpen(true);
-      }}
-      onPointerLeave={(e) => {
-        if (e.pointerType === 'mouse') setOpen(false);
-      }}
-      onPointerDown={(e) => {
-        if (e.pointerType === 'mouse') return;
-        window.clearTimeout(timer.current);
-        timer.current = window.setTimeout(() => setOpen(true), 450);
-      }}
-      onPointerUp={() => window.clearTimeout(timer.current)}
-      onPointerCancel={() => window.clearTimeout(timer.current)}
-      onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
-    >
-      {children}
-      {open && (
-        <span className={`tip ${align}`} role="tooltip">
-          <strong>{header}</strong>
-          <span className={prose(line)}>{line}</span>
-        </span>
-      )}
-    </span>
-  );
-}
-
-/**
- * The stat bar (decision 25; round 2c, A1–A4): hype · craft · heat · next scandal · money · actions. Ambient
- * state is words, decisions are numbers: the tier /core picks, the number small beside it. The countdown
- * keeps its "N TO GO" (decision 1) in four levels. Every cell has a tooltip (ui/stats.ts); actions show in
- * the play phase.
- */
-function StatStrip({ s, lane }: { s: GameState; lane: string | null }) {
-  return (
-    <div className="stats">
-      {statCells(s, lane).map((cell) =>
-        cell.id === 'actions' && s.phase !== 'play' ? null : (
-          <HoverTip key={cell.id} header={cell.tipHeader} line={cell.tipLine} className={`stat stat-${cell.id}${cell.level ? ` level-${cell.level}` : ''}`}>
-            {cell.id === 'next' ? (
-              <strong className="togo">{cell.value}</strong>
-            ) : (
-              <>
-                <span className="stat-name">{cell.label}</span>{' '}
-                {cell.tier !== null ? (
-                  <>
-                    <strong className="tier">{cell.tier}</strong> <small className="num">{cell.value}</small>
-                  </>
-                ) : (
-                  <span className={cell.id === 'actions' ? 'pips' : 'value'}>{cell.value}</span>
-                )}
-              </>
-            )}
-          </HoverTip>
-        ),
-      )}
-    </div>
-  );
-}
+// Frame: feed, side panel (the stat bar is the desk's: ui/desk/StatBar.tsx)
 
 function Feed({ c, steps }: { c: ContentIndex; steps: readonly PlayedStep[] }) {
   const box = useRef<HTMLDivElement>(null);

@@ -58,25 +58,6 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .plain .masthead .seed { flex: 1; text-align: right; }
 .plain .masthead .counts { font-size: 0.85em; }
 .plain .masthead .deck-open { font-size: 0.8em; padding: 0 0.5em; }
-/* Sized for the widest bar a run can show — "Household name", "Finding your voice", "A story is breaking",
-   "LINE CROSSED · N TO THE NEXT" at once — with room to spare on the 1280px stage. */
-.plain .stats { flex: none; display: flex; align-items: baseline; gap: 0.75em; padding: 0.3em 0.8em; border-bottom: 1px solid var(--rule); white-space: nowrap; font-size: 0.9em; }
-/* Decision 25: the tier word leads; the number is small beside it, and in full on hover (title). */
-.plain .stat-name { color: var(--muted); font-size: 0.85em; }
-.plain .stat .tier { font-weight: bold; }
-.plain .stat .num { color: var(--muted); font-size: 0.75em; }
-.plain .togo { font-weight: bold; font-size: 0.9em; }
-/* The next-scandal countdown's four levels (round 2c, A4): 5+ to go plain, 3–4 amber, 2 or fewer red, crossed
-   red and emphasised. The levels come from content (rules.tiers.heat.countdown), never from a number here. */
-.plain .level-amber .togo { color: #a35f00; }
-.plain .level-red .togo { color: var(--red); }
-.plain .level-crossed .togo { color: var(--page); background: var(--red); padding: 0 0.35em; letter-spacing: 0.04em; }
-/* Tooltips (round 2c, A2): under the element, inside the stage; they never take a click. */
-.plain .tipped { position: relative; }
-.plain .tipped:focus { outline: none; }
-.plain .tip { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; width: 300px; display: flex; flex-direction: column; gap: 0.2em; padding: 0.35em 0.55em; background: var(--page); color: var(--ink); border: 1px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 0.8rem; font-weight: normal; line-height: 1.3; white-space: normal; pointer-events: none; }
-.plain .tip.right { left: auto; right: 0; }
-.plain .tip strong { font-size: 1.05em; }
 .plain .masthead .season { margin-left: 0.4em; }
 .plain .dateline { margin: 0 0 0.15em; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.06em; }
 .plain .pips { letter-spacing: 0.1em; }
@@ -235,9 +216,7 @@ ul, ol { margin: 0; padding-left: 1.1em; }
    replace it (round V1a, Parts B–F); nothing here outlives Part F. */
 .plain.dock { position: absolute; inset: 0; z-index: 100; pointer-events: none; font: 20px/1.3 system-ui, sans-serif; color: var(--ink); }
 .plain.dock > * { pointer-events: auto; }
-.plain.dock > .dock-stats, .plain.dock > .dock-feed, .plain.dock > .dock-goals, .plain.dock > .dock-hand { position: absolute; background: var(--page); overflow: hidden; }
-.plain .dock-stats { left: 0; right: 0; top: 0; height: 46px; display: flex; align-items: center; }
-.plain .dock-stats .stats { flex: 1; border: 0; }
+.plain.dock > .dock-feed, .plain.dock > .dock-goals, .plain.dock > .dock-hand { position: absolute; background: var(--page); overflow: hidden; }
 .plain .dock-feed { left: 176px; top: 58px; width: 470px; height: 344px; padding: 0.3em 0.5em; font-size: 0.7em; }
 .plain .dock-feed .feed { height: 100%; border: 0; }
 .plain .dock-goals { left: 688px; top: 52px; width: 420px; height: 350px; padding: 0.3em 0.5em; }

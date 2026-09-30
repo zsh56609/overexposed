@@ -13,6 +13,7 @@
 }
 .desk *, .desk *::before, .desk *::after { box-sizing: border-box; margin: 0; padding: 0; }
 .desk button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; }
+.desk .icondefs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .desk .wallpaper { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 235, 200, .028) 0 2px, transparent 2px 40px); }
 .desk .lightpool { position: absolute; left: 540px; top: 0; width: 780px; height: 560px; background: radial-gradient(ellipse at 50% 40%, var(--light), transparent 62%); opacity: .26; mix-blend-mode: screen; transition: background .7s; }

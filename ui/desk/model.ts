@@ -82,6 +82,8 @@ export interface StatBarModel {
   readonly cells: readonly StatCellModel[];
   readonly actions: { readonly total: number; readonly left: number; readonly tipHeader: string; readonly tipLine: string };
   readonly when: { readonly date: string; readonly marks: readonly ('past' | 'now' | 'next')[]; readonly tipHeader: string; readonly tipLine: string };
+  /** The deck's button (the deck itself is a screen of round V2). */
+  readonly deck: string;
 }
 
 export interface NoteReq {
@@ -210,21 +212,25 @@ export interface DeskInput {
 
 const seasonOf = (s: GameState): SeasonId => s.content.rules.seasons?.[s.act - 1] ?? 'summer';
 
+/**
+ * The issue on the desk (see the header): in the play phase, the month's front pages as they would print if
+ * the player ended the month now — composed from the history with that month end added, which `history`
+ * returns; otherwise /core's issueNow.
+ */
+export function deskIssue(s: GameState, steps: readonly PlayedStep[]): { readonly issue: MonthPress | null; readonly history: readonly PlayedStep[] } {
+  if (s.phase !== 'play') return { issue: issueNow(steps), history: steps };
+  const after = reduce(s, { type: 'END_TURN' });
+  const history = [...steps, { id: -1, action: { type: 'END_TURN' as const }, before: s, after, events: after.events }];
+  return { issue: frontPages(history).at(-1) ?? null, history };
+}
+
 export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
   const lane = lines.lane;
   const laneClass: LaneClass = lane === 'music' || lane === 'screen' || lane === 'celebrity' ? lane : 'early';
   const tiers = statTiers(s);
   const fame = tiers.hype?.index ?? 0;
-
-  // The issue, and the month's end if the player ended it now: one reducer run serves both.
-  let hypothetical: PlayedStep | null = null;
-  if (s.phase === 'play') {
-    const after = reduce(s, { type: 'END_TURN' });
-    hypothetical = { id: -1, action: { type: 'END_TURN' }, before: s, after, events: after.events };
-  }
-  const issue: MonthPress | null = hypothetical ? (frontPages([...steps, hypothetical]).at(-1) ?? null) : issueNow(steps);
+  const { issue, history } = deskIssue(s, steps);
   const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter, lane) : null;
-  const history: readonly PlayedStep[] = hypothetical ? [...steps, hypothetical] : steps;
   const season = seasonOf(s);
 
   return {
@@ -279,6 +285,7 @@ function statBar(s: GameState, lane: string | null): StatBarModel {
       tipHeader: calendarLabel(c, s.turn),
       tipLine: dateLine(c, s.turn),
     },
+    deck: t('ui.deck.open'),
   };
 }
 

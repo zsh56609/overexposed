@@ -15,10 +15,14 @@
 //                tooltip against the month (round 2c).
 // After each run: the front pages and the manager's messages are pure functions of history (round 2b),
 // and the feed prints every message and every month-end perk line.
+// The desk (round V1a): at every state, every number and word the desk's adapter (ui/desk/model.ts) gives
+// the scene against /core; before each END TURN, the issue on the desk is the month END TURN prints.
 // Exit code 1 on any mismatch.
 
 import {
   bagIndex,
+  calendarDate,
+  countdownLevel,
   createInitialState,
   cursor,
   deriveSeed,
@@ -41,6 +45,7 @@ import {
   monthEndEffects,
   monthEndLines,
   nextInt,
+  pressLines,
   readLines,
   reduce,
   rerollCost,
@@ -62,6 +67,7 @@ import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
 import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, seasonLabel } from '../ui/text.ts';
+import { deskIssue, deskModel } from '../ui/desk/model.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -72,7 +78,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { desks: 0, deskIssues: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -178,6 +184,11 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   // Heat carries into a next month unless this month end leads straight to the year's end.
   const yearEnds = real.phase === 'gate' && reduce(real, { type: 'CHOOSE_GATE', gateId: real.gateOffer[0] ?? '' }).phase === 'ended';
   if (pe.carries === yearEnds) report('endTurn carries', seed, s.turn, `preview carries=${pe.carries}, but the year ${yearEnds ? 'ends' : 'goes on'}`);
+  // The desk (round V1a): the issue on the desk before END TURN is exactly the month END TURN prints.
+  const ended: PlayedStep = { id: (history.at(-1)?.id ?? 0) + 1, action: { type: 'END_TURN' }, before: s, after: real, events: real.events };
+  const printed = frontPages([...history, ended]).at(-1);
+  if (!same(deskIssue(s, history).issue, printed)) report('desk issue', seed, s.turn, 'the issue on the desk before END TURN is not the month it prints');
+  counts.deskIssues++;
   counts.monthEndScandals += realCards.length;
   counts.copies += realCards.filter((x) => x.cause.kind === 'added').length;
   // The preview never reveals the next turn's draw.
@@ -458,6 +469,62 @@ function checkStatBar(s: GameState, seed: number, lane: string | null): void {
   checkDate(s, seed);
 }
 
+/**
+ * The desk (round V1a): every number and word the adapter gives the scene, against /core.
+ * - The stat bar (README §1): the cells in order; each tier word and number; the icons, craft's by lane; the
+ *   countdown, its level, and money; the actions left; the date and the season's marks; every tooltip the
+ *   cell's own (held to /core by checkStatBar). The season is content's for the act; the crisis look is the
+ *   issue's frenzy — in the play phase, the scandals this month would print reaching `frenzyAt`.
+ */
+function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], lane: string | null): void {
+  counts.desks++;
+  const c = s.content;
+  const m = deskModel({ state: s, steps: history, lines: { ...readLines(history), lane } });
+  const bad = (what: string) => report('desk', seed, s.turn, what);
+  // The stat bar.
+  const bar = m.stats;
+  const order = bar.cells.map((x) => x.id).join(' · ');
+  if (order !== 'hype · craft · heat · next · money') bad(`stat bar order ${order}`);
+  const icons: Record<string, string> = { hype: 'star', craft: lane === 'screen' ? 'clap' : 'note', heat: 'flame', next: 'paper', money: 'cash' };
+  const tips = statCells(s, lane);
+  for (const cell of bar.cells) {
+    if (cell.icon !== icons[cell.id]) bad(`${cell.id}: icon ${cell.icon}, lane ${lane}`);
+    const tip = tips.find((x) => x.id === cell.id);
+    if (cell.tipHeader !== tip?.tipHeader || cell.tipLine !== tip.tipLine) bad(`${cell.id}: tooltip "${cell.tipHeader}" is not the cell's`);
+  }
+  const tiers = statTiers(s);
+  for (const id of ['hype', 'craft', 'heat'] as const) {
+    const cell = bar.cells.find((x) => x.id === id);
+    const tier = tiers[id];
+    if (!cell || !tier || cell.word !== t(tier.nameKey) || cell.number !== String(s.resources[id])) bad(`${id}: shows ${cell?.word} ${cell?.number}, is ${tier ? t(tier.nameKey) : '?'} ${s.resources[id]}`);
+  }
+  const next = bar.cells.find((x) => x.id === 'next');
+  if (next?.word !== heatText(heatLine(s)) || next.number !== null || next.level !== countdownLevel(s)) bad(`countdown shows ${next?.word} (${next?.level}), is ${heatText(heatLine(s))} (${countdownLevel(s)})`);
+  const cash = bar.cells.find((x) => x.id === 'money');
+  if (cash?.word !== money(s.resources.capital) || cash.number !== null) bad(`money shows ${cash?.word}, is ${money(s.resources.capital)}`);
+  const total = c.rules.slotsPerTurn;
+  const left = s.phase === 'play' ? s.slots : total;
+  if (bar.actions.total !== total || bar.actions.left !== left) bad(`actions ${bar.actions.left} of ${bar.actions.total}, are ${left} of ${total}`);
+  if (!bar.actions.tipHeader.endsWith(` · ${left} left`)) bad(`actions tooltip "${bar.actions.tipHeader}"`);
+  if (bar.when.date !== CALENDAR[s.turn - 1] || bar.when.tipHeader !== bar.when.date || bar.when.tipLine !== dateLine(c, s.turn)) bad(`date ${bar.when.date}`);
+  const k = turnInAct(s);
+  const marks = Array.from({ length: calendarDate(c, s.turn).seasonMonths }, (_, i) => (i + 1 < k ? 'past' : i + 1 === k ? 'now' : 'next'));
+  if (!same(bar.when.marks, marks) || marks.length !== c.rules.turnsPerAct) bad(`season marks ${bar.when.marks} in month ${k} of the season`);
+  // The season and the crisis look.
+  if (m.season !== c.rules.seasons?.[s.act - 1] || c.rules.actNameKeys[s.act - 1] !== `act.${m.season}.name`) bad(`season ${m.season} in act ${s.act}`);
+  const { issue, history: withEnd } = deskIssue(s, history);
+  const frenzyAt = c.press?.page?.frenzyAt ?? Infinity;
+  const scandals = pressLines(withEnd).filter((l) => l.kind === 'scandal' && monthOfStep(withEnd, l.step) === issue?.turn).length;
+  if (m.crisis !== (issue?.frenzy ?? false) || (issue !== null && m.crisis !== scandals >= frenzyAt)) bad(`crisis ${m.crisis} with ${scandals} scandals this month (frenzy at ${frenzyAt})`);
+}
+
+/** The month a step belongs to: a month end belongs to the month it ends. */
+function monthOfStep(history: readonly PlayedStep[], step: number): number {
+  const h = history[step];
+  const end = h ? turnEndOf(h.events) : undefined;
+  return end?.type === 'turnEnd' ? end.turn : (h?.before?.turn ?? h?.after.turn ?? 0);
+}
+
 /** The calendar (round 2c, A3): month 1 is March 2027, month 10 December 2027, months 11 and 12 January and February 2028. */
 const CALENDAR = ['March 2027', 'April 2027', 'May 2027', 'June 2027', 'July 2027', 'August 2027', 'September 2027', 'October 2027', 'November 2027', 'December 2027', 'January 2028', 'February 2028'];
 
@@ -519,6 +586,7 @@ for (let i = 0; i < RUNS; i++) {
     const lane = establishedLanes(history).at(-1) ?? null;
     if (s.establishedLane !== lane) report('lane', seed, s.turn, `the reducer holds ${s.establishedLane}, history reads ${lane}`);
     checkStatBar(s, seed, lane);
+    if (s.phase !== 'manager') checkDesk(s, seed, history, lane);
     checkGoals(s, seed);
     if (s.phase === 'play') checkPlayPhase(s, seed, history);
     else if (s.phase === 'gate') checkGatePhase(s, seed);
@@ -540,7 +608,8 @@ console.log(
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
-    `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
+    `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
+    `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

@@ -4,14 +4,24 @@
 // (the plain screens until round V2).
 
 import type { ReactNode } from 'react';
+import { IconDefs } from './Icons.tsx';
 import type { DeskModel } from './model.ts';
+import { StatBar } from './StatBar.tsx';
 import './tokens.css';
 import './fonts.css';
 import './css/scene.css';
+import './css/stats.css';
 
-export function Desk({ model, children }: { model: DeskModel; children?: ReactNode }) {
+/** What the player can do on the desk: each is a dispatch or a UI toggle in App, never a rule. */
+export interface DeskActions {
+  /** Open the deck (its plain screen until round V2). */
+  readonly deck: () => void;
+}
+
+export function Desk({ model, on, children }: { model: DeskModel; on: DeskActions; children?: ReactNode }) {
   return (
     <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}`} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+      <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
       <div className="floor" />
@@ -22,6 +32,7 @@ export function Desk({ model, children }: { model: DeskModel; children?: ReactNo
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
       <div className="scene3d pile" data-hook="pile" />
       <div className="dim" />
+      <StatBar stats={model.stats} season={model.season} onDeck={on.deck} />
       {children}
     </div>
   );

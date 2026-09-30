@@ -1,0 +1,88 @@
+/* The stat bar (round V1a; README §1), as the mockup (v18) sets it: `.stats`, `.cell`, `.pill`, `.strip`,
+   `.slotcell`, with the measured optical offsets — icons and text aligned by their ink, not their boxes. */
+
+.desk .stats {
+  position: absolute; left: 0; top: 0; width: 1280px; height: 46px; z-index: 60;
+  display: flex; align-items: center; padding: 0 14px 0 16px;
+  background: rgba(10, 8, 6, .8); border-bottom: 1px solid rgba(255, 220, 170, .12); color: var(--cream);
+}
+.desk .stats .cell {
+  width: 114px; height: 26px; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 0 4px;
+  border-left: 1px solid rgba(255, 220, 170, .16); white-space: nowrap; overflow: hidden; flex: none; cursor: help; outline: none;
+}
+.desk .stats .cell:first-child { border-left: none; }
+.desk .stats .cell:focus-visible { box-shadow: inset 0 0 0 1px rgba(255, 207, 133, .6); }
+/* The actions cell is fixed so its three bulbs centre exactly on x=640; dividers on both sides. */
+.desk .stats .slotcell { position: absolute; left: 586px; width: 108px; border-right: 1px solid rgba(255, 220, 170, .16); }
+.desk .stats .cell svg { width: 14px; height: 14px; flex: none; }
+.desk .stats .cell .w { font-weight: 800; font-size: 12px; letter-spacing: -.005em; color: var(--cream); }
+.desk .stats .cell .n { color: #9c8e7b; font-size: 10px; font-weight: 600; }
+
+/* Icon colours never change. */
+.desk .stats .cell.hype { color: var(--icon-hype); }
+.desk .stats .cell.craft { color: var(--icon-craft); }
+.desk .stats .cell.heat { color: var(--icon-heat); }
+.desk .stats .cell.money { color: var(--icon-money); }
+.desk .stats .cell.heat .w { color: #ffcf85; }
+.desk.crisis .stats .cell.heat .w { color: #ff6b55; }
+
+/* The actions: three bulbs; a used action goes dark. */
+.desk .stats .slotbulbs { display: flex; gap: 7px; align-items: center; }
+.desk .stats .slotbulbs i { width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 8px 2px rgba(255, 214, 130, .55); transition: all .3s; }
+.desk .stats .slotbulbs i.used { background: radial-gradient(circle at 40% 35%, #5e564d, #34302b 70%); box-shadow: none; }
+
+/* The next-scandal countdown: ≥5 to go neutral · 3–4 amber · ≤2 red · crossed filled red with a slow pulse.
+   The newspaper icon stays scandal-red except when filled, where it turns white. */
+.desk .stats .pill { display: flex; align-items: center; gap: 4px; border: 1px solid rgba(237, 230, 214, .32); padding: 3px 6px 3px 5px; border-radius: 3px; color: var(--cream); transition: all .3s; }
+.desk .stats .pill em { font-style: normal; font-weight: 800; font-size: 10px; letter-spacing: .06em; }
+.desk .stats .pill svg { width: 13px; height: 13px; color: var(--icon-scandal); }
+.desk .stats .pill.warn { border-color: #ffcf85; color: #ffcf85; }
+.desk .stats .pill.close { border-color: #ff5a45; color: #ff6b55; box-shadow: 0 0 10px rgba(255, 90, 69, .38); }
+.desk .stats .pill.over { border-color: #ff5a45; background: #c3261a; color: #fff; animation: desk-pulseR 1.6s ease-in-out infinite; }
+.desk .stats .pill.close svg { color: currentColor; }
+.desk .stats .pill.over svg { color: #fff; }
+@keyframes desk-pulseR { 0%, 100% { box-shadow: 0 0 7px rgba(255, 90, 69, .35); } 50% { box-shadow: 0 0 18px rgba(255, 90, 69, .8); } }
+
+/* The season marks and the date, at the right. */
+.desk .stats .when { margin-left: auto; display: flex; align-items: center; gap: 14px; cursor: help; outline: none; color: var(--cream); }
+.desk .stats .when:focus-visible { box-shadow: 0 0 0 1px rgba(255, 207, 133, .6); }
+.desk .stats .when b { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 17px; }
+.desk .stats .strip { display: flex; gap: 4px; align-items: center; }
+.desk .stats .strip svg { width: 15px; height: 15px; color: rgba(237, 230, 214, .2); transition: color .3s; }
+.desk .stats .strip svg.past { color: var(--sc); opacity: .55; }
+.desk .stats .strip svg.now { color: var(--sc); filter: drop-shadow(0 0 4px var(--sc)); }
+
+/* The optical offsets, measured in the mockup: text +0.75px, numbers +1px, flame +1.25px, craft and money
+   icons +0.25px, clapperboard −0.5px, date −1px, season marks +0.85px, pill contents +0.75px. */
+.desk .stats .cell .w { transform: translateY(.75px); }
+.desk .stats .cell .n { transform: translateY(1px); }
+.desk .stats .cell.craft > svg, .desk .stats .cell.money > svg { transform: translateY(.25px); }
+.desk .stats .cell.heat > svg { transform: translateY(1.25px); }
+.desk .stats .cell.craft > svg.clap { transform: translateY(-.5px); }
+.desk .stats .pill svg, .desk .stats .pill em { transform: translateY(.75px); }
+.desk .stats .when b { transform: translateY(-1px); }
+.desk .stats .strip { transform: translateY(.85px); }
+
+/* The deck (V1a): its plain screen (round V2) opens from here, in every phase, so the player can look while
+   choosing. Not in the README's stat bar — see docs/handoff/v1a.md. */
+.desk .stats .deckbtn {
+  position: absolute; left: 708px; top: 10px; height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 9px;
+  border: 1px solid rgba(237, 230, 214, .22); border-radius: 3px; color: rgba(237, 230, 214, .78);
+  font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; transition: color .2s, border-color .2s;
+}
+.desk .stats .deckbtn svg { width: 13px; height: 13px; flex: none; }
+.desk .stats .deckbtn span { transform: translateY(.75px); }
+.desk .stats .deckbtn:hover, .desk .stats .deckbtn:focus-visible { color: var(--cream); border-color: rgba(237, 230, 214, .55); outline: none; }
+
+/* A tooltip under its cell: a header with the stat, tier and value, then one short line in the game's voice.
+   Above the plain screens of round V2, so it reads while the player chooses; it never takes a click. */
+.desk .tip {
+  position: absolute; top: 52px; z-index: 200; width: 236px; background: var(--ink); color: var(--cream);
+  border: 1px solid rgba(255, 220, 170, .28); padding: 9px 12px 10px; box-shadow: 0 12px 24px rgba(0, 0, 0, .6);
+  opacity: 0; transform: translateY(-4px); transition: opacity .15s, transform .15s; pointer-events: none;
+}
+.desk .tip.on { opacity: 1; transform: none; }
+.desk .tip::before { content: ""; position: absolute; top: -6px; left: 22px; width: 10px; height: 10px; background: var(--ink); border-left: 1px solid rgba(255, 220, 170, .28); border-top: 1px solid rgba(255, 220, 170, .28); transform: rotate(45deg); }
+.desk .tip b { display: block; font-size: 8.5px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #ffcf85; margin-bottom: 4px; }
+.desk .tip span { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 13px; line-height: 1.38; }
+.desk .placeholder { outline: 1px dashed currentColor; outline-offset: 1px; opacity: .8; }
