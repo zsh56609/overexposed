@@ -20,6 +20,7 @@ import {
   issueNow,
   majorRequirements,
   managerMessages,
+  playCheck,
   pressLines,
   reduce,
   statTiers,
@@ -35,7 +36,7 @@ import {
   type SceneId,
   type SeasonId,
 } from '../../core/index.ts';
-import { has, t } from '../i18n.ts';
+import { has, t, tp } from '../i18n.ts';
 import { legalOf, outcomeOf, previewEndTurn, type EndTurnPreview, type LinesSoFar } from '../preview.ts';
 import type { PlayedStep } from '../queue.ts';
 import { statCells } from '../stats.ts';
@@ -46,7 +47,9 @@ import {
   cardRuleLines,
   cardText,
   clauseText,
+  conditionText,
   dateLine,
+  flagName,
   lineText,
   majorGoal,
   majorName,
@@ -177,7 +180,8 @@ export interface DeskLabels {
 }
 
 export interface ValueChip {
-  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'text';
+  /** `flag`: what the card marks the player as ("Went viral"), in the flag's own words. */
+  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'text';
   readonly icon: IconId | null;
   readonly text: string;
 }
@@ -190,11 +194,27 @@ export interface HandCardModel {
   readonly name: string;
   /** Values for a card whose effects are all plain values (round V1a, 0.3); else null and `rules` holds its text. */
   readonly values: readonly ValueChip[] | null;
+  /** A conditional card's rules; a scandal's, when drawn and at month end. */
   readonly rules: string | null;
+  /** What a card with plain values needs to be played ("Needs 20 Hype"). */
+  readonly needs: string | null;
   readonly flavour: string | null;
   /** Actions it costs: bulbs on the face only above one. */
   readonly cost: number;
   readonly playable: boolean;
+  /** Why it cannot be played now, as /core's playCheck says: a scandal, no actions left, or its requirement. */
+  readonly why: 'scandal' | 'actions' | 'requires' | null;
+}
+
+/** The hand's own words: a face's printed header, the notes a click on a card that can't be played shows. */
+export interface HandWords {
+  readonly callsheet: string;
+  readonly revision: string;
+  readonly pass: string;
+  /** The scandal face's ✕. */
+  readonly cross: string;
+  readonly scandal: string;
+  readonly noActions: string;
 }
 
 export interface EndTurnModel {
@@ -205,6 +225,8 @@ export interface EndTurnModel {
 }
 
 export interface DeskModel {
+  /** The play phase: the hand and END TURN are on the desk. */
+  readonly playing: boolean;
   readonly season: SeasonId;
   readonly crisis: boolean;
   readonly lane: LaneClass;
@@ -220,6 +242,7 @@ export interface DeskModel {
   /** The frenzy's two crumpled paper balls: each its own shape, from the run's seed. */
   readonly balls: readonly [number, number];
   readonly hand: readonly HandCardModel[];
+  readonly handWords: HandWords;
   readonly endTurn: EndTurnModel;
   /** The END TURN preview, for its hover (null outside the play phase). */
   readonly endPreview: EndTurnPreview | null;
@@ -255,6 +278,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
   const season = seasonOf(s);
 
   return {
+    playing: s.phase === 'play',
     season,
     crisis: issue?.frenzy ?? false,
     lane: laneClass,
@@ -269,6 +293,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
     labels: labels(),
     balls: [deriveSeed(s.seed, 0xba11), deriveSeed(s.seed, 0xba12)],
     hand: hand(s, lines),
+    handWords: HAND_WORDS(),
     endTurn: endTurn(s, endPreview),
     endPreview,
   };
@@ -519,10 +544,14 @@ function labels(): DeskLabels {
 // ---------------------------------------------------------------------------
 // The hand (README §6)
 
-const PLAIN_OPS = new Set(['resource', 'draw', 'slots']);
+/** The effects a face shows as values; a flag it sets is a value too, named by the flag's own label. */
+const PLAIN_OPS = new Set(['resource', 'draw', 'slots', 'setFlag']);
 
-/** A card's effects as values (round V1a, 0.3): icon and number in the resource's colour; drawing is "Draw N". */
-function chips(s: GameState, cardId: string): ValueChip[] | null {
+/**
+ * A card's effects as values (round V1a, 0.3): icon and number in the resource's colour — craft's icon the
+ * stat bar's, by the established lane; drawing is "Draw N"; extra actions and a flag set in their words.
+ */
+function chips(s: GameState, cardId: string, lane: string | null): ValueChip[] | null {
   const card = getCard(s.content, cardId);
   const effects = card?.effects ?? [];
   if (!card || !effects.every((e) => PLAIN_OPS.has(e.op))) return null;
@@ -531,12 +560,25 @@ function chips(s: GameState, cardId: string): ValueChip[] | null {
     if (e.op === 'resource') {
       if (e.target === 'capital') return { kind: e.value >= 0 ? 'gain' : 'cost', icon: null, text: signedMoney(e.value) };
       if (e.target === 'hype') return { kind: 'hype', icon: 'star', text: signed(e.value) };
-      if (e.target === 'craft') return { kind: 'craft', icon: card.lane === 'screen' ? 'clap' : 'note', text: signed(e.value) };
+      if (e.target === 'craft') return { kind: 'craft', icon: lane === 'screen' ? 'clap' : 'note', text: signed(e.value) };
       return { kind: 'heat', icon: 'flame', text: signed(e.value) };
     }
+    if (e.op === 'setFlag') return { kind: 'flag', icon: null, text: flagName(e.flag) };
+    if (e.op === 'slots') return { kind: 'text', icon: null, text: tp('ui.effect.slots', e.value, { delta: signed(e.value) }) };
     return { kind: 'text', icon: null, text: cardText(s.content, cardId) };
   });
 }
+
+const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
+
+const HAND_WORDS = (): HandWords => ({
+  callsheet: t('ui.face.callsheet'),
+  revision: t('ui.face.revision'),
+  pass: t('ui.face.pass'),
+  cross: t('ui.face.cross'),
+  scandal: t('ui.toast.scandal'),
+  noActions: t('ui.toast.noActions'),
+});
 
 function hand(s: GameState, lines: LinesSoFar): HandCardModel[] {
   const c = s.content;
@@ -544,7 +586,9 @@ function hand(s: GameState, lines: LinesSoFar): HandCardModel[] {
   return s.hand.map((h) => {
     const def = getCard(c, h.cardId);
     const scandal = def?.kind === 'scandal';
-    const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, h.cardId);
+    const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, h.cardId, lines.lane);
+    const playable = legal.play.has(h.uid);
+    const check = playable ? null : playCheck(s, h.uid);
     return {
       uid: h.uid,
       cardId: h.cardId,
@@ -553,9 +597,11 @@ function hand(s: GameState, lines: LinesSoFar): HandCardModel[] {
       name: cardName(c, h.cardId),
       values,
       rules: scandal ? cardRuleLines(c, h.cardId).join(' ') || null : values === null ? cardText(c, h.cardId) : null,
+      needs: !scandal && values !== null && def?.requires ? capitalised(t('ui.card.needs', { cond: conditionText(c, def.requires) })) : null,
       flavour: scandal ? lineText(c, lines.inHand.get(h.uid), h.cardId) : cardFlavor(c, h.cardId),
       cost: def?.cost ?? 1,
-      playable: legal.play.has(h.uid),
+      playable,
+      why: scandal ? 'scandal' : !check ? null : check.blockers.some((b) => b.code === 'slots') ? 'actions' : 'requires',
     };
   });
 }

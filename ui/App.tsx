@@ -26,7 +26,6 @@ import {
   type CardInstance,
   type ContentIndex,
   type GameState,
-  type LineShow,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { Desk } from './desk/Desk.tsx';
@@ -168,11 +167,6 @@ interface Anchor {
   readonly areaHeight: number;
 }
 
-function anchorOf(el: HTMLElement): Anchor {
-  const area = el.offsetParent as HTMLElement | null;
-  return { left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, areaWidth: area?.offsetWidth ?? 0, areaHeight: area?.offsetHeight ?? 0 };
-}
-
 /** What floats beside the player's pointer: a card's preview, the end of the month's, or nothing. */
 type Focus = { readonly kind: 'card'; readonly uid: number; readonly anchor: Anchor } | { readonly kind: 'end'; readonly anchor: Anchor } | null;
 
@@ -215,19 +209,29 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).at(-1) ?? null }), [snap.steps]);
   // The desk: every word and number it shows, from /core (round V1a; ui/desk/model.ts).
   const model = useMemo(() => deskModel({ state: s, steps: snap.steps, lines }), [s, snap.steps, lines]);
+  const act = useCallback(
+    (action: Action) => {
+      if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
+      try {
+        const next = reduce(queue.latest, action);
+        queue.enqueue({ action, state: next, events: next.events });
+        setError(null);
+      } catch (err) {
+        setError(t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed: run.seed, action: JSON.stringify(action) }));
+      }
+    },
+    [queue, run.seed],
+  );
   // What the desk can ask for: stable, so a part that did not change does not render again.
-  const on = useMemo(() => ({ deck: () => setDeckOpen(true) }), []);
-
-  const act = (action: Action) => {
-    if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
-    try {
-      const next = reduce(queue.latest, action);
-      queue.enqueue({ action, state: next, events: next.events });
-      setError(null);
-    } catch (err) {
-      setError(t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed: run.seed, action: JSON.stringify(action) }));
-    }
-  };
+  const on = useMemo(
+    () => ({
+      deck: () => setDeckOpen(true),
+      play: (uid: number) => act({ type: 'PLAY_CARD', uid }),
+      end: () => act({ type: 'END_TURN' }),
+      focus: setFocus,
+    }),
+    [act],
+  );
 
   if (s.phase === 'ended') return <div className="plain full"><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
   if (s.phase === 'manager') return <div className="plain full"><ManagerChoice s={s} legal={legal} act={act} error={error} /></div>;
@@ -237,24 +241,17 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   return (
     <Desk model={model} on={on}>
-      {/* V1a scaffolding: the plain play area over the new scene, until the desk's parts replace it. */}
-      <div className="plain dock">
-        {s.phase === 'play' && (
-          <div className="dock-hand">
-            <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />
-          </div>
-        )}
-        {card && focus?.kind === 'card' && (
-          <Floating anchor={focus.anchor}>
-            <PlayPreviewView c={c} p={card} />
-          </Floating>
-        )}
-        {focus?.kind === 'end' && endPreview && (
-          <Floating anchor={focus.anchor}>
-            <EndTurnPreviewView c={c} p={endPreview} />
-          </Floating>
-        )}
-      </div>
+      {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
+      {s.phase === 'play' && card && focus?.kind === 'card' && (
+        <Floating anchor={focus.anchor}>
+          <PlayPreviewView c={c} p={card} />
+        </Floating>
+      )}
+      {s.phase === 'play' && focus?.kind === 'end' && endPreview && (
+        <Floating anchor={focus.anchor}>
+          <EndTurnPreviewView c={c} p={endPreview} />
+        </Floating>
+      )}
       {error && (
         <p className="plain error-layer">
           {t('ui.error.title')}: {error}
@@ -278,9 +275,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     </Desk>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Frame: feed, side panel (the stat bar is the desk's: ui/desk/StatBar.tsx)
 
 // ---------------------------------------------------------------------------
 // Previews
@@ -401,117 +395,6 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
         </p>
       )}
       {p.carries && <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Play: the hand
-
-function Hand({
-  s,
-  inHand,
-  legal,
-  act,
-  setFocus,
-  endPreview,
-}: {
-  s: GameState;
-  /** Each scandal's in-hand line, as the run's history picked it. */
-  inHand: ReadonlyMap<number, LineShow>;
-  legal: Legal;
-  act: (a: Action) => void;
-  setFocus: (f: Focus) => void;
-  endPreview: EndTurnPreview | null;
-}) {
-  const c = s.content;
-  const pressTimer = useRef<number | undefined>(undefined);
-  const longPressed = useRef(false);
-  const printing = endPreview?.scandalCards.length ?? 0;
-  const endLabel = printing === 0 ? t('ui.hand.endTurnNone') : printing === 1 ? t('ui.hand.endTurnOne') : t('ui.hand.endTurnMany', { n: printing });
-  return (
-    <div className="hand">
-      <div className="row">
-        <h2>{t('ui.hand.title')}</h2>
-        <span className="muted grow">{t('ui.hand.hint')}</span>
-        <button
-          className={`end${printing ? ' printing' : ''}`}
-          disabled={!legal.endTurn}
-          onPointerEnter={(e) => {
-            if (e.pointerType === 'mouse') setFocus({ kind: 'end', anchor: anchorOf(e.currentTarget) });
-          }}
-          onPointerLeave={(e) => {
-            if (e.pointerType === 'mouse') setFocus(null);
-          }}
-          onFocus={(e) => setFocus({ kind: 'end', anchor: anchorOf(e.currentTarget) })}
-          onBlur={() => setFocus(null)}
-          onClick={() => {
-            setFocus(null);
-            act({ type: 'END_TURN' });
-          }}
-        >
-          {endLabel}
-        </button>
-      </div>
-      {/* Draw effects can grow the hand past five; the row shrinks its type to keep one line of cards. */}
-      <div className="cards" style={{ '--n': s.hand.length } as CSSProperties}>
-        {s.hand.map((card) => {
-          const def = getCard(c, card.cardId);
-          const scandal = def?.kind === 'scandal';
-          const playable = legal.play.has(card.uid);
-          const text = scandal ? lineText(c, inHand.get(card.uid), card.cardId) : cardText(c, card.cardId);
-          const flavor = scandal ? null : cardFlavor(c, card.cardId);
-          const cost = scandal ? null : costLabel(c, card.cardId);
-          return (
-            <button
-              key={card.uid}
-              className={`card face-${cardFace(c, card.cardId) ?? 'none'}${scandal ? ' scandal' : ''}${playable ? '' : ' off'}`}
-              aria-disabled={!playable}
-              onPointerEnter={(e) => {
-                if (e.pointerType === 'mouse') setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) });
-              }}
-              onFocus={(e) => setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) })}
-              onBlur={() => setFocus(null)}
-              onPointerLeave={(e) => {
-                if (e.pointerType === 'mouse') setFocus(null);
-              }}
-              onPointerDown={(e) => {
-                if (e.pointerType === 'mouse') return;
-                longPressed.current = false;
-                const anchor = anchorOf(e.currentTarget);
-                pressTimer.current = window.setTimeout(() => {
-                  longPressed.current = true;
-                  setFocus({ kind: 'card', uid: card.uid, anchor });
-                }, 450);
-              }}
-              onPointerUp={() => window.clearTimeout(pressTimer.current)}
-              onClick={(e) => {
-                if (longPressed.current) {
-                  longPressed.current = false; // a long-press previews; it never plays
-                  return;
-                }
-                if (playable) {
-                  setFocus(null);
-                  act({ type: 'PLAY_CARD', uid: card.uid });
-                } else setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) }); // tapping a card you can't play shows why
-              }}
-            >
-              <span className="card-head">
-                <strong>{cardName(c, card.cardId)}</strong>
-                {(scandal || cost) && <span className="muted">{scandal ? t('ui.hand.dead') : cost}</span>}
-              </span>
-              <span className={prose(text, scandal ? 'in-hand' : '')}>{text}</span>
-              {flavor && <span className={prose(flavor, 'flavor')}>{flavor}</span>}
-              {scandal &&
-                cardRuleLines(c, card.cardId).map((line, i) => (
-                  <span key={i} className="muted rules">
-                    {line}
-                  </span>
-                ))}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }

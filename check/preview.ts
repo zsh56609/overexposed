@@ -23,6 +23,7 @@ import {
   bagIndex,
   boxOffice,
   calendarDate,
+  cardFace,
   countdownLevel,
   createInitialState,
   cursor,
@@ -47,6 +48,7 @@ import {
   monthEndEffects,
   monthEndLines,
   nextInt,
+  playCheck,
   pressLines,
   readLines,
   reduce,
@@ -80,7 +82,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -581,6 +583,41 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
     if (msgs && msgs.reactions.join(' ') !== t(m.crisis ? 'ui.react.frenzy' : 'ui.react.calm')) bad(`reactions ${msgs.reactions}`);
   }
 
+  // The hand (README §6): /core's hand in order, each face content's, each value its effect's number, what can
+  // be played /core's legal plays — and why not, /core's playCheck; END TURN's line counts the month end's
+  // scandal cards, as its preview does.
+  if (m.playing !== (s.phase === 'play')) bad(`hand ${m.playing ? 'on' : 'off'} the desk in the ${s.phase} phase`);
+  if (m.hand.length !== s.hand.length) bad(`${m.hand.length} cards in the fan, ${s.hand.length} in hand`);
+  const plays = new Set(legalActions(s).flatMap((a) => (a.type === 'PLAY_CARD' ? [a.uid] : [])));
+  m.hand.forEach((hc, i) => {
+    const h = s.hand[i];
+    const def = h ? getCard(c, h.cardId) : undefined;
+    if (!h || !def || hc.uid !== h.uid || hc.cardId !== h.cardId || hc.name !== t(`card.${h.cardId}.name`) || hc.face !== (cardFace(c, h.cardId) ?? 'notebook') || hc.scandal !== (def.kind === 'scandal') || hc.cost !== def.cost) return bad(`card ${i}: ${JSON.stringify(hc)}`);
+    counts.handCards++;
+    if (hc.playable !== plays.has(h.uid)) bad(`${h.cardId}: playable ${hc.playable}, /core says ${plays.has(h.uid)}`);
+    const check = playCheck(s, h.uid);
+    const why = hc.scandal ? 'scandal' : check.ok ? null : check.blockers.some((b) => b.code === 'slots') ? 'actions' : 'requires';
+    if (hc.why !== why) bad(`${h.cardId}: why ${hc.why}, /core's playCheck says ${why}`);
+    if (hc.values && !hc.scandal) {
+      counts.valueCards++;
+      const effects = def.effects ?? [];
+      if (hc.values.length !== effects.length) bad(`${h.cardId}: ${hc.values.length} values for ${effects.length} effects`);
+      effects.forEach((e, k) => {
+        const v = hc.values?.[k];
+        const want =
+          e.op === 'resource' ? (e.target === 'capital' ? money(Math.abs(e.value)) : String(Math.abs(e.value))) : e.op === 'draw' ? String(e.count) : e.op === 'setFlag' ? t(`flag.${e.flag}.positive`) : null;
+        if (!v || want === null || !v.text.includes(want)) bad(`${h.cardId}: value ${k} "${v?.text}" for ${JSON.stringify(e)}`);
+        if (e.op === 'resource' && v && v.kind !== (e.target === 'capital' ? (e.value >= 0 ? 'gain' : 'cost') : e.target)) bad(`${h.cardId}: value ${k} coloured ${v.kind}`);
+      });
+      if ((hc.needs !== null) !== (def.requires !== undefined)) bad(`${h.cardId}: needs "${hc.needs}"`);
+    } else if (!hc.scandal && !hc.rules) bad(`${h.cardId}: neither values nor rules`);
+  });
+  if (s.phase === 'play') {
+    const n = previewEndTurn(s, readLines(history).counter, lane)?.scandalCards.length ?? 0;
+    const sub = n === 0 ? t('ui.end.none') : n === 1 ? t('ui.end.one') : t('ui.end.many', { n });
+    if (m.endTurn.printing !== n || m.endTurn.sub !== sub || !m.endTurn.legal) bad(`END TURN "${m.endTurn.sub}" for ${n} scandal cards`);
+  }
+
   const papers = m.papers;
   if ((papers === null) !== (issue === null)) bad(`papers ${papers === null ? 'missing' : 'without an issue'}`);
   if (!papers || !issue) return;
@@ -725,7 +762,7 @@ console.log(
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
     `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
-    `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers) ` +
+    `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers; ${counts.handCards} cards in the fan, ${counts.valueCards} faces of values) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

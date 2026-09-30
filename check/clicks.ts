@@ -4,8 +4,11 @@
 // END TURN beneath it. The preview is display-only (pointer-events: none); this check keeps it that way.
 // In the style of the stage overflow audits: seeded runs played through the real UI in headless Chrome,
 // and at every play state, with the floating preview open over each card position and over END TURN,
-// every card and END TURN — the hovered one included — must be the element a click at its centre, and
-// near each corner, would reach. A hover that opens no preview fails too, so the check is never vacuous.
+// every card and END TURN — the hovered one included — must be the element a click would reach: END TURN
+// at its centre and near each corner; a card of the fanned hand (round V1a) across the strip of it the
+// next card leaves showing — near its top, its middle and its lower edge, in the card's own tilted frame —
+// so nothing on the desk (the papers, the mirror, the bubbles, the phone, the props) and nothing floating
+// ever covers a card or END TURN. A hover that opens no preview fails too, so the check is never vacuous.
 // At every draft (round 2c): at most one extra card — Dex's — labelled with his line, the label inside its card.
 // The managers alternate run by run (round V1a): any number of runs from two covers both.
 //
@@ -63,6 +66,27 @@ const DRIVE = (runs: number) => `(async () => {
     }
     return null;
   };
+  // A fanned card is tilted and the next one overlaps it: probe points placed inside the card itself, across
+  // the strip the next card leaves showing, are carried by the card's own transform.
+  const hitCard = (card, cards) => {
+    const next = cards[cards.indexOf(card) + 1];
+    const strip = next ? Math.min(card.offsetWidth, next.offsetLeft - card.offsetLeft) : card.offsetWidth;
+    for (const [x, y] of [[10, 22], [strip - 12, 22], [strip / 2, 110], [10, 200], [strip - 12, 200]]) {
+      stats.points++;
+      const probe = document.createElement('i');
+      probe.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:1px;height:1px;pointer-events:none';
+      card.appendChild(probe);
+      const r = probe.getBoundingClientRect();
+      probe.remove();
+      const top = document.elementFromPoint(r.left + 0.5, r.top + 0.5);
+      if (!top || !(top === card || card.contains(top))) return top;
+    }
+    return null;
+  };
+  // Transitions are presentation: the check measures where things settle, not where they are mid-glide.
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; }';
+  document.head.appendChild(still);
   document.querySelector('button.big').click();
   await sleep(40);
   for (let run = 0; run < ${runs}; run++) {
@@ -104,7 +128,7 @@ const DRIVE = (runs: number) => `(async () => {
           if (!document.querySelector('.floating')) note('no preview opened over ' + name(source, cards, end));
           for (const target of targets) {
             stats.targets++;
-            const by = hitBy(target);
+            const by = target === end ? hitBy(target) : hitCard(target, cards);
             if (by) note(name(target, cards, end) + ' blocked by ' + describe(by) + ' while previewing ' + name(source, cards, end));
           }
           source.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' }));

@@ -6,6 +6,44 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part F: the hand
+
+- **As README §6 and the mockup set it**: the fan centred at x=540, 150px
+  apart (128 above five cards), tilted up to 8° and lifted in the middle;
+  the hover (13px up, 60% of the tilt, ×1.012, 0.42 s after 70 ms); the
+  fixed anchors (name 18px, values 70px, flavour 108px); bulbs top right
+  only above one action; the eleven faces from content's `face` field,
+  the headshot a halftone drawing. END TURN at the bottom right, red in a
+  frenzy.
+- **Draws that swell the hand** tighten the fan so it never reaches END
+  TURN (at most 960px wide: eight cards sit 111px apart).
+- **Values** (round V1a, 0.3): icon and number in the resource's colour,
+  lighter on the dark faces, paler on gloss, deeper on gold; money green
+  earned, red spent; "Draw N". Craft's icon is the stat bar's, by the
+  established lane, so one resource wears one icon at a time. A flag a
+  card sets is a value too, in the flag's own words ("Went viral",
+  "Signed to a label"). A card with a requirement adds it under its
+  values ("Needs Hype 25+"); conditional cards keep their rules text,
+  and rules longer than two lines push the flavour down.
+- **A scandal** is red with a dashed white border and ✕; its values line
+  reads "Can't be played", its in-hand line is the flavour, and its rules
+  (when drawn, at month end) sit below. Clicked, it shakes and the desk
+  says so; so does any card once the month has no actions left; a card
+  whose requirement is unmet shakes and shows its preview, which says why.
+- **The previews** on hover (and long-press, and keyboard focus) are the
+  plain previews on a newsprint slip, standing above the highest a lifted
+  card reaches.
+- **Playing is plain until V1b**: the card leaves the fan and the fan
+  re-lays at once — the mockup's gliding close of the gap is V1b's.
+- **Signs**: figures take a true minus (U+2212), as the reference sets
+  them ("−3", "−£1,000"), everywhere the interface signs a number.
+- **Actions, not slots**: the interface strings that still said "slot"
+  (the preview's "Actions left", the reasons, the effects) now say
+  "action", as round 2c named them; an extra action lasts "this month".
+- `check:clicks` now hit-tests a fanned card across the strip the next
+  card leaves showing, in the card's own tilted frame, with transitions
+  settled; `check:preview` holds the fan and END TURN to /core.
+
 ## 2026-10-01 — Round V1a, Part E: the desk, the phone and the manager
 
 - **As README §4–§5 and the mockup set them.** Flat in the desk's own
