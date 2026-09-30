@@ -30,6 +30,7 @@ import {
   endingIfYearEndedNow,
   establishedLanes,
   evaluate,
+  fameBand,
   explainCondition,
   freeRerollAvailable,
   frontPages,
@@ -552,6 +553,34 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   // The papers (README §2, §7): /core's issue — its pages in order, its lead paper, each masthead's name, date and
   // issue number, each story's words, kicker marks and slot; the photograph is the lead's scene, drawn by the
   // shuffle bag on /core's count; the Marquee carries /core's box office unless its lead is photographed.
+  // The desk and the phone (README §4, §5): the lane's props; the notebook's page is the player's latest quiet
+  // line; an actor's script is their fame band's; the phone's bars are this month's messages and, in a frenzy,
+  // the press; the bubbles are /core's messages for the month, two each, keyed by month and place.
+  const laneClass = lane === 'music' || lane === 'screen' || lane === 'celebrity' ? lane : 'early';
+  if (m.lane !== laneClass) bad(`desk lane ${m.lane}, established ${lane}`);
+  const quiet = pressLines(history).filter((l) => l.paper === null && l.kind === 'play').at(-1);
+  const page = quiet ? lineText(c, quiet, quiet.cardId, quiet.subjectKey) : null;
+  if (m.notebook !== page) bad(`notebook "${m.notebook}", the latest quiet line is "${page}"`);
+  if ((m.script !== null) !== (lane === 'screen')) bad(`script ${m.script ? 'on' : 'off'} the desk in lane ${lane}`);
+  if (m.script) {
+    const band = fameBand(c, statTiers(s).hype?.index ?? 0);
+    // One of the band's scenes a season, in content's order.
+    const scenes = (c.scripts?.scripts ?? []).filter((x) => x.band === band);
+    const sc = scenes[(s.act - 1) % Math.max(1, scenes.length)];
+    if (!sc || m.script.heading !== t(sc.headingKey) || m.script.lines.length !== sc.lines.length || m.script.lines.some((l, i) => l.kind !== sc.lines[i]?.kind)) bad(`script "${m.script.heading}" for the ${band} band in act ${s.act}`);
+  }
+  const month = managerMessages(history).find((x) => x.turn === s.turn);
+  const due = month?.messages.length ?? 0;
+  const mgr = m.phone.notes.filter((k) => k === 'mgr').length;
+  const press = m.phone.notes.filter((k) => k === 'press').length;
+  if (mgr !== due || m.phone.notes.length > 6 || (press > 0 && !m.crisis)) bad(`phone: ${mgr} manager bars for ${due} messages, ${press} press bars, crisis ${m.crisis}`);
+  if (s.manager !== null) {
+    const msgs = m.messages;
+    if (!msgs || msgs.messages.length !== due || msgs.messages.some((x, i) => x.id !== `${month?.turn}.${i}` || x.bubbles.length !== 2)) bad(`bubbles ${JSON.stringify(msgs?.messages)} for ${due} messages`);
+    if (msgs && !msgs.from.startsWith(t(`manager.${s.manager}.name`).split(' ')[0] as string)) bad(`bubbles from "${msgs.from}"`);
+    if (msgs && msgs.reactions.join(' ') !== t(m.crisis ? 'ui.react.frenzy' : 'ui.react.calm')) bad(`reactions ${msgs.reactions}`);
+  }
+
   const papers = m.papers;
   if ((papers === null) !== (issue === null)) bad(`papers ${papers === null ? 'missing' : 'without an issue'}`);
   if (!papers || !issue) return;

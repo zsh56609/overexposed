@@ -4,6 +4,7 @@
 // (the plain screens until round V2).
 
 import type { ReactNode } from 'react';
+import { Bubbles, DeskPlane, Uprights } from './DeskItems.tsx';
 import { IconDefs } from './Icons.tsx';
 import { Mirror } from './Mirror.tsx';
 import { Papers } from './Papers.tsx';
@@ -15,6 +16,7 @@ import './css/scene.css';
 import './css/stats.css';
 import './css/mirror.css';
 import './css/papers.css';
+import './css/desk-items.css';
 
 /** "Mark my stories" (README §2): a House rules setting, on by default; round V2 gives it its switch. */
 const MARK_MY_STORIES = true;
@@ -35,11 +37,15 @@ export function Desk({ model, on, children }: { model: DeskModel; on: DeskAction
       <Mirror mirror={model.mirror} crisis={model.crisis} />
       <div className="floor" />
       <div className="deskscene">
-        <div className="desktop" />
+        <div className="desktop">
+          <DeskPlane lane={model.lane} crisis={model.crisis} notebook={model.notebook} script={model.script} phone={model.phone} labels={model.labels} />
+        </div>
       </div>
       <div className="deskfront" />
+      <Uprights lane={model.lane} crisis={model.crisis} labels={model.labels} balls={model.balls} />
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
       <div className="scene3d pile" data-hook="pile" />
+      <Bubbles messages={model.messages} />
       <div className="dim" />
       <StatBar stats={model.stats} season={model.season} onDeck={on.deck} />
       {children}

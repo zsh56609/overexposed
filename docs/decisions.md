@@ -6,6 +6,39 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part E: the desk, the phone and the manager
+
+- **As README §4–§5 and the mockup set them.** Flat in the desk's own
+  perspective: the lane's props (music: two different sheets of music;
+  screen: the script and the clapperboard, arm open; celebrity: the GLOSS
+  magazine; no lane yet: nothing flat), the spiral notebook with its
+  pencil, a frenzy's three red clippings, and the phone. Standing: the
+  metronome (music), the brush cup (celebrity) or the mug (no lane), with
+  a contact shadow, and in a frenzy two crumpled paper balls, each its own
+  shape from the run's seed.
+- **The notebook's page** is the player's latest quiet line; the script is
+  the fame band's scene for the season, from content (round 2c).
+- **The metronome** is the mockup's engine: it swings (2.4 s, 1.3 s in a
+  frenzy); a click finishes the stroke and eases it to the centre; another
+  starts it with a growing swing. It starts stopped under the system's
+  reduced-motion setting.
+- **The phone**: no badge; one bar per notification — this month's
+  manager messages in blue and, in a frenzy, the press in red (at most
+  six); the player's own local time, as their phone formats it, without
+  AM/PM, refreshed every 15 s; in a frenzy a red screen that buzzes every
+  few seconds. No `Math.random()`: the buzz only shakes and lights the
+  phone, it adds no bar.
+- **The bubbles** are this month's messages from /core, two bubbles each,
+  under the manager's **first name** ("Marguerite · Manager", as the
+  mockup labels them — the full name runs into the mirror's bulbs).
+  Clicking a bubble opens ❤️ 😂 👍 (💔 😭 👍 in a frenzy); a reaction is
+  kept per bubble of one message — month, place in the month, bubble —
+  never per words; choosing it again removes it; a click elsewhere closes
+  the row. UI state only. The reaction sets are keys (`ui.react.*`), and
+  so are the words drawn on the props (`desk.sheet.*`).
+- `check:preview` holds the lane's props, the notebook, the script, the
+  phone's bars and the bubbles to /core at every state.
+
 ## 2026-10-01 — Round V1a, Part D: the papers
 
 - **As README §2 and the mockup set them**: three papers standing on the

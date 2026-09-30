@@ -12,6 +12,7 @@ import {
   boxOffice,
   calendarDate,
   cardFace,
+  deriveSeed,
   endingIfYearEndedNow,
   fameBand,
   frontPages,
@@ -161,7 +162,18 @@ export interface PhoneModel {
 
 export interface MessagesModel {
   readonly from: string;
+  /** This month's messages; a message's id is its month and its place in the month (README §5). */
   readonly messages: readonly { readonly id: string; readonly bubbles: readonly string[] }[];
+  /** The tapback row: calm ❤️ 😂 👍, in a frenzy 💔 😭 👍. */
+  readonly reactions: readonly string[];
+}
+
+/** The words drawn on the desk's props (README §4). */
+export interface DeskLabels {
+  readonly gloss: string;
+  readonly clapper: { readonly prod: string; readonly scene: string; readonly take: string; readonly roll: string; readonly int: string };
+  readonly metronome: string;
+  readonly sheet: { readonly bridge: string; readonly breathe: string; readonly dynamic: string };
 }
 
 export interface ValueChip {
@@ -204,6 +216,9 @@ export interface DeskModel {
   readonly script: ScriptModel | null;
   readonly phone: PhoneModel;
   readonly messages: MessagesModel | null;
+  readonly labels: DeskLabels;
+  /** The frenzy's two crumpled paper balls: each its own shape, from the run's seed. */
+  readonly balls: readonly [number, number];
   readonly hand: readonly HandCardModel[];
   readonly endTurn: EndTurnModel;
   /** The END TURN preview, for its hover (null outside the play phase). */
@@ -250,7 +265,9 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
     notebook: notebook(steps),
     script: laneClass === 'screen' ? script(s, fame) : null,
     phone: phone(s, steps, issue),
-    messages: messages(s, steps),
+    messages: messages(s, steps, issue?.frenzy ?? false),
+    labels: labels(),
+    balls: [deriveSeed(s.seed, 0xba11), deriveSeed(s.seed, 0xba12)],
     hand: hand(s, lines),
     endTurn: endTurn(s, endPreview),
     endPreview,
@@ -478,12 +495,24 @@ function phone(s: GameState, steps: readonly PlayedStep[], issue: MonthPress | n
   return { notes };
 }
 
-function messages(s: GameState, steps: readonly PlayedStep[]): MessagesModel | null {
+function messages(s: GameState, steps: readonly PlayedStep[], frenzy: boolean): MessagesModel | null {
   if (s.manager === null) return null;
   const month = thisMonth(s, steps);
   return {
-    from: t('ui.phone.from', { name: managerName(s.content, s.manager) }),
+    // The manager by their first name, as the mockup labels the bubbles ("Marguerite · Manager"): the full name
+    // runs into the mirror's bulbs.
+    from: t('ui.phone.from', { name: managerName(s.content, s.manager).split(/\s+/)[0] ?? '' }),
     messages: (month?.messages ?? []).map((m, i) => ({ id: `${month?.turn ?? s.turn}.${i}`, bubbles: messageBubbles(s.manager as string, m) })),
+    reactions: t(frenzy ? 'ui.react.frenzy' : 'ui.react.calm').split(' '),
+  };
+}
+
+function labels(): DeskLabels {
+  return {
+    gloss: t('desk.gloss'),
+    clapper: { prod: t('desk.clapper.prod'), scene: t('desk.clapper.scene'), take: t('desk.clapper.take'), roll: t('desk.clapper.roll'), int: t('desk.clapper.int') },
+    metronome: t('desk.metronome'),
+    sheet: { bridge: t('desk.sheet.bridge'), breathe: t('desk.sheet.breathe'), dynamic: t('desk.sheet.dynamic') },
   };
 }
 
