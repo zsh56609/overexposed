@@ -19,6 +19,7 @@ import {
   evaluate,
   getCard,
   getGate,
+  lanePlays,
   nextInt,
   reduce,
   RESOURCE_KEYS,
@@ -32,9 +33,10 @@ import {
   type Range,
   type ResourceKey,
   type RngCursor,
+  type YearConditions,
 } from '../core/index.ts';
 
-export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker', 'comeback', 'artisan'] as const;
+export const PERSONA_IDS = ['minmaxer', 'random', 'crafter', 'hypechaser', 'dealseeker', 'comeback', 'artisan', 'screenseeker', 'celebseeker'] as const;
 export type PersonaId = (typeof PERSONA_IDS)[number];
 
 export interface Persona {
@@ -71,6 +73,12 @@ interface Weights {
    * (0..1) toward the gate's requirements. 0 = off. Lets a persona plan for a deal it wants.
    */
   readonly dealDrive: number;
+  /**
+   * A career lane to pursue (docs/design/content-expansion.md §2), and how hard: `lanePull` per play of
+   * lead that lane holds over the next lane in cards played. Absent: lanes are not valued at all.
+   */
+  readonly lane?: string;
+  readonly lanePull?: number;
 }
 
 const END_TURN: Action = { type: 'END_TURN' };
@@ -110,7 +118,12 @@ function flagRefs(content: ContentIndex): FlagRefs {
       scanEffects(e.else, tier);
     }
   };
-  for (const ending of content.endings) scan(ending.conditions, 'ending');
+  // Endings read flags in their minors' year conditions, alternatives included.
+  const scanYear = (c: YearConditions | undefined) => {
+    scan(c, 'ending');
+    for (const alt of c?.anyOf ?? []) scanYear(alt);
+  };
+  for (const minor of content.minors) scanYear(minor.conditions);
   for (const gate of Object.values(content.gates)) {
     scan(gate.requires, 'gate');
     scanEffects(gate.onPass, 'gate');
@@ -159,6 +172,13 @@ function dealPull(s: GameState, w: Weights): number {
   return total;
 }
 
+/** How far the persona's lane leads the next lane in cards played (negative: it trails). */
+function laneLead(s: GameState, lane: string): number {
+  const plays = lanePlays(s);
+  const others = Object.entries(plays).filter(([l]) => l !== lane).map(([, n]) => n);
+  return (plays[lane] ?? 0) - Math.max(0, ...others);
+}
+
 function score(s: GameState, w: Weights): number {
   const r = s.resources;
   const threshold = effectiveHeatThreshold(s);
@@ -174,7 +194,8 @@ function score(s: GameState, w: Weights): number {
     w.scandal * scandalCount(s) +
     w.risk * atRisk +
     w.hand * s.hand.length +
-    flags
+    flags +
+    (w.lane !== undefined && w.lanePull ? w.lanePull * laneLead(s, w.lane) : 0)
   );
 }
 
@@ -227,9 +248,10 @@ function effectsValue(effects: readonly Effect[] | undefined, s: GameState, w: W
   return v;
 }
 
-/** Value per slot of playing the card once. */
+/** Value per slot of playing the card once; a card in the pursued lane adds the lane's pull. */
 function playValue(s: GameState, def: CardDef, w: Weights): number {
-  return (effectsValue(def.effects, s, w) + effectsValue(def.onDraw, s, w)) / Math.max(1, def.cost);
+  const lane = w.lane !== undefined && def.lane === w.lane ? (w.lanePull ?? 0) : 0;
+  return (effectsValue(def.effects, s, w) + effectsValue(def.onDraw, s, w) + lane) / Math.max(1, def.cost);
 }
 
 const within = (value: number, r: Range) => (r.min === undefined || value >= r.min) && (r.max === undefined || value <= r.max);
@@ -294,7 +316,7 @@ function flagsValue(effects: readonly Effect[] | undefined, s: GameState, w: Wei
 }
 
 /**
- * Draft value (CLAUDE.md §5): the odds its `requires` will hold × value per slot of one play, with a
+ * Draft value (docs/sim.md → Drafting): the odds its `requires` will hold × value per slot of one play, with a
  * one-shot's repeatable part scaled by the share of a kept card's uses it gets. The rest of the run
  * draws a card about remainingTurns × handSize ÷ (cards owned + 1) times; a kept card can be played
  * each time, a one-shot (opportunity) only once, so its repeatable effects count min(1, 1 ÷ draws).
@@ -413,6 +435,13 @@ const random: Persona = {
 
 const BALANCED = { hype: 1, craft: 1, capital: 0.5, heat: -0.5, scandal: -8, risk: -6, hand: 1.5, slots: 2, gatePass: 6 };
 
+/**
+ * A lane probe's pull, per play of lead its lane holds (an instrument setting, like COMEBACK_SWITCH_AT:
+ * fixed, not derived from content). About one good card's worth, so the lane outweighs a card's own
+ * value without making the probe ignore its resources.
+ */
+export const LANE_PULL = 6;
+
 export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   // Balanced: grows everything, treats heat as debt, buys off scandals, dodges thresholds.
   minmaxer: greedy('minmaxer', { ...BALANCED, flagUnlock: 12, flagLock: 12, dealDrive: 0 }),
@@ -428,6 +457,9 @@ export const PERSONAS: { readonly [K in PersonaId]: Persona } = {
   // Player-like, craft-leaning: high craft, moderate hype, risk-averse. No weight is zero, so the
   // probe rule can never capture it (it is the player crafter no longer models).
   artisan: greedy('artisan', { hype: 0.5, craft: 1.5, capital: 0.5, heat: -1, scandal: -10, risk: -8, hand: 1.5, slots: 2, gatePass: 6, flagUnlock: 6, flagLock: 6, dealDrive: 0.25 }),
+  // Lane probes: balanced, but pursuing one career lane. Experiments on lane reachability, not players.
+  screenseeker: greedy('screenseeker', { ...BALANCED, flagUnlock: 12, flagLock: 12, dealDrive: 0, lane: 'screen', lanePull: LANE_PULL }),
+  celebseeker: greedy('celebseeker', { ...BALANCED, flagUnlock: 12, flagLock: 12, dealDrive: 0, lane: 'celebrity', lanePull: LANE_PULL }),
 };
 
 /** Salt that separates each persona's decision stream from the game's own RNG. */
@@ -439,12 +471,15 @@ export const PERSONA_SALT: { readonly [K in PersonaId]: number } = {
   dealseeker: 0x6465616c,
   comeback: 0x636f6d65,
   artisan: 0x61727469,
+  screenseeker: 0x73637265,
+  celebseeker: 0x63656c65,
 };
 
 // ---------------------------------------------------------------------------
-// Classes (CLAUDE.md §5), derived from weights, never from ids. A persona that gives an axis zero
+// Classes (docs/sim.md → Tuning targets), derived from weights, never from ids. A persona that gives an axis zero
 // weight in every mode ignores it entirely: it is a control probe — an experiment on the design
-// thesis, not a model of a player. Everyone else is player-like, random included (it scores nothing).
+// thesis, not a model of a player. One that pursues a single career lane in every mode is a lane probe —
+// an experiment on lane reachability. Everyone else is player-like, random included (it scores nothing).
 
 export type ProbeAxis = 'heat' | 'hype';
 
@@ -458,6 +493,16 @@ export function ignoredAxes(id: PersonaId): readonly ProbeAxis[] {
   return axes;
 }
 
+/**
+ * The career lane the persona pursues: every mode pulls toward the same lane. A lane seeker is a probe
+ * too — an experiment on lane reachability, never a model of a player.
+ */
+export function seeksLane(id: PersonaId): string | null {
+  const modes = PERSONAS[id].weights ?? [];
+  const lane = modes[0]?.lane;
+  return lane !== undefined && modes.every((w) => w.lane === lane && (w.lanePull ?? 0) > 0) ? lane : null;
+}
+
 export function isProbe(id: PersonaId): boolean {
-  return ignoredAxes(id).length > 0;
+  return ignoredAxes(id).length > 0 || seeksLane(id) !== null;
 }

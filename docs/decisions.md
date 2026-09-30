@@ -6,6 +6,83 @@ rules).
 
 ---
 
+## 2026-09-30 — Phase 1: two-level endings and career lanes
+
+Phase 1 of the content expansion (docs/design/content-expansion.md §1,
+§2, §8, §10). Numbers chosen with the sim, 1000 runs per persona on
+seeds 20260929, 1 and 424242.
+
+**The splits.** Fame: hype 80 at year end — the "Known" tier boundary,
+moved from 60 to 80 so the split is on it (validate now requires the
+fame split to be a hype tier boundary). Reputation: 6 scandals held —
+clean is 5 or fewer, damaged 6 or more. Found by searching both splits
+over year-end dumps: no pair keeps every player-like persona at or
+under 70% on one major. The artisan ends in The Long Game in 98–99% of
+runs at every candidate (its year-end hype p90 is 58), and a fame split
+low enough to move it breaks minmaxer and dealseeker instead. This is
+the lean the design predicted; it is reported, not tuned away.
+Dealseeker's Breakthrough share is 67–69%: in band, narrowly.
+
+**Minor thresholds.** Leading Role: screen lane. Household Name and
+Tabloid Royalty: celebrity lane. Headliner: music lane and signed.
+The Redemption Arc: scandals down at least 1 from the year's peak. The
+Character Actor: craft 55+ and screen lane; The Musician's Musician:
+craft 55+. Flash in the Pan: peak hype 75+ (a new year stat, kept at
+each month end like the others). Running on Empty: holding Burnout, or
+craft 34 or less. The fallbacks as the design table gives them.
+
+**Lanes count cards played from the career, not the starting deck
+(pending the author's confirmation).** Counting every play, the shared
+starting deck — four music cards, two celebrity, no screen — decided the
+lane: 89.4% of player-like runs ended in music and 1.4% in screen, so
+two screen minors were nearly unreachable. `rules.laneStartingDeck`
+(false) leaves out the starting deck's own instances; a drafted copy of
+a starting card still counts. Lanes at year end, player-like runs
+pooled: music 47%, celebrity 28%, screen 25%. Setting the rule to true
+restores counting every play without a code change.
+
+**Five screen cards** (lane screen), drafted by the author's names and
+headlines (docs/writing/draft-v4.md): Screen Test (4 craft, 2 hype, 2
+more hype at craft 15+), Acting Class (pay 1 capital: 6 craft, −1 heat),
+Guest Spot (needs 15 hype: 6 hype, 3 heat; summer on), Soundtrack
+Single (needs 20 craft: 5 hype, 2 craft, 2 heat; summer on), Streaming
+Role (opportunity, needs 25 hype — below Film Cameo's 35: 9 hype, 2
+craft, 3 heat; summer on). Their rules lines state their effects in the
+cards' existing form. The content budget is raised to 25 action, 8
+opportunity, 6 scandal, 8 gate, 4 major and 13 minor endings.
+
+**The Award Show gate needs 45 craft (was 40).** The new craft cards
+lifted its met% to 66–68%, out of band; at 45 it is 62.7–64.3%.
+
+**Awards remapped.** Best New Artist: Headliner or The Independent.
+Critics' Choice: craft 90+ and not The Breakthrough (a major matches
+every minor under it). The others read no ending.
+
+**Tiers realigned.** Hype: Known at 80 (the fame split), Household name
+at 105 (People's Choice). Craft unchanged: Accomplished at 55 (The
+Musician's Musician, The Character Actor), Remarkable at 90 (Critics'
+Choice). Every tier is still reached in play (`npm run sim:tiers`).
+
+**Bands.** New: major concentration (player-like, 70%), minor
+reachability (player-like pooled, 3% each), lane reachability as probe
+assertions (two lane probes, `screenseeker` and `celebseeker`, each ends
+in its own lane in over 50% of its runs). Kept: every existing band,
+the ending-concentration band now read on minors, the thesis probes now
+read on the axis sides. Three fail and are reported rather than forced:
+artisan's Long Game share (98–99%, predicted); artisan's Musician's
+Musician share, 69.5–70.8% — within seed noise of the line, and five
+card-number experiments moved it by no more than that noise; and four
+minors below 3% pooled (The Independent 1.8–2.1%, Flash in the Pan
+2.2–2.4%, Running on Empty 1.9–2.2%, Starting Over 2.4–2.6%): The Hard
+Way holds about 7% of player-like runs and splits three ways, and no
+threshold search raised the lowest minor above 2.4%.
+
+**On screen** (docs/ui-plan.md decision 26): the goals board shows the
+majors; the marker, the final gate and the ending screen name major and
+minor; the endings collection replaces the list of locked endings. The
+unused labels `ui.ending.others`, `ui.ending.other` and
+`ui.goals.fallback` are removed; the old endings' goal lines are kept.
+
 ## 2026-09-30 — Endings deliberately unfrozen for the content expansion
 
 The endings list, frozen for the UI since 2026-09-29, is **deliberately

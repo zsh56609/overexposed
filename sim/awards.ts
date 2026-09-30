@@ -1,12 +1,12 @@
 // npm run sim:awards -- [--runs=1000] [--seed=20260929]
 // Year-end award rates (docs/ui-plan.md §13, decisions 16 and 20): the same personas and seeds as
-// `npm run sim`, each run's event history collected, the /core awards query run on the finished year.
+// `npm run sim`, the /core awards query run on each finished year.
 // Awards are read-only, so this changes no run: `npm run sim` stays byte-identical. Ids and numbers only.
 //
 // Tuning target: every award won in at least a few percent and at most about 40% of player-like runs,
 // and no run ends with zero awards.
 
-import { yearAwards, type GameEvent, type GameState } from '../core/index.ts';
+import { yearAwards, type GameState } from '../core/index.ts';
 import { runOne, runSeeds } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS, type PersonaId } from './personas.ts';
@@ -29,15 +29,13 @@ const t0 = performance.now();
 for (const persona of PERSONA_IDS) {
   const t = tally();
   for (const seed of seeds) {
-    const history: GameEvent[] = [];
     let last: GameState | null = null;
     runOne(content, persona, seed, (state) => {
-      history.push(...state.events);
       last = state;
     });
     const final = last as GameState | null;
     if (!final || final.phase !== 'ended') continue;
-    const won = yearAwards(final, history);
+    const won = yearAwards(final);
     for (const target of isProbe(persona) ? [t] : [t, players]) {
       target.runs++;
       for (const id of won) target.won[id] = (target.won[id] ?? 0) + 1;
@@ -50,19 +48,21 @@ for (const persona of PERSONA_IDS) {
 const pct = (n: number, d: number) => (d === 0 ? '-' : `${((100 * n) / d).toFixed(1)}%`);
 const pad = (s: string, n: number) => s.padEnd(n);
 const cols = [...PERSONA_IDS.map((p) => (isProbe(p) ? `${p}*` : p)), 'players'];
+// Wide enough for the longest persona name, and a gap between columns.
+const W = Math.max(12, ...cols.map((c) => c.length + 2));
 const lines: string[] = [];
 lines.push(`AWARDS  seed=${SEED}  ${RUNS} runs x ${PERSONA_IDS.length} personas  (${((performance.now() - t0) / 1000).toFixed(1)}s)`);
-lines.push(`share of runs winning each award; * = control probe, not in "players"`, '');
-lines.push(pad('award', 26) + cols.map((c) => c.padStart(12)).join(''));
+lines.push(`share of runs winning each award; * = probe, not in "players"`, '');
+lines.push(pad('award', 26) + cols.map((c) => c.padStart(W)).join(''));
 const tallies = [...PERSONA_IDS.map((p) => perPersona.get(p) as Tally), players];
-for (const id of awardIds) lines.push(pad(id, 26) + tallies.map((t) => pct(t.won[id] ?? 0, t.runs).padStart(12)).join(''));
+for (const id of awardIds) lines.push(pad(id, 26) + tallies.map((t) => pct(t.won[id] ?? 0, t.runs).padStart(W)).join(''));
 lines.push('');
 const maxCount = Math.max(...tallies.flatMap((t) => Object.keys(t.byCount).map(Number)));
 for (let n = 0; n <= maxCount; n++) {
-  lines.push(pad(`runs with ${n} award(s)`, 26) + tallies.map((t) => pct(t.byCount[n] ?? 0, t.runs).padStart(12)).join(''));
+  lines.push(pad(`runs with ${n} award(s)`, 26) + tallies.map((t) => pct(t.byCount[n] ?? 0, t.runs).padStart(W)).join(''));
 }
 const multi = (t: Tally) => Object.entries(t.byCount).reduce((sum, [k, v]) => sum + (Number(k) >= 2 ? v : 0), 0);
-lines.push(pad('runs with 2+ awards', 26) + tallies.map((t) => pct(multi(t), t.runs).padStart(12)).join(''));
+lines.push(pad('runs with 2+ awards', 26) + tallies.map((t) => pct(multi(t), t.runs).padStart(W)).join(''));
 lines.push('');
 
 let pass = true;

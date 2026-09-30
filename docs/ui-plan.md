@@ -227,29 +227,33 @@ through /core's "as if this card were in hand" query (decision 8).
 and every requirement live as met / unmet.
 The final gate is an informed choice (decision 11). When every option
 gives the same ending, one plain line says so: "Either way, the year
-ends as <ending>."; otherwise each option shows "This ends the year as:
-<ending>". Awards are the ending screen's to reveal: they appear on the
+ends as <major> · <minor>."; otherwise each option shows "This ends the
+year as: <major> · <minor>" (decision 26). Awards are the ending screen's to reveal: they appear on the
 options only when the options bring different awards, each option with
 its own ("On the night: Critics' Choice" — awards night), because then
 they bear on the choice (decision 23, revised).
 
 **Goals board** — visible from the first turn, and through every
-decision: it holds the right rail on its own (§3). The four endings, each
-with its name, its goal line (goalKey) and what it requires, live via
-explainCondition. The player must always know what they are steering
-toward (decision 10). Narrative order, aspirations first — Headliner, The
-Musician's Musician, Cautionary Tale, Nobody Yet — from each ending's
-`boardOrder`, never its resolution priority. A marker labelled "If the
-year ended today" sits on the ending the year would resolve to now,
-from /core's `endingIfYearEndedNow` (decision 22).
+decision: it holds the right rail on its own (§3). The four major
+endings, each with its name, its goal line (goalKey) and its side of the
+two axes — "Hype 80+", "Scandals 5 or fewer" — live via /core's
+`majorRequirements`. The player must always know what they are steering
+toward (decision 10). Narrative order, aspirations first — The
+Breakthrough, The Long Game, Overexposed, The Hard Way — the order of
+`majors` in content/endings.json. A marker labelled "If the year ended
+today" sits on the major the year would resolve to now and names the
+minor too — "The Breakthrough · Leading Role" — from /core's
+`endingIfYearEndedNow` (decisions 22 and 26). Minors are not on the
+board: the marker is how a lane shows as a destination.
 
 **Deck viewer** — read-only deck and discard lists, sorted by name, never
 revealing draw order (decision 12).
 
 **Ending** — the ending and the year's awards (decision 16;
 docs/decisions.md). The ending decides the headline.
-- ending name and text, from the ending's nameKey and textKey
-  (decisions 9 and 15)
+- the major as the night's category, then the minor as the ending: its
+  name and text, from the minor's nameKey and textKey (decisions 9, 15
+  and 26)
 - below them, every award won this run with its citation: a plain list,
   no reveal, no ceremony presentation (2026-09-30). Every award whose
   conditions hold is won; the fallback (Most Promising Newcomer (Still))
@@ -258,8 +262,12 @@ docs/decisions.md). The ending decides the headline.
   the final state and the run's event history
 - run summary (peak hype, scandals held, milestone flags such as signed,
   ...)
-- **the other endings shown as locked**, each with its name and a
-  one-line hint (its goal line) — "3 other endings remain"
+- **the endings collection** — "Endings found: 3 of 13", grouped by
+  major, found minors named, the rest "Undiscovered". Kept in this
+  browser only (localStorage `overexposed.endingsFound`, every access in
+  try/catch): with storage empty or unavailable it shows this run's
+  ending alone and never fails. A completion record only; it changes
+  nothing in play (decision 26)
 - **"Play again" is the largest element on the screen and restarts in
   one click** once the screen has settled; a click during an animation
   only fast-forwards (decision 7)
@@ -496,13 +504,23 @@ it.
     - A tier word must never imply a requirement is met when it is not.
       Requirement lines keep their exact numbers; no requirement is ever
       written as a tier. Where it can, a boundary sits on a goal's own
-      threshold (Known at Headliner's 60 hype, Accomplished at The
-      Musician's Musician's 55 craft), so a word never runs ahead of a
-      goal the player can see.
+      threshold (Known at the fame split, the "Hype 80+" of The
+      Breakthrough and Overexposed; Accomplished at the 55 craft of The
+      Musician's Musician and The Character Actor), so a word never runs
+      ahead of a goal the player can see. Validate enforces the fame
+      split on a hype tier boundary.
     - For visual craft, which rebuilds the stat bar: touch has no hover,
       so a long-press on a stat must show its full value. Until then the
       small numbers at 800×450 and on touch are accepted.
     (2026-09-30)
+26. Two levels of ending on screen (phase 1 of the content expansion,
+    docs/design/content-expansion.md §1.5). The goals board shows the
+    four majors, never the minors; the marker, the final gate and the
+    ending screen always name both, as "<major> · <minor>"
+    (`ui.ending.pair`). The ending screen reads category, ending, text,
+    awards, then the run summary and the endings collection, which
+    replaces the list of locked endings; the old endings' goal lines are
+    no longer shown (their keys are kept). (2026-09-30)
 
 ### Still open
 

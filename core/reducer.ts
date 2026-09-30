@@ -9,7 +9,8 @@
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
 
 import { CoreError, getCard, getGate, type GateDef } from './content.ts';
-import { effectiveHeatThreshold, endingIfYearEndedNow, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
+import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
+import { endingIfYearEndedNow } from './endings.ts';
 import { nextInt } from './rng.ts';
 import {
   addCard,
@@ -194,6 +195,8 @@ function playCard(state: GameState, uid: number): GameState {
 
   d.slots -= def.cost;
   d.events.push({ type: 'play', uid: card.uid, cardId: card.cardId, cost: def.cost });
+  // The career lane counts what the player built from the starting deck, not the deck itself (core/lanes.ts).
+  if (!card.starting || d.content.rules.laneStartingDeck === true) d.careerPlays[card.cardId] = (d.careerPlays[card.cardId] ?? 0) + 1;
   applyCardEffects(d, card.cardId, def.effects);
   // Opportunities are one-shot: spent, not discarded.
   if (def.kind === 'opportunity') {
@@ -223,15 +226,24 @@ function endTurn(state: GameState): GameState {
   // 3. The hand goes to the discard pile, scandals included.
   d.discard.push(...d.hand);
   d.hand = [];
+  const held = scandalCount(d);
   d.events.push({
     type: 'turnEnd',
     act: d.act,
     turn: d.turn,
     resources: { ...d.resources },
-    scandalCount: scandalCount(d),
+    scandalCount: held,
     threshold,
     crystallised,
   });
+  // The year so far, from the values this month end carries (endings and awards read it: core/year.ts).
+  const hype = d.resources.hype;
+  d.year = {
+    peakHype: Math.max(d.year.peakHype, hype),
+    peakScandals: Math.max(d.year.peakScandals, held),
+    bestMonthHype: Math.max(d.year.bestMonthHype, hype - d.year.lastMonthEndHype),
+    lastMonthEndHype: hype,
+  };
 
   // 4. Next turn (its draft first, if it has one), or this act's Gate.
   if (turnInAct(d) >= rules.turnsPerAct) offerGates(d);
@@ -389,11 +401,12 @@ function advanceAct(d: Draft): void {
   }
 }
 
-/** Descending priority, first match wins. Validation guarantees a priority-0 unconditional fallback. */
+/** Two levels (docs/design/content-expansion.md §1): the major from the axes, then its first minor that holds, else its fallback. */
 function resolveEnding(d: Draft): void {
-  const endingId = endingIfYearEndedNow(d);
+  // The same query as the goals board's "If the year ended today" marker, so the two cannot disagree.
+  const ending = endingIfYearEndedNow(d);
   d.phase = 'ended';
-  d.endingId = endingId;
-  if (endingId === null) fault(d, 'noEndingMatched', String(d.turn));
+  d.endingId = ending?.minorId ?? null;
+  if (ending === null) fault(d, 'noEndingMatched', String(d.turn));
   d.events.push({ type: 'ending', endingId: d.endingId });
 }

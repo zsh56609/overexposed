@@ -143,6 +143,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
   "textKey": "card.vocal_coaching.text",
   "playable": true,
   "tags": ["craft", "training"],
+  "lane": "music",
   "actMin": 1,
   "effects": [
     { "op": "resource", "target": "craft", "value": 6 }
@@ -152,6 +153,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 
 `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
+`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral` — draws, relief, money, removal. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): `headlineKeys` (non-scandals) are the feed headline variants for playing the card — the UI picks one by a hash of run seed, month and card instance, never the game RNG — and `register` (`loud` | `quiet` | `money`) is the voice it is printed in. A scandal has `headlineKey`, printed when it crystallises, and its `textKey` is its in-hand line: the interface shows its rules from its effects.
@@ -197,9 +199,11 @@ Requirements are evaluated at resolution. Prefer conditions on state at that mom
 
 Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Thirteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
 
+`content/endings.json`: `axes` (`id`, `key` — a condition key —, `from` — where the high side starts —, `sides` low then high), `majors` (`id`, `on` — a side per axis —, `nameKey`, `goalKey`) in board order, and `minors` (`id`, `major`, `nameKey`, `textKey`, optional `goalKey`, and either `conditions` or `fallback: true`, last in its major). Minor conditions are **year conditions**: the condition shape plus `lane` (`any`/`not`), `holds` (card ids in the deck, `all`/`any`/`not`), `anyOf` (alternatives), and the year stats `peakHype`, `peakScandals`, `scandalDrop` (peak minus now), `bestMonthHype` — kept in `state.year` at each month end.
+
 ### Awards
 
-`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — the condition shape plus `ending` (`any`/`not` ending ids) and year stats — `peakScandals`, `scandalDrop` (peak minus end), `bestMonthHype`, from `turnEnd` events — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state and the event history, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
+`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — year conditions plus `ending` (`any`/`not` major or minor ids; a major matches each of its minors) — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
 
 ### Stat tiers
 
@@ -207,8 +211,8 @@ Four **major** endings are a 2×2 of fame (hype at year end against a split that
 
 ### Content budget
 
-21 action · 7 opportunity · 6 scandal · 8 gate (two per season) · 4 ending = 46 pieces.
-A ceiling, not a target.
+25 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 13 minor endings = 64 pieces (raised for the content expansion; its events get their own budget).
+A ceiling, not a target; validate enforces it.
 
 Card design rules: a card must create an interaction (tags, `conditional`, `requires`), not just add a resource. Keep cards that convert between axes (spend craft to cool heat, spend capital or hype to exhaust a scandal) so the two engines connect. Scandals vary in how they hurt: taking a hand slot, draining at end of turn, and worsening while left in the deck.
 
@@ -219,7 +223,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` · `ending.<id>.text` · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` (variants) · `card.<id>.headline` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text` (minors) · `act.<season>.name` · `act.<season>.opener` · `story.opening` · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
 - Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
@@ -233,16 +237,18 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 `npm run validate` checks, and runs in CI:
 
 - unknown effect ops
-- references to nonexistent card / gate / ending ids
+- references to nonexistent card / gate / ending ids, and to lanes not in `rules.lanes`
 - missing i18n keys
 - cards unreachable in any act
-- **missing `priority: 0` fallback ending**
+- **endings not exhaustive**: every corner of the axes exactly one major, every major exactly one fallback minor, last; the fame split on a hype tier boundary
+- a non-scandal card without a lane, a scandal with one
+- the content budget
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
 - awards: fields, conditions, ending ids, a fallback award, at most 8
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
-- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, an ending without name, goal line or text, a gate without flavour, a season without an opener, the opening
+- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.
 

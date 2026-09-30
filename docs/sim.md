@@ -2,7 +2,8 @@
 
 Reference for `/sim` (AGENTS.md §5). Moved here verbatim from AGENTS.md on
 2026-09-30, so that AGENTS.md carries only rules, the frozen summary and
-pointers (docs/decisions.md).
+pointers (docs/decisions.md). Updated for the two-level endings and career
+lanes (phase 1 of the content expansion, docs/design/content-expansion.md §8).
 
 ## Drafting (greedy personas)
 
@@ -12,13 +13,16 @@ a card's draft value = the odds its `requires` holds when it comes up × its val
 
 **Band population:** the player-like personas in `sim/personas.ts`, 1000 runs each on the same run seeds (`npm run sim -- --runs=1000`). Per-persona bands are checked on each persona separately; pooled bands pool the player-like personas with equal weight (equal runs each). Probes run on the same seeds but never count towards a pooled band: their draws must not set gate difficulty. A pass counts only after it also holds on two alternate batch seeds (`--seed=`).
 
-**Two persona classes**, derived from weights, never from ids. A persona that gives an axis zero weight in every mode ignores that axis entirely and is a **control probe**: ignoring heat = heat, scandal and risk weights all 0 (today `hypechaser`); ignoring hype = hype weight 0 (today `crafter`). Every other persona is **player-like** (`minmaxer`, `dealseeker`, `comeback`, `artisan`, and `random`, which weighs nothing). Probes are not player models but experiments on the design thesis: a deterministic outcome means the experiment worked, so they are exempt from the concentration band and carry inverted assertions that fail if the thesis breaks. The endings those assertions name are derived from content too: the collapse ending sets a scandal floor; the top-hype ending demands the most hype among the endings that don't.
+**Two persona classes**, derived from weights, never from ids. A persona that gives an axis zero weight in every mode ignores that axis entirely and is a **control probe**: ignoring heat = heat, scandal and risk weights all 0 (today `hypechaser`); ignoring hype = hype weight 0 (today `crafter`). A persona that pursues one career lane in every mode (`lane` set, `lanePull` > 0) is a **lane probe** (today `screenseeker` and `celebseeker`: balanced weights, plus `LANE_PULL` = 6 per play of lead their lane holds over the next, and per play of one of their lane's cards — an instrument setting like `COMEBACK_SWITCH_AT`, fixed, not derived from content). Every other persona is **player-like** (`minmaxer`, `dealseeker`, `comeback`, `artisan`, and `random`, which weighs nothing). Probes are not player models but experiments on the design: a deterministic outcome means the experiment worked, so they are exempt from the concentration bands and carry assertions that fail if the design breaks. The majors those assertions name are derived from content too: collapse = the majors on the high ("damaged") side of the axis on `scandalCount`; top hype = the majors on the high ("known") side of the axis on `hype`. Music, the base lane, needs no probe; every other lane in `rules.lanes` must have one, or the lane band fails.
 
 | Metric | Population | Band |
 |---|---|---|
-| Ending concentration | each player-like persona separately | no single ending above 70% of that persona's runs |
-| Thesis: ignoring heat collapses | each probe that ignores heat | the collapse ending (meltdown) in more than 80% of its runs |
-| Thesis: ignoring hype never makes a star | each probe that ignores hype | the top-hype ending (star) in fewer than 5% of its runs |
+| Major concentration | each player-like persona separately | no single major ending above 70% of that persona's runs |
+| Ending concentration | each player-like persona separately | no single minor ending above 70% of that persona's runs |
+| Minor reachability | player-like runs, pooled | every minor ending in at least 3% of runs |
+| Thesis: ignoring heat collapses | each probe that ignores heat | the collapse majors (Overexposed, The Hard Way) in more than 80% of its runs |
+| Thesis: ignoring hype never makes it big | each probe that ignores hype | the top-hype majors (The Breakthrough, Overexposed) in fewer than 5% of its runs |
+| Lane reachability | each lane probe | ends the year in its own lane (`currentLane`) in more than 50% of its runs |
 | Clogging: dead cards (scandals) drawn per turn, averaged per act | player-like runs, pooled | rising act by act — lowest in spring, highest in winter |
 | Scandals held at run end | player-like runs, pooled | median 2–5 |
 | Gate difficulty: met% (requirement already satisfied when offered) | offers to player-like personas, pooled | 35–65% per gate |
@@ -29,4 +33,6 @@ a card's draft value = the odds its `requires` holds when it comes up × its val
 
 "The spiral lands in winter" means clogging: the player never sees a crystallisation rate, they see how many of their five cards are dead this turn. Where crystallisation peaks is not a target.
 
-Diagnostics, reported but not bands: the pooled ending distribution and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.
+The artisan persona leans hard toward The Long Game by design (docs/design/content-expansion.md §8): if it cannot come under 70% the result is reported, not tuned away by changing the persona.
+
+Diagnostics, reported but not bands: the pooled major, minor and lane distributions and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.

@@ -1,23 +1,30 @@
-// Aggregate a batch into the §5 report: JSON-able data plus console tables.
+// Aggregate a batch into the report (AGENTS.md §5, docs/sim.md): JSON-able data plus console tables.
 // Ids and numbers only; no content display strings.
 
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
-import { COMEBACK_SWITCH_AT, ignoredAxes, PERSONA_IDS, type PersonaId, type ProbeAxis } from './personas.ts';
+import { COMEBACK_SWITCH_AT, ignoredAxes, isProbe, PERSONA_IDS, seeksLane, type PersonaId, type ProbeAxis } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
- * Tuning targets, CLAUDE.md §5. Every persona runs the same seeds, equal runs each. Two persona
- * classes (see ignoredAxes): player-like personas are the band population — the concentration band per
- * persona, the aggregate bands pooled over them with equal weight. Control probes only carry assertions
- * that fail if the design thesis breaks; their draws never set gate difficulty or the scandal median.
+ * Tuning targets (docs/sim.md → Tuning targets). Every persona runs the same seeds, equal runs each. Two
+ * persona classes (see isProbe): player-like personas are the band population — the concentration bands
+ * per persona, the aggregate bands pooled over them with equal weight. Probes — control probes ignoring
+ * an axis, lane probes pursuing a lane — only carry assertions that fail if the design breaks; their draws
+ * never set gate difficulty, the scandal median or minor reachability.
  */
 export const BANDS = {
-  /** Per player-like persona: no single ending may take more than this share of its runs. */
+  /** Per player-like persona: no single (minor) ending may take more than this share of its runs. */
   personaEndingMax: 0.7,
-  /** A probe ignoring heat must reach the collapse ending (the one with a scandal floor) in more than this share. */
+  /** Per player-like persona: no single major ending may take more than this share of its runs. */
+  personaMajorMax: 0.7,
+  /** Player-like, pooled: every minor ending reached in at least this share of runs. */
+  minorReachMin: 0.03,
+  /** A probe ignoring heat must end on the damaged side of the scandal axis in more than this share. */
   probeHeatCollapseMin: 0.8,
-  /** A probe ignoring hype must reach the top-hype ending (the one demanding the most hype) in less than this share. */
+  /** A probe ignoring hype must end on the famous side of the hype axis in less than this share. */
   probeHypeTopMax: 0.05,
+  /** A lane probe must end the year in its own lane in more than this share of its runs (most of them). */
+  laneProbeMin: 0.5,
   /** Player-like, pooled: median scandals held at run end. */
   scandalMedian: [2, 5],
   /** Player-like, pooled, per gate: requirement already satisfied when offered. */
@@ -64,11 +71,12 @@ export interface Report {
     readonly seconds: number;
     readonly acts: number;
     readonly turnsPerAct: number;
-    /** Per persona: the axes it ignores entirely. Empty = player-like; any = control probe. */
+    /** Per persona: the axes it ignores entirely (a control probe), and the lane it pursues (a lane probe). */
     readonly ignores: Readonly<Record<string, readonly ProbeAxis[]>>;
-    /** Endings the probe assertions name, derived from content. */
-    readonly collapseEnding: string | null;
-    readonly topHypeEnding: string | null;
+    readonly seeks: Readonly<Record<string, string | null>>;
+    /** Majors the probe assertions name, derived from content: the damaged side of the scandal axis, the famous side of the hype axis. */
+    readonly collapseMajors: readonly string[];
+    readonly topHypeMajors: readonly string[];
     /** Scandals held at which comeback switches from spiking to cleaning up (a fixed persona parameter). */
     readonly comebackLimit: number | null;
   };
@@ -77,7 +85,10 @@ export interface Report {
     readonly softLocks: readonly { seed: number; persona: PersonaId; reason: string }[];
     readonly replay: BatchResult['replay'];
   };
-  readonly endings: { readonly ids: readonly string[]; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
+  /** Minor endings (grouped by major), majors, and the lane each run ended in: shares of runs per group. */
+  readonly endings: { readonly ids: readonly string[]; readonly majorOf: Readonly<Record<string, string>>; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
+  readonly majors: { readonly ids: readonly string[]; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
+  readonly lanes: { readonly ids: readonly string[]; readonly share: Readonly<Record<Group, Readonly<Record<string, number>>>> };
   readonly scandalsHeld: Readonly<
     Record<
       Group,
@@ -161,7 +172,8 @@ function dist(xs: readonly number[]): Dist {
 export function buildReport(batch: BatchResult): Report {
   const { records, personas, content } = batch;
   const ignores = Object.fromEntries(personas.map((p) => [p, ignoredAxes(p)])) as Record<PersonaId, readonly ProbeAxis[]>;
-  const players = personas.filter((p) => ignores[p].length === 0);
+  const seeks = Object.fromEntries(personas.map((p) => [p, seeksLane(p)])) as Record<PersonaId, string | null>;
+  const players = personas.filter((p) => !isProbe(p));
   const byPersona = (p: PersonaId) => records.filter((r) => r.persona === p);
   const playerRecords = records.filter((r) => players.includes(r.persona));
   const groups: [Group, readonly RunRecord[]][] = [...personas.map((p): [Group, RunRecord[]] => [p, byPersona(p)]), ['players', playerRecords]];
@@ -169,14 +181,20 @@ export function buildReport(batch: BatchResult): Report {
   /** The band population: healthy runs of player-like personas. */
   const healthyPlayers = healthy.filter((r) => players.includes(r.persona));
 
-  // Endings
-  const endingIds = content.endings.map((e) => e.id);
-  const share = Object.fromEntries(
-    groups.map(([g, rs]) => {
-      const done = rs.filter((r) => r.endingId !== null);
-      return [g, Object.fromEntries(endingIds.map((id) => [id, done.filter((r) => r.endingId === id).length / Math.max(1, done.length)]))];
-    }),
-  ) as Record<Group, Record<string, number>>;
+  // Endings: minors (the ending), their majors, and the lane each run ended in
+  const endingIds = content.endings.minors.map((m) => m.id);
+  const majorIds = content.endings.majors.map((m) => m.id);
+  const laneIds = content.rules.lanes ?? [];
+  const shareBy = (ids: readonly string[], of: (r: RunRecord) => string | null) =>
+    Object.fromEntries(
+      groups.map(([g, rs]) => {
+        const done = rs.filter((r) => r.endingId !== null);
+        return [g, Object.fromEntries(ids.map((id) => [id, done.filter((r) => of(r) === id).length / Math.max(1, done.length)]))];
+      }),
+    ) as Record<Group, Record<string, number>>;
+  const share = shareBy(endingIds, (r) => r.endingId);
+  const majorShare = shareBy(majorIds, (r) => r.majorId);
+  const laneShare = shareBy(laneIds, (r) => r.lane);
 
   // Scandals held at the end of the run
   const scandalsHeld = Object.fromEntries(
@@ -411,62 +429,65 @@ export function buildReport(batch: BatchResult): Report {
   // Bands
   const pct = (x: number | null) => (x === null ? 'n/a' : `${(x * 100).toFixed(1)}%`);
   const bands: BandCheck[] = [];
-  const topEnding = (p: PersonaId) =>
-    endingIds.map((id) => ({ id, share: share[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
-  const concentrated = players.filter((p) => topEnding(p).share > BANDS.personaEndingMax);
+  const concentration = (ids: readonly string[], sh: Record<Group, Record<string, number>>, max: number, what: string): BandCheck => {
+    const top = (p: PersonaId) => ids.map((id) => ({ id, share: sh[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
+    return {
+      target: `player-like personas: no single ${what} > ${pct(max)} of its runs`,
+      pass: players.length === 0 ? null : players.every((p) => top(p).share <= max),
+      actual:
+        players.length === 0
+          ? 'no player-like persona in this batch'
+          : players
+              .map((p) => {
+                const t = top(p);
+                return `${p} ${t.id} ${pct(t.share)}${t.share > max ? ' (over)' : ''}`;
+              })
+              .join(', '),
+    };
+  };
+  bands.push(concentration(majorIds, majorShare, BANDS.personaMajorMax, 'major ending'), concentration(endingIds, share, BANDS.personaEndingMax, 'minor ending'));
+  const rare = endingIds.filter((id) => (share.players[id] ?? 0) < BANDS.minorReachMin);
   bands.push({
-    target: `player-like personas: no single ending > ${pct(BANDS.personaEndingMax)} of its runs`,
-    pass: players.length === 0 ? null : concentrated.length === 0,
-    actual:
-      players.length === 0
-        ? 'no player-like persona in this batch'
-        : players
-            .map((p) => {
-              const t = topEnding(p);
-              return `${p} ${t.id} ${pct(t.share)}${t.share > BANDS.personaEndingMax ? ' (over)' : ''}`;
-            })
-            .join(', '),
+    target: `every minor ending reached in >= ${pct(BANDS.minorReachMin)} of runs (player-like, pooled)`,
+    pass: players.length === 0 ? null : rare.length === 0,
+    actual: rare.length === 0 ? `lowest ${[...endingIds].sort((a, b) => (share.players[a] ?? 0) - (share.players[b] ?? 0)).slice(0, 3).map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ')}` : `below: ${rare.map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ')}`,
   });
 
-  // Probe assertions. Their endings come from content: the collapse ending sets a scandal floor
-  // (highest priority first); the top-hype ending demands the most hype among the rest — a collapse
-  // ending with a high hype floor must never pass for the reward.
-  const collapseEnding =
-    [...content.endings].sort((a, b) => b.priority - a.priority).find((e) => e.conditions?.scandalCount?.min !== undefined)?.id ?? null;
-  const topHypeEnding =
-    content.endings
-      .filter((e) => e.conditions?.hype?.min !== undefined && e.conditions.scandalCount?.min === undefined)
-      .reduce<{ id: string; min: number } | null>((best, e) => {
-        const min = e.conditions?.hype?.min as number;
-        return best === null || min > best.min ? { id: e.id, min } : best;
-      }, null)?.id ?? null;
+  // Probe assertions. Their majors come from content: ignoring heat must end on the damaged side of the
+  // axis on scandals held, ignoring hype must never end on the famous side of the axis on hype.
+  const sideMajors = (key: string) => {
+    const axis = content.endings.axes.find((a) => a.key === key);
+    return axis ? content.endings.majors.filter((m) => m.on[axis.id] === axis.sides[1]).map((m) => m.id) : [];
+  };
+  const collapseMajors = sideMajors('scandalCount');
+  const topHypeMajors = sideMajors('hype');
   // With every persona in the batch, a missing probe is a broken instrument: fail. A filtered batch: n/a.
   const fullBatch = PERSONA_IDS.every((p) => personas.includes(p));
-  const probeBand = (axis: ProbeAxis, ending: string | null, target: string, holds: (x: number) => boolean): BandCheck => {
+  const probeBand = (axis: ProbeAxis, majors: readonly string[], target: string, holds: (x: number) => boolean): BandCheck => {
     const probes = personas.filter((p) => ignores[p].includes(axis));
-    if (ending === null) return { target, pass: false, actual: `no ending to assert on (${axis === 'heat' ? 'none sets a scandal floor' : 'none demands hype'})` };
+    if (majors.length === 0) return { target, pass: false, actual: `no major to assert on (no axis on ${axis === 'heat' ? 'scandalCount' : 'hype'})` };
     if (probes.length === 0) return { target, pass: fullBatch ? false : null, actual: `no persona in this batch ignores ${axis}` };
-    const x = (p: PersonaId) => share[p][ending] ?? 0;
+    const x = (p: PersonaId) => majors.reduce((sum, id) => sum + (majorShare[p][id] ?? 0), 0);
     return {
       target,
       pass: probes.every((p) => holds(x(p))),
-      actual: probes.map((p) => `${p} ${ending} ${pct(x(p))}${holds(x(p)) ? '' : ' (thesis broken)'}`).join(', '),
+      actual: probes.map((p) => `${p} ${majors.join('+')} ${pct(x(p))}${holds(x(p)) ? '' : ' (thesis broken)'}`).join(', '),
     };
   };
   bands.push(
-    probeBand(
-      'heat',
-      collapseEnding,
-      `probes ignoring heat: ${collapseEnding ?? 'collapse ending'} > ${pct(BANDS.probeHeatCollapseMin)} of runs`,
-      (x) => x > BANDS.probeHeatCollapseMin,
-    ),
-    probeBand(
-      'hype',
-      topHypeEnding,
-      `probes ignoring hype: ${topHypeEnding ?? 'top-hype ending'} < ${pct(BANDS.probeHypeTopMax)} of runs`,
-      (x) => x < BANDS.probeHypeTopMax,
-    ),
+    probeBand('heat', collapseMajors, `probes ignoring heat: ${collapseMajors.join(' or ') || 'damaged majors'} > ${pct(BANDS.probeHeatCollapseMin)} of runs`, (x) => x > BANDS.probeHeatCollapseMin),
+    probeBand('hype', topHypeMajors, `probes ignoring hype: ${topHypeMajors.join(' or ') || 'famous majors'} < ${pct(BANDS.probeHypeTopMax)} of runs`, (x) => x < BANDS.probeHypeTopMax),
   );
+  // Lane probes: each lane must be reachable by a persona that pursues it (docs/design/content-expansion.md §8).
+  const laneProbes = personas.filter((p) => seeks[p] !== null);
+  const unsought = laneIds.filter((lane) => lane !== laneIds[0] && !laneProbes.some((p) => seeks[p] === lane));
+  bands.push({
+    target: `lane probes: each ends the year in its own lane in > ${pct(BANDS.laneProbeMin)} of runs`,
+    pass: laneProbes.length === 0 ? (fullBatch ? false : null) : laneProbes.every((p) => (laneShare[p][seeks[p] as string] ?? 0) > BANDS.laneProbeMin) && unsought.length === 0,
+    actual:
+      laneProbes.map((p) => `${p} ${seeks[p]} ${pct(laneShare[p][seeks[p] as string] ?? 0)}`).join(', ') +
+      (unsought.length ? `; no probe pursues ${unsought.join(', ')}` : ''),
+  });
   // Clogging: dead cards drawn per turn, by act, must rise act by act (lowest first, highest last).
   const rising = (xs: readonly number[]) => xs.every((x, i) => i === 0 || x > (xs[i - 1] as number));
   const clog = (g: Group) => (cascadeByAct[g] ?? []).map((a) => a.drawn);
@@ -513,7 +534,9 @@ export function buildReport(batch: BatchResult): Report {
     .map((c) => ({ id: c.id, rate: ratio(count(healthy, 'plays', c.id), count(healthy, 'draws', c.id)) }))
     .sort((a, b) => (a.rate ?? 0) - (b.rate ?? 0));
   const diagnostics = [
-    { label: 'ending distribution (player-like, pooled)', value: endingIds.map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ') },
+    { label: 'major distribution (player-like, pooled)', value: majorIds.map((id) => `${id} ${pct(majorShare.players[id] ?? 0)}`).join(', ') },
+    { label: 'minor distribution (player-like, pooled)', value: endingIds.map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ') },
+    { label: 'lane at year end (player-like, pooled)', value: laneIds.map((id) => `${id} ${pct(laneShare.players[id] ?? 0)}`).join(', ') },
     { label: 'gate pass% (passed when chosen, player-like, pooled)', value: gates.map((g) => `${g.id} ${pct(g.passRate)}`).join(', ') },
     { label: 'scandals held at run end, all personas (probes included)', value: allScandals.length ? `median ${median(allScandals)}` : 'n/a' },
     {
@@ -538,12 +561,15 @@ export function buildReport(batch: BatchResult): Report {
       acts: content.rules.acts,
       turnsPerAct: content.rules.turnsPerAct,
       ignores,
-      collapseEnding,
-      topHypeEnding,
+      seeks,
+      collapseMajors,
+      topHypeMajors,
       comebackLimit: personas.includes('comeback') ? COMEBACK_SWITCH_AT : null,
     },
     health: { crashes, softLocks, replay: batch.replay },
-    endings: { ids: endingIds, share },
+    endings: { ids: endingIds, majorOf: Object.fromEntries(content.endings.minors.map((m) => [m.id, m.major])), share },
+    majors: { ids: majorIds, share: majorShare },
+    lanes: { ids: laneIds, share: laneShare },
     scandalsHeld,
     crystalTurns,
     scandalKinds,
@@ -583,7 +609,7 @@ const n0 = (x: number) => (Number.isFinite(x) ? x.toFixed(0) : '-');
 
 export function formatReport(r: Report): string {
   // Player-like personas first, control probes last, so the two classes read separately.
-  const isProbe = (p: PersonaId) => (r.meta.ignores[p] ?? []).length > 0;
+  const isProbe = (p: PersonaId) => (r.meta.ignores[p] ?? []).length > 0 || (r.meta.seeks[p] ?? null) !== null;
   const P = [...r.meta.personas.filter((p) => !isProbe(p)), ...r.meta.personas.filter(isProbe)];
   const out: string[] = [];
   const h = (title: string) => out.push('', title);
@@ -596,7 +622,7 @@ export function formatReport(r: Report): string {
   const probes = P.filter(isProbe);
   out.push(
     `persona classes: player-like ${P.filter((p) => !isProbe(p)).join(', ') || '-'}; ` +
-      `probes ${probes.map((p) => `${p} (ignores ${(r.meta.ignores[p] ?? []).join(' and ')})`).join(', ') || '-'}`,
+      `probes ${probes.map((p) => `${p} (${r.meta.seeks[p] ? `seeks ${r.meta.seeks[p]}` : `ignores ${(r.meta.ignores[p] ?? []).join(' and ')}`})`).join(', ') || '-'}`,
     `'players' columns pool the player-like personas: the band population. Probes appear only in their own columns.`,
   );
   if (r.meta.comebackLimit !== null) {
@@ -605,8 +631,13 @@ export function formatReport(r: Report): string {
   for (const c of r.health.crashes.slice(0, 10)) out.push(`  CRASH  --replay=${c.seed} --persona=${c.persona}  ${c.error}`);
   for (const s of r.health.softLocks.slice(0, 10)) out.push(`  SOFT-LOCK  --replay=${s.seed} --persona=${s.persona}  ${s.reason}`);
 
-  h('ENDING DISTRIBUTION');
-  out.push(table(['ending', ...P, 'players'], r.endings.ids.map((id) => [id, ...[...P, 'players' as const].map((g) => pc(r.endings.share[g][id] ?? 0))])));
+  const G = [...P, 'players' as const];
+  h('MAJOR ENDINGS');
+  out.push(table(['major', ...P, 'players'], r.majors.ids.map((id) => [id, ...G.map((g) => pc(r.majors.share[g][id] ?? 0))])));
+  h('MINOR ENDINGS  (grouped by major)');
+  out.push(table(['minor', ...P, 'players'], r.endings.ids.map((id) => [`${r.endings.majorOf[id] ?? '?'} / ${id}`, ...G.map((g) => pc(r.endings.share[g][id] ?? 0))])));
+  h('LANE AT YEAR END  (the most-played career lane; ties to the first)');
+  out.push(table(['lane', ...P, 'players'], r.lanes.ids.map((id) => [id, ...G.map((g) => pc(r.lanes.share[g][id] ?? 0))])));
 
   h('SCANDALS  (held at run end; crystallised per run; turns per run that crystallised 2+ at once; most in one turn)');
   out.push(
@@ -793,7 +824,7 @@ export function formatReport(r: Report): string {
   h('DIAGNOSTICS  (not bands: they measure the persona mix as much as the game)');
   for (const d of r.diagnostics) out.push(`  ${d.label}: ${d.value}`);
 
-  h('BANDS  (CLAUDE.md §5)');
+  h('BANDS  (docs/sim.md → Tuning targets)');
   for (const b of r.bands) {
     const mark = b.pass === null ? 'n/a ' : b.pass ? 'PASS' : 'FAIL';
     out.push(`  [${mark}] ${b.target}`, `         ${b.actual}`);

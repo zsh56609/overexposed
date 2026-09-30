@@ -5,20 +5,26 @@
 // before ending the turn), so play reaches heat, crossings, gates and endings. At every state the check
 // takes each action the UI previews and compares the preview with the action's real result:
 //   play phase — every card in hand (its outcome, and its headline against the feed's), and END_TURN;
-//   gate phase — every offered gate, and at the final gate the ending and awards each option predicts;
-//   draft phase — the live requirement of every card on offer.
+//   gate phase — every offered gate, and at the final gate the ending (major and minor) and awards each
+//                option predicts;
+//   draft phase — the live requirement of every card on offer;
+//   every state — the stat bar's tiers, and the goals board: the major the marker names is the one major
+//                whose requirements all show met.
 // Exit code 1 on any mismatch.
 
 import {
   createInitialState,
   cursor,
   deriveSeed,
+  endingIfYearEndedNow,
   evaluate,
   explainCondition,
   getCard,
   getGate,
   heatLine,
   legalActions,
+  majorOf,
+  majorRequirements,
   nextInt,
   reduce,
   RESOURCE_KEYS,
@@ -132,12 +138,11 @@ function checkPlayPhase(s: GameState, seed: number): void {
   if (pe.outcome.drawn !== 0) report('endTurn leak', seed, s.turn, `preview reports ${pe.outcome.drawn} next-turn draws`);
 }
 
-/** `history`: every event of the walk so far, as the UI's queue holds them — what a year's awards are read from. */
-function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[]): void {
+function checkGatePhase(s: GameState, seed: number): void {
   const predicted: string[] = [];
   for (const gateId of s.gateOffer) {
     counts.gates++;
-    const p = previewGate(s, gateId, history);
+    const p = previewGate(s, gateId);
     const real = reduce(s, { type: 'CHOOSE_GATE', gateId });
     const gate = real.events.find((e) => e.type === 'gate');
     const passed = gate?.type === 'gate' && gate.passed;
@@ -146,11 +151,14 @@ function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[
     const ending = real.events.find((e) => e.type === 'ending');
     const realEnding = ending?.type === 'ending' ? ending.endingId : null;
     if (p.endingId !== realEnding) report('gate ending', seed, s.turn, `${gateId}: preview ${p.endingId}, real ${realEnding}`);
+    // Named as major · minor: the major is the real minor's own major.
+    const realMajor = realEnding === null ? null : (majorOf(real.content, realEnding) ?? 'unknown');
+    if (p.majorId !== realMajor) report('gate major', seed, s.turn, `${gateId}: preview ${p.majorId}, real ${realMajor}`);
     if (realEnding !== null) counts.finalGates++;
-    // ...and the awards it brings (decision 23): those of the real finished year, read off the whole run.
-    const realAwards = real.phase === 'ended' ? yearAwards(real, [...history, ...real.events]) : null;
+    // ...and the awards it brings (decision 23): those of the real finished year.
+    const realAwards = real.phase === 'ended' ? yearAwards(real) : null;
     if (!same(p.awardIds, realAwards)) report('gate awards', seed, s.turn, `${gateId}: preview ${JSON.stringify(p.awardIds)}, real ${JSON.stringify(realAwards)}`);
-    predicted.push(`${p.endingId}|${(p.awardIds ?? []).join()}`);
+    predicted.push(`${p.majorId}:${p.endingId}|${(p.awardIds ?? []).join()}`);
     if (p.clauses.every((c) => c.met) !== evaluate(getGate(s.content, gateId)?.requires, s)) report('gate clauses', seed, s.turn, `${gateId}: clauses disagree with evaluate`);
     // Independent of the events: the next season opens on its draft (or the run ends) before anything
     // else can touch resources, so the real state diff is exactly the gate's branch.
@@ -163,10 +171,21 @@ function checkGatePhase(s: GameState, seed: number, history: readonly GameEvent[
   }
   // A final gate (decision 23): the ending said once when every option gives the same one ("either way"),
   // and each option's awards shown only when the options bring different ones.
-  if (predicted.length > 1 && !predicted.some((x) => x.startsWith('null|'))) {
+  if (predicted.length > 1 && !predicted.some((x) => x.startsWith('null:'))) {
     if (new Set(predicted.map((x) => x.split('|')[0])).size === 1) counts.eitherWay++;
     if (new Set(predicted.map((x) => x.split('|')[1])).size > 1) counts.awardsShown++;
   }
+}
+
+/**
+ * The goals board (design §1.5): the marker's major, from /core's endingIfYearEndedNow, is the one major
+ * whose requirements all show met — the board and its marker can never point at different corners.
+ */
+function checkGoals(s: GameState, seed: number): void {
+  const today = endingIfYearEndedNow(s);
+  const met = s.content.majors.filter((m) => majorRequirements(m, s).every((c) => c.met)).map((m) => m.id);
+  if (today === null || met.length !== 1 || met[0] !== today.majorId) report('goals', seed, s.turn, `marker ${today?.majorId}, requirements met for [${met.join()}]`);
+  else if (majorOf(s.content, today.minorId) !== today.majorId) report('goals', seed, s.turn, `minor ${today.minorId} is not under ${today.majorId}`);
 }
 
 /**
@@ -216,15 +235,14 @@ for (let i = 0; i < RUNS; i++) {
   const seed = deriveSeed(SEED, i);
   const rng = cursor(seedRng(deriveSeed(seed, 0x75693121)));
   let s = createInitialState(seed, content, { strict: true });
-  const history: GameEvent[] = [...s.events];
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
     checkTiers(s, seed);
+    checkGoals(s, seed);
     if (s.phase === 'play') checkPlayPhase(s, seed);
-    else if (s.phase === 'gate') checkGatePhase(s, seed, history);
+    else if (s.phase === 'gate') checkGatePhase(s, seed);
     else if (s.phase === 'draft') checkDraftPhase(s, seed);
     s = reduce(s, choose(s, rng));
-    history.push(...s.events);
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
 }
@@ -232,8 +250,8 @@ for (let i = 0; i < RUNS; i++) {
 console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
-    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending and its awards; ${counts.eitherWay} final gates said "either way", ` +
-    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers at ${counts.tierStates} states ` +
+    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
+    `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

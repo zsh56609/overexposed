@@ -62,17 +62,19 @@ for (const persona of PERSONA_IDS) {
 
 const pct = (n: number, d: number) => (d === 0 ? '-' : `${((100 * n) / d).toFixed(1)}%`);
 const cols = [...PERSONA_IDS.map((p) => (isProbe(p) ? `${p}*` : p)), 'players'];
+// Wide enough for the longest persona name, and a gap between columns.
+const W = Math.max(12, ...cols.map((c) => c.length + 2));
 const tallies = [...PERSONA_IDS.map((p) => perPersona.get(p) as Tally), players];
 const lines: string[] = [];
 lines.push(`TIERS  seed=${SEED}  ${RUNS} runs x ${PERSONA_IDS.length} personas  (${((performance.now() - t0) / 1000).toFixed(1)}s)`);
-lines.push('reached = share of runs that show the tier at least once; time = share of all states shown in it', '* = control probe, not in "players"', '');
-lines.push('reached'.padEnd(18) + cols.map((c) => c.padStart(12)).join(''));
+lines.push('reached = share of runs that show the tier at least once; time = share of all states shown in it', '* = probe, not in "players"', '');
+lines.push('reached'.padEnd(18) + cols.map((c) => c.padStart(W)).join(''));
 for (const stat of TIER_STATS) {
-  tierKeys(stat).forEach((key, i) => lines.push(key.padEnd(18) + tallies.map((t) => pct(t.reached[stat][i] ?? 0, t.runs).padStart(12)).join('')));
+  tierKeys(stat).forEach((key, i) => lines.push(key.padEnd(18) + tallies.map((t) => pct(t.reached[stat][i] ?? 0, t.runs).padStart(W)).join('')));
 }
-lines.push('', 'time'.padEnd(18) + cols.map((c) => c.padStart(12)).join(''));
+lines.push('', 'time'.padEnd(18) + cols.map((c) => c.padStart(W)).join(''));
 for (const stat of TIER_STATS) {
-  tierKeys(stat).forEach((key, i) => lines.push(key.padEnd(18) + tallies.map((t) => pct(t.time[stat][i] ?? 0, t.states).padStart(12)).join('')));
+  tierKeys(stat).forEach((key, i) => lines.push(key.padEnd(18) + tallies.map((t) => pct(t.time[stat][i] ?? 0, t.states).padStart(W)).join('')));
 }
 lines.push('');
 

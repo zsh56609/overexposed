@@ -29,6 +29,8 @@ export interface DraftState {
 export interface CardInstance {
   readonly uid: number;
   readonly cardId: string;
+  /** Dealt from the starting deck, which every run shares: it says nothing of the career the player chose. */
+  readonly starting?: true;
 }
 
 export interface GateRecord {
@@ -36,6 +38,20 @@ export interface GateRecord {
   readonly offered: readonly string[];
   readonly gateId: string;
   readonly passed: boolean;
+}
+
+/**
+ * What the year has shown at its month ends so far, kept by the reducer at every turnEnd with the values
+ * that event carries. Endings and awards read it through core/year.ts, so the goals board's marker and the
+ * real ending need no event history.
+ */
+export interface YearRecord {
+  readonly peakHype: number;
+  readonly peakScandals: number;
+  /** The biggest hype gain from one month end to the next. */
+  readonly bestMonthHype: number;
+  /** Hype at the last month end (the starting hype before the first): what a month's rise counts from. */
+  readonly lastMonthEndHype: number;
 }
 
 /**
@@ -107,8 +123,14 @@ export interface GameState {
   /** Gate ids on offer; non-empty only in the 'gate' phase. */
   readonly gateOffer: readonly string[];
   readonly gateHistory: readonly GateRecord[];
-  /** Set when phase becomes 'ended'. */
+  /** Set when phase becomes 'ended': the minor ending (its major follows from content). */
   readonly endingId: string | null;
+  /**
+   * The plays the career lane is read from (card id → plays): every play of a card the player added to the
+   * deck — and of the shared starting deck too when rules.laneStartingDeck is true (core/lanes.ts).
+   */
+  readonly careerPlays: Readonly<Record<string, number>>;
+  readonly year: YearRecord;
 
   readonly events: readonly GameEvent[];
 }
@@ -131,7 +153,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
       if (strict) throw new CoreError('unknownCard', entry.cardId);
       continue;
     }
-    for (let i = 0; i < entry.count; i++) deck.push({ uid: uid++, cardId: entry.cardId });
+    for (let i = 0; i < entry.count; i++) deck.push({ uid: uid++, cardId: entry.cardId, starting: true });
   }
 
   const d: Draft = {
@@ -156,6 +178,8 @@ export function createInitialState(seed: number, content: Content, options: Stat
     gateOffer: [],
     gateHistory: [],
     endingId: null,
+    careerPlays: {},
+    year: { peakHype: 0, peakScandals: 0, bestMonthHype: 0, lastMonthEndHype: rules.startingResources.hype },
     events: [],
     budget: EFFECT_BUDGET,
   };

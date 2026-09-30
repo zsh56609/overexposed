@@ -1,6 +1,7 @@
 [
   {
     "id": "vocal_coaching",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.vocal_coaching.name",
@@ -13,6 +14,7 @@
   },
   {
     "id": "open_mic",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.open_mic.name",
@@ -29,6 +31,7 @@
   },
   {
     "id": "viral_stunt",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.viral_stunt.name",
@@ -45,6 +48,7 @@
   },
   {
     "id": "press_junket",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.press_junket.name",
@@ -70,6 +74,7 @@
   },
   {
     "id": "side_gig",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.side_gig.name",
@@ -85,6 +90,7 @@
   },
   {
     "id": "lay_low",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.lay_low.name",
@@ -100,6 +106,7 @@
   },
   {
     "id": "networking",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.networking.name",
@@ -112,6 +119,7 @@
   },
   {
     "id": "crisis_pr",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.crisis_pr.name",
@@ -128,6 +136,7 @@
   },
   {
     "id": "studio_session",
+    "lane": "music",
     "kind": "action",
     "cost": 2,
     "nameKey": "card.studio_session.name",
@@ -168,6 +177,7 @@
   },
   {
     "id": "ghostwriter",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.ghostwriter.name",
@@ -183,6 +193,7 @@
   },
   {
     "id": "meditation_retreat",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.meditation_retreat.name",
@@ -198,6 +209,7 @@
   },
   {
     "id": "apology_tour",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.apology_tour.name",
@@ -213,6 +225,7 @@
   },
   {
     "id": "collab_single",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.collab_single.name",
@@ -237,6 +250,7 @@
   },
   {
     "id": "tabloid_bait",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.tabloid_bait.name",
@@ -261,6 +275,7 @@
   },
   {
     "id": "reinvent_image",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.reinvent_image.name",
@@ -276,6 +291,7 @@
   },
   {
     "id": "sellout_ad",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.sellout_ad.name",
@@ -291,6 +307,7 @@
   },
   {
     "id": "street_team",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.street_team.name",
@@ -307,6 +324,7 @@
   },
   {
     "id": "demo_tape",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.demo_tape.name",
@@ -322,6 +340,7 @@
   },
   {
     "id": "fan_meetup",
+    "lane": "celebrity",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.fan_meetup.name",
@@ -346,6 +365,7 @@
   },
   {
     "id": "late_night_show",
+    "lane": "screen",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.late_night_show.name",
@@ -363,6 +383,7 @@
   },
   {
     "id": "cover_single",
+    "lane": "music",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.cover_single.name",
@@ -384,6 +405,7 @@
   },
   {
     "id": "brand_deal",
+    "lane": "celebrity",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.brand_deal.name",
@@ -399,6 +421,7 @@
   },
   {
     "id": "film_cameo",
+    "lane": "screen",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.film_cameo.name",
@@ -416,6 +439,7 @@
   },
   {
     "id": "mentorship",
+    "lane": "music",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.mentorship.name",
@@ -430,6 +454,7 @@
   },
   {
     "id": "world_tour",
+    "lane": "music",
     "kind": "opportunity",
     "cost": 2,
     "nameKey": "card.world_tour.name",
@@ -447,6 +472,7 @@
   },
   {
     "id": "award_campaign",
+    "lane": "music",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.award_campaign.name",
@@ -463,6 +489,7 @@
   },
   {
     "id": "legal_team",
+    "lane": "neutral",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.legal_team.name",
@@ -479,6 +506,7 @@
   },
   {
     "id": "indie_label",
+    "lane": "music",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.indie_label.name",
@@ -547,6 +575,92 @@
         "then": [{ "op": "resource", "target": "hype", "value": -8 }],
         "else": [{ "op": "resource", "target": "hype", "value": -3 }]
       }
+    ]
+  },
+  {
+    "id": "screen_test",
+    "lane": "screen",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.screen_test.name",
+    "textKey": "card.screen_test.text",
+    "headlineKeys": ["card.screen_test.headline.1", "card.screen_test.headline.2"],
+    "register": "quiet",
+    "tags": ["craft", "training"],
+    "effects": [
+      { "op": "resource", "target": "craft", "value": 4 },
+      { "op": "resource", "target": "hype", "value": 2 },
+      { "op": "conditional", "if": { "craft": { "min": 15 } }, "then": [{ "op": "resource", "target": "hype", "value": 2 }] }
+    ]
+  },
+  {
+    "id": "acting_class",
+    "lane": "screen",
+    "kind": "action",
+    "cost": 1,
+    "nameKey": "card.acting_class.name",
+    "textKey": "card.acting_class.text",
+    "headlineKeys": ["card.acting_class.headline.1", "card.acting_class.headline.2"],
+    "register": "quiet",
+    "tags": ["craft", "training"],
+    "requires": { "capital": { "min": 1 } },
+    "effects": [
+      { "op": "resource", "target": "capital", "value": -1 },
+      { "op": "resource", "target": "craft", "value": 6 },
+      { "op": "resource", "target": "heat", "value": -1 }
+    ]
+  },
+  {
+    "id": "guest_spot",
+    "lane": "screen",
+    "kind": "action",
+    "cost": 1,
+    "actMin": 2,
+    "nameKey": "card.guest_spot.name",
+    "textKey": "card.guest_spot.text",
+    "headlineKeys": ["card.guest_spot.headline.1", "card.guest_spot.headline.2"],
+    "register": "loud",
+    "tags": ["hype", "press"],
+    "requires": { "hype": { "min": 15 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 6 },
+      { "op": "resource", "target": "heat", "value": 3 }
+    ]
+  },
+  {
+    "id": "soundtrack_single",
+    "lane": "screen",
+    "kind": "action",
+    "cost": 1,
+    "actMin": 2,
+    "nameKey": "card.soundtrack_single.name",
+    "textKey": "card.soundtrack_single.text",
+    "headlineKeys": ["card.soundtrack_single.headline.1", "card.soundtrack_single.headline.2"],
+    "register": "loud",
+    "tags": ["hype", "recording"],
+    "requires": { "craft": { "min": 20 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 5 },
+      { "op": "resource", "target": "craft", "value": 2 },
+      { "op": "resource", "target": "heat", "value": 2 }
+    ]
+  },
+  {
+    "id": "streaming_role",
+    "lane": "screen",
+    "kind": "opportunity",
+    "cost": 1,
+    "actMin": 2,
+    "nameKey": "card.streaming_role.name",
+    "textKey": "card.streaming_role.text",
+    "headlineKeys": ["card.streaming_role.headline.1"],
+    "register": "loud",
+    "tags": ["hype", "press"],
+    "requires": { "hype": { "min": 25 } },
+    "effects": [
+      { "op": "resource", "target": "hype", "value": 9 },
+      { "op": "resource", "target": "craft", "value": 2 },
+      { "op": "resource", "target": "heat", "value": 3 }
     ]
   }
 ]

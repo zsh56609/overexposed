@@ -12,6 +12,7 @@ import {
   getGate,
   heatLine,
   legalActions,
+  majorOf,
   monthsLeft,
   playCheck,
   reduce,
@@ -205,14 +206,14 @@ export interface GatePreview {
   readonly passes: boolean;
   /** The branch that would fire now: the gate's effects, up to the next turn or the ending. */
   readonly outcome: Outcome;
-  /** The ending this choice leads to, when it is the run's last choice (decision 11); otherwise null. */
+  /** The ending this choice leads to, when it is the run's last choice (decision 11): its minor and major; otherwise null. */
   readonly endingId: string | null;
+  readonly majorId: string | null;
   /** With the ending, the awards the year would bring (decision 23, via /core's yearAwards); otherwise null. */
   readonly awardIds: readonly string[] | null;
 }
 
-/** `history`: the run's events so far, which a finished year's awards are read from. */
-export function previewGate(state: GameState, gateId: string, history: readonly GameEvent[] = []): GatePreview {
+export function previewGate(state: GameState, gateId: string): GatePreview {
   const after = reduce(state, { type: 'CHOOSE_GATE', gateId });
   const events = after.events;
   const at = events.findIndex((e) => e.type === 'gate');
@@ -226,7 +227,8 @@ export function previewGate(state: GameState, gateId: string, history: readonly 
     passes: gate?.type === 'gate' ? gate.passed : false,
     outcome: outcomeOf(stop === -1 ? rest : rest.slice(0, stop)),
     endingId: ending?.type === 'ending' ? ending.endingId : null,
-    awardIds: after.phase === 'ended' ? yearAwards(after, [...history, ...events]) : null,
+    majorId: ending?.type === 'ending' && ending.endingId !== null ? majorOf(state.content, ending.endingId) : null,
+    awardIds: after.phase === 'ended' ? yearAwards(after) : null,
   };
 }
 

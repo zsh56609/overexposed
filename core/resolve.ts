@@ -16,7 +16,7 @@ import {
 } from './content.ts';
 import { evaluate } from './conditions.ts';
 import { cursor, nextInt, shuffleInPlace, type RngCursor } from './rng.ts';
-import type { CardInstance, DraftState, GameEvent, GameState, GateRecord, Phase } from './state.ts';
+import type { CardInstance, DraftState, GameEvent, GameState, GateRecord, Phase, YearRecord } from './state.ts';
 
 /** Max effect applications per action. A content loop (onDraw → draw → …) fails loudly instead of hanging. */
 export const EFFECT_BUDGET = 10_000;
@@ -45,6 +45,8 @@ export interface Draft {
   gateOffer: string[];
   gateHistory: GateRecord[];
   endingId: string | null;
+  careerPlays: Record<string, number>;
+  year: YearRecord;
   events: GameEvent[];
   budget: number;
 }
@@ -72,6 +74,8 @@ export function openDraft(s: GameState): Draft {
     gateOffer: [...s.gateOffer],
     gateHistory: [...s.gateHistory],
     endingId: s.endingId,
+    careerPlays: { ...s.careerPlays },
+    year: s.year,
     events: [],
     budget: EFFECT_BUDGET,
   };
@@ -100,6 +104,8 @@ export function closeDraft(d: Draft): GameState {
     gateOffer: d.gateOffer,
     gateHistory: d.gateHistory,
     endingId: d.endingId,
+    careerPlays: d.careerPlays,
+    year: d.year,
     events: d.events,
   };
 }

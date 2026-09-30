@@ -1,8 +1,9 @@
-// Content validation (CLAUDE.md §4). Pure: takes parsed JSON, returns issues. No Node APIs,
+// Content validation (AGENTS.md §4). Pure: takes parsed JSON, returns issues. No Node APIs,
 // so the UI can run the same checks on load in dev later.
 //
 // The §4 checks: unknown effect ops · references to nonexistent ids · missing i18n keys ·
-// cards unreachable in any act · missing priority-0 fallback ending · numeric ranges.
+// cards unreachable in any act · endings not exhaustive (a major per corner, a fallback per major) ·
+// numeric ranges · lanes · the content budget.
 // Supporting checks: schema shape, run structure, and the §0 code boundaries (see checkBoundaries).
 
 import {
@@ -13,21 +14,24 @@ import {
   EFFECT_OPS,
   FLAG_TEST_KEYS,
   isEffectOp,
+  NEUTRAL_LANE,
   REGISTERS,
   RESOURCE_KEYS,
+  YEAR_ONLY_KEYS,
   YEAR_STAT_KEYS,
 } from '../core/index.ts';
 
 export const CHECKS = {
   unknownOp: 'unknown effect ops',
-  references: 'references to card / gate / ending ids',
+  references: 'references to card / gate / ending / lane ids',
   i18n: 'missing i18n keys',
   prose: 'player-facing prose not yet written (warnings)',
   reachability: 'cards unreachable in any act',
-  fallback: 'priority-0 fallback ending',
+  fallback: 'endings exhaustive: a major per corner, a fallback per major',
   ranges: 'numeric ranges',
   schema: 'schema shape (fields, types, duplicates)',
   structure: 'run structure (gates per act, scandal pool, flags)',
+  budget: 'content budget (ceilings)',
   boundaries: 'code boundaries (CLAUDE.md §0)',
 } as const;
 export type CheckId = keyof typeof CHECKS;
@@ -52,7 +56,14 @@ export interface ValidationResult {
   readonly issues: readonly Issue[];
   /** Earliest act each card can enter a run; Infinity = never. */
   readonly earliestAct: Readonly<Record<string, number>>;
-  readonly counts: { readonly cards: number; readonly gates: number; readonly endings: number; readonly awards: number; readonly i18nKeys: number };
+  readonly counts: {
+    readonly cards: number;
+    readonly gates: number;
+    readonly majors: number;
+    readonly minors: number;
+    readonly awards: number;
+    readonly i18nKeys: number;
+  };
 }
 
 type Obj = Readonly<Record<string, unknown>>;
@@ -64,17 +75,25 @@ const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
   'id', 'kind', 'cost', 'nameKey', 'textKey', 'headlineKeys', 'register', 'headlineKey',
-  'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn',
+  'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKey', 'requires', 'onPass', 'onFail'];
-const ENDING_FIELDS = ['id', 'priority', 'boardOrder', 'nameKey', 'goalKey', 'conditions', 'textKey'];
+const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
+const AXIS_FIELDS = ['id', 'key', 'from', 'sides'];
+const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey'];
+const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKey', 'goalKey'];
 const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
 /** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
 const MAX_AWARDS = 8;
+/**
+ * The content budget (AGENTS.md → Content budget): a ceiling per kind, not a target. Raised for phase 1 of
+ * the content expansion — five screen cards, and endings as 4 majors × 13 minors.
+ */
+const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 13 } as const;
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft', 'tiers',
+  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -84,7 +103,6 @@ const LIMIT = {
   resourceDelta: [-100, 100],
   slotsDelta: [-10, 10],
   count: [1, 10],
-  priority: [0, 100_000],
   conditionBound: [0, 10_000],
   acts: [1, 10],
   turnsPerAct: [1, 20],
@@ -108,6 +126,8 @@ class Ctx {
   readonly flagsRead = new Map<string, string>();
   readonly exhaustTags = new Map<string, string>();
   readonly keysUsed = new Map<string, string>();
+  /** rules.lanes, once checked: what a card's lane and a lane test may name. */
+  lanes: readonly string[] = [];
 
   error(check: CheckId, where: string, message: string): void {
     this.issues.push({ level: 'error', check, where, message });
@@ -349,6 +369,14 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.int(raw.draft.rerollCost, 'rules.draft.rerollCost', LIMIT.price);
   }
   checkTiers(v, raw.tiers);
+  if (!Array.isArray(raw.lanes) || raw.lanes.length === 0) v.error('schema', 'rules.lanes', 'must be a non-empty array of lane ids, the base first');
+  else {
+    raw.lanes.forEach((lane, i) => v.id(lane, `rules.lanes[${i}]`));
+    if (new Set(raw.lanes).size !== raw.lanes.length) v.error('schema', 'rules.lanes', 'lists a lane twice');
+    if (raw.lanes.includes(NEUTRAL_LANE)) v.error('schema', 'rules.lanes', `"${NEUTRAL_LANE}" is not a career lane: it is what counts toward none`);
+    v.lanes = raw.lanes.filter(isStr);
+  }
+  if (raw.laneStartingDeck !== undefined && typeof raw.laneStartingDeck !== 'boolean') v.error('schema', 'rules.laneStartingDeck', 'must be a boolean');
   return raw;
 }
 
@@ -481,6 +509,12 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
       v.key(c.headlineKey, `${where}.headlineKey`);
       if (c.kind !== 'scandal') v.warn('schema', `${where}.headlineKey`, 'only scandals have a single headline: use headlineKeys');
     }
+    // The career lane playing it builds (docs/design/content-expansion.md §2). Scandals are never played.
+    if (c.kind === 'scandal') {
+      if (c.lane !== undefined) v.error('schema', `${where}.lane`, 'a scandal is never played: it has no lane');
+    } else if (!isStr(c.lane) || ![...v.lanes, NEUTRAL_LANE].includes(c.lane)) {
+      v.error('references', `${where}.lane`, `must be one of ${[...v.lanes, NEUTRAL_LANE].join(', ')}, got ${q(c.lane)}`);
+    }
   });
   for (const c of cards) if (isStr(c.id)) v.cardIds.add(c.id);
   return cards;
@@ -502,56 +536,129 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
   });
 }
 
-function checkEndings(v: Ctx, raw: unknown): Obj[] {
-  const endings = checkList(v, raw, 'content/endings.json', 'ending', (e, where) => {
-    v.fields(e, ENDING_FIELDS, where);
-    v.int(e.priority, `${where}.priority`, LIMIT.priority);
-    if (e.conditions !== undefined) checkCondition(v, e.conditions, `${where}.conditions`);
-    for (const field of ['nameKey', 'goalKey'] as const) if (e[field] !== undefined) v.key(e[field], `${where}.${field}`);
-    v.key(e.textKey, `${where}.textKey`);
-    v.int(e.boardOrder, `${where}.boardOrder`, [1, 100], { optional: true });
-  });
-  const orders = endings.map((e) => e.boardOrder).filter(isInt);
-  if (new Set(orders).size !== orders.length) v.warn('structure', 'content/endings.json', 'two endings share a boardOrder: the goals board breaks the tie by priority');
-
-  const unconditional = (e: Obj) => e.conditions === undefined || (isObj(e.conditions) && Object.keys(e.conditions).length === 0);
-  const fallbacks = endings.filter((e) => e.priority === 0);
-  if (fallbacks.length === 0) {
-    v.error('fallback', 'content/endings.json', 'missing the priority: 0 fallback ending; a run must always resolve');
-  }
-  for (const f of fallbacks) {
-    if (!unconditional(f)) v.error('fallback', `ending ${String(f.id)}`, 'priority 0 is the unconditional fallback: remove its conditions');
-  }
-  if (fallbacks.length > 1) v.warn('fallback', 'content/endings.json', 'several priority-0 endings: only the first in file order can resolve');
-
-  const byPriority = new Map<unknown, string>();
-  for (const e of endings) {
-    const prev = byPriority.get(e.priority);
-    if (prev !== undefined) v.warn('structure', `ending ${String(e.id)}`, `shares priority ${String(e.priority)} with ${prev}: file order breaks the tie`);
-    else byPriority.set(e.priority, String(e.id));
-  }
-  for (const u of endings.filter(unconditional)) {
-    for (const e of endings) {
-      if (isInt(e.priority) && isInt(u.priority) && e.priority < u.priority) {
-        v.warn('structure', `ending ${String(e.id)}`, `can never resolve: shadowed by unconditional ending ${String(u.id)}`);
+/**
+ * Year conditions (core/year.ts): the condition shape plus a lane test, cards held, alternatives and the
+ * year stats. Minor endings and awards read them; `extra` names keys the caller checks itself (`ending`).
+ */
+function checkYearConditions(v: Ctx, c: unknown, where: string, extra: readonly string[] = []): void {
+  if (!isObj(c)) return v.error('schema', where, 'must be an object');
+  const own: readonly string[] = [...YEAR_ONLY_KEYS, ...extra];
+  checkCondition(v, Object.fromEntries(Object.entries(c).filter(([k]) => !own.includes(k))), where);
+  if (c.lane !== undefined) {
+    const at = `${where}.lane`;
+    if (!isObj(c.lane)) v.error('schema', at, 'must be an object like { "any": ["screen"] }');
+    else {
+      v.fields(c.lane, ['any', 'not'], at);
+      for (const k of ['any', 'not'] as const) {
+        const list = c.lane[k];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of lane ids');
+        else for (const lane of list) if (!v.lanes.includes(lane)) v.error('references', `${at}.${k}`, `no lane ${q(lane)} in rules.lanes`);
       }
     }
   }
-  // No single-axis endings: a lone threshold makes one resource a dominant strategy (CLAUDE.md §2).
-  for (const e of endings) {
-    if (e.priority === 0 || !isObj(e.conditions)) continue;
-    const axes = Object.keys(e.conditions).length;
-    if (axes < 2) v.error('structure', `ending ${String(e.id)}.conditions`, `single-axis ending (${axes} condition key); endings need at least two`);
+  if (c.holds !== undefined) {
+    const at = `${where}.holds`;
+    if (!isObj(c.holds)) v.error('schema', at, 'must be an object like { "any": ["burnout"] }');
+    else {
+      v.fields(c.holds, FLAG_TEST_KEYS, at);
+      for (const k of FLAG_TEST_KEYS) {
+        const list = c.holds[k];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of card ids');
+        else for (const id of list) if (!v.cardIds.has(id)) v.error('references', `${at}.${k}`, `no card with id ${q(id)}`);
+      }
+    }
   }
-  return endings;
+  if (c.anyOf !== undefined) {
+    if (!Array.isArray(c.anyOf) || c.anyOf.length < 2) v.error('schema', `${where}.anyOf`, 'must list two or more alternative conditions');
+    else c.anyOf.forEach((alt, i) => checkYearConditions(v, alt, `${where}.anyOf[${i}]`));
+  }
+  for (const k of YEAR_STAT_KEYS) if (c[k] !== undefined) checkRange(v, c[k], `${where}.${k}`, LIMIT.conditionBound);
+}
+
+/**
+ * Endings, two levels (docs/design/content-expansion.md §1): majors on axes, minors within them. Checked to
+ * be exhaustive: exactly one major for every combination of the axes' sides, and one fallback minor per
+ * major, last and unconditional. A split on a tiered stat must sit on a tier boundary, so the stat bar's
+ * word says which side of it the player is on (decision 25). Ids are unique across majors and minors:
+ * an award's ending test may name either.
+ */
+function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[]; minors: Obj[] } {
+  const file = 'content/endings.json';
+  if (!isObj(raw)) {
+    v.error('schema', file, 'must be an object: { axes, majors, minors }');
+    return { majors: [], minors: [] };
+  }
+  v.fields(raw, ENDINGS_FIELDS, file);
+  const tiers = rules && isObj(rules.tiers) ? rules.tiers : {};
+  const axes = checkList(v, raw.axes, `${file} axes`, 'axis', (a, where) => {
+    v.fields(a, AXIS_FIELDS, where);
+    if (!(CONDITION_RANGE_KEYS as readonly unknown[]).includes(a.key)) v.error('schema', `${where}.key`, `must be one of ${CONDITION_RANGE_KEYS.join(', ')}, got ${q(a.key)}`);
+    const fromOk = v.int(a.from, `${where}.from`, LIMIT.conditionBound);
+    if (!Array.isArray(a.sides) || a.sides.length !== 2 || !a.sides.every(isStr) || a.sides[0] === a.sides[1]) {
+      v.error('schema', `${where}.sides`, 'must be two different names: [below "from", from "from" on]');
+    }
+    const t = isStr(a.key) ? tiers[a.key] : undefined;
+    const bounds: unknown[] = isObj(t) && Array.isArray(t.from) ? t.from : [];
+    if (fromOk && bounds.length > 0 && !bounds.includes(a.from)) {
+      v.error('structure', `${where}.from`, `${String(a.from)} is not a ${String(a.key)} tier boundary (${bounds.join(', ')}): the stat bar's word must say which side of the split the player is on`);
+    }
+  });
+  if (axes.length === 0) v.error('fallback', file, 'needs at least one axis');
+  const axisSides = new Map(axes.filter((a) => isStr(a.id) && Array.isArray(a.sides)).map((a) => [a.id as string, a.sides as string[]]));
+  const majors = checkList(v, raw.majors, `${file} majors`, 'major', (m, where) => {
+    v.fields(m, MAJOR_FIELDS, where);
+    v.key(m.nameKey, `${where}.nameKey`);
+    v.key(m.goalKey, `${where}.goalKey`);
+    if (!isObj(m.on)) return v.error('schema', `${where}.on`, 'must name its side of every axis, like { "fame": "known" }');
+    v.fields(m.on, [...axisSides.keys()], `${where}.on`);
+    for (const [axis, sides] of axisSides) {
+      if (!sides.includes(m.on[axis] as string)) v.error('schema', `${where}.on.${axis}`, `must be one of ${sides.join(', ')}, got ${q(m.on[axis])}`);
+    }
+  });
+  // Exhaustive and disjoint: every combination of sides has exactly one major.
+  let corners: string[][] = [[]];
+  for (const sides of axisSides.values()) corners = corners.flatMap((c) => sides.map((side) => [...c, side]));
+  const axisIds = [...axisSides.keys()];
+  for (const corner of corners) {
+    const here = majors.filter((m) => {
+      const on = m.on;
+      return isObj(on) && axisIds.every((axis, i) => on[axis] === corner[i]);
+    });
+    const name = axisIds.map((axis, i) => `${axis} ${corner[i]}`).join(', ');
+    if (here.length === 0) v.error('fallback', file, `no major for ${name}: a year could end in no ending`);
+    if (here.length > 1) v.error('fallback', file, `${here.length} majors for ${name}: ${here.map((m) => String(m.id)).join(', ')}`);
+  }
+  const majorIds = new Set(majors.map((m) => m.id).filter(isStr));
+  const minors = checkList(v, raw.minors, `${file} minors`, 'minor', (m, where) => {
+    v.fields(m, MINOR_FIELDS, where);
+    if (!majorIds.has(m.major as string)) v.error('references', `${where}.major`, `no major with id ${q(m.major)}`);
+    v.key(m.nameKey, `${where}.nameKey`);
+    v.key(m.textKey, `${where}.textKey`);
+    if (m.goalKey !== undefined) v.key(m.goalKey, `${where}.goalKey`);
+    if (m.fallback !== undefined && typeof m.fallback !== 'boolean') v.error('schema', `${where}.fallback`, 'must be a boolean');
+    if (m.fallback === true && m.conditions !== undefined) v.error('fallback', where, 'a major\'s fallback takes no conditions: it catches everything else');
+    if (m.fallback !== true) {
+      if (m.conditions === undefined) v.error('schema', where, 'needs "conditions", or "fallback": true');
+      else checkYearConditions(v, m.conditions, `${where}.conditions`);
+    }
+  });
+  for (const major of majorIds) {
+    const own = minors.filter((m) => m.major === major);
+    const fallbacks = own.filter((m) => m.fallback === true);
+    if (fallbacks.length !== 1) v.error('fallback', `major ${major}`, `needs exactly one fallback minor, has ${fallbacks.length}`);
+    else if (own.at(-1) !== fallbacks[0]) v.error('fallback', `major ${major}`, `fallback ${String(fallbacks[0]?.id)} must come last: minors after it can never resolve`);
+  }
+  for (const m of minors) if (majorIds.has(m.id as string)) v.error('schema', `minor ${String(m.id)}`, 'shares its id with a major: an award ending test could not tell them apart');
+  return { majors, minors };
 }
 
 /**
  * Year-end awards (decisions 16 and 20): the condition shape, plus the award-only keys (the year's ending,
  * and a range on any year stat — YEAR_STAT_KEYS). At most 8, and a fallback so that every year ends with one.
  */
-function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
-  const endingIds = new Set(endings.map((e) => e.id).filter(isStr));
+function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>): Obj[] {
   const awards = checkList(v, raw, 'content/awards.json', 'award', (a, where) => {
     v.fields(a, AWARD_FIELDS, where);
     v.key(a.nameKey, `${where}.nameKey`);
@@ -561,9 +668,8 @@ function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
     if (a.fallback !== true && a.conditions === undefined) v.error('structure', where, 'needs "conditions", or "fallback": true');
     if (a.conditions === undefined) return;
     if (!isObj(a.conditions)) return v.error('schema', `${where}.conditions`, 'must be an object');
-    const { ending, ...rest } = a.conditions;
-    const stats: readonly string[] = YEAR_STAT_KEYS;
-    checkCondition(v, Object.fromEntries(Object.entries(rest).filter(([k]) => !stats.includes(k))), `${where}.conditions`);
+    checkYearConditions(v, a.conditions, `${where}.conditions`, ['ending']);
+    const { ending } = a.conditions;
     if (ending !== undefined) {
       const at = `${where}.conditions.ending`;
       if (!isObj(ending)) v.error('schema', at, 'must be an object like { "any": ["star"] }');
@@ -572,12 +678,11 @@ function checkAwards(v: Ctx, raw: unknown, endings: readonly Obj[]): Obj[] {
         for (const k of ['any', 'not'] as const) {
           const list = ending[k];
           if (list === undefined) continue;
-          if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of ending ids');
-          else for (const id of list) if (!endingIds.has(id)) v.error('references', `${at}.${k}`, `no ending with id ${q(id)}`);
+          if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of major or minor ending ids');
+          else for (const id of list) if (!endingIds.has(id)) v.error('references', `${at}.${k}`, `no major or minor ending with id ${q(id)}`);
         }
       }
     }
-    for (const k of YEAR_STAT_KEYS) if (rest[k] !== undefined) checkRange(v, rest[k], `${where}.conditions.${k}`, LIMIT.conditionBound);
   });
   if (awards.length > MAX_AWARDS) v.error('ranges', 'content/awards.json', `${awards.length} awards; the list is capped at ${MAX_AWARDS}`);
   if (awards.length > 0 && !awards.some((a) => a.fallback === true)) {
@@ -724,7 +829,8 @@ export const OPENING_KEY = 'story.opening';
 
 /**
  * Missing player-facing prose, reported as warnings: every card with no headline, every scandal missing its
- * headline or in-hand line, every ending missing its name, goal line or text, every gate missing its
+ * headline or in-hand line, every major missing its name or goal line, every minor missing its name or
+ * text, every gate missing its
  * flavour, every season missing its opener, the opening, and a flag label still a placeholder (a missing
  * one is an i18n error). Missing prose must be visible, not silent.
  */
@@ -734,7 +840,7 @@ function checkProse(
   rules: Obj | null,
   cards: readonly Obj[],
   gates: readonly Obj[],
-  endings: readonly Obj[],
+  endings: { readonly majors: readonly Obj[]; readonly minors: readonly Obj[] },
   awards: readonly Obj[],
 ): void {
   const written = (key: unknown) =>
@@ -751,10 +857,14 @@ function checkProse(
     if (headlines.length === 0) v.warn('prose', where, c.register === undefined ? 'no headline and no register' : 'no headline');
     else if (c.register === undefined) v.warn('prose', where, 'headline has no register');
   }
-  for (const e of endings) {
-    const where = `ending ${String(e.id)}`;
-    const missing = (['nameKey', 'goalKey', 'textKey'] as const).filter((f) => !written(e[f])).map((f) => f.replace('Key', ''));
-    if (missing.length > 0) v.warn('prose', where, `no ${missing.join(', ')}`);
+  // Endings, two levels: a major shows its name and goal line, a minor its name and text.
+  for (const m of endings.majors) {
+    const missing = (['nameKey', 'goalKey'] as const).filter((f) => !written(m[f])).map((f) => f.replace('Key', ''));
+    if (missing.length > 0) v.warn('prose', `major ${String(m.id)}`, `no ${missing.join(', ')}`);
+  }
+  for (const m of endings.minors) {
+    const missing = (['nameKey', 'textKey'] as const).filter((f) => !written(m[f])).map((f) => f.replace('Key', ''));
+    if (missing.length > 0) v.warn('prose', `minor ${String(m.id)}`, `no ${missing.join(', ')}`);
   }
   for (const g of gates) if (!written(g.flavorKey)) v.warn('prose', `gate ${String(g.id)}${nameOf(g)}`, 'no flavour');
   const openers = rules && Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
@@ -785,18 +895,35 @@ export function validateContent(raw: RawContent, i18n?: unknown): ValidationResu
   const rules = checkRules(v, raw.rules);
   const cards = checkCards(v, raw.cards);
   const gates = checkGates(v, raw.gates);
-  const endings = checkEndings(v, raw.endings);
-  const awards = checkAwards(v, raw.awards, endings);
+  const endings = checkEndings(v, raw.endings, rules);
+  const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
+  const awards = checkAwards(v, raw.awards, endingIds);
   checkReferences(v, rules, cards);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
+  checkBudget(v, cards, gates, endings);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);
   if (isObj(i18n)) checkProse(v, i18n, rules, cards, gates, endings, awards);
   return {
     issues: v.issues,
     earliestAct,
-    counts: { cards: cards.length, gates: gates.length, endings: endings.length, awards: awards.length, i18nKeys },
+    counts: { cards: cards.length, gates: gates.length, majors: endings.majors.length, minors: endings.minors.length, awards: awards.length, i18nKeys },
   };
+}
+
+/** The content budget: a ceiling per kind (CONTENT_BUDGET), not a target. */
+function checkBudget(v: Ctx, cards: readonly Obj[], gates: readonly Obj[], endings: { readonly majors: readonly Obj[]; readonly minors: readonly Obj[] }): void {
+  const counts: Record<keyof typeof CONTENT_BUDGET, number> = {
+    action: cards.filter((c) => c.kind === 'action').length,
+    opportunity: cards.filter((c) => c.kind === 'opportunity').length,
+    scandal: cards.filter((c) => c.kind === 'scandal').length,
+    gate: gates.length,
+    major: endings.majors.length,
+    minor: endings.minors.length,
+  };
+  for (const [kind, ceiling] of Object.entries(CONTENT_BUDGET) as [keyof typeof CONTENT_BUDGET, number][]) {
+    if (counts[kind] > ceiling) v.error('budget', `${kind} count`, `${counts[kind]} is over the budget of ${ceiling}: a ceiling, not a target`);
+  }
 }
 
 // ---------------------------------------------------------------------------

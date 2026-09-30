@@ -16,6 +16,12 @@ export type AddCardZone = (typeof ADD_CARD_ZONES)[number];
 export const REGISTERS = ['loud', 'quiet', 'money'] as const;
 export type Register = (typeof REGISTERS)[number];
 
+/**
+ * A card's lane when it builds no career (docs/design/content-expansion.md §2): draws, relief, money and
+ * removal. Plays of neutral cards never count toward the career lane.
+ */
+export const NEUTRAL_LANE = 'neutral';
+
 // ---------------------------------------------------------------------------
 // Conditions — one shape everywhere:
 //   { "craft": { "min": 20 }, "scandalCount": { "max": 2 }, "flags": { "not": ["went_tabloid"] } }
@@ -114,6 +120,11 @@ export interface CardDef {
   readonly register?: Register;
   /** Scandals: the headline printed when it crystallises. */
   readonly headlineKey?: string;
+  /**
+   * Non-scandals: the career lane playing it builds (core/lanes.ts) — one of rules.lanes, or NEUTRAL_LANE.
+   * Scandals are never played and carry none.
+   */
+  readonly lane?: string;
 }
 
 export interface GateDef {
@@ -127,42 +138,89 @@ export interface GateDef {
   readonly onFail: readonly Effect[];
 }
 
-export interface EndingDef {
-  readonly id: string;
-  /** Resolved in descending priority; first match wins. Priority 0 is the unconditional fallback. */
-  readonly priority: number;
-  readonly conditions?: Condition;
-  // Player-facing prose (decision 15): the ending's name, its goals-board line, and its text.
-  readonly nameKey?: string;
-  readonly goalKey?: string;
-  readonly textKey: string;
-  /** Position on the goals board, 1 first (decision 22): narrative order, aspirations first. Display only. */
-  readonly boardOrder?: number;
+/**
+ * What only a whole year shows, kept at each month end in GameState.year (core/year.ts). Any minor ending
+ * or award may put a range on any of them; none belongs to one ending or award.
+ */
+export const YEAR_STAT_KEYS = ['peakScandals', 'scandalDrop', 'bestMonthHype', 'peakHype'] as const;
+export type YearStatKey = (typeof YEAR_STAT_KEYS)[number];
+
+/** One of `any` (when given), none of `not`. */
+export interface IdTest {
+  readonly any?: readonly string[];
+  readonly not?: readonly string[];
 }
 
 /**
- * What only a whole year shows, derived from the run's event history and its end (core/awards.ts). Any
- * award may put a range on any of them; none belongs to one award.
+ * The condition shape plus what a year has shown (core/year.ts): the career lane, the cards held, a
+ * choice of alternatives, and the year stats. Minor endings and awards read it.
  */
-export const YEAR_STAT_KEYS = ['peakScandals', 'scandalDrop', 'bestMonthHype'] as const;
-export type YearStatKey = (typeof YEAR_STAT_KEYS)[number];
-
-/**
- * An award's conditions: the condition shape, checked against the final state, plus what only a finished
- * year has — the ending it resolved to, and the year stats.
- */
-export interface AwardConditions extends Condition {
-  /** The year's ending: one of `any`, none of `not`. */
-  readonly ending?: { readonly any?: readonly string[]; readonly not?: readonly string[] };
-  /** The most scandals held at any month end during the run. */
+export interface YearConditions extends Condition {
+  /** The career lane the cards played make (core/lanes.ts). */
+  readonly lane?: IdTest;
+  /** Card ids held in deck, hand or discard: one of `any`, all of `all`, none of `not`. */
+  readonly holds?: FlagTest;
+  /** Holds when any one of these holds. */
+  readonly anyOf?: readonly YearConditions[];
+  /** The most scandals held at any month end. */
   readonly peakScandals?: Range;
-  /** How far the year came down from that peak: peak minus the scandals held at the year's end. */
+  /** How far the year came down from that peak: peak minus the scandals held now. */
   readonly scandalDrop?: Range;
   /** The biggest hype gain from one month end to the next: the fastest rise. */
   readonly bestMonthHype?: Range;
+  /** The most hype held at any month end. */
+  readonly peakHype?: Range;
 }
 
-export const AWARD_ONLY_KEYS = ['ending', ...YEAR_STAT_KEYS] as const;
+export const YEAR_ONLY_KEYS = ['lane', 'holds', 'anyOf', ...YEAR_STAT_KEYS] as const;
+
+/** An award's conditions: year conditions plus the ending the year resolved to (a major or a minor id). */
+export interface AwardConditions extends YearConditions {
+  readonly ending?: IdTest;
+}
+
+export const AWARD_ONLY_KEYS = ['ending', ...YEAR_ONLY_KEYS] as const;
+
+// ---------------------------------------------------------------------------
+// Endings, two levels (docs/design/content-expansion.md §1). Majors partition the year's end on axes;
+// minors refine each major, first match in content order, else the major's fallback. Exhaustive at both
+// levels by construction: every state has one side on every axis, every major one fallback.
+
+/** A split of the year's end: `sides[0]` below `from`, `sides[1]` from it on. */
+export interface AxisDef {
+  readonly id: string;
+  readonly key: ConditionRangeKey;
+  readonly from: number;
+  readonly sides: readonly [string, string];
+}
+
+export interface MajorDef {
+  readonly id: string;
+  /** Its side of every axis, by axis id. */
+  readonly on: Readonly<Record<string, string>>;
+  readonly nameKey: string;
+  /** Its goals-board line. */
+  readonly goalKey: string;
+}
+
+export interface MinorDef {
+  readonly id: string;
+  readonly major: string;
+  readonly conditions?: YearConditions;
+  /** The major's catch-all: taken when none of its other minors holds. One per major, last, unconditional. */
+  readonly fallback?: boolean;
+  readonly nameKey: string;
+  readonly textKey: string;
+  /** The goal line it had as a flat ending; kept, no longer shown (the goals board shows majors). */
+  readonly goalKey?: string;
+}
+
+/** content/endings.json. Majors in goals-board order; minors in resolution order within their major. */
+export interface EndingsDef {
+  readonly axes: readonly AxisDef[];
+  readonly majors: readonly MajorDef[];
+  readonly minors: readonly MinorDef[];
+}
 
 /**
  * A year-end award (docs/ui-plan.md §13, decisions 16 and 20). It presents an outcome and changes no play.
@@ -222,6 +280,13 @@ export interface Rules {
   readonly draft: DraftRules;
   /** The stat bar's words (decision 25): boundaries only — /core picks the tier (core/tiers.ts). */
   readonly tiers?: StatTierRules;
+  /** Career lanes (core/lanes.ts), the base first: a tie in cards played resolves to the earlier lane. */
+  readonly lanes?: readonly string[];
+  /**
+   * Whether plays of starting-deck cards count toward the career lane. False: the lane is read from the
+   * cards the player added — the starting deck is where every career begins, the same in every run.
+   */
+  readonly laneStartingDeck?: boolean;
 }
 
 /** Tiers of a value, lowest first. `from[i]` is the lowest value of tier i: 0 first, then ascending. */
@@ -252,7 +317,7 @@ export interface Content {
   readonly rules: Rules;
   readonly cards: readonly CardDef[];
   readonly gates: readonly GateDef[];
-  readonly endings: readonly EndingDef[];
+  readonly endings: EndingsDef;
   /** A separate list, capped at 8 (decision 20). Absent: no awards. */
   readonly awards?: readonly AwardDef[];
 }
@@ -266,8 +331,13 @@ export interface ContentIndex {
   readonly gates: Readonly<Record<string, GateDef>>;
   /** Gates grouped by act, in content order. */
   readonly gatesByAct: Readonly<Record<string, readonly GateDef[]>>;
-  /** Endings in resolution order: descending priority, ties in content order. */
-  readonly endings: readonly EndingDef[];
+  /** The axes the majors partition the year's end on. */
+  readonly axes: readonly AxisDef[];
+  /** Major endings in goals-board order (content order). */
+  readonly majors: readonly MajorDef[];
+  /** Minor endings in content order; by major, in resolution order. */
+  readonly minors: readonly MinorDef[];
+  readonly minorsByMajor: Readonly<Record<string, readonly MinorDef[]>>;
   /** Awards in content order. */
   readonly awards: readonly AwardDef[];
   /** Scandal card ids in content order: the pool heat crystallises from. */
@@ -281,6 +351,8 @@ export interface ContentIndex {
 export function indexContent(content: Content): ContentIndex {
   const gatesByAct: Record<string, GateDef[]> = {};
   for (const gate of content.gates) (gatesByAct[String(gate.act)] ??= []).push(gate);
+  const minorsByMajor: Record<string, MinorDef[]> = {};
+  for (const minor of content.endings.minors) (minorsByMajor[minor.major] ??= []).push(minor);
   const scandals = content.cards.filter((c) => c.kind === 'scandal');
   const firstTags = scandals[0]?.tags ?? [];
   return {
@@ -289,7 +361,10 @@ export function indexContent(content: Content): ContentIndex {
     cards: Object.fromEntries(content.cards.map((c) => [c.id, c])),
     gates: Object.fromEntries(content.gates.map((g) => [g.id, g])),
     gatesByAct,
-    endings: [...content.endings].sort((a, b) => b.priority - a.priority),
+    axes: content.endings.axes,
+    majors: content.endings.majors,
+    minors: content.endings.minors,
+    minorsByMajor,
     awards: content.awards ?? [],
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
@@ -303,6 +378,9 @@ export function getCard(index: ContentIndex, id: string): CardDef | undefined {
 export function getGate(index: ContentIndex, id: string): GateDef | undefined {
   return Object.hasOwn(index.gates, id) ? index.gates[id] : undefined;
 }
+
+export const getMajor = (index: ContentIndex, id: string): MajorDef | undefined => index.majors.find((m) => m.id === id);
+export const getMinor = (index: ContentIndex, id: string): MinorDef | undefined => index.minors.find((m) => m.id === id);
 
 export function heatThreshold(rules: Rules, act: number): number {
   const t = rules.heatThreshold;

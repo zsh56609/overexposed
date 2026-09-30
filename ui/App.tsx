@@ -4,7 +4,7 @@
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import {
   createInitialState,
   endingIfYearEndedNow,
@@ -12,6 +12,8 @@ import {
   getCard,
   getGate,
   heatLine,
+  majorOf,
+  majorRequirements,
   reduce,
   RESOURCE_KEYS,
   scandalCount,
@@ -37,9 +39,11 @@ import {
   cardText,
   clauseLine,
   effectsText,
-  endingGoal,
-  endingName,
-  endingText,
+  endingPair,
+  majorGoal,
+  majorName,
+  minorName,
+  minorText,
   flagName,
   gateFlavor,
   gateName,
@@ -209,7 +213,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           <section className="bottom">
             {s.phase === 'play' && <Hand s={s} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
             {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
-            {s.phase === 'gate' && <GatePanel s={s} steps={snap.steps} legal={legal} act={act} />}
+            {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
           </section>
           {card && focus?.kind === 'card' && (
             <Floating anchor={focus.anchor}>
@@ -341,35 +345,34 @@ function Side({ s }: { s: GameState }) {
 }
 
 // ---------------------------------------------------------------------------
-// Goals (decision 10): every ending, its name, its goal line and its requirements, live from the first turn.
-// In narrative order, aspirations first (decision 22) — content order is resolution priority, never shown —
-// with a marker on the ending the year would resolve to today, from /core.
+// Goals (decision 10): the four major endings in narrative order, aspirations first (decision 22) — each
+// with its name, its goal line and its side of the 2×2 of fame and reputation, live. The marker names the
+// ending the year would resolve to today, major and minor, from /core (docs/design/content-expansion.md §1).
 
 function GoalsBoard({ s }: { s: GameState }) {
   const c = s.content;
   const today = endingIfYearEndedNow(s);
-  const board = [...c.endings].sort((a, b) => (a.boardOrder ?? Infinity) - (b.boardOrder ?? Infinity));
   return (
     <div className="goals">
       <h2>{t('ui.goals.title')}</h2>
-      {board.map((e) => {
-        const clauses = explainCondition(e.conditions, s);
-        const name = endingName(c, e.id);
-        const goal = endingGoal(c, e.id);
+      {c.majors.map((m) => {
+        const name = majorName(c, m.id);
+        const goal = majorGoal(c, m.id);
+        const isToday = today !== null && today.majorId === m.id;
         return (
-          <div key={e.id} className={e.id === today ? 'goal today' : 'goal'}>
-            {e.id === today && <div className="today-mark">{t('ui.goals.today')}</div>}
+          <div key={m.id} className={isToday ? 'goal today' : 'goal'}>
+            {isToday && (
+              <div className="today-mark">
+                {t('ui.goals.today')}: {endingPair(c, today.majorId, today.minorId)}
+              </div>
+            )}
             <strong className={prose(name)}>{name}</strong> <em className={prose(goal)}>{goal}</em>
             <div className="clauses">
-              {clauses.length === 0 ? (
-                <span className="muted">{t('ui.goals.fallback')}</span>
-              ) : (
-                clauses.map((clause, i) => (
-                  <span key={i} className={clause.met ? 'met' : 'unmet'}>
-                    {clauseLine(clause)}
-                  </span>
-                ))
-              )}
+              {majorRequirements(m, s).map((clause, i) => (
+                <span key={i} className={clause.met ? 'met' : 'unmet'}>
+                  {clauseLine(clause)}
+                </span>
+              ))}
             </div>
           </div>
         );
@@ -644,10 +647,10 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
 
 const awardList = (c: ContentIndex, p: GatePreview): string => (p.awardIds ?? []).map((id) => awardName(c, id)).join(' · ');
 
-function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly PlayedStep[]; legal: Legal; act: (a: Action) => void }) {
+function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Action) => void }) {
   const c = s.content;
-  const history = useMemo(() => steps.flatMap((step) => step.events), [steps]);
-  const previews = s.gateOffer.map((id) => previewGate(s, id, history));
+  const previews = s.gateOffer.map((id) => previewGate(s, id));
+  const pair = (p: GatePreview) => (p.majorId !== null && p.endingId !== null ? endingPair(c, p.majorId, p.endingId) : '');
   // The run's last choice is an informed one (decision 11). The ending: one plain line when every option
   // gives the same one, otherwise on each option. Awards are the ending screen's to reveal — shown on each
   // option only when the options bring different ones, because then they bear on the choice (decision 23).
@@ -657,7 +660,7 @@ function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly Pla
   return (
     <div className="gates">
       <h2>{t('ui.gate.title', { season: seasonName(c, s.act) })}</h2>
-      {sameEnding && <p className="leads">{t('ui.gate.eitherWay', { ending: endingName(c, ending) })}</p>}
+      {sameEnding && previews[0] && <p className="leads">{t('ui.gate.eitherWay', { ending: pair(previews[0]) })}</p>}
       <div className="gate-row">
         {previews.map((p) => {
           const id = p.gateId;
@@ -683,7 +686,7 @@ function GatePanel({ s, steps, legal, act }: { s: GameState; steps: readonly Pla
               <p className="branches">
                 {t('ui.gate.onPass')}: {effectsText(c, gate?.onPass ?? [])} · {t('ui.gate.onFail')}: {effectsText(c, gate?.onFail ?? [])}
               </p>
-              {!sameEnding && p.endingId !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: endingName(c, p.endingId) })}</p>}
+              {!sameEnding && p.endingId !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: pair(p) })}</p>}
               {awardsDiffer && <p className="leads">{t('ui.gate.awards', { awards: awardList(c, p) })}</p>}
               <button className="take" disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
                 {t('ui.gate.choose', { gate: gateName(c, id) })}
@@ -752,19 +755,74 @@ function DeckViewer({ s, onClose }: { s: GameState; onClose: () => void }) {
 // ---------------------------------------------------------------------------
 // Ending
 
+/** Where the endings collection is kept: found minor ids, this browser only (design §1.5). */
+const COLLECTION_KEY = 'overexposed.endingsFound';
+
+/**
+ * Add this year's ending to the collection and return every minor found. A completion record only — it
+ * changes nothing in play. Storage can be missing or refuse (private windows, blocked site data): the
+ * collection then shows this run's ending alone, and never fails.
+ */
+function recordEnding(minorId: string): ReadonlySet<string> {
+  let stored: string[] = [];
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(COLLECTION_KEY) ?? '[]');
+    if (Array.isArray(parsed)) stored = parsed.filter((x): x is string => typeof x === 'string');
+  } catch {
+    // unreadable or unavailable: start from this run
+  }
+  const found = new Set([...stored, minorId]);
+  try {
+    localStorage.setItem(COLLECTION_KEY, JSON.stringify([...found]));
+  } catch {
+    // not saved; still shown
+  }
+  return found;
+}
+
+/** Endings found, grouped by major; the rest undiscovered. */
+function EndingsCollection({ c, found }: { c: ContentIndex; found: ReadonlySet<string> }) {
+  const known = c.minors.filter((m) => found.has(m.id)).length;
+  return (
+    <div className="collection">
+      <h2>{t('ui.collection.title', { n: known, total: c.minors.length })}</h2>
+      <ul>
+        {c.majors.map((major) => (
+          <li key={major.id}>
+            <strong>{majorName(c, major.id)}</strong>
+            <div className="minors">
+              {(c.minorsByMajor[major.id] ?? []).map((m, i) => (
+                <Fragment key={m.id}>
+                  {i > 0 && ' · '}
+                  <span className={found.has(m.id) ? 'found' : 'muted'}>{found.has(m.id) ? minorName(c, m.id) : t('ui.collection.undiscovered')}</span>
+                </Fragment>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
+ * The year's end: the major as the night's category, the minor as the ending with its text, then every
+ * award won (decision 16: a plain list, no reveal, no ceremony), the run summary and the collection.
+ */
 function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedStep[]; onRestart: () => void }) {
   const c = s.content;
   const id = s.endingId ?? '';
-  const others = c.endings.filter((e) => e.id !== id);
+  const majorId = majorOf(c, id) ?? '';
+  const [found] = useState(() => recordEnding(id));
   const events = steps.flatMap((step) => step.events);
   const peakHype = Math.max(s.resources.hype, ...events.flatMap((e) => (e.type === 'turnEnd' ? [e.resources.hype] : [])));
   const played = events.filter((e) => e.type === 'play').length;
   const passed = s.gateHistory.filter((g) => g.passed).length;
   const flags = Object.keys(s.flags);
-  const name = endingName(c, id);
-  const text = endingText(c, id);
-  // Every award the year won, from /core (decision 16): a plain list, no reveal, no ceremony.
-  const awards = yearAwards(s, events);
+  const category = majorName(c, majorId);
+  const name = minorName(c, id);
+  const text = minorText(c, id);
+  const awards = yearAwards(s);
   return (
     <div className="ending">
       <button className="play-again" onClick={onRestart}>
@@ -773,6 +831,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
       <div className="ending-body">
         <div className="ending-story">
           <p className="muted">{t('ui.ending.title')}</p>
+          <p className={prose(category, 'category')}>{category}</p>
           <h1 className={prose(name)}>{name}</h1>
           <p className={prose(text, 'ending-text')}>{text}</p>
           <h2>{t('ui.ending.awards')}</h2>
@@ -798,12 +857,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
             <li>{t('ui.ending.gates', { passed, total: s.gateHistory.length })}</li>
             <li>{t('ui.ending.played', { n: played })}</li>
           </ul>
-          <h2>{t('ui.ending.others', { n: others.length })}</h2>
-          <ul>
-            {others.map((e) => (
-              <li key={e.id}>{t('ui.ending.other', { name: endingName(c, e.id), goal: endingGoal(c, e.id) })}</li>
-            ))}
-          </ul>
+          <EndingsCollection c={c} found={found} />
           <p className="muted">{t('ui.ending.seed', { seed: s.seed })}</p>
         </div>
       </div>

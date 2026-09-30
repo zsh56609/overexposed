@@ -3,11 +3,13 @@
 
 import {
   createInitialState,
+  currentLane,
   cursor,
   deriveSeed,
   evaluate,
   getGate,
   legalActions,
+  majorOf,
   reduce,
   RESOURCE_KEYS,
   scandalCount,
@@ -55,7 +57,11 @@ export interface TurnSnapshot {
 export interface RunRecord {
   readonly seed: number;
   readonly persona: PersonaId;
+  /** The minor ending, and its major (docs/design/content-expansion.md §1). */
   readonly endingId: string | null;
+  readonly majorId: string | null;
+  /** The career lane the cards played made by the year's end (null: none played). */
+  readonly lane: string | null;
   readonly scandalsAtEnd: number;
   readonly scandalsCrystallised: number;
   /** Crystallised scandals matched to the blamed card by tag (the rest fell back to seeded random). */
@@ -259,6 +265,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     seed,
     persona,
     endingId: state?.endingId ?? null,
+    majorId: state?.endingId ? majorOf(state.content, state.endingId) : null,
+    lane: state ? currentLane(state) : null,
     scandalsAtEnd: state ? scandalCount(state) : 0,
     scandalsCrystallised,
     scandalsByTag,

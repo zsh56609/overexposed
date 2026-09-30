@@ -4,6 +4,7 @@ import {
   heatThreshold,
   thresholdFloor,
   type Condition,
+  type ConditionRangeKey,
   type ContentIndex,
   type FlagTest,
   type Range,
@@ -86,12 +87,18 @@ export function lineMoved(before: ConditionSubject, after: ConditionSubject): nu
   return firstLine(after) - firstLine(before);
 }
 
-/**
- * The ending the year would resolve to if it ended now (decision 22): descending priority, first match —
- * the rule the reducer resolves the real ending by, so the goals board's marker can't disagree with it.
- */
-export function endingIfYearEndedNow(s: ConditionSubject): string | null {
-  return s.content.endings.find((e) => evaluate(e.conditions, s))?.id ?? null;
+/** The value a range key reads: a resource, the scandals held, the act or the month. */
+export function rangeValue(key: ConditionRangeKey, s: ConditionSubject): number {
+  switch (key) {
+    case 'scandalCount':
+      return scandalCount(s);
+    case 'act':
+      return s.act;
+    case 'turn':
+      return s.turn;
+    default:
+      return s.resources[key];
+  }
 }
 
 /** Months of the year still to come after the current one: 0 in its last month, when nothing carries over. */

@@ -82,7 +82,7 @@
     "act": 4,
     "nameKey": "gate.award_show.name",
     "flavorKey": "gate.award_show.flavor",
-    "requires": { "craft": { "min": 40 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
+    "requires": { "craft": { "min": 45 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
     "onPass": [{ "op": "resource", "target": "craft", "value": 10 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -6 }]
   }

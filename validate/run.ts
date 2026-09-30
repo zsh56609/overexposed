@@ -20,8 +20,8 @@ const warnings = issues.filter((i) => i.level === 'warning');
 
 const lines: string[] = [];
 if (result) {
-  const { cards, gates, endings, awards, i18nKeys } = result.counts;
-  lines.push(`validate: ${cards} cards, ${gates} gates, ${endings} endings, ${awards} awards, ${i18nKeys} i18n keys, sources in /${SOURCE_DIRS.join(' /')}`, '');
+  const { cards, gates, majors, minors, awards, i18nKeys } = result.counts;
+  lines.push(`validate: ${cards} cards, ${gates} gates, ${majors} major and ${minors} minor endings, ${awards} awards, ${i18nKeys} i18n keys, sources in /${SOURCE_DIRS.join(' /')}`, '');
 }
 for (const check of Object.keys(CHECKS) as CheckId[]) {
   const n = errors.filter((i) => i.check === check).length;

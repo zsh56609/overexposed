@@ -4,6 +4,8 @@
 import {
   getCard,
   getGate,
+  getMajor,
+  getMinor,
   type AddCardZone,
   type ClauseReport,
   type Condition,
@@ -42,9 +44,15 @@ export const isPlaceholder = (text: string): boolean => text.startsWith(PLACEHOL
 
 export const gateFlavor = (c: ContentIndex, id: string): string => t(getGate(c, id)?.flavorKey ?? `gate.${id}.flavor`);
 export const seasonOpener = (c: ContentIndex, act: number): string => t(c.rules.actOpenerKeys?.[act - 1] ?? `act.${act}.opener`);
-export const endingName = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.nameKey ?? `ending.${id}.name`);
-export const endingGoal = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.goalKey ?? `ending.${id}.goal`);
-export const endingText = (c: ContentIndex, id: string): string => t(c.endings.find((e) => e.id === id)?.textKey ?? `ending.${id}.text`);
+// Endings, two levels (docs/design/content-expansion.md §1): a major has a name and a goal line, a minor a
+// name and its text.
+export const majorName = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.nameKey ?? `ending.${id}.name`);
+export const majorGoal = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.goalKey ?? `ending.${id}.goal`);
+export const minorName = (c: ContentIndex, id: string): string => t(getMinor(c, id)?.nameKey ?? `ending.${id}.name`);
+export const minorText = (c: ContentIndex, id: string): string => t(getMinor(c, id)?.textKey ?? `ending.${id}.text`);
+/** A year's ending in full: "The Breakthrough · Leading Role". */
+export const endingPair = (c: ContentIndex, majorId: string, minorId: string): string =>
+  t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });
 export const awardName = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
 export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
 /** The headline a scandal prints when it crystallises. */

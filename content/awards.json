@@ -3,7 +3,7 @@
     "id": "best_new_artist",
     "nameKey": "award.best_new_artist.name",
     "citationKey": "award.best_new_artist.citation",
-    "conditions": { "ending": { "any": ["star"] } }
+    "conditions": { "ending": { "any": ["star", "the_independent"] } }
   },
   {
     "id": "breakthrough_of_the_year",
@@ -21,7 +21,7 @@
     "id": "critics_choice",
     "nameKey": "award.critics_choice.name",
     "citationKey": "award.critics_choice.citation",
-    "conditions": { "craft": { "min": 90 }, "ending": { "not": ["star"] } }
+    "conditions": { "craft": { "min": 90 }, "ending": { "not": ["breakthrough"] } }
   },
   {
     "id": "comeback_of_the_year",

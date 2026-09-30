@@ -6,6 +6,8 @@
   "handSize": 5,
   "slotsPerTurn": 3,
   "gatesOffered": 2,
+  "lanes": ["music", "screen", "celebrity"],
+  "laneStartingDeck": false,
   "heatThreshold": [7, 6, 6, 5],
   "degradePerScandal": 0.5,
   "thresholdFloor": [7, 6, 5, 4.5],
@@ -34,7 +36,7 @@
   "tiers": {
     "hype": {
       "nameKeys": ["tier.hype.1", "tier.hype.2", "tier.hype.3", "tier.hype.4", "tier.hype.5"],
-      "from": [0, 15, 30, 60, 105]
+      "from": [0, 15, 30, 80, 105]
     },
     "heat": {
       "nameKeys": ["tier.heat.1", "tier.heat.2", "tier.heat.3", "tier.heat.4", "tier.heat.5", "tier.heat.6"],

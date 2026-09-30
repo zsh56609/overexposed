@@ -1,37 +1,129 @@
-[
-  {
-    "id": "meltdown",
-    "priority": 300,
-    "boardOrder": 3,
-    "nameKey": "ending.meltdown.name",
-    "goalKey": "ending.meltdown.goal",
-    "conditions": { "scandalCount": { "min": 7 }, "hype": { "min": 30 } },
-    "textKey": "ending.meltdown.text"
-  },
-  {
-    "id": "star",
-    "priority": 200,
-    "boardOrder": 1,
-    "nameKey": "ending.star.name",
-    "goalKey": "ending.star.goal",
-    "conditions": { "hype": { "min": 60 }, "flags": { "all": ["signed_label"] }, "scandalCount": { "max": 5 } },
-    "textKey": "ending.star.text"
-  },
-  {
-    "id": "craftsman",
-    "priority": 100,
-    "boardOrder": 2,
-    "nameKey": "ending.craftsman.name",
-    "goalKey": "ending.craftsman.goal",
-    "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
-    "textKey": "ending.craftsman.text"
-  },
-  {
-    "id": "nobody",
-    "priority": 0,
-    "boardOrder": 4,
-    "nameKey": "ending.nobody.name",
-    "goalKey": "ending.nobody.goal",
-    "textKey": "ending.nobody.text"
-  }
-]
+{
+  "axes": [
+    { "id": "fame", "key": "hype", "from": 80, "sides": ["unknown", "known"] },
+    { "id": "reputation", "key": "scandalCount", "from": 6, "sides": ["clean", "damaged"] }
+  ],
+  "majors": [
+    {
+      "id": "breakthrough",
+      "on": { "fame": "known", "reputation": "clean" },
+      "nameKey": "ending.breakthrough.name",
+      "goalKey": "ending.breakthrough.goal"
+    },
+    {
+      "id": "long_game",
+      "on": { "fame": "unknown", "reputation": "clean" },
+      "nameKey": "ending.long_game.name",
+      "goalKey": "ending.long_game.goal"
+    },
+    {
+      "id": "overexposed",
+      "on": { "fame": "known", "reputation": "damaged" },
+      "nameKey": "ending.overexposed.name",
+      "goalKey": "ending.overexposed.goal"
+    },
+    {
+      "id": "hard_way",
+      "on": { "fame": "unknown", "reputation": "damaged" },
+      "nameKey": "ending.hard_way.name",
+      "goalKey": "ending.hard_way.goal"
+    }
+  ],
+  "minors": [
+    {
+      "id": "leading_role",
+      "major": "breakthrough",
+      "conditions": { "lane": { "any": ["screen"] } },
+      "nameKey": "ending.leading_role.name",
+      "textKey": "ending.leading_role.text"
+    },
+    {
+      "id": "household_name",
+      "major": "breakthrough",
+      "conditions": { "lane": { "any": ["celebrity"] } },
+      "nameKey": "ending.household_name.name",
+      "textKey": "ending.household_name.text"
+    },
+    {
+      "id": "star",
+      "major": "breakthrough",
+      "conditions": { "lane": { "any": ["music"] }, "flags": { "all": ["signed_label"] } },
+      "nameKey": "ending.star.name",
+      "goalKey": "ending.star.goal",
+      "textKey": "ending.star.text"
+    },
+    {
+      "id": "the_independent",
+      "major": "breakthrough",
+      "fallback": true,
+      "nameKey": "ending.the_independent.name",
+      "textKey": "ending.the_independent.text"
+    },
+    {
+      "id": "redemption_arc",
+      "major": "overexposed",
+      "conditions": { "scandalDrop": { "min": 1 } },
+      "nameKey": "ending.redemption_arc.name",
+      "textKey": "ending.redemption_arc.text"
+    },
+    {
+      "id": "tabloid_royalty",
+      "major": "overexposed",
+      "conditions": { "lane": { "any": ["celebrity"] } },
+      "nameKey": "ending.tabloid_royalty.name",
+      "textKey": "ending.tabloid_royalty.text"
+    },
+    {
+      "id": "meltdown",
+      "major": "overexposed",
+      "fallback": true,
+      "nameKey": "ending.meltdown.name",
+      "goalKey": "ending.meltdown.goal",
+      "textKey": "ending.meltdown.text"
+    },
+    {
+      "id": "character_actor",
+      "major": "long_game",
+      "conditions": { "craft": { "min": 55 }, "lane": { "any": ["screen"] } },
+      "nameKey": "ending.character_actor.name",
+      "textKey": "ending.character_actor.text"
+    },
+    {
+      "id": "craftsman",
+      "major": "long_game",
+      "conditions": { "craft": { "min": 55 } },
+      "nameKey": "ending.craftsman.name",
+      "goalKey": "ending.craftsman.goal",
+      "textKey": "ending.craftsman.text"
+    },
+    {
+      "id": "nobody",
+      "major": "long_game",
+      "fallback": true,
+      "nameKey": "ending.nobody.name",
+      "goalKey": "ending.nobody.goal",
+      "textKey": "ending.nobody.text"
+    },
+    {
+      "id": "flash_in_the_pan",
+      "major": "hard_way",
+      "conditions": { "peakHype": { "min": 75 } },
+      "nameKey": "ending.flash_in_the_pan.name",
+      "textKey": "ending.flash_in_the_pan.text"
+    },
+    {
+      "id": "running_on_empty",
+      "major": "hard_way",
+      "conditions": { "anyOf": [{ "holds": { "any": ["burnout"] } }, { "craft": { "max": 34 } }] },
+      "nameKey": "ending.running_on_empty.name",
+      "textKey": "ending.running_on_empty.text"
+    },
+    {
+      "id": "starting_over",
+      "major": "hard_way",
+      "fallback": true,
+      "nameKey": "ending.starting_over.name",
+      "textKey": "ending.starting_over.text"
+    }
+  ]
+}
