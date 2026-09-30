@@ -1,5 +1,7 @@
-// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--out=path] [--no-json]
-// npm run sim -- --replay=<run seed> --persona=<id>      one run, action by action
+// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--manager=<id>] [--out=path] [--no-json]
+// npm run sim -- --replay=<run seed> --persona=<id> [--manager=<id>]      one run, action by action
+//
+// Every band runs once per manager (round 2b): without --manager, one report per manager in content, in turn.
 //
 // Exit code 1 if any run crashed or soft-locked. Out-of-band balance is reported, not fatal.
 
@@ -7,12 +9,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import type { GameEvent } from '../core/index.ts';
 import { ROOT } from '../validate/load.ts';
-import { runBatch, runOne, type RunRecord } from './batch.ts';
+import { managersToRun, runBatch, runOne, type RunRecord } from './batch.ts';
 import { loadContent } from './content.ts';
 import { PERSONA_IDS, type PersonaId } from './personas.ts';
 import { buildReport, formatReport } from './report.ts';
 
-const OPTIONS = ['runs', 'seed', 'persona', 'replay', 'out', 'no-json'];
+const OPTIONS = ['runs', 'seed', 'persona', 'manager', 'replay', 'out', 'no-json'];
 const DEFAULT_SEED = 20260929;
 
 function parseArgs(argv: readonly string[]): Record<string, string> {
@@ -67,13 +69,19 @@ function describe(e: GameEvent): string {
   }
 }
 
-function replay(seed: number, persona: PersonaId): RunRecord {
+function replay(seed: number, persona: PersonaId, manager: string | undefined): RunRecord {
   const content = loadContent();
-  console.log(`replay seed=${seed} persona=${persona}`);
-  const record = runOne(content, persona, seed, (state) => {
-    const parts = state.events.map(describe);
-    console.log(parts.join(', ').replaceAll(', \n', '\n'));
-  });
+  const record = runOne(
+    content,
+    persona,
+    seed,
+    (state) => {
+      const parts = state.events.map(describe);
+      console.log(parts.join(', ').replaceAll(', \n', '\n'));
+    },
+    manager === undefined ? {} : { manager },
+  );
+  console.log(`replay seed=${seed} persona=${persona} manager=${record.manager ?? 'none'}`);
   console.log(`\nending ${record.endingId}, scandals held ${record.scandalsAtEnd}, actions ${record.actions}`);
   if (record.crash) console.log(`CRASH ${record.crash}`);
   if (record.softLock) console.log(`SOFT-LOCK ${record.softLock}`);
@@ -86,23 +94,37 @@ function main(): number {
   if (args.replay !== undefined) {
     const personas = toPersonas(args.persona);
     if (personas.length !== 1) throw new Error('--replay needs exactly one --persona');
-    const r = replay(toUint(args.replay, 'replay'), personas[0] as PersonaId);
+    const r = replay(toUint(args.replay, 'replay'), personas[0] as PersonaId, args.manager);
     return r.crash || r.softLock ? 1 : 0;
   }
 
   const runs = toUint(args.runs ?? '1000', 'runs');
   const seed = toUint(args.seed ?? String(DEFAULT_SEED), 'seed');
-  const batch = runBatch(runs, seed, { content: loadContent(), personas: toPersonas(args.persona) });
+  const content = loadContent();
+  const managers = managersToRun(content, args.manager);
+  let failures = 0;
+  for (const [i, manager] of managers.entries()) {
+    if (i > 0) console.log('\n');
+    failures += simulate(runs, seed, content, toPersonas(args.persona), manager, managers.length > 1, args);
+  }
+  return failures > 0 ? 1 : 0;
+}
+
+/** One batch under one manager: its report, and its JSON (report.<manager>.json when several run). Returns its crashes and soft-locks. */
+function simulate(runs: number, seed: number, content: ReturnType<typeof loadContent>, personas: PersonaId[], manager: string | undefined, several: boolean, args: Record<string, string>): number {
+  const batch = runBatch(runs, seed, { content, personas, ...(manager === undefined ? {} : { manager }) });
   const report = buildReport(batch);
   console.log(formatReport(report));
 
   if (args['no-json'] === undefined) {
-    const out = args.out ?? join(ROOT, 'sim', 'out', 'report.json');
+    const base = args.out ?? join(ROOT, 'sim', 'out', 'report.json');
+    const out = several && manager ? base.replace(/(\.json)?$/, `.${manager}.json`) : base;
     mkdirSync(dirname(out), { recursive: true });
     const runsJson = batch.records.map((r) =>
       JSON.stringify({
         seed: r.seed,
         persona: r.persona,
+        manager: r.manager,
         ending: r.endingId,
         scandalsAtEnd: r.scandalsAtEnd,
         scandalsCrystallised: r.scandalsCrystallised,
@@ -117,7 +139,7 @@ function main(): number {
     writeFileSync(out, `{"report": ${JSON.stringify(report, null, 2)},\n"runs": [\n${runsJson.join(',\n')}\n]}\n`, 'utf8');
     console.log(`\nJSON report: ${relative(ROOT, out).replaceAll('\\', '/')}`);
   }
-  return report.health.crashes.length + report.health.softLocks.length > 0 ? 1 : 0;
+  return report.health.crashes.length + report.health.softLocks.length;
 }
 
 try {

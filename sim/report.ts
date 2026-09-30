@@ -75,6 +75,8 @@ export interface BandCheck {
 export interface Report {
   readonly meta: {
     readonly seed: number;
+    /** The manager every run chose (round 2b); null when content has none. */
+    readonly manager: string | null;
     readonly runsPerPersona: number;
     readonly personas: readonly PersonaId[];
     readonly totalRuns: number;
@@ -569,6 +571,7 @@ export function buildReport(batch: BatchResult): Report {
   return {
     meta: {
       seed: batch.seed,
+      manager: batch.manager,
       runsPerPersona: batch.runsPerPersona,
       personas,
       totalRuns: records.length,
@@ -630,7 +633,7 @@ export function formatReport(r: Report): string {
   const h = (title: string) => out.push('', title);
 
   out.push(
-    `SIM  seed=${r.meta.seed}  ${r.meta.runsPerPersona} runs x ${P.length} personas = ${r.meta.totalRuns} runs  (${r.meta.seconds.toFixed(1)}s)`,
+    `SIM  seed=${r.meta.seed}${r.meta.manager ? `  manager=${r.meta.manager}` : ''}  ${r.meta.runsPerPersona} runs x ${P.length} personas = ${r.meta.totalRuns} runs  (${r.meta.seconds.toFixed(1)}s)`,
     `crashes: ${r.health.crashes.length}   soft-locks: ${r.health.softLocks.length} (limit ${MAX_ACTIONS} actions)   ` +
       `replay check: ${r.health.replay.checked - r.health.replay.mismatches.length}/${r.health.replay.checked} identical`,
   );

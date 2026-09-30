@@ -15,6 +15,9 @@ import {
   FLAG_TEST_KEYS,
   inHandGroup,
   isEffectOp,
+  MESSAGE_TRIGGERS,
+  messageGroup,
+  monthEndGroup,
   NEUTRAL_LANE,
   onceItem,
   playGroup,
@@ -58,6 +61,7 @@ export interface RawContent {
   readonly endings: unknown;
   readonly awards: unknown;
   readonly press?: unknown;
+  readonly managers?: unknown;
 }
 
 export interface ValidationResult {
@@ -122,7 +126,11 @@ const LIMIT = {
   price: [0, 100],
 } as const satisfies Record<string, readonly [number, number]>;
 
-type Owner = { readonly kind: 'card'; readonly id: string } | { readonly kind: 'gate'; readonly id: string; readonly act: number };
+type Owner =
+  | { readonly kind: 'card'; readonly id: string }
+  | { readonly kind: 'gate'; readonly id: string; readonly act: number }
+  /** A manager's month-end effects: from the first month on. */
+  | { readonly kind: 'manager'; readonly id: string };
 
 class Ctx {
   readonly issues: Issue[] = [];
@@ -767,7 +775,7 @@ function checkReachability(v: Ctx, rules: Obj | null, cards: readonly Obj[]): Re
   for (let changed = true; changed; ) {
     changed = false;
     for (const ref of v.addCardRefs) {
-      const from = ref.owner.kind === 'gate' ? ref.owner.act + 1 : (earliest[ref.owner.id] ?? Number.POSITIVE_INFINITY);
+      const from = ref.owner.kind === 'gate' ? ref.owner.act + 1 : ref.owner.kind === 'manager' ? 1 : (earliest[ref.owner.id] ?? Number.POSITIVE_INFINITY);
       if (lower(ref.cardId, from)) changed = true;
     }
   }
@@ -940,7 +948,7 @@ export function variantsNeeded(perRun: number): number {
 /** An item shown once per run needs two, so different runs read differently. */
 export const ONCE_VARIANTS_NEEDED = 2;
 
-export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'world' | 'once';
+export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'world' | 'once' | 'manager' | 'monthEnd';
 
 /** A line group and its variants, as content lists them. */
 export interface VariantGroup {
@@ -984,6 +992,15 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
     if (Array.isArray(p.spilloverKeys)) groups.push({ id: `spillover:${p.id}`, kind: 'spillover', owner: p.id, keys: keyList(p.spilloverKeys), register: null, lane: null });
     const world = list(p.world).map((s) => s.key).filter(isStr);
     if (world.length > 0) groups.push({ id: `world:${p.id}`, kind: 'world', owner: p.id, keys: world, register: null, lane: null });
+  }
+  // The managers (round 2b): each manager's lines per trigger, and the line of their month-end perk.
+  const managers = isObj(raw.managers) ? raw.managers : {};
+  for (const m of list(managers.managers)) {
+    if (!isStr(m.id)) continue;
+    const lines = isObj(m.lines) ? m.lines : {};
+    for (const [lineKey, keys] of Object.entries(lines)) groups.push({ id: messageGroup(m.id, lineKey), kind: 'manager', owner: m.id, keys: keyList(keys), register: null, lane: null });
+    const perk = isObj(m.perk) ? m.perk : {};
+    if (perk.monthEnd !== undefined) groups.push({ id: monthEndGroup(m.id), kind: 'monthEnd', owner: m.id, keys: keyList(perk.monthEndKeys), register: null, lane: null });
   }
   return groups;
 }
@@ -1042,6 +1059,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const awards = checkAwards(v, raw.awards, endingIds);
   checkReferences(v, rules, cards);
   checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)));
+  checkManagers(v, raw.managers, rules, raw.endings);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1174,6 +1192,103 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
           });
       });
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The managers (content/managers.json, round 2b): the choice before month 1, each manager's perk — data the
+// engine applies — and a line group per message trigger.
+
+const MANAGERS_FIELDS = ['choice', 'managers', 'messages'];
+const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'perk', 'sample', 'lines'];
+const PERK_FIELDS = ['nameKey', 'effectKey', 'freeRerollsPerAct', 'freeRerollKey', 'monthEnd', 'monthEndKeys'];
+const MESSAGES_FIELDS = ['perMonth', 'priority', 'highFrom', 'knownAxis', 'signedFlag', 'viralFlag', 'stuck'];
+
+/** Every trigger line key content must write, for its majors and lanes (core/manager.ts). */
+export function messageLineKeys(majorIds: readonly string[], lanes: readonly string[]): string[] {
+  return MESSAGE_TRIGGERS.flatMap((t) =>
+    t === 'frenzy' || t === 'first_scandal' ? [`${t}.low`, `${t}.high`] : t === 'checkin' ? majorIds.map((m) => `checkin.${m}`) : t === 'lane' ? lanes.map((l) => `lane.${l}`) : [t],
+  );
+}
+
+function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown): void {
+  const file = 'content/managers.json';
+  if (raw === undefined) return v.error('schema', file, 'is missing: the managers the player chooses from before month 1');
+  if (!isObj(raw)) return v.error('schema', file, 'must be an object: { choice, managers, messages }');
+  v.fields(raw, MANAGERS_FIELDS, file);
+  const choice = raw.choice;
+  if (!isObj(choice)) v.error('schema', `${file} choice`, 'must be { kickerKey, titleKey, subtitleKey, footerKey }');
+  else {
+    v.fields(choice, ['kickerKey', 'titleKey', 'subtitleKey', 'footerKey'], `${file} choice`);
+    for (const f of ['kickerKey', 'titleKey', 'subtitleKey', 'footerKey'] as const) v.key(choice[f], `${file} choice.${f}`);
+  }
+  const ends = isObj(endings) ? endings : {};
+  const majorIds = (Array.isArray(ends.majors) ? ends.majors : []).filter(isObj).map((m) => m.id).filter(isStr);
+  const needed = messageLineKeys(majorIds, v.lanes);
+  const managers = checkList(v, raw.managers, `${file} managers`, 'manager', (m, where) => {
+    v.fields(m, MANAGER_FIELDS, where);
+    for (const f of ['nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey'] as const) v.key(m[f], `${where}.${f}`);
+    const sample = m.sample;
+    if (!isObj(sample)) v.error('schema', `${where}.sample`, 'must be { labelKey, key }');
+    else {
+      v.fields(sample, ['labelKey', 'key'], `${where}.sample`);
+      v.key(sample.labelKey, `${where}.sample.labelKey`);
+      v.key(sample.key, `${where}.sample.key`);
+    }
+    // The perk: data the engine applies.
+    const perk = m.perk;
+    if (!isObj(perk)) v.error('schema', `${where}.perk`, 'must be { nameKey, effectKey, ... }');
+    else {
+      v.fields(perk, PERK_FIELDS, `${where}.perk`);
+      v.key(perk.nameKey, `${where}.perk.nameKey`);
+      v.key(perk.effectKey, `${where}.perk.effectKey`);
+      const free = v.int(perk.freeRerollsPerAct, `${where}.perk.freeRerollsPerAct`, LIMIT.draftCount, { optional: true }) && (perk.freeRerollsPerAct as number) > 0;
+      if (free) v.key(perk.freeRerollKey, `${where}.perk.freeRerollKey`);
+      else if (perk.freeRerollKey !== undefined) v.error('structure', `${where}.perk.freeRerollKey`, 'labels a free reroll the perk does not give');
+      if (perk.monthEnd !== undefined) {
+        checkEffects(v, perk.monthEnd, `${where}.perk.monthEnd`, { kind: 'manager', id: String(m.id) });
+        v.keys(perk.monthEndKeys, `${where}.perk.monthEndKeys`);
+      } else if (perk.monthEndKeys !== undefined) v.error('structure', `${where}.perk.monthEndKeys`, 'lines for month-end effects the perk does not have');
+      if (!free && perk.monthEnd === undefined) v.warn('structure', `${where}.perk`, 'does nothing: no free rerolls, no month-end effects');
+    }
+    // A line group for every trigger's case, and none for a case no trigger reads.
+    if (!isObj(m.lines)) return v.error('schema', `${where}.lines`, 'must map each trigger line key to its variants');
+    for (const [lineKey, keys] of Object.entries(m.lines)) {
+      if (!needed.includes(lineKey)) v.error('references', `${where}.lines.${lineKey}`, `no trigger reads it (triggers: ${needed.join(', ')})`);
+      else v.keys(keys, `${where}.lines.${lineKey}`);
+    }
+    for (const lineKey of needed) if (!Object.hasOwn(m.lines, lineKey)) v.warn('prose', `${where}.lines`, `no lines for ${lineKey}: that message would print its key`);
+  });
+  if (managers.length === 0) v.error('structure', `${file} managers`, 'needs at least one manager: the choice before month 1');
+
+  const msg = raw.messages;
+  const at = `${file} messages`;
+  if (!isObj(msg)) return v.error('schema', at, `must be { ${MESSAGES_FIELDS.join(', ')} }`);
+  v.fields(msg, MESSAGES_FIELDS, at);
+  v.int(msg.perMonth, `${at}.perMonth`, LIMIT.count);
+  const priority: unknown[] = Array.isArray(msg.priority) ? msg.priority : [];
+  const known: readonly unknown[] = MESSAGE_TRIGGERS;
+  if (priority.length !== MESSAGE_TRIGGERS.length || new Set(priority).size !== priority.length || !priority.every((t) => known.includes(t))) {
+    v.error('schema', `${at}.priority`, `must list every trigger once, highest priority first: ${MESSAGE_TRIGGERS.join(', ')}`);
+  }
+  const tierCount = (stat: string): number => {
+    const tiers = rules && isObj(rules.tiers) ? rules.tiers[stat] : undefined;
+    return isObj(tiers) && Array.isArray(tiers.nameKeys) ? tiers.nameKeys.length : 1;
+  };
+  v.int(msg.highFrom, `${at}.highFrom`, [0, Math.max(0, tierCount('hype') - 1)]);
+  const axisIds = (Array.isArray(ends.axes) ? ends.axes : []).filter(isObj).map((a) => a.id);
+  if (!axisIds.includes(msg.knownAxis)) v.error('references', `${at}.knownAxis`, `no ending axis with id ${q(msg.knownAxis)}`);
+  for (const f of ['signedFlag', 'viralFlag'] as const) {
+    const flag = msg[f];
+    if (!isStr(flag)) v.error('schema', `${at}.${f}`, 'must be a flag name');
+    else if (!v.flagsSet.has(flag)) v.warn('structure', `${at}.${f}`, `no setFlag ever sets ${q(flag)}: the trigger never fires`);
+  }
+  const stuck = msg.stuck;
+  if (!isObj(stuck)) v.error('schema', `${at}.stuck`, 'must be { heatTierFrom, months }');
+  else {
+    v.fields(stuck, ['heatTierFrom', 'months'], `${at}.stuck`);
+    v.int(stuck.heatTierFrom, `${at}.stuck.heatTierFrom`, [0, Math.max(0, tierCount('heat') - 1)]);
+    v.int(stuck.months, `${at}.stuck.months`, [1, v.totalTurns]);
   }
 }
 

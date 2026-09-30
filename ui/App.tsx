@@ -10,13 +10,16 @@ import {
   endingIfYearEndedNow,
   establishedLanes,
   explainCondition,
+  freeRerollAvailable,
   getCard,
   getGate,
+  getManager,
   heatLine,
   majorOf,
   majorRequirements,
   readLines,
   reduce,
+  rerollCost,
   rivalArc,
   RESOURCE_KEYS,
   scandalCount,
@@ -199,6 +202,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   };
 
   if (s.phase === 'ended') return <Ending s={s} steps={snap.steps} onRestart={onRestart} />;
+  if (s.phase === 'manager') return <ManagerChoice s={s} legal={legal} act={act} error={error} />;
 
   const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter, lines.lane) : null;
   const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
@@ -332,6 +336,19 @@ function Feed({ c, steps }: { c: ContentIndex; steps: readonly PlayedStep[] }) {
 
 function FeedRow({ c, line }: { c: ContentIndex; line: FeedLine }) {
   if (line.page) return <FrontPageView c={c} month={line.page} />;
+  // The manager's messages (round 2b): their name, not a masthead; a message may be two bubbles.
+  if (line.kind === 'message') {
+    return (
+      <li className={prose(line.text, 'feed-message')}>
+        {line.speaker && <span className="speaker-label">{line.speaker}</span>}
+        {line.text.split('\n').map((bubble, i) => (
+          <span key={i} className="bubble">
+            {bubble}
+          </span>
+        ))}
+      </li>
+    );
+  }
   const reg = line.register ? ` reg-${line.register}` : '';
   // A line the press prints carries its paper's masthead (phase 2a); a quiet line is the player's notebook.
   return (
@@ -434,6 +451,12 @@ function GoalsBoard({ s }: { s: GameState }) {
 
 // ---------------------------------------------------------------------------
 // Previews
+
+/** An outcome's resource changes on one line: "Heat −1". */
+const outcomeDeltas = (o: Outcome): string =>
+  RESOURCE_KEYS.filter((k) => o.deltas[k] !== 0)
+    .map((k) => t('ui.effect.resource', { delta: signedAmount(k, o.deltas[k]), resource: resourceName(k) }))
+    .join(' · ');
 
 function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outcome; skipScandals?: boolean }) {
   const lines: string[] = [];
@@ -538,6 +561,12 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
         </>
       )}
       <OutcomeLines c={c} o={p.outcome} skipScandals />
+      {/* The manager's month-end relief, after the check (round 2b): named by the perk. */}
+      {p.perk && (
+        <p className="muted perk">
+          {t('ui.preview.endPerk', { perk: t(getManager(c, p.perk.manager)?.perk.nameKey ?? `manager.${p.perk.manager}.perk.name`), deltas: outcomeDeltas(p.perk.outcome) })}
+        </p>
+      )}
       {p.carries && <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>}
     </div>
   );
@@ -654,6 +683,12 @@ function Hand({
 // ---------------------------------------------------------------------------
 // Draft
 
+/** The reroll button's label: the manager's free label while their free reroll lasts (round 2b), else the price. */
+function rerollLabel(s: GameState): string {
+  const key = getManager(s.content, s.manager)?.perk.freeRerollKey;
+  return freeRerollAvailable(s) && key ? t(key) : t('ui.draft.reroll', { cost: money(rerollCost(s)) });
+}
+
 function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Action) => void }) {
   const c = s.content;
   const cfg = c.rules.draft;
@@ -665,8 +700,8 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
         <button disabled={!legal.extraPick} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
           {t('ui.draft.extraPick', { cost: money(cfg.extraPickCost) })}
         </button>
-        <button disabled={!legal.reroll} onClick={() => act({ type: 'DRAFT_REROLL' })}>
-          {t('ui.draft.reroll', { cost: money(cfg.rerollCost) })}
+        <button className="reroll" disabled={!legal.reroll} onClick={() => act({ type: 'DRAFT_REROLL' })}>
+          {rerollLabel(s)}
         </button>
       </div>
       <div className="cards">
@@ -863,6 +898,41 @@ function EndingsCollection({ c, found }: { c: ContentIndex; found: ReadonlySet<s
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The manager (round 2b, C1): before month 1 the player chooses someone for their corner. Each card shows
+// who they are, their one perk — its name and its rule, plain like a card's — and how they text.
+
+function ManagerChoice({ s, legal, act, error }: { s: GameState; legal: Legal; act: (a: Action) => void; error: string | null }) {
+  const m = s.content.managers;
+  if (!m) return null;
+  return (
+    <div className="manager-choice">
+      <p className="kicker muted">{t(m.choice.kickerKey)}</p>
+      <h1>{t(m.choice.titleKey)}</h1>
+      <p className="subtitle">{t(m.choice.subtitleKey)}</p>
+      <div className="managers">
+        {m.managers.map((mg) => (
+          <button key={mg.id} className="manager choose" disabled={!legal.managers.has(mg.id)} onClick={() => act({ type: 'CHOOSE_MANAGER', managerId: mg.id })}>
+            <strong className="manager-name">{t(mg.nameKey)}</strong>
+            <span className="muted role">{t(mg.roleKey)}</span>
+            <em className="quote">{t(mg.quoteKey)}</em>
+            <span className="description">{t(mg.descriptionKey)}</span>
+            <span className="tag muted">{t(mg.tagKey)}</span>
+            <span className="perk">
+              <strong>{t(mg.perk.nameKey)}</strong> <span>{t(mg.perk.effectKey)}</span>
+            </span>
+            <span className="sample">
+              <span className="muted">{t(mg.sample.labelKey)}</span> <span className="bubble">{t(mg.sample.key)}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <p className="footer muted">{t(m.choice.footerKey)}</p>
+      {error && <p className="error">{error}</p>}
     </div>
   );
 }

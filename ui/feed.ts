@@ -1,10 +1,26 @@
 // The feed (docs/ui-plan.md §3; §13, decisions 5 and 18): the run's events, aggregated per action.
 // One headline per card played, in its register, with its resource deltas beneath; draws merged into one
-// line; scandals as the lead story; a season opener when a season starts. An explanation attaches to the
-// event that caused it: the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
+// line; scandals as the lead story; a season opener when a season starts; the manager's messages as each
+// month opens, and their month-end perk (round 2b). An explanation attaches to the event that caused it:
+// the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
-import { frontPages, getCard, lineMoved, monthsLeft, pressLines, RESOURCE_KEYS, type GameEvent, type MonthPress, type PressLine, type Register, type ResourceKey } from '../core/index.ts';
+import {
+  frontPages,
+  getCard,
+  lineMoved,
+  managerMessages,
+  monthEndEffects,
+  monthEndLines,
+  monthsLeft,
+  pressLines,
+  RESOURCE_KEYS,
+  type GameEvent,
+  type MonthPress,
+  type PressLine,
+  type Register,
+  type ResourceKey,
+} from '../core/index.ts';
 import { t, tp } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
@@ -14,7 +30,10 @@ import {
   gateName,
   isPlaceholder,
   lineText,
+  managerName,
   mastheadName,
+  messageText,
+  monthEndText,
   resourceName,
   seasonName,
   money,
@@ -24,7 +43,7 @@ import {
   zoneName,
 } from './text.ts';
 
-export type FeedLineKind = 'month' | 'opener' | 'headline' | 'lead' | 'detail' | 'note' | 'page';
+export type FeedLineKind = 'month' | 'opener' | 'headline' | 'lead' | 'detail' | 'note' | 'page' | 'message' | 'perk';
 
 export interface FeedLine {
   readonly id: string;
@@ -40,6 +59,8 @@ export interface FeedLine {
   readonly subjectKey: string | null;
   /** A month's front pages (Part E), printed at the month's end: kind 'page'. */
   readonly page: MonthPress | null;
+  /** Who is speaking: the manager's name on their messages (round 2b), distinct from the press. */
+  readonly speaker: string | null;
   /** Prose the author has not written yet: shown as a placeholder, never hidden. */
   readonly placeholder: boolean;
 }
@@ -66,6 +87,9 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
   // month's front pages, by the step that ended the month.
   const printed = pressLines(steps);
   const pages = new Map(frontPages(steps).map((m) => [m.step, m]));
+  // The manager's messages, by the event that opens their month; their month-end line, by its step.
+  const messages = new Map(managerMessages(steps).map((m) => [`${m.step}:${m.event}`, m]));
+  const perkLines = new Map(monthEndLines(steps).map((l) => [l.step, l]));
   let next = 0;
 
   for (const [index, step] of steps.entries()) {
@@ -75,9 +99,10 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     while (next < printed.length && printed[next]?.step === index) mine.push(printed[next++] as PressLine);
     const printedFor = (kind: PressLine['kind'], uid: number) => mine.find((l) => l.kind === kind && l.uid === uid);
     let n = 0;
-    const push = (kind: FeedLineKind, text: string, register: Register | null = null, line: PressLine | null = null, page: MonthPress | null = null) =>
+    const push = (kind: FeedLineKind, text: string, register: Register | null = null, line: PressLine | null = null, page: MonthPress | null = null, speaker: string | null = null) =>
       out.push({
         page,
+        speaker,
         id: `${step.id}.${n++}`,
         kind,
         text,
@@ -126,6 +151,14 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
       }
     };
 
+    // The month that opens at this event, if any: the manager's messages for it (round 2b), under its header.
+    const tell = (event: number) => {
+      const month = messages.get(`${index}:${event}`);
+      if (!month) return;
+      const speaker = managerName(c, month.manager);
+      for (const m of month.messages) push('message', messageText(month.manager, m), null, null, null, speaker);
+    };
+
     const crystallised = new Set(step.events.flatMap((e) => (e.type === 'scandal' ? [e.uid] : [])));
     const isScandal = (cardId: string) => getCard(c, cardId)?.kind === 'scandal';
     const leadFor = (e: GameEvent) => {
@@ -142,11 +175,15 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     };
 
     let events = step.events;
+    let offset = 0;
     if (step.action?.type === 'END_TURN') {
       // Month end, up to turnEnd, is one block: the scandals lead, then the month's deltas and the residue.
       const end = events.findIndex((e) => e.type === 'turnEnd');
       const head = end === -1 ? events : events.slice(0, end + 1);
-      events = end === -1 ? [] : events.slice(end + 1);
+      // Then the manager's month-end effects (round 2b), told on a line of their own.
+      const perk = monthEndEffects(events);
+      offset = end === -1 ? events.length : end + 1 + perk.length;
+      events = events.slice(offset);
       const b = emptyBlock();
       for (const e of head) {
         if (e.type === 'resource') b.deltas[e.target] += e.delta;
@@ -160,8 +197,19 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
       // The year's last month carries nothing: there is no next month.
       const d = deltasText(b.deltas);
       const turnEnd = head.find((e) => e.type === 'turnEnd');
-      const carry = turnEnd?.type === 'turnEnd' && step.before && monthsLeft(step.before) !== 0 ? turnEnd.resources.heat : 0;
-      if (d && carry !== 0) push('detail', t('ui.feed.monthEndCarry', { deltas: d, n: carry }));
+      const perkDeltas = emptyBlock().deltas;
+      for (const e of perk) if (e.type === 'resource') perkDeltas[e.target] += e.delta;
+      // What carries into the next month: the heat after the check, and after the manager's relief.
+      const carry = turnEnd?.type === 'turnEnd' && step.before && monthsLeft(step.before) !== 0 ? turnEnd.resources.heat + perkDeltas.heat : 0;
+      const perkLine = perkLines.get(index);
+      if (perkLine) {
+        // The month's own line, then the manager's with its delta beneath, then what carries over.
+        if (d) push('detail', t('ui.feed.monthEnd', { deltas: d }));
+        push('perk', monthEndText(perkLine));
+        const pd = deltasText(perkDeltas);
+        if (pd) push('detail', pd);
+        if (carry !== 0) push('detail', t('ui.feed.carry', { n: carry }));
+      } else if (d && carry !== 0) push('detail', t('ui.feed.monthEndCarry', { deltas: d, n: carry }));
       else if (d) push('detail', t('ui.feed.monthEnd', { deltas: d }));
       else if (carry !== 0) push('detail', t('ui.feed.carry', { n: carry }));
       for (const x of b.details) push('detail', x);
@@ -173,16 +221,18 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
 
     // A draft purchase's price is in its own line; its capital event would only repeat it.
     const priced = step.action?.type === 'DRAFT_EXTRA_PICK' || step.action?.type === 'DRAFT_REROLL';
-    for (const e of events) {
+    for (const [k, e] of events.entries()) {
       switch (e.type) {
         case 'turnStart':
           enterMonth(e.act, e.turn);
           flush();
+          tell(offset + k);
           block = emptyBlock(); // the month's draw, merged into one line
           break;
         case 'draftOffer':
           enterMonth(e.act, step.after.turn);
           flush();
+          tell(offset + k);
           push('note', t('ui.event.draftOffer', { cards: e.cardIds.map((id) => cardName(c, id)).join(' · ') }));
           break;
         case 'play': {
@@ -234,7 +284,7 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
           break;
         case 'draftReroll':
           flush();
-          push('note', t('ui.event.draftReroll', { cost: money(e.cost) }));
+          push('note', e.cost === 0 ? t('ui.event.draftRerollFree') : t('ui.event.draftReroll', { cost: money(e.cost) }));
           break;
         case 'gateOffer':
           flush();

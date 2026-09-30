@@ -12,6 +12,7 @@ import {
   heatLine,
   legalActions,
   majorOf,
+  monthEndEffects,
   monthsLeft,
   nextEstablishedLane,
   playCheck,
@@ -112,7 +113,12 @@ export interface EndTurnPreview {
    * (docs/ui-plan.md §13, decision 2) — each with the headline it would print.
    */
   readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause; readonly line: LineShow; readonly press: LinePress }[];
-  /** Heat left after the vent: it carries into the next month. */
+  /**
+   * The manager's month-end effects (round 2b: Mags's relief), after the check: whose, and what they do.
+   * Null when none apply (another manager, or heat already at zero).
+   */
+  readonly perk: { readonly manager: string; readonly outcome: Outcome } | null;
+  /** Heat left after the vent and the manager's relief: it carries into the next month. */
   readonly heatAfter: number;
   /** Whether there is a next month to carry it into: not in the year's last month (/core's monthsLeft). */
   readonly carries: boolean;
@@ -128,12 +134,16 @@ export function addedBy(state: GameState, cardId: string): string | null {
 }
 
 /**
- * END_TURN on a hypothetical, cut at the turnEnd event. Only meaningful in the play phase. `counter`: the
- * line counter as the run stands (it is forked, never advanced); `lane`: the established lane now.
+ * END_TURN on a hypothetical, cut at the turnEnd event — and the manager's month-end effects after it, told
+ * apart. Only meaningful in the play phase. `counter`: the line counter as the run stands (it is forked,
+ * never advanced); `lane`: the established lane now.
  */
 export function previewEndTurn(state: GameState, counter: LineCounter, lane: string | null): EndTurnPreview | null {
   if (state.phase !== 'play') return null;
-  const events = through(reduce(state, { type: 'END_TURN' }).events, 'turnEnd');
+  const all = reduce(state, { type: 'END_TURN' }).events;
+  const events = through(all, 'turnEnd');
+  const perkEvents = monthEndEffects(all);
+  const perk = state.manager !== null && perkEvents.some((e) => e.type !== 'warning') ? { manager: state.manager, outcome: outcomeOf(perkEvents) } : null;
   const end = events.find((e) => e.type === 'turnEnd');
   const blamed = new Map(events.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
   const lines = counter.fork();
@@ -149,7 +159,8 @@ export function previewEndTurn(state: GameState, counter: LineCounter, lane: str
   return {
     crystallised: end?.type === 'turnEnd' ? end.crystallised : 0,
     scandalCards,
-    heatAfter: end?.type === 'turnEnd' ? end.resources.heat : state.resources.heat,
+    perk,
+    heatAfter: (end?.type === 'turnEnd' ? end.resources.heat : state.resources.heat) + (perk?.outcome.deltas.heat ?? 0),
     carries: monthsLeft(state) !== 0,
     outcome: outcomeOf(events),
   };
@@ -272,6 +283,8 @@ export function previewDraftCard(state: GameState, cardId: string): readonly Cla
 // What is clickable: legalActions, sorted by kind. The UI enables exactly these and nothing else.
 
 export interface Legal {
+  /** The managers to choose from, before month 1 (round 2b). */
+  readonly managers: ReadonlySet<string>;
   readonly play: ReadonlySet<number>;
   readonly endTurn: boolean;
   readonly picks: ReadonlySet<string>;
@@ -284,6 +297,7 @@ export function legalOf(state: GameState): Legal {
   const play = new Set<number>();
   const picks = new Set<string>();
   const gates = new Set<string>();
+  const managers = new Set<string>();
   let endTurn = false;
   let extraPick = false;
   let reroll = false;
@@ -294,6 +308,7 @@ export function legalOf(state: GameState): Legal {
     else if (a.type === 'DRAFT_EXTRA_PICK') extraPick = true;
     else if (a.type === 'DRAFT_REROLL') reroll = true;
     else if (a.type === 'CHOOSE_GATE') gates.add(a.gateId);
+    else if (a.type === 'CHOOSE_MANAGER') managers.add(a.managerId);
   }
-  return { play, endTurn, picks, extraPick, reroll, gates };
+  return { managers, play, endTurn, picks, extraPick, reroll, gates };
 }

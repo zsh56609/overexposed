@@ -22,6 +22,7 @@ import {
   lanePlays,
   nextInt,
   reduce,
+  rerollCost,
   RESOURCE_KEYS,
   scandalCount,
   type Action,
@@ -342,6 +343,13 @@ function draftChoice(state: GameState, legal: readonly Action[], w: Weights): Ac
   const cfg = state.content.rules.draft;
   const ranked = dr.offer.map((id) => ({ id, v: draftValue(state, id, w) })).sort((a, b) => b.v - a.v);
   const can = (type: Action['type']) => legal.some((a) => a.type === type);
+  // A free reroll (the manager's, round 2b): take it when the offer is weak for this persona — its best card
+  // worth less than the average card this season's pool holds, by the persona's own draft value.
+  if (can('DRAFT_REROLL') && rerollCost(state) === 0) {
+    const pool = state.content.draftPool.filter((id) => (getCard(state.content, id)?.actMin ?? 1) <= state.act);
+    const mean = pool.reduce((sum, id) => sum + draftValue(state, id, w), 0) / Math.max(1, pool.length);
+    if ((ranked.at(0)?.v ?? 0) < mean) return { type: 'DRAFT_REROLL' };
+  }
   // Nothing on offer is worth what a reroll costs: reroll.
   if (can('DRAFT_REROLL') && (ranked.at(0)?.v ?? 0) < cfg.rerollCost * w.capital) return { type: 'DRAFT_REROLL' };
   // The best card these picks would leave behind is worth more than an extra pick costs: buy one.

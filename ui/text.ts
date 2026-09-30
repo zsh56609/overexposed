@@ -5,6 +5,7 @@ import {
   getCard,
   getGate,
   getMajor,
+  getManager,
   getMinor,
   onceItem,
   onceKey,
@@ -15,6 +16,8 @@ import {
   type Effect,
   type LineShow,
   type MajorClause,
+  type ManagerMessage,
+  type MonthEndLine,
   type PageItem,
   type PlayBlocker,
   type Range,
@@ -78,6 +81,13 @@ export const minorText = (c: ContentIndex, seed: number, id: string): string =>
 /** A year's ending in full: "The Breakthrough · Leading Role". */
 export const endingPair = (c: ContentIndex, majorId: string, minorId: string): string =>
   t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });
+/** A manager's name (round 2b): the label on their messages. */
+export const managerName = (c: ContentIndex, id: string): string => t(getManager(c, id)?.nameKey ?? `manager.${id}.name`);
+/** A manager's message as it reads: its variant — or, with none written, its key, loudly. Bubbles split on line breaks. */
+export const messageText = (managerId: string, m: ManagerMessage): string => t(m.key ?? `manager.${managerId}.${m.lineKey}`);
+/** The line for the manager's month-end perk (Mags's relief). */
+export const monthEndText = (line: MonthEndLine): string => t(line.key ?? `manager.${line.manager}.perk.monthEnd`);
+
 export const awardName = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
 export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
 /**

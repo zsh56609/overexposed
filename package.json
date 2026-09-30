@@ -14,6 +14,7 @@
     "sim:tiers": "node sim/tiers.ts",
     "sim:variants": "node sim/variants.ts",
     "sim:press": "node sim/press.ts",
+    "sim:managers": "node sim/managers.ts",
     "validate": "node validate/run.ts",
     "check:preview": "node check/preview.ts && node check/clicks.ts",
     "check:clicks": "node check/clicks.ts",

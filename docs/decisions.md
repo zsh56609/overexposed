@@ -6,6 +6,84 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2b, Part C: the managers
+
+- **The choice is state.** Before month 1 the run waits in a new phase,
+  `manager`; the new action `CHOOSE_MANAGER` sets `GameState.manager` and
+  opens the first month. Both are additive, and **no GameEvent is added or
+  changed**: the choice emits none, a free reroll is a `draftReroll` whose
+  cost is 0, and Mags's relief is a `resource` event. The deck is shuffled
+  when the run is created, before the choice, so a seed deals the same
+  year whichever manager is chosen; only the perks make the years diverge.
+- **Dex Holloway, "Knows everyone": the first draft reroll each season
+  costs nothing** (`perk.freeRerollsPerAct: 1`). "Already used this
+  season" is derived from the run's reroll history — which the reducer
+  keeps in state (`GameState.rerolls`: the season and cost of every
+  reroll, like `gateHistory`), because a reducer sees only state.
+  /core's `freeRerollAvailable` and `rerollCost` answer it; the reroll
+  button shows the author's free label while it holds.
+- **Marguerite Ashby, "Calms things down": −1 heat at the end of every
+  month, never below zero** (`perk.monthEnd`: one `resource` effect),
+  applied by the reducer like a card's effects once the month's check has
+  resolved and its `turnEnd` is recorded — step 4 of the month end, before
+  the season's gate or the next month. **Why this respects the frozen heat
+  formula:** the formula decides how many scandals crystallise from the
+  heat the month leaves at its check. `heatThreshold`, `thresholdFloor`,
+  `degradePerScandal` and `vent` are untouched, and the check reads
+  exactly the heat the month left, relief or no relief. The relief is an
+  ordinary change to the next month's heat, like a card that cools heat;
+  the formula has always let heat fall between checks. Because it lands
+  after the check, the END TURN preview's scandals stay exact. The preview
+  counts the relief in the heat it says carries over, and names it
+  separately ("Calms things down: Heat −1"). The feed prints one of the
+  author's relief lines, with its delta beneath, whenever the relief
+  changes something (not while heat is 0). `check:preview` holds both
+  against the real reducer.
+- **When messages arrive.** A month's messages arrive as it opens, under
+  its header and before its draft. The manager reacts to what the month
+  before brought (its scandals, its paper, the season's gate), checks in
+  at the first month of a season, and says the opening line at the first
+  month. What the year's last month brings, and the winter gate, are
+  never messaged: the ending speaks instead, and the gate lines ("the next
+  door's heavier", "there'll be others") assume a next door. At most two
+  a month, the highest priority first (`messages.priority`).
+- **The triggers, read explicitly** (core/manager.ts):
+  - `first_scandal` is the first scandal line printed, `.low` or `.high`
+    by the fame tier it printed at (`.high` from Known).
+  - `frenzy` is a month whose front page is a frenzy (two or more scandals
+    printed), split by the fame tier at the month's end.
+  - `stuck` fires when heat has ended two months running at Breaking or
+    Frenzy — once per streak, not every month it lasts. It reads heat as
+    the month's check left it (the `turnEnd` record, before any relief).
+  - `lane.<lane>` fires for the first lane established, and for each
+    change to a different lane. A fall back to early, then a return to the
+    same lane, is no change.
+  - `known` fires when hype first reaches the fame split (80), once a run.
+  - `signed` and `viral` fire when their flag is first set.
+  - `rival` fires when the rival's beat prints in a paper's lead slot.
+  - A trigger fires at most once a month; a lane that changes twice in one
+    month speaks for the latest.
+- **Messages are /core read-only queries** (`managerMessages`,
+  `monthEndLines`), pure functions of history like the front pages. Each
+  (manager, trigger case) pair, and the relief lines, is a line group on
+  the shuffle bag. `check:preview` asserts purity and prefix stability, the
+  cap, the order, and that the feed prints every one.
+- **The sim.** The manager is the batch's to set, never the persona's:
+  every band runs once per manager (`sim`, `sim:awards` and `sim:tiers`
+  report each in turn unless `--manager=` names one). The greedy personas
+  take a free reroll when the offer is weak for their strategy — when its
+  best card is worth less, by their own draft value, than the average card
+  in the season's pool. The paid-reroll rule is unchanged.
+  `npm run sim:managers` sets the two managers side by side.
+- **Measured as specified** (seed 20260929, player-like personas pooled):
+  Mags takes 9.8 heat off a run, and Dex gives 2.1 free rerolls. The
+  Breakthrough reaches 50.4% of runs under Mags against 38.1% under Dex;
+  scandals held at year end fall to 2.4 from 3.3. **Mags is strictly
+  better**: every player-like persona does at least as well under her on
+  every count. Bands fail under each manager. Per the author's
+  instruction, the smallest fix is proposed, not applied (docs/status.md,
+  round 2b report).
+
 ## 2026-09-30 — Round 2b, Part B: draft v6
 
 Draft v6 is saved verbatim (docs/writing/draft-v6.md) and committed on its

@@ -1,4 +1,4 @@
-# Content schema: endings, awards, the press, stat tiers
+# Content schema: endings, awards, the press, the managers, stat tiers
 
 Reference for `/content` beyond the card, effect and gate schemas in
 AGENTS.md §2. Moved out of AGENTS.md on 2026-09-30 (phase 2a) so that it
@@ -64,6 +64,37 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
 /core's `pressLines` gives each printed line its variant, paper and
 subject, fixed at the moment it prints; `frontPages` composes every
 month's front pages from the run's history.
+
+## The managers — `content/managers.json`
+
+Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
+§3.2; the prose in [`writing/draft-v6.md`](writing/draft-v6.md)).
+
+- `choice`: the choice screen's `kickerKey`, `titleKey`, `subtitleKey`,
+  `footerKey`.
+- `managers`: `id`, `nameKey`, `roleKey`, `quoteKey`, `descriptionKey`,
+  `tagKey`; `sample` (`labelKey`, `key`), the choice screen's sample text;
+  `perk`, and `lines`.
+- `perk`: `nameKey`, `effectKey` (its rule, plain like a card's), and what
+  it does — data the engine applies: `freeRerollsPerAct`, the first N
+  draft rerolls each season cost nothing (`freeRerollKey`: the reroll
+  button's label meanwhile); `monthEnd`, effects applied at every month
+  end after the `turnEnd` record (`monthEndKeys`: the feed's line when
+  they change something, a line group).
+- `lines`: per trigger case, its variants (a line group). A variant may
+  hold two bubbles, split by a line break. The cases: `opening`,
+  `checkin.<major>`, `first_scandal.low|high`, `frenzy.low|high`, `stuck`,
+  `signed`, `known`, `lane.<lane>`, `gate_passed`, `gate_failed`, `viral`,
+  `rival`. Validate errors on a case no trigger reads, and warns on one
+  without lines.
+- `messages`: `perMonth`, messages a month at most; `priority`, every
+  trigger, highest first; `highFrom`, the fame tier from which the scandal
+  triggers are `.high`; `knownAxis`, the ending axis whose split `known`
+  fires on; `signedFlag`, `viralFlag`; `stuck` (`heatTierFrom`, the heat
+  tier counted as over the line; `months`, how many month ends running).
+
+/core's `managerMessages` derives each month's messages from the run's
+history; `monthEndLines` the perk's line at each month end.
 
 ## Stat tiers — `rules.tiers`
 

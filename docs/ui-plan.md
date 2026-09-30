@@ -35,7 +35,7 @@ state machine.
 ## 2. Flow
 
 ```
-Title → new run
+Title → new run → choose a manager (round 2b)
   each turn:
     [a draft turn — turns 1 and 2 today, read from content] → Draft
     → draw → play → end turn → resolution (end-of-turn card effects,
@@ -224,8 +224,15 @@ Crossing the line and crystallisation are two separate moments
 
 ## 8. Draft, Gate, Goals, Deck, Ending
 
+**Manager** — before month 1 (round 2b, decision 29): the choice screen,
+kicker, title and subtitle over two cards side by side — each manager's
+name, role, quote, description, tag, perk (its name and its rule, plain
+like a card's) and a sample text — then the footer. Each card is one
+button.
+
 **Draft** — the offer (3 cards today, read from content), pick 1. Extra-pick and reroll are enabled per
-legalActions, with cost shown on the button. Cards support preview,
+legalActions, with cost shown on the button — Dex's free label while his
+free reroll lasts (decision 29). Cards support preview,
 through /core's "as if this card were in hand" query (decision 8).
 
 **Gate** — 2 offered, pick 1. Each shows its flavour line (flavorKey)
@@ -570,6 +577,17 @@ it.
     top to bottom — category, ending, text, awards, the rival's closing
     line — and then "Play again", still the largest element. The lead
     paper follows the player's lane (design §3.4). (2026-09-30)
+29. The managers on screen (round 2b; design §3.2). Before month 1, the
+    choice screen shows both managers with their perks (§8). The month's
+    messages print in the feed as the month opens — under its header,
+    before its draft — labelled with the manager's name set in reverse:
+    a private voice, never a masthead, apart from the press. A
+    two-bubble message shows as two lines. Mags's relief prints at the
+    month end with its delta beneath, before what carries over; the END
+    TURN preview names it by the perk ("Calms things down: Heat −1") and
+    counts it in the heat carried. The reroll button shows Dex's free
+    label while his free reroll lasts; the feed records a free reroll as
+    such. (2026-09-30)
 
 ### Still open
 
@@ -611,6 +629,10 @@ it is built yet.** The phase designs for the one 1280×720 stage
   signature image.
 - **A frenzy**: the desk fills with red clippings and crumpled paper —
   faceted, a different shape each ball.
+- **The manager's phone** (round 2b, C4): a phone lies on the desk; as
+  each month opens, the manager's messages rise from it as bubbles, one
+  at a time, with an optional sound. A two-bubble message rises as two.
+  In the unstyled build they are the feed's labelled lines (decision 29).
 - **Stat bar**: six cells of one equal width, narrower than now (tier words
   are single words of at most 10 characters, so they fit). Action slots
   are three small glowing bulbs, the same bulbs as the mirror; a used

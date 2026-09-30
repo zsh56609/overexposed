@@ -1,0 +1,106 @@
+{
+  "choice": {
+    "kickerKey": "manager.choice.kicker",
+    "titleKey": "manager.choice.title",
+    "subtitleKey": "manager.choice.subtitle",
+    "footerKey": "manager.choice.footer"
+  },
+  "managers": [
+    {
+      "id": "veteran",
+      "nameKey": "manager.veteran.name",
+      "roleKey": "manager.veteran.role",
+      "quoteKey": "manager.veteran.quote",
+      "descriptionKey": "manager.veteran.description",
+      "tagKey": "manager.veteran.tag",
+      "perk": {
+        "nameKey": "manager.veteran.perk.name",
+        "effectKey": "manager.veteran.perk.effect",
+        "freeRerollsPerAct": 1,
+        "freeRerollKey": "manager.veteran.perk.reroll"
+      },
+      "sample": {
+        "labelKey": "manager.veteran.sample.label",
+        "key": "manager.veteran.sample.text"
+      },
+      "lines": {
+        "opening": ["manager.veteran.opening.1", "manager.veteran.opening.2"],
+        "checkin.breakthrough": ["manager.veteran.checkin.breakthrough.1", "manager.veteran.checkin.breakthrough.2"],
+        "checkin.long_game": ["manager.veteran.checkin.long_game.1", "manager.veteran.checkin.long_game.2"],
+        "checkin.overexposed": ["manager.veteran.checkin.overexposed.1", "manager.veteran.checkin.overexposed.2"],
+        "checkin.hard_way": ["manager.veteran.checkin.hard_way.1", "manager.veteran.checkin.hard_way.2"],
+        "first_scandal.low": ["manager.veteran.first_scandal.low.1", "manager.veteran.first_scandal.low.2"],
+        "first_scandal.high": ["manager.veteran.first_scandal.high.1", "manager.veteran.first_scandal.high.2"],
+        "frenzy.low": ["manager.veteran.frenzy.low.1", "manager.veteran.frenzy.low.2"],
+        "frenzy.high": ["manager.veteran.frenzy.high.1", "manager.veteran.frenzy.high.2"],
+        "stuck": ["manager.veteran.stuck.1", "manager.veteran.stuck.2"],
+        "signed": ["manager.veteran.signed.1", "manager.veteran.signed.2"],
+        "known": ["manager.veteran.known.1", "manager.veteran.known.2"],
+        "lane.music": ["manager.veteran.lane.music.1", "manager.veteran.lane.music.2"],
+        "lane.screen": ["manager.veteran.lane.screen.1", "manager.veteran.lane.screen.2"],
+        "lane.celebrity": ["manager.veteran.lane.celebrity.1", "manager.veteran.lane.celebrity.2"],
+        "gate_passed": ["manager.veteran.gate_passed.1", "manager.veteran.gate_passed.2"],
+        "gate_failed": ["manager.veteran.gate_failed.1", "manager.veteran.gate_failed.2"],
+        "viral": ["manager.veteran.viral.1", "manager.veteran.viral.2"],
+        "rival": ["manager.veteran.rival.1", "manager.veteran.rival.2"]
+      }
+    },
+    {
+      "id": "guardian",
+      "nameKey": "manager.guardian.name",
+      "roleKey": "manager.guardian.role",
+      "quoteKey": "manager.guardian.quote",
+      "descriptionKey": "manager.guardian.description",
+      "tagKey": "manager.guardian.tag",
+      "perk": {
+        "nameKey": "manager.guardian.perk.name",
+        "effectKey": "manager.guardian.perk.effect",
+        "monthEnd": [
+          {
+            "op": "resource",
+            "target": "heat",
+            "value": -1
+          }
+        ],
+        "monthEndKeys": ["manager.guardian.perk.relief.1", "manager.guardian.perk.relief.2", "manager.guardian.perk.relief.3"]
+      },
+      "sample": {
+        "labelKey": "manager.guardian.sample.label",
+        "key": "manager.guardian.sample.text"
+      },
+      "lines": {
+        "opening": ["manager.guardian.opening.1", "manager.guardian.opening.2"],
+        "checkin.breakthrough": ["manager.guardian.checkin.breakthrough.1", "manager.guardian.checkin.breakthrough.2"],
+        "checkin.long_game": ["manager.guardian.checkin.long_game.1", "manager.guardian.checkin.long_game.2"],
+        "checkin.overexposed": ["manager.guardian.checkin.overexposed.1", "manager.guardian.checkin.overexposed.2"],
+        "checkin.hard_way": ["manager.guardian.checkin.hard_way.1", "manager.guardian.checkin.hard_way.2"],
+        "first_scandal.low": ["manager.guardian.first_scandal.low.1", "manager.guardian.first_scandal.low.2"],
+        "first_scandal.high": ["manager.guardian.first_scandal.high.1", "manager.guardian.first_scandal.high.2"],
+        "frenzy.low": ["manager.guardian.frenzy.low.1", "manager.guardian.frenzy.low.2"],
+        "frenzy.high": ["manager.guardian.frenzy.high.1", "manager.guardian.frenzy.high.2"],
+        "stuck": ["manager.guardian.stuck.1", "manager.guardian.stuck.2"],
+        "signed": ["manager.guardian.signed.1", "manager.guardian.signed.2"],
+        "known": ["manager.guardian.known.1", "manager.guardian.known.2"],
+        "lane.music": ["manager.guardian.lane.music.1", "manager.guardian.lane.music.2"],
+        "lane.screen": ["manager.guardian.lane.screen.1", "manager.guardian.lane.screen.2"],
+        "lane.celebrity": ["manager.guardian.lane.celebrity.1", "manager.guardian.lane.celebrity.2"],
+        "gate_passed": ["manager.guardian.gate_passed.1", "manager.guardian.gate_passed.2"],
+        "gate_failed": ["manager.guardian.gate_failed.1", "manager.guardian.gate_failed.2"],
+        "viral": ["manager.guardian.viral.1", "manager.guardian.viral.2"],
+        "rival": ["manager.guardian.rival.1", "manager.guardian.rival.2"]
+      }
+    }
+  ],
+  "messages": {
+    "perMonth": 2,
+    "priority": ["frenzy", "first_scandal", "checkin", "known", "signed", "viral", "lane", "gate_failed", "gate_passed", "stuck", "rival", "opening"],
+    "highFrom": 3,
+    "knownAxis": "fame",
+    "signedFlag": "signed_label",
+    "viralFlag": "went_viral",
+    "stuck": {
+      "heatTierFrom": 4,
+      "months": 2
+    }
+  }
+}

@@ -333,6 +333,73 @@ export interface PressDef {
   readonly rival?: { readonly arcs: readonly RivalArcDef[] };
 }
 
+// ---------------------------------------------------------------------------
+// The managers (design §3.2, round 2b): chosen before month 1, the player's own voice in the year. Each has
+// one small perk — data the engine applies, never a special case — and a line group per message trigger.
+
+/**
+ * The manager's message triggers, a closed set: /core detects them in the run's history (core/manager.ts).
+ * In priority order is content's (messages.priority). Their line keys: `frenzy` and `first_scandal` take a
+ * `.low` or `.high` fame suffix, `checkin` the major's id, `lane` the lane's; the rest are bare.
+ */
+export const MESSAGE_TRIGGERS = ['frenzy', 'first_scandal', 'checkin', 'known', 'signed', 'viral', 'lane', 'gate_failed', 'gate_passed', 'stuck', 'rival', 'opening'] as const;
+export type MessageTrigger = (typeof MESSAGE_TRIGGERS)[number];
+
+/** A manager's perk. Each field is optional: a perk is what its fields say, applied by the engine. */
+export interface ManagerPerk {
+  readonly nameKey: string;
+  /** Its rule text, plain like a card's: the stat and the number. */
+  readonly effectKey: string;
+  /** Draft rerolls each season that cost nothing: the first N the season takes. */
+  readonly freeRerollsPerAct?: number;
+  /** The reroll button's label while a free reroll is available. */
+  readonly freeRerollKey?: string;
+  /**
+   * Effects at the end of every month, after the month's check has resolved and its turnEnd is recorded —
+   * applied like a card's effects, so the heat formula is untouched (decisions.md, round 2b).
+   */
+  readonly monthEnd?: readonly Effect[];
+  /** The feed's line when the month-end effects change something: a line group on the shuffle bag. */
+  readonly monthEndKeys?: readonly string[];
+}
+
+export interface ManagerDef {
+  readonly id: string;
+  readonly nameKey: string;
+  readonly roleKey: string;
+  readonly quoteKey: string;
+  readonly descriptionKey: string;
+  readonly tagKey: string;
+  readonly perk: ManagerPerk;
+  /** The choice screen's sample message and its label. */
+  readonly sample: { readonly labelKey: string; readonly key: string };
+  /** Message variants by trigger line key; a variant may hold two bubbles, split by a line break. */
+  readonly lines: Readonly<Record<string, readonly string[]>>;
+}
+
+/** When the managers speak (core/manager.ts): the triggers' parameters and the monthly cap. */
+export interface MessageRules {
+  /** Messages a month at most: the highest-priority triggers that fired. */
+  readonly perMonth: number;
+  /** Every trigger, highest priority first. */
+  readonly priority: readonly MessageTrigger[];
+  /** The fame tier (rules.tiers.hype, 0-based) from which a scandal trigger is `.high`. */
+  readonly highFrom: number;
+  /** The ending axis whose split `known` fires on, the first time the player reaches it. */
+  readonly knownAxis: string;
+  readonly signedFlag: string;
+  readonly viralFlag: string;
+  /** `stuck`: heat at this pressure tier (rules.tiers.heat, 0-based) or above at this many month ends running. */
+  readonly stuck: { readonly heatTierFrom: number; readonly months: number };
+}
+
+/** content/managers.json. */
+export interface ManagersDef {
+  readonly choice: { readonly kickerKey: string; readonly titleKey: string; readonly subtitleKey: string; readonly footerKey: string };
+  readonly managers: readonly ManagerDef[];
+  readonly messages: MessageRules;
+}
+
 /** The drafts inside each act. Prices are in capital; caps are per draft. */
 export interface DraftRules {
   /** Turn-within-act numbers (1-based) whose start opens a draft. */
@@ -427,6 +494,8 @@ export interface Content {
   readonly awards?: readonly AwardDef[];
   /** The press (phase 2a). Absent: no papers — every line is the player's own. */
   readonly press?: PressDef;
+  /** The managers (round 2b). Absent: no choice before month 1, and no messages. */
+  readonly managers?: ManagersDef;
 }
 
 // ---------------------------------------------------------------------------
@@ -448,6 +517,7 @@ export interface ContentIndex {
   /** Awards in content order. */
   readonly awards: readonly AwardDef[];
   readonly press: PressDef | null;
+  readonly managers: ManagersDef | null;
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
   /** Tags every scandal carries (e.g. the marker removal cards target). They say nothing about the kind of trouble. */
@@ -475,6 +545,7 @@ export function indexContent(content: Content): ContentIndex {
     minorsByMajor,
     awards: content.awards ?? [],
     press: content.press ?? null,
+    managers: content.managers ?? null,
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
   };
@@ -489,6 +560,8 @@ export function getGate(index: ContentIndex, id: string): GateDef | undefined {
 }
 
 export const getMajor = (index: ContentIndex, id: string): MajorDef | undefined => index.majors.find((m) => m.id === id);
+export const getManager = (index: ContentIndex, id: string | null): ManagerDef | undefined =>
+  id === null ? undefined : index.managers?.managers.find((m) => m.id === id);
 export const getMinor = (index: ContentIndex, id: string): MinorDef | undefined => index.minors.find((m) => m.id === id);
 
 export function heatThreshold(rules: Rules, act: number): number {

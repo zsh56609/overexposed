@@ -10,6 +10,7 @@ import {
   getGate,
   legalActions,
   majorOf,
+  monthEndEffects,
   reduce,
   RESOURCE_KEYS,
   scandalCount,
@@ -57,6 +58,8 @@ export interface TurnSnapshot {
 export interface RunRecord {
   readonly seed: number;
   readonly persona: PersonaId;
+  /** The manager chosen before month 1 (null: content has none). */
+  readonly manager: string | null;
   /** The minor ending, and its major (docs/design/content-expansion.md §1). */
   readonly endingId: string | null;
   readonly majorId: string | null;
@@ -88,6 +91,10 @@ export interface RunRecord {
   readonly draftPicks: number;
   readonly extraPicks: number;
   readonly rerolls: number;
+  /** Rerolls that cost nothing: the manager's free reroll (Dex). */
+  readonly freeRerolls: number;
+  /** Heat the manager's month-end effects took off (Mags's relief). */
+  readonly heatRelieved: number;
   /** Capital spent on extra picks and rerolls. */
   readonly draftSpend: number;
   readonly capital: CapitalFlow;
@@ -148,10 +155,19 @@ function removalCards(content: Content): ReadonlySet<string> {
 
 /** How a run is set up beyond its persona and seed: the manager chosen at the opening (round 2b). */
 export interface RunOptions {
+  /** Default: the first manager in content. The persona never chooses: the batch runs every band once per manager. */
   readonly manager?: string;
 }
 
-export function runOne(content: Content, persona: PersonaId, seed: number, trace?: TraceFn, _options: RunOptions = {}): RunRecord {
+/** The managers a sim run covers: the one asked for (--manager=<id>), or every manager in content, in order. */
+export function managersToRun(content: Content, asked: string | undefined): (string | undefined)[] {
+  const ids = (content.managers?.managers ?? []).map((m) => m.id);
+  if (asked === undefined) return ids.length > 0 ? ids : [undefined];
+  if (!ids.includes(asked)) throw new Error(`unknown manager ${asked} (${ids.join(', ') || 'content has none'})`);
+  return [asked];
+}
+
+export function runOne(content: Content, persona: PersonaId, seed: number, trace?: TraceFn, options: RunOptions = {}): RunRecord {
   const policy = PERSONAS[persona];
   const decisions = cursor(seedRng(deriveSeed(seed, PERSONA_SALT[persona])));
   const draws: Record<string, number> = {};
@@ -163,6 +179,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let draftPicks = 0;
   let extraPicks = 0;
   let rerolls = 0;
+  let freeRerolls = 0;
+  let heatRelieved = 0;
   let draftSpend = 0;
   let scandalsCrystallised = 0;
   let scandalsByTag = 0;
@@ -232,8 +250,10 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
       } else if (e.type === 'draftReroll') {
         rerolls++;
         draftSpend += e.cost;
+        if (e.cost === 0) freeRerolls++;
       }
     }
+    for (const e of monthEndEffects(s.events)) if (e.type === 'resource' && e.target === 'heat' && e.delta < 0) heatRelieved -= e.delta;
   };
 
   try {
@@ -254,7 +274,11 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
       for (const gateId of state.phase === 'gate' ? state.gateOffer : []) {
         gateChecks.push({ gateId, met: evaluate(getGate(state.content, gateId)?.requires, state) });
       }
-      const action = policy.choose(state, legal, decisions);
+      // The manager, before month 1, is the batch's to set, not the persona's: every band runs once per manager.
+      const action: Action =
+        state.phase === 'manager'
+          ? (legal.find((a) => a.type === 'CHOOSE_MANAGER' && a.managerId === options.manager) ?? (legal[0] as Action))
+          : policy.choose(state, legal, decisions);
       state = reduce(state, action);
       actions++;
       tally(state, action);
@@ -269,6 +293,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   return {
     seed,
     persona,
+    manager: state?.manager ?? null,
     endingId: state?.endingId ?? null,
     majorId: state?.endingId ? majorOf(state.content, state.endingId) : null,
     lane: state ? currentLane(state) : null,
@@ -292,6 +317,8 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     draftPicks,
     extraPicks,
     rerolls,
+    freeRerolls,
+    heatRelieved,
     draftSpend,
     capital,
     final: state?.resources ?? null,
@@ -318,12 +345,15 @@ export interface BatchOptions {
   readonly personas?: readonly PersonaId[];
   /** Runs per persona re-executed to prove seeds replay exactly. */
   readonly replaySample?: number;
+  /** The manager every run chooses (default: the first in content). */
+  readonly manager?: string;
 }
 
 export interface BatchResult {
   readonly seed: number;
   readonly runsPerPersona: number;
   readonly personas: readonly PersonaId[];
+  readonly manager: string | null;
   readonly content: Content;
   readonly records: readonly RunRecord[];
   readonly ms: number;
@@ -337,15 +367,16 @@ export function runBatch(runs: number, seed: number, options: BatchOptions = {})
   const seeds = runSeeds(seed, runs);
   const t0 = performance.now();
 
+  const run: RunOptions = options.manager === undefined ? {} : { manager: options.manager };
   const records: RunRecord[] = [];
-  for (const persona of personas) for (const s of seeds) records.push(runOne(content, persona, s));
+  for (const persona of personas) for (const s of seeds) records.push(runOne(content, persona, s, undefined, run));
 
   const sample = Math.min(options.replaySample ?? 5, runs);
   const mismatches: { seed: number; persona: PersonaId }[] = [];
   for (const persona of personas) {
     for (const s of seeds.slice(0, sample)) {
       const first = records.find((r) => r.persona === persona && r.seed === s);
-      if (!first || fingerprint(first) !== fingerprint(runOne(content, persona, s))) mismatches.push({ seed: s, persona });
+      if (!first || fingerprint(first) !== fingerprint(runOne(content, persona, s, undefined, run))) mismatches.push({ seed: s, persona });
     }
   }
 
@@ -353,6 +384,7 @@ export function runBatch(runs: number, seed: number, options: BatchOptions = {})
     seed,
     runsPerPersona: runs,
     personas,
+    manager: records[0]?.manager ?? null,
     content,
     records,
     ms: performance.now() - t0,

@@ -3,7 +3,8 @@ import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
 import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
 import { beginTurn } from './reducer.ts';
 
-export type Phase = 'draft' | 'play' | 'gate' | 'ended';
+/** 'manager': before month 1, the player chooses a manager (round 2b) — only when content has managers. */
+export type Phase = 'manager' | 'draft' | 'play' | 'gate' | 'ended';
 
 /**
  * Heat changes since the last end-of-turn check, each with the card whose effect caused it (null for
@@ -31,6 +32,12 @@ export interface CardInstance {
   readonly cardId: string;
   /** Dealt from the starting deck, which every run shares: it says nothing of the career the player chose. */
   readonly starting?: true;
+}
+
+/** A draft reroll the run took: in which season, and what it cost (0: a manager's free reroll). */
+export interface RerollRecord {
+  readonly act: number;
+  readonly cost: number;
 }
 
 export interface GateRecord {
@@ -123,6 +130,13 @@ export interface GameState {
   /** Gate ids on offer; non-empty only in the 'gate' phase. */
   readonly gateOffer: readonly string[];
   readonly gateHistory: readonly GateRecord[];
+  /**
+   * Every draft reroll so far. The reducer sees only state, so the run's reroll history lives here, like
+   * gateHistory; whether a manager's free reroll is used this season is derived from it (rerollCost).
+   */
+  readonly rerolls: readonly RerollRecord[];
+  /** The manager the player chose before month 1 (null: content has none, or not chosen yet). */
+  readonly manager: string | null;
   /** Set when phase becomes 'ended': the minor ending (its major follows from content). */
   readonly endingId: string | null;
   /**
@@ -140,7 +154,11 @@ export interface StateOptions {
   readonly strict?: boolean;
 }
 
-/** Build the run and open turn 1: the returned state waits on its draft (or on play if drafting is off). */
+/**
+ * Build the run. With managers in content it waits on the choice (phase 'manager'), and CHOOSE_MANAGER opens
+ * turn 1; without, turn 1 opens here: the state waits on its draft (or on play if drafting is off). The deck
+ * is shuffled either way before anything else draws on the seed, so a run deals the same whatever is chosen.
+ */
 export function createInitialState(seed: number, content: Content, options: StateOptions = {}): GameState {
   const index = indexContent(content);
   const strict = options.strict ?? true;
@@ -177,6 +195,8 @@ export function createInitialState(seed: number, content: Content, options: Stat
     draft: null,
     gateOffer: [],
     gateHistory: [],
+    rerolls: [],
+    manager: null,
     endingId: null,
     careerPlays: {},
     year: { peakHype: 0, peakScandals: 0, bestMonthHype: 0, lastMonthEndHype: rules.startingResources.hype },
@@ -184,6 +204,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
     budget: EFFECT_BUDGET,
   };
   shuffleInPlace(d.rng, d.deck);
-  beginTurn(d);
+  if ((index.managers?.managers.length ?? 0) > 0) d.phase = 'manager';
+  else beginTurn(d);
   return closeDraft(d);
 }

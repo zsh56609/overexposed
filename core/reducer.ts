@@ -1,14 +1,15 @@
 // (state, action) => state. Pure. The only place game state changes.
 //
 // Run flow (CLAUDE.md §2):
+//   before month 1: CHOOSE_MANAGER — when content has managers (round 2b); it opens turn 1
 //   start of act:  draft — pick from an offer of cards; capital buys an extra pick or a reroll
 //   start of turn: slots refresh, draw to hand size (onDraw fires per card)
 //   PLAY_CARD:     spend slots, apply effects, card goes to discard
 //   END_TURN:      onEndOfTurn for cards in hand → heat check (Heat → Scandal) → hand discarded
-//                  → next turn, or the act's Gate after its last turn
+//                  → the manager's month-end effects → next turn, or the act's Gate after its last turn
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
 
-import { CoreError, getCard, getGate, type GateDef } from './content.ts';
+import { CoreError, getCard, getGate, getManager, type GateDef } from './content.ts';
 import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { endingIfYearEndedNow } from './endings.ts';
 import { nextInt } from './rng.ts';
@@ -26,6 +27,7 @@ import {
 import type { GameState } from './state.ts';
 
 export type Action =
+  | { readonly type: 'CHOOSE_MANAGER'; readonly managerId: string }
   | { readonly type: 'DRAFT_PICK'; readonly cardId: string }
   | { readonly type: 'DRAFT_EXTRA_PICK' }
   | { readonly type: 'DRAFT_REROLL' }
@@ -35,6 +37,8 @@ export type Action =
 
 export function reduce(state: GameState, action: Action): GameState {
   switch (action.type) {
+    case 'CHOOSE_MANAGER':
+      return chooseManager(state, action.managerId);
     case 'DRAFT_PICK':
       return draftPick(state, action.cardId);
     case 'DRAFT_EXTRA_PICK':
@@ -103,14 +107,32 @@ export function canBuyExtraPick(state: GameState): boolean {
   );
 }
 
+type RerollSubject = Pick<GameState, 'content' | 'manager' | 'rerolls' | 'act'>;
+
+/**
+ * Whether the next draft reroll is one of the manager's free ones (round 2b: Dex's first reroll each
+ * season): the season's rerolls so far, from the run's reroll history, against the perk's allowance.
+ */
+export function freeRerollAvailable(state: RerollSubject): boolean {
+  const free = getManager(state.content, state.manager)?.perk.freeRerollsPerAct ?? 0;
+  return state.rerolls.filter((r) => r.act === state.act).length < free;
+}
+
+/** What rerolling the draft offer costs now: nothing while a free reroll lasts, else the rules' price. */
+export function rerollCost(state: RerollSubject): number {
+  return freeRerollAvailable(state) ? 0 : state.content.rules.draft.rerollCost;
+}
+
 export function canReroll(state: GameState): boolean {
   const dr = state.draft;
   const cfg = state.content.rules.draft;
-  return state.phase === 'draft' && dr !== null && dr.rerollsUsed < cfg.maxRerolls && state.resources.capital >= cfg.rerollCost;
+  return state.phase === 'draft' && dr !== null && dr.rerollsUsed < cfg.maxRerolls && state.resources.capital >= rerollCost(state);
 }
 
 export function legalActions(state: GameState): Action[] {
   switch (state.phase) {
+    case 'manager':
+      return (state.content.managers?.managers ?? []).map((m) => ({ type: 'CHOOSE_MANAGER', managerId: m.id }));
     case 'draft': {
       const dr = state.draft;
       if (!dr) return [];
@@ -139,6 +161,15 @@ export function turnInAct(state: { readonly turn: number; readonly act: number; 
 
 // ---------------------------------------------------------------------------
 // Actions
+
+/** The manager, before month 1: the choice is state (no event), and it opens the first month. */
+function chooseManager(state: GameState, managerId: string): GameState {
+  if (state.phase !== 'manager' || !getManager(state.content, managerId)) return illegal(state, 'illegalManager', managerId);
+  const d = openDraft(state);
+  d.manager = managerId;
+  beginTurn(d);
+  return closeDraft(d);
+}
 
 function draftPick(state: GameState, cardId: string): GameState {
   const dr = state.draft;
@@ -172,8 +203,9 @@ function draftReroll(state: GameState): GameState {
   const dr = state.draft;
   if (!canReroll(state) || !dr) return illegal(state, 'illegalReroll', String(state.act));
   const d = openDraft(state);
-  const cost = d.content.rules.draft.rerollCost;
+  const cost = rerollCost(state);
   addResource(d, 'capital', -cost);
+  d.rerolls.push({ act: d.act, cost });
   const offer = rollOffer(d);
   d.draft = { ...dr, offer, picksLeft: Math.min(dr.picksLeft, offer.length), rerollsUsed: dr.rerollsUsed + 1 };
   d.events.push({ type: 'draftReroll', cost }, { type: 'draftOffer', act: d.act, cardIds: offer });
@@ -245,7 +277,12 @@ function endTurn(state: GameState): GameState {
     lastMonthEndHype: hype,
   };
 
-  // 4. Next turn (its draft first, if it has one), or this act's Gate.
+  // 4. The manager's month-end effects (round 2b: Mags's relief), applied like a card's effects once the
+  // month's check has resolved and its turnEnd is recorded: the heat formula is untouched, the END TURN
+  // preview's count stays exact, and the relief shows in the next month's starting heat.
+  applyEffects(d, getManager(d.content, d.manager)?.perk.monthEnd);
+
+  // 5. Next turn (its draft first, if it has one), or this act's Gate.
   if (turnInAct(d) >= rules.turnsPerAct) offerGates(d);
   else {
     d.turn++;

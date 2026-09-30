@@ -7,9 +7,12 @@
 //   play phase — every card in hand (its outcome, and its headline against the feed's), and END_TURN;
 //   gate phase — every offered gate, and at the final gate the ending (major and minor) and awards each
 //                option predicts;
-//   draft phase — the live requirement of every card on offer;
+//   draft phase — the live requirement of every card on offer, and the reroll's price and free label
+//                 against the real reroll (round 2b);
 //   every state — the stat bar's tiers, and the goals board: the major the marker names is the one major
 //                whose requirements all show met.
+// After each run: the front pages and the manager's messages are pure functions of history (round 2b),
+// and the feed prints every message and every month-end perk line.
 // Exit code 1 on any mismatch.
 
 import {
@@ -21,16 +24,22 @@ import {
   establishedLanes,
   evaluate,
   explainCondition,
+  freeRerollAvailable,
   frontPages,
   getCard,
   getGate,
+  getManager,
   heatLine,
   legalActions,
   majorOf,
   majorRequirements,
+  managerMessages,
+  monthEndEffects,
+  monthEndLines,
   nextInt,
   readLines,
   reduce,
+  rerollCost,
   RESOURCE_KEYS,
   seedRng,
   statTiers,
@@ -56,7 +65,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -151,7 +160,14 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   const leads = feedFor(history, { type: 'END_TURN' }, s, real).filter((l) => l.kind === 'lead').map((l) => [l.text, l.paper, l.subjectKey]);
   const previewLeads = pe.scandalCards.map((x) => [lineText(s.content, x.line, x.cardId, x.press.subjectKey), x.press.paper, x.press.subjectKey]);
   if (!same(previewLeads, leads)) report('endTurn headlines', seed, s.turn, `preview ${JSON.stringify(previewLeads)}, feed ${JSON.stringify(leads)}`);
-  if (pe.heatAfter !== end.resources.heat) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${end.resources.heat}`);
+  // The manager's month-end effects (round 2b): after the check, told apart, and in what carries over.
+  const perkEvents = monthEndEffects(real.events);
+  const realPerk = perkEvents.some((e) => e.type !== 'warning') ? outcomeOf(perkEvents) : null;
+  if (!same(pe.perk?.outcome ?? null, realPerk)) report('endTurn perk', seed, s.turn, `preview ${JSON.stringify(pe.perk)}, real ${JSON.stringify(realPerk)}`);
+  // What carries is the heat the next month opens with: independent of the events when it opens on a draft
+  // or a gate (nothing has drawn yet); otherwise the check's heat and the relief after it.
+  const carried = real.phase === 'draft' || real.phase === 'gate' ? real.resources.heat : end.resources.heat + (realPerk?.deltas.heat ?? 0);
+  if (pe.heatAfter !== carried) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${carried}`);
   // Heat carries into a next month unless this month end leads straight to the year's end.
   const yearEnds = real.phase === 'gate' && reduce(real, { type: 'CHOOSE_GATE', gateId: real.gateOffer[0] ?? '' }).phase === 'ended';
   if (pe.carries === yearEnds) report('endTurn carries', seed, s.turn, `preview carries=${pe.carries}, but the year ${yearEnds ? 'ends' : 'goes on'}`);
@@ -243,6 +259,16 @@ function checkTiers(s: GameState, seed: number): void {
 }
 
 function checkDraftPhase(s: GameState, seed: number): void {
+  // The reroll's price and its free label (round 2b) against the real reroll.
+  if (legalActions(s).some((a) => a.type === 'DRAFT_REROLL')) {
+    counts.rerolls++;
+    const paid = reduce(s, { type: 'DRAFT_REROLL' }).events.find((e) => e.type === 'draftReroll');
+    const cost = paid?.type === 'draftReroll' ? paid.cost : -1;
+    if (cost !== rerollCost(s)) report('reroll', seed, s.turn, `price ${rerollCost(s)}, real ${cost}`);
+    const free = freeRerollAvailable(s);
+    if (free) counts.freeRerolls++;
+    if (free !== (cost === 0 && (getManager(s.content, s.manager)?.perk.freeRerollsPerAct ?? 0) > 0)) report('reroll', seed, s.turn, `free label ${free}, real cost ${cost}`);
+  }
   for (const cardId of s.draft?.offer ?? []) {
     counts.draftCards++;
     const clauses = previewDraftCard(s, cardId);
@@ -267,6 +293,37 @@ function checkPages(history: readonly PlayedStep[], seed: number): void {
     // Every page is full, and the lead paper holds the player's most prominent story (or is the default).
     for (const fp of month.pages) if (fp.items.length !== (history[0]?.after.content.press?.page?.slots.length ?? 0)) report('page', seed, month.turn, `${fp.paper}: ${fp.items.length} stories`);
   }
+}
+
+/**
+ * The manager's messages (round 2b, C5) are a pure function of history: the same history gives the same
+ * messages, and a month's messages are the same whether read as it opens or at the year's end. Each month
+ * has at most messages.perMonth, the highest priority first, and the first month opens with the opening.
+ * The feed prints every one of them, and every month-end perk line.
+ */
+function checkMessages(history: readonly PlayedStep[], seed: number): void {
+  const final = managerMessages(history);
+  if (!same(final, managerMessages(history))) report('message purity', seed, 12, 'reading the same history twice gave different messages');
+  const rules = history[0]?.after.content.managers?.messages;
+  for (const month of final) {
+    counts.messageMonths++;
+    counts.messages += month.messages.length;
+    const atTheTime = managerMessages(history.slice(0, month.step + 1)).find((m) => m.turn === month.turn);
+    if (!same(atTheTime, month)) report('message purity', seed, month.turn, `month ${month.turn}: read as it opens differs from read at the year's end`);
+    if (rules && month.messages.length > rules.perMonth) report('messages', seed, month.turn, `${month.messages.length} messages`);
+    const ranks = month.messages.map((m) => rules?.priority.indexOf(m.trigger) ?? 0);
+    if (ranks.some((r, i) => i > 0 && r < (ranks[i - 1] as number))) report('messages', seed, month.turn, `out of priority order: ${month.messages.map((m) => m.trigger)}`);
+    if (month.turn === 1 && !month.fired.includes('opening')) report('messages', seed, 1, 'the first month opens without the opening');
+  }
+  const perk = monthEndLines(history);
+  counts.perkLines += perk.length;
+  if (!same(perk, monthEndLines(history))) report('message purity', seed, 12, 'month-end lines differ on the same history');
+  const feed = feedLines(history);
+  const shown = feed.filter((l) => l.kind === 'message').length;
+  const due = final.reduce((n, m) => n + m.messages.length, 0);
+  if (shown !== due) report('feed messages', seed, 12, `the feed prints ${shown} messages, ${due} are due`);
+  const perkShown = feed.filter((l) => l.kind === 'perk').length;
+  if (perkShown !== perk.length) report('feed perk', seed, 12, `the feed prints ${perkShown} month-end lines, ${perk.length} are due`);
 }
 
 /** The random persona's choice: any playable card before ending the turn; otherwise any legal action. */
@@ -321,6 +378,7 @@ for (let i = 0; i < RUNS; i++) {
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
   checkPages(history, seed);
+  checkMessages(history, seed);
 }
 
 console.log(
@@ -328,7 +386,9 @@ console.log(
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
-    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed ` +
+    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed, ` +
+    `${counts.messageMonths} months of manager messages (${counts.messages} messages, ${counts.perkLines} month-end lines) re-read, ` +
+    `${counts.rerolls} reroll prices (${counts.freeRerolls} free) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

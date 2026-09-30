@@ -277,6 +277,29 @@ the pair has replay value.
   is profile-based, the second profile costs lines, not engineering.
 - **Full version:** an event-driven change of manager mid-year.
 
+**Built in round 2b** (content/managers.json, core/manager.ts; draft v6):
+Dex Holloway, the Veteran, and Marguerite Ashby — "call me Mags" — the
+Guardian.
+- **The choice**, before month 1, on a screen showing each manager's
+  perk. The choice is state; no GameEvent records it.
+- **One small perk each**, pulling toward the manager's philosophy — data
+  the engine applies, never a special case. Dex, "Knows everyone": the
+  first draft reroll each season is free. Mags, "Calms things down": −1
+  heat at the end of every month, after the month's check (the heat
+  formula is untouched; docs/decisions.md). Neither may be strictly
+  better than the other.
+- **Messages** are derived from the run's history each month, like the
+  front pages. The triggers: the opening; a check-in at the first month
+  of summer, autumn and winter, keyed by the major the year would end in
+  now; the first scandal and a frenzy, each low or high by fame; two
+  month ends running over the line (stuck); the signing; becoming known;
+  going viral; the lane established or changed; a gate passed or failed;
+  the rival leading a paper. At most two a month, by priority. A month's
+  messages arrive as it opens, reacting to the month before; the year's
+  last month end is left to the ending.
+- Each manager's lines for each trigger case are a line group on the
+  shuffle bag; a message may hold two bubbles.
+
 ### 3.3 Rival
 
 Light for the jam, and introduced through the press in phase 2a rather

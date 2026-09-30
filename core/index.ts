@@ -39,6 +39,16 @@ export {
   type PrintContext,
 } from './press.ts';
 export { statTiers, TIER_STATS, type StatTier, type TierStat } from './tiers.ts';
+export {
+  managerMessages,
+  messageGroup,
+  monthEndEffects,
+  monthEndGroup,
+  monthEndLines,
+  type ManagerMessage,
+  type MonthEndLine,
+  type MonthMessages,
+} from './manager.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
 export {
   effectiveHeatThreshold,
@@ -58,8 +68,10 @@ export {
   canPlay,
   canBuyExtraPick,
   canReroll,
+  freeRerollAvailable,
   legalActions,
   playCheck,
+  rerollCost,
   turnInAct,
   type Action,
   type PlayBlocker,

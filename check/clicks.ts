@@ -67,7 +67,10 @@ const DRIVE = (runs: number) => `(async () => {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 600) {
       stats.states++;
-      if (document.querySelector('.draft')) {
+      if (document.querySelector('.manager-choice')) {
+        const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
+        take[rand(take.length)].click();
+      } else if (document.querySelector('.draft')) {
         const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled);
         take[rand(take.length)].click();
       } else if (document.querySelector('.gates')) {

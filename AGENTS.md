@@ -86,13 +86,15 @@ The player plants the seeds of their own collapse. Failure is never random.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After the last act (winter): ending resolution. **A run always completes.**
+- Before month 1: the player chooses a manager (phase `manager`). Each has one perk — data in `content/managers.json`, applied by the engine — and messages /core derives from history ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §3.2).
 
-Actions: `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`.
+Actions: `CHOOSE_MANAGER`, `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`.
 
 End-of-turn resolution, in order:
 1. `onEndOfTurn` effects of every card still in hand, in hand order.
 2. The Heat → Scandal check (below).
 3. The whole hand, Scandals included, goes to the discard pile. The next turn draws back up to hand size.
+4. The manager's month-end effects (`perk.monthEnd`), after the `turnEnd` record: the heat formula is untouched.
 
 ### GameEvents (frozen)
 
@@ -257,6 +259,7 @@ The primary QA instrument, not an extra. Build it in week one.
 - Runs N complete playthroughs headless, seeded, in Node
 - Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`, `artisan`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `artisan` is the craft-leaning player (high craft, moderate hype, risk-averse; no weight is zero, so it stays player-like). `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on. N is a fixed persona parameter (`COMEBACK_SWITCH_AT` in `sim/personas.ts`, 5), deliberately not derived from content: an instrument that shifts when you tune the system it measures is not an instrument.
 - Drafting (greedy personas): the draft-value heuristics are in [`docs/sim.md`](docs/sim.md#drafting-greedy-personas).
+- The manager is the batch's to set, never the persona's: every band runs once per manager (`--manager=<id>`; without it, each in turn). `npm run sim:managers` sets the two side by side.
 - Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, the cascade by act (effective threshold, crystallisations per turn, scandal cards drawn), gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
@@ -383,6 +386,7 @@ npm run check:preview  # every UI preview against the real reducer outcome, then
 npm run check:clicks   # no click on a card or END TURN is swallowed (headless Chrome)
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
+npm run sim:managers   # the two managers side by side, and the message triggers
 npm run sim:variants   # appearances per line group → sim/appearances.json, and the variant gap list
 npm run sim:press      # front pages: lead papers, the fame meter, the rival, world-pool repeats
 ```
