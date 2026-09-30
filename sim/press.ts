@@ -36,6 +36,9 @@ const byTier = Array.from({ length: tierCount }, () => ({ months: 0, led: zeros(
 const scandalLead = Array.from({ length: tierCount }, () => ({ months: 0, leadsFlash: 0, flashOnDesk: 0 }));
 const meter = Array.from({ length: tierCount }, () => ({ months: 0, share: 0, realShare: 0, leadOverwhelmed: 0, pages: 0, overwhelmedPages: 0, playerLeads: 0, fillerLeads: 0, allShare: 0, papersIn: 0, filler: 0 }));
 const fallback = { runs: 0, established: 0, laterEnds: 0, earlyEnds: 0, runsFallingBack: 0, changes: 0 };
+/** Runs whose lane was established (for the first time) by each month's end, and the lane each run first established. */
+const establishedBy = Array.from({ length: 12 }, () => 0);
+const firstLane: Record<string, number> = {};
 const arcs = new Map<string, { runs: number; differs: number }>();
 let rivalBeats = 0;
 let rivalShown = 0;
@@ -117,6 +120,8 @@ for (const persona of PERSONA_IDS) {
     const first = ends.findIndex((x) => x !== null);
     fallback.runs++;
     if (first !== -1) {
+      for (let m = first; m < establishedBy.length; m++) establishedBy[m] = (establishedBy[m] ?? 0) + 1;
+      firstLane[ends[first] ?? ''] = (firstLane[ends[first] ?? ''] ?? 0) + 1;
       fallback.established++;
       const later = ends.slice(first + 1);
       fallback.laterEnds += later.length;
@@ -193,6 +198,8 @@ lines.push('');
 lines.push('THE ESTABLISHED LANE  (player-like; with hysteresis, round 2b)');
 lines.push(
   `  established by the year's end in ${pct(fallback.established, fallback.runs)} of runs; after it first settles, ${pct(fallback.earlyEnds, fallback.laterEnds)} of later month ends read early again (${pct(fallback.runsFallingBack, fallback.established)} of those runs ever do); it changes lane in ${pct(fallback.changes, fallback.established)}`,
+  `  established by month:  ${establishedBy.map((n, i) => `${i + 1}: ${pct(n, fallback.runs)}`).join('  ')}`,
+  `  the lane first established: ${Object.entries(firstLane).map(([l, n]) => `${l} ${pct(n, fallback.established)}`).join(', ')}`,
   '',
 );
 lines.push('THE RIVAL  (player-like runs; her major is fixed by her arc)');
@@ -220,5 +227,5 @@ lines.push(
 console.log(lines.join('\n'));
 writeFileSync(
   join(ROOT, 'sim/out/press.json'),
-  JSON.stringify({ seed: SEED, runs: RUNS, manager: MANAGER ?? null, led: Object.fromEntries(ledBy), byLane, byTier, scandalLead, meter, fallback, arcs: Object.fromEntries(arcs), rival: { beats: rivalBeats, shown: rivalShown }, sagas, world: Object.fromEntries(world), leadWorld }, null, 2),
+  JSON.stringify({ seed: SEED, runs: RUNS, manager: MANAGER ?? null, led: Object.fromEntries(ledBy), byLane, byTier, scandalLead, meter, fallback, establishedBy, firstLane, arcs: Object.fromEntries(arcs), rival: { beats: rivalBeats, shown: rivalShown }, sagas, world: Object.fromEntries(world), leadWorld }, null, 2),
 );

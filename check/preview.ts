@@ -72,7 +72,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -274,6 +274,14 @@ function checkTiers(s: GameState, seed: number): void {
 }
 
 function checkDraftPhase(s: GameState, seed: number): void {
+  // Lane-weighted (round 2c, E1): once a lane is established, every offer holds one of its cards if the pool
+  // has one — every offer as it is dealt (a pick, then an extra pick, can take the lane's card away).
+  const lane = s.events.some((e) => e.type === 'draftOffer') ? s.establishedLane : null;
+  const pool = s.content.draftPool.filter((id) => (getCard(s.content, id)?.actMin ?? 1) <= s.act);
+  if (lane !== null && pool.some((id) => getCard(s.content, id)?.lane === lane) && !(s.draft?.offer ?? []).some((id) => getCard(s.content, id)?.lane === lane)) {
+    report('lane draft', seed, s.turn, `offer ${s.draft?.offer.join()} holds no ${lane} card`);
+  }
+  if (lane !== null) counts.laneOffers++;
   // The reroll's price and its free label (round 2b) against the real reroll.
   if (legalActions(s).some((a) => a.type === 'DRAFT_REROLL')) {
     counts.rerolls++;
@@ -486,7 +494,9 @@ for (let i = 0; i < RUNS; i++) {
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
     checkTiers(s, seed);
-    checkStatBar(s, seed, establishedLanes(history).at(-1) ?? null);
+    const lane = establishedLanes(history).at(-1) ?? null;
+    if (s.establishedLane !== lane) report('lane', seed, s.turn, `the reducer holds ${s.establishedLane}, history reads ${lane}`);
+    checkStatBar(s, seed, lane);
     checkGoals(s, seed);
     if (s.phase === 'play') checkPlayPhase(s, seed, history);
     else if (s.phase === 'gate') checkGatePhase(s, seed);
@@ -508,7 +518,7 @@ console.log(
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
-    `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
+    `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

@@ -12,6 +12,7 @@
 import { CoreError, getCard, getGate, getManager, type GateDef } from './content.ts';
 import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { endingIfYearEndedNow } from './endings.ts';
+import { nextEstablishedLane } from './lanes.ts';
 import { nextInt } from './rng.ts';
 import {
   addCard,
@@ -229,6 +230,7 @@ function playCard(state: GameState, uid: number): GameState {
   d.events.push({ type: 'play', uid: card.uid, cardId: card.cardId, cost: def.cost });
   // The career lane counts what the player built from the starting deck, not the deck itself (core/lanes.ts).
   if (!card.starting || d.content.rules.laneStartingDeck === true) d.careerPlays[card.cardId] = (d.careerPlays[card.cardId] ?? 0) + 1;
+  d.establishedLane = nextEstablishedLane(d, d.establishedLane);
   applyCardEffects(d, card.cardId, def.effects);
   // Opportunities are one-shot: spent, not discarded.
   if (def.kind === 'opportunity') {
@@ -324,16 +326,27 @@ export function beginTurn(d: Draft): void {
   d.events.push({ type: 'draftOffer', act: d.act, cardIds: offer });
 }
 
-/** Seeded sample of distinct draftable cards whose actMin has been reached, in content order. */
+/**
+ * Seeded sample of distinct draftable cards whose actMin has been reached, in content order. Lane-weighted
+ * (round 2c): once a lane is established, the offer holds at least `draft.laneCards` of that lane's cards
+ * when the pool has them — drawn first — and the rest are drawn from the whole pool as before.
+ */
 function rollOffer(d: Draft): string[] {
+  const cfg = d.content.rules.draft;
   const pool = d.content.draftPool.filter((id) => (getCard(d.content, id)?.actMin ?? 1) <= d.act);
-  const n = Math.min(d.content.rules.draft.offerSize, pool.length);
-  const order = [...pool];
-  for (let i = 0; i < n; i++) {
-    const j = i + nextInt(d.rng, order.length - i);
-    [order[i], order[j]] = [order[j] as string, order[i] as string];
-  }
-  const picked = new Set(order.slice(0, n));
+  const n = Math.min(cfg.offerSize, pool.length);
+  const picked = new Set<string>();
+  const draw = (from: readonly string[], k: number) => {
+    const order = [...from];
+    for (let i = 0; i < k && i < order.length; i++) {
+      const j = i + nextInt(d.rng, order.length - i);
+      [order[i], order[j]] = [order[j] as string, order[i] as string];
+      picked.add(order[i] as string);
+    }
+  };
+  const lane = d.establishedLane;
+  if (lane !== null && (cfg.laneCards ?? 0) > 0) draw(pool.filter((id) => getCard(d.content, id)?.lane === lane), Math.min(cfg.laneCards ?? 0, n));
+  draw(pool.filter((id) => !picked.has(id)), n - picked.size);
   return pool.filter((id) => picked.has(id));
 }
 

@@ -46,7 +46,17 @@ export const signedAmount = (key: string, n: number): string => (key === 'capita
 
 export const cardName = (c: ContentIndex, id: string): string => t(getCard(c, id)?.nameKey ?? `card.${id}.name`);
 /** A card's text: its rules, or for a scandal the line shown while it sits in hand. */
-export const cardText = (c: ContentIndex, id: string): string => t(getCard(c, id)?.textKey ?? `card.${id}.text`);
+/**
+ * A card's rules as the card states them: its rules text — or, for a card without one (round 2c's new screen
+ * cards, until the author writes theirs), the interface's words for its requirement and effects.
+ */
+export function cardText(c: ContentIndex, id: string): string {
+  const card = getCard(c, id);
+  if (!card || card.textKey) return t(card?.textKey ?? `card.${id}.text`);
+  const parts = [...(card.requires ? [t('ui.card.needs', { cond: conditionText(c, card.requires) })] : []), effectsText(c, card.effects ?? [], id)];
+  const text = parts.join(' · ');
+  return text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
+}
 /** A card's flavour line (round 2c), italic on its face; none for a card without one. */
 export const cardFlavor = (c: ContentIndex, id: string): string | null => {
   const key = getCard(c, id)?.flavorKey;

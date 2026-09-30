@@ -83,7 +83,7 @@ The player plants the seeds of their own collapse. Failure is never random.
 ### Run structure
 
 - 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — and the UI names them by season, never by number. Act count, turns per act, the season name keys (`actNameKeys`) and the season opener keys (`actOpenerKeys`) live in `content/rules.json`, never as constants.
-- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 2 of every act, 8 per run — never the last turn of a season, whose pick would rarely be drawn), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached); pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
+- Drafts, twice per act: at the start of the turns listed in `draft.atTurns` (turns 1 and 2 of every act, 8 per run — never the last turn of a season, whose pick would rarely be drawn), `offerSize` cards from the draftable pool (non-scandal cards whose `actMin` has been reached), at least `laneCards` of them from the established lane once there is one; pick 1, no skipping. Capital buys one extra pick from the same offer, or rerolls the offer. Prices and caps (per draft) live in `content/rules.json` → `draft`.
 - Each turn: draw to hand size → spend Slots to play cards → end-of-turn resolution
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After the last act (winter): ending resolution. **A run always completes.**
@@ -140,7 +140,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 Their shapes, and the engine rules content can rely on: [`docs/content-schema.md`](docs/content-schema.md).
 
 - `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only and one-shot: played, they are exhausted, so spending one is a decision.
-- Every non-scandal card has a `lane` (one of `rules.lanes`, or `neutral`). The career lane is read from the cards played, never chosen: /core's `currentLane` for endings; the established lane (for display) has hysteresis ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+- Every non-scandal card has a `lane` (one of `rules.lanes`, or `neutral`). The career lane is read from the cards played, never chosen: /core's `currentLane` for endings; the established lane (display, and the lane-weighted draft) has hysteresis ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 - **Effect ops are a closed set** — `resource`, `draw`, `addCard`, `exhaustTag`, `slots`, `setFlag`, `conditional`: extend the set, never special-case a card. Conditions have one shape everywhere. Strict mode (dev and `/sim`) throws on bad content or an illegal action; lenient mode (shipped build) skips it and records a `warning` event.
 - Gates: two offered per season, resolved after its last month. Failing one is a setback, never a run-ender. Prefer conditions on state at resolution over permanent flag locks (validate warns). From act 2 on, at least one gate a season requires `hype` (validate enforces).
 - Player-facing prose is keys only: every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG.
@@ -155,7 +155,7 @@ Read-only /core queries, never GameEvents, that change no play: `yearAwards` (ev
 
 ### Content budget
 
-25 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 14 minor endings = 65 pieces (raised for the content expansion; its events get their own budget).
+28 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 14 minor endings = 68 pieces (raised for the content expansion, and for round 2c's three screen cards; its events get their own budget).
 A ceiling, not a target; validate enforces it.
 
 Card design rules: a card must create an interaction (tags, `conditional`, `requires`), not just add a resource. Keep cards that convert between axes (spend craft to cool heat, spend capital or hype to exhaust a scandal) so the two engines connect. Scandals vary in how they hurt: taking a hand slot, draining at end of turn, and worsening while left in the deck.

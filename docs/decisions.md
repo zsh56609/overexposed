@@ -6,6 +6,49 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2c, Part E: lane depth
+
+- **The lane-weighted draft.**
+  - The reducer now keeps the established lane in state
+    (`GameState.establishedLane`), updated at every play with the same
+    hysteresis `establishedLanes` reads from history. A draw can't see
+    history. `check:preview` asserts the two agree at every state.
+  - Once a lane is established, the offer's first cards come from that
+    lane's share of the pool — `rules.draft.laneCards`, one. The rest are
+    drawn from the whole pool as before. Neutral cards are no lane.
+  - Rerolls and extra picks deal the same way.
+- **Pivots stay possible.** Among runs that establish a lane, it changes
+  lane in 4.8% of Dex runs and 4.2% of Mags runs, against 8.6% and 8.5%
+  before; E1 alone gave 3.9% and 4.1%. The share of later month ends
+  that fall back to early halves, from 14.7% to 8.4%. Establishment is
+  unchanged: 64% of runs by the end of month 6, 92% by the year's end.
+  The lane probes still end in their lanes (band passes).
+- **The three screen cards**. Names, headlines and flavour are draft v7's;
+  the numbers are these:
+  - Table Read: quiet; 1 action; +3 craft; draw 1; no money.
+  - Self-Tape: LOUD in Marquee; 2 actions; +6 craft (as Acting Class) and
+    +2 hype; no heat.
+  - Voice-Over: Money; 1 action; +£2,000 and +2 craft; no hype, no heat.
+
+  Their faces are revision, headshot and revision.
+- **The screen cards come in from summer (`actMin` 2)** — a change under
+  the standing instruction. Drawn from spring, they made screen the most
+  common career: 44% of player-like runs against music's 35%, where
+  music was 48% before. Players are singers first. From summer they
+  deepen a screen career rather than start one. Screen ends 35% of runs
+  (28% without them), music 40%, celebrity 25%.
+  Play rates, player-like pooled under Dex (played ÷ drawn):
+  - Table Read 72% (75% in screen careers);
+  - Self-Tape 41% (44%);
+  - Voice-Over 68% (70%).
+
+  Mags's runs are within 3 points.
+- **Their rules text is not written.** The draft gave none, and rules text
+  is the author's to write. The interface states their rules from their
+  effects ("+3 Craft, draw 1") until `card.<id>.text` exists; validate no
+  longer requires a textKey.
+- **The content budget** rises to 28 actions for them.
+
 ## 2026-09-30 — Round 2c, Part D: cards
 
 - **Flavour lines and cost.**

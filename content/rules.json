@@ -37,7 +37,8 @@
     "extraPickCost": 4,
     "maxExtraPicks": 1,
     "rerollCost": 2,
-    "maxRerolls": 1
+    "maxRerolls": 1,
+    "laneCards": 1
   },
   "tiers": {
     "hype": {

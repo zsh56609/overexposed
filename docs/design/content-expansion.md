@@ -181,6 +181,12 @@ The starting deck does not count (`rules.laneStartingDeck`: false): it is the
 premise — the player begins as a singer — not a choice, and the lane must
 reflect choices.
 
+**Lane depth** (round 2c). Once a lane is established, every draft offer
+holds at least one card of that lane when the pool has one
+(`rules.draft.laneCards`); the rest are drawn as before, so a pivot stays
+possible. Three screen cards deepen the screen lane from summer on: Table
+Read (quiet), Self-Tape (LOUD, Marquee) and Voice-Over (Money).
+
 **The established lane** (phase 2a) is for display only. A single play
 should not change what the press calls the player, so a lane establishes
 itself once it has at least two plays and leads the next lane by two

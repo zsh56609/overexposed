@@ -46,6 +46,7 @@ export interface Draft {
   gateHistory: GateRecord[];
   rerolls: RerollRecord[];
   manager: string | null;
+  establishedLane: string | null;
   endingId: string | null;
   careerPlays: Record<string, number>;
   year: YearRecord;
@@ -77,6 +78,7 @@ export function openDraft(s: GameState): Draft {
     gateHistory: [...s.gateHistory],
     rerolls: [...s.rerolls],
     manager: s.manager,
+    establishedLane: s.establishedLane,
     endingId: s.endingId,
     careerPlays: { ...s.careerPlays },
     year: s.year,
@@ -109,6 +111,7 @@ export function closeDraft(d: Draft): GameState {
     gateHistory: d.gateHistory,
     rerolls: d.rerolls,
     manager: d.manager,
+    establishedLane: d.establishedLane,
     endingId: d.endingId,
     careerPlays: d.careerPlays,
     year: d.year,

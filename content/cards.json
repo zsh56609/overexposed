@@ -708,5 +708,50 @@
       { "op": "resource", "target": "craft", "value": 2 },
       { "op": "resource", "target": "heat", "value": 3 }
     ]
+  },
+  {
+    "id": "table_read",
+    "lane": "screen",
+    "face": "revision",
+    "kind": "action",
+    "cost": 1,
+    "actMin": 2,
+    "nameKey": "card.table_read.name",
+    "flavorKey": "card.table_read.flavor",
+    "headlineKeys": ["card.table_read.headline.1", "card.table_read.headline.2"],
+    "register": "quiet",
+    "playable": true,
+    "tags": ["craft", "training"],
+    "effects": [{ "op": "resource", "target": "craft", "value": 3 }, { "op": "draw", "count": 1 }]
+  },
+  {
+    "id": "self_tape",
+    "lane": "screen",
+    "face": "headshot",
+    "kind": "action",
+    "cost": 2,
+    "actMin": 2,
+    "nameKey": "card.self_tape.name",
+    "flavorKey": "card.self_tape.flavor",
+    "headlineKeys": ["card.self_tape.headline.1", "card.self_tape.headline.2"],
+    "register": "loud",
+    "playable": true,
+    "tags": ["craft", "training"],
+    "effects": [{ "op": "resource", "target": "craft", "value": 6 }, { "op": "resource", "target": "hype", "value": 2 }]
+  },
+  {
+    "id": "voice_over",
+    "lane": "screen",
+    "face": "revision",
+    "kind": "action",
+    "cost": 1,
+    "actMin": 2,
+    "nameKey": "card.voice_over.name",
+    "flavorKey": "card.voice_over.flavor",
+    "headlineKeys": ["card.voice_over.headline.1", "card.voice_over.headline.2"],
+    "register": "money",
+    "playable": true,
+    "tags": ["money", "recording"],
+    "effects": [{ "op": "resource", "target": "capital", "value": 2 }, { "op": "resource", "target": "craft", "value": 2 }]
   }
 ]

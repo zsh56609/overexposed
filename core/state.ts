@@ -137,6 +137,11 @@ export interface GameState {
   readonly rerolls: readonly RerollRecord[];
   /** The manager the player chose before month 1 (null: content has none, or not chosen yet). */
   readonly manager: string | null;
+  /**
+   * The established career lane (round 2c): kept by the reducer at every play with the same hysteresis as
+   * core/lanes.ts establishedLanes reads from history — the lane-weighted draft needs it. Null: early.
+   */
+  readonly establishedLane: string | null;
   /** Set when phase becomes 'ended': the minor ending (its major follows from content). */
   readonly endingId: string | null;
   /**
@@ -197,6 +202,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
     gateHistory: [],
     rerolls: [],
     manager: null,
+    establishedLane: null,
     endingId: null,
     careerPlays: {},
     year: { peakHype: 0, peakScandals: 0, bestMonthHype: 0, lastMonthEndHype: rules.startingResources.hype },

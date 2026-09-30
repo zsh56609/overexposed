@@ -491,6 +491,8 @@ export interface DraftRules {
   /** Price of replacing the offer with a fresh one. */
   readonly rerollCost: number;
   readonly maxRerolls: number;
+  /** Lane-weighted drafting (round 2c): once a lane is established, at least this many of its cards on every offer. */
+  readonly laneCards?: number;
 }
 
 /** Run-level tuning numbers. Data, so the heat loop can be tuned without touching code. */

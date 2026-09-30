@@ -107,13 +107,13 @@ const MAX_AWARDS = 8;
  * The content budget (AGENTS.md → Content budget): a ceiling per kind, not a target. Raised for phase 1 of
  * the content expansion — five screen cards, and endings as 4 majors × 13 minors.
  */
-const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 14 } as const;
+const CONTENT_BUDGET = { action: 28, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 14 } as const;
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
 ];
-const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
+const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls', 'laneCards'];
 
 /** Hard numeric bounds. Values outside them are errors, not taste. */
 const LIMIT = {
@@ -399,6 +399,7 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.int(raw.draft.maxRerolls, 'rules.draft.maxRerolls', LIMIT.draftCount);
     v.int(raw.draft.extraPickCost, 'rules.draft.extraPickCost', LIMIT.price);
     v.int(raw.draft.rerollCost, 'rules.draft.rerollCost', LIMIT.price);
+    v.int(raw.draft.laneCards, 'rules.draft.laneCards', LIMIT.draftCount, { optional: true });
   }
   if (!Array.isArray(raw.lanes) || raw.lanes.length === 0) v.error('schema', 'rules.lanes', 'must be a non-empty array of lane ids, the base first');
   else {
@@ -601,7 +602,8 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
       // Its flavour line is its in-hand line (round 2c).
       if (c.flavorKey !== undefined) v.error('schema', `${where}.flavorKey`, "a scandal's flavour line is its in-hand line");
     } else {
-      v.key(c.textKey, `${where}.textKey`);
+      // Without rules text the interface states the card's rules from its requirement and effects (round 2c).
+      if (c.textKey !== undefined) v.key(c.textKey, `${where}.textKey`);
       if (c.flavorKey !== undefined) v.key(c.flavorKey, `${where}.flavorKey`);
     }
     if (c.playable !== undefined && typeof c.playable !== 'boolean') v.error('schema', `${where}.playable`, 'must be a boolean');

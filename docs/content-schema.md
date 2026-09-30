@@ -37,6 +37,9 @@ scandal's flavour line is its in-hand line.
 `rules.cardFaces` (music flyer, screen script, celebrity gloss, neutral
 notebook; scandals scandal). /core's `cardFace` resolves it; validate
 requires every card to have a known face.
+`textKey` is the card's rules text. A card without one (round 2c's new
+screen cards, until the author writes theirs) shows the interface's words
+for its requirement and effects.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.

@@ -617,7 +617,9 @@ it.
     under its rules — a scandal's is its in-hand line. The cost shows only
     above one action ("2 actions"). The card's face and a lead story's
     photograph scene are content for the visual phase: in this build a
-    face is only a class on the card. (2026-09-30)
+    face is only a class on the card. A card without rules text (round
+    2c's new screen cards) states its rules in the interface's words.
+    (2026-09-30)
 
 ### Still open
 
