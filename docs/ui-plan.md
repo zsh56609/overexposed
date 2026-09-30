@@ -602,8 +602,8 @@ it.
 ## 14. Visual phase
 
 The visual direction the author approved through mockups (2026-09-30,
-round 2a). Recorded here so it survives until the visual phase; **none of
-it is built yet.** The phase designs for the one 1280×720 stage
+rounds 2a and 2b). Recorded here so it survives until the visual phase;
+**none of it is built yet.** The phase designs for the one 1280×720 stage
 (decision 17) and keeps everything inside it.
 
 - **The scene**: a dressing-room vanity with a lightbulb mirror, drawn in
@@ -618,20 +618,37 @@ it is built yet.** The phase designs for the one 1280×720 stage
   rejected for the jam: it would bring a second visual language, and a
   cover structure the fame meter does not fit. It stays a possible fourth
   outlet for the full version.
+- **Marquee's box-office table** changes every month. The player's film,
+  "One Year", tops it when they are Famous on the screen lane (round 2b).
+- **Newspaper photographs** (round 2b) are halftone images drawn in code —
+  no image files, no generation models. Eight scenes: a singer at a
+  microphone; the rival with a guitar; a festival crowd; a paparazzi shot,
+  in red duotone, only when a scandal leads; a red carpet; a film set; a
+  street, in each of the four seasons; an award under a spotlight. The
+  rule the mockups taught: a silhouette needs light behind it, and a
+  picture is recognised by one iconic object.
+- **Which picture** (round 2b): each line group carries scene tags
+  (defined in round 2c); each scene has several variants, drawn from the
+  seed; the picture is chosen by shuffle bag, and never the same picture
+  on the same paper two months running.
 - **The desk**: three papers stand at the back of the desk — the month's
   lead paper in front, the other two behind with their mastheads
   showing; clicking one pulls it forward (the feed's paper switch today,
-  decision 27).
+  decision 27). In an unknown's scandal month the lane's paper stays in
+  front; the tabloid behind carries the scandal as a brief (round 2b:
+  fame amplifies scandal, design §3.4).
 - **The notebook**: private work — the quiet register — is a notebook
   lying on the desk.
-- **Props by lane**, standing on the desk: a metronome (music), a
-  clapperboard (screen), a makeup-brush cup (celebrity), a plain coffee
-  mug while no lane is established (/core's `establishedLane`). The
-  metronome swings slowly when calm and faster in a frenzy, close to the
-  mirror bulbs' flicker. No mask: the white half mask is another work's
-  signature image.
-- **A frenzy**: the desk fills with red clippings and crumpled paper —
-  faceted, a different shape each ball.
+- **Props by lane**, on the desk: a metronome (music), a clapperboard
+  (screen) — lying flat on the desk, in the desk's perspective (round 2b)
+  — a makeup-brush cup (celebrity), a plain coffee mug while no lane is
+  established (/core's `establishedLanes`). The metronome swings slowly
+  when calm and faster in a frenzy, close to the mirror bulbs' flicker. No
+  mask: the white half mask is another work's signature image.
+- **A frenzy**: the desk fills with red clippings and crumpled paper. The
+  crumpled paper (round 2b): two balls of different sizes, staggered
+  centre-left, between the lane props and the red clippings; faceted, a
+  different shape each ball; the contact shadow shows only at the base.
 - **The manager's phone** (round 2b, C4): a phone lies on the desk; as
   each month opens, the manager's messages rise from it as bubbles, one
   at a time, with an optional sound. A two-bubble message rises as two.
