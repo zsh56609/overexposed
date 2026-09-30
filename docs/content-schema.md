@@ -1,9 +1,76 @@
-# Content schema: endings, awards, the press, the managers, stat tiers
+# Content schema
 
-Reference for `/content` beyond the card, effect and gate schemas in
-AGENTS.md §2. Moved out of AGENTS.md on 2026-09-30 (phase 2a) so that it
-carries only rules, the frozen summary and pointers. `npm run validate`
-enforces every shape here.
+Reference for `/content`: the shapes of cards, effects, gates, endings,
+awards, the press, the managers and stat tiers; the i18n key convention;
+and what `npm run validate` checks — it enforces every shape here. Moved
+out of AGENTS.md so that it carries only rules, the frozen summary and
+pointers: endings to tiers in phase 2a, cards, effects, gates, keys and
+checks in round 2c (2026-09-30).
+
+## Cards — `content/cards.json`
+
+```json
+{
+  "id": "vocal_coaching",
+  "kind": "action",
+  "cost": 1,
+  "nameKey": "card.vocal_coaching.name",
+  "textKey": "card.vocal_coaching.text",
+  "playable": true,
+  "tags": ["craft", "training"],
+  "lane": "music",
+  "actMin": 1,
+  "effects": [
+    { "op": "resource", "target": "craft", "value": 6 }
+  ]
+}
+```
+
+`kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
+`actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
+`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (display only: the press subject, the lead paper, the managers) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+`onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
+`requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
+Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
+
+## Effect ops and conditions
+
+A closed set: extend the set, never special-case a card.
+
+| op | fields |
+|---|---|
+| `resource` | `target`, `value` |
+| `draw` | `count` |
+| `addCard` | `cardId`, `to` (`deck`\|`discard`\|`hand`), `count` |
+| `exhaustTag` | `tag`, `count` — permanently removes matching cards |
+| `slots` | `value` — this turn only |
+| `setFlag` | `flag` |
+| `conditional` | `if` (condition), `then` (effects), `else` (effects) |
+
+Engine rules content can rely on:
+- Resources and slots floor at 0.
+- `exhaustTag` searches hand → discard → deck.
+- `addCard` with `to: "deck"` shuffles the card in at a seeded random position.
+- Strict mode (dev and `/sim`): an unknown op, bad content or an illegal action throws. Lenient mode (shipped build): it is skipped and recorded as a `warning` event.
+
+Conditions use one shape everywhere:
+`{ "craft": { "min": 20 }, "flags": { "not": ["went_tabloid"] } }`
+
+## Gates — `content/gates.json`
+
+```json
+{
+  "id": "gate_audition",
+  "act": 1,
+  "nameKey": "gate.audition.name",
+  "requires": { "craft": { "min": 18 } },
+  "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
+  "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
+}
+```
+
+`flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
+Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ## Endings — `content/endings.json`
 
@@ -110,3 +177,29 @@ for hype and craft; for heat `toGoAtLeast` and `linesCrossed`, from the
 distance to the line, never the threshold. /core's `statTiers` picks;
 /ui never computes a boundary. A tier word is one word of at most 10
 characters.
+
+## i18n keys
+
+The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `ui.<area>.<label>`
+
+## What validate checks
+
+`npm run validate` checks, and runs in CI:
+
+- unknown effect ops
+- references to nonexistent card / gate / ending ids, and to lanes not in `rules.lanes`
+- missing i18n keys
+- cards unreachable in any act
+- **endings not exhaustive**: every corner of the axes exactly one major, every major exactly one fallback minor, last; the fame split on a hype tier boundary
+- a non-scandal card without a lane, a scandal with one
+- the content budget
+- numeric ranges
+- opportunity cards in the starting deck; an act with an empty draft pool
+- awards: fields, conditions, ending ids, a fallback award, at most 8
+- every flag set or read has both labels, positive and negative (an error, never a template)
+- `rules.tiers`: a word per tier, boundaries in order
+- variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)
+- tier words: one word of at most 10 characters
+- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
+
+Load failures are loud in dev, graceful in the shipped build.

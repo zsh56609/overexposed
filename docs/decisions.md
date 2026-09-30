@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-09-30 — Round f9c11fb answered; round 2c begins
+
+The author's answers to round 2b, and the terms of round 2c:
+- **The visual design reference** is committed on its own at
+  `docs/design/visual/` (835d4a8): mockups v12, the cover, reference
+  shots. Its README is the newer, fuller visual spec and wins where it and
+  ui-plan §14 differ. A byte-identical duplicate unzipped by mistake at
+  `docs/design/overexposed-visual-handoff/` was deleted, never committed.
+- **AGENTS.md is kept under 24 KiB** (was 27,371 bytes, now 22.6 KB). The
+  reference material moved to `docs/`: the card, effect and gate shapes,
+  the i18n key convention and what validate checks to
+  `docs/content-schema.md`; the personas to `docs/sim.md`. The rules and
+  the FROZEN summary stay at the top; the visual reference is linked there.
+- **Round 2b's ten interpretations** (the summary's §5) are all confirmed.
+- **The winter gate gets no reaction.** Instead the manager has the last
+  word on the ending screen, keyed by the major (Part C3).
+- **The two edge variants** (Copycat Story's "STILL THE ONLY STORY IN
+  TOWN", Cover Single's praise line) are replaced in draft v7.
+- **Once-per-run variants are deferred to phase 4**: the 27 lines for the
+  14 endings, 8 gates, 4 season openers and the opening only change a
+  second run, and jam raters mostly play once or twice. Their validate
+  warnings stay.
+- **The standing instruction for this round:** where the prompt or the
+  findings leave room for a better fix, apply the most effective change —
+  do not stop to ask — keeping frozen items frozen, and record each such
+  change here with its reason. Agents still write no player-facing prose:
+  a change that needs new text uses a marked placeholder and is flagged.
+
 ## 2026-09-30 — Round 2b, Part D: the world
 
 - **Sagas.** Each paper follows two stories across the year, a beat a

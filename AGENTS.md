@@ -2,6 +2,7 @@
 
 **Overexposed** — Game Gauntlet SIM Jam entry. Read this at the start of every session.
 **UI scope and layer plan:** [`docs/ui-plan.md`](docs/ui-plan.md) — build one layer at a time.
+Visual design reference: [`docs/design/visual/README.md`](docs/design/visual/README.md) — read it before any visual-phase work.
 
 **Jam window:** 2026-09-24 03:00 JST → **2026-11-05 04:00 JST** (submission).
 **Ship language:** English. **Target:** browser build on itch.io.
@@ -16,7 +17,7 @@
 - A design decision made in conversation is written to [`docs/decisions.md`](docs/decisions.md) in the same session.
 - Every AI-assisted commit identifies the tool. Claude Code adds its Co-Authored-By trailer automatically; any other tool adds a Co-Authored-By trailer naming itself.
 - Agents never invent player-facing prose: they build fields, keys and placeholders and import prose the author has approved (see [`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15).
-- Keep this file under ~28 KiB: some agents read only its first 32 KiB and drop the rest silently. It carries only rules, the frozen summary and pointers; detailed specifications live in `docs/` (the GameEvent spec, the sim's bands, the content expansion design) and are linked from here.
+- Keep this file under 24 KiB: some agents read only its first 32 KiB and drop the rest silently. It carries only rules, the frozen summary and pointers; reference material lives in `docs/` and is linked from here — content shapes and what validate checks ([`docs/content-schema.md`](docs/content-schema.md)), the sim's personas and bands ([`docs/sim.md`](docs/sim.md)), the GameEvent spec, the content expansion design.
 
 ---
 
@@ -41,7 +42,7 @@
   resolve.ts   effect application
   reducer.ts   (state, action) => state — pure, the only place state changes
 
-/content     JSON. Cards, gates, endings, awards, the press. String KEYS only, never prose.
+/content     JSON. Cards, gates, endings, awards, the press, the managers. String KEYS only, never prose.
 /i18n        en.json (ships), zh-CN.json (reserved, not a jam deliverable)
 /sim         Node harness. Imports /core. Never imports /ui or /i18n.
 /ui          React. Renders what /core returns. Holds no game rules.
@@ -134,76 +135,23 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 
 **This is the one mechanic the design bets on. Tune it before anything else.**
 
-### Card schema
+### Cards, effects, gates
 
-```json
-{
-  "id": "vocal_coaching",
-  "kind": "action",
-  "cost": 1,
-  "nameKey": "card.vocal_coaching.name",
-  "textKey": "card.vocal_coaching.text",
-  "playable": true,
-  "tags": ["craft", "training"],
-  "lane": "music",
-  "actMin": 1,
-  "effects": [
-    { "op": "resource", "target": "craft", "value": 6 }
-  ]
-}
-```
+Their shapes, and the engine rules content can rely on: [`docs/content-schema.md`](docs/content-schema.md).
 
-`kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
-`actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
-`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (display only: the press subject, the lead paper, the managers) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
-`onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
-`requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
-Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
-
-### Effect ops (closed set — extend the set, never special-case a card)
-
-| op | fields |
-|---|---|
-| `resource` | `target`, `value` |
-| `draw` | `count` |
-| `addCard` | `cardId`, `to` (`deck`\|`discard`\|`hand`), `count` |
-| `exhaustTag` | `tag`, `count` — permanently removes matching cards |
-| `slots` | `value` — this turn only |
-| `setFlag` | `flag` |
-| `conditional` | `if` (condition), `then` (effects), `else` (effects) |
-
-Engine rules content can rely on:
-- Resources and slots floor at 0.
-- `exhaustTag` searches hand → discard → deck.
-- `addCard` with `to: "deck"` shuffles the card in at a seeded random position.
-- Strict mode (dev and `/sim`): an unknown op, bad content or an illegal action throws. Lenient mode (shipped build): it is skipped and recorded as a `warning` event.
-
-Conditions use one shape everywhere:
-`{ "craft": { "min": 20 }, "flags": { "not": ["went_tabloid"] } }`
-
-### Gate schema
-
-```json
-{
-  "id": "gate_audition",
-  "act": 1,
-  "nameKey": "gate.audition.name",
-  "requires": { "craft": { "min": 18 } },
-  "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
-  "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
-}
-```
-
-`flavorKey`: the gate's flavour line (prose). Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
-Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
+- `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only and one-shot: played, they are exhausted, so spending one is a decision.
+- Every non-scandal card has a `lane` (one of `rules.lanes`, or `neutral`). The career lane is read from the cards played, never chosen: /core's `currentLane` for endings; the established lane (for display) has hysteresis ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+- **Effect ops are a closed set** — `resource`, `draw`, `addCard`, `exhaustTag`, `slots`, `setFlag`, `conditional`: extend the set, never special-case a card. Conditions have one shape everywhere. Strict mode (dev and `/sim`) throws on bad content or an illegal action; lenient mode (shipped build) skips it and records a `warning` event.
+- Gates: two offered per season, resolved after its last month. Failing one is a setback, never a run-ender. Prefer conditions on state at resolution over permanent flag locks (validate warns). From act 2 on, at least one gate a season requires `hype` (validate enforces).
+- Player-facing prose is keys only: every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG.
 
 ### Endings (two levels)
 
 Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Fourteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
 
-### Awards, the press, stat tiers
+### Awards, the press, the managers, stat tiers
 
-Every award whose conditions hold is won, a fallback only when none is; /core's `yearAwards` is a read-only query, never a GameEvent, and awards change no play (capped at 8). The press prints a LOUD line in its card's lane's paper, Money and every scandal in theirs, a quiet line in none (the notebook); /core's `pressLines` fixes each line's paper and subject when it prints, and `frontPages` composes each month's front page per paper — the player placed by fame and lane, the world and the rival around them (design §3.4). /core's `statTiers` picks the stat bar's tier words; /ui never computes a boundary. **The content shapes of endings, awards, the press and tiers: [`docs/content-schema.md`](docs/content-schema.md).**
+Read-only /core queries, never GameEvents, that change no play: `yearAwards` (every award whose conditions hold, a fallback only when none does; at most 8); `pressLines` and `frontPages` (the press — design §3.4); `managerMessages` (design §3.2); `statTiers` (the stat bar's words — /ui never computes a boundary).
 
 ### Content budget
 
@@ -219,7 +167,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `ui.<area>.<label>`
+- The key convention: [`docs/content-schema.md`](docs/content-schema.md#i18n-keys).
 - Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**
@@ -230,23 +178,7 @@ Rationale: the store page must be English for judges and raters. Chinese is the 
 
 ## 4. Content & validation
 
-`npm run validate` checks, and runs in CI:
-
-- unknown effect ops
-- references to nonexistent card / gate / ending ids, and to lanes not in `rules.lanes`
-- missing i18n keys
-- cards unreachable in any act
-- **endings not exhaustive**: every corner of the axes exactly one major, every major exactly one fallback minor, last; the fame split on a hype tier boundary
-- a non-scandal card without a lane, a scandal with one
-- the content budget
-- numeric ranges
-- opportunity cards in the starting deck; an act with an empty draft pool
-- awards: fields, conditions, ending ids, a fallback award, at most 8
-- every flag set or read has both labels, positive and negative (an error, never a template)
-- `rules.tiers`: a word per tier, boundaries in order
-- variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)
-- tier words: one word of at most 10 characters
-- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
+`npm run validate` checks content against [`docs/content-schema.md`](docs/content-schema.md) and runs in CI: ids and references, i18n keys, reachability, exhaustive endings, lanes, the content budget, numeric ranges, awards, flag labels, tiers, the press, the managers, and the §0 code boundaries. Missing prose and too few variants per line group are warnings, not errors. The full list: [`docs/content-schema.md`](docs/content-schema.md#what-validate-checks).
 
 Load failures are loud in dev, graceful in the shipped build.
 
@@ -257,7 +189,7 @@ Load failures are loud in dev, graceful in the shipped build.
 The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
-- Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`, `artisan`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `artisan` is the craft-leaning player (high craft, moderate hype, risk-averse; no weight is zero, so it stays player-like). `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on. N is a fixed persona parameter (`COMEBACK_SWITCH_AT` in `sim/personas.ts`, 5), deliberately not derived from content: an instrument that shifts when you tune the system it measures is not an instrument.
+- Personas ([`docs/sim.md`](docs/sim.md#personas)): player-like `minmaxer`, `random`, `dealseeker`, `comeback`, `artisan`; control probes `crafter`, `hypechaser`; lane probes `screenseeker`, `celebseeker`. An instrument that shifts when you tune the system it measures is not an instrument: persona parameters (e.g. `COMEBACK_SWITCH_AT`) are fixed, never derived from content.
 - Drafting (greedy personas): the draft-value heuristics are in [`docs/sim.md`](docs/sim.md#drafting-greedy-personas).
 - The manager is the batch's to set, never the persona's: every band runs once per manager (`--manager=<id>`; without it, each in turn). `npm run sim:managers` sets the two side by side.
 - Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, the cascade by act (effective threshold, crystallisations per turn, scandal cards drawn), gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
@@ -281,18 +213,9 @@ Illustration is concentrated at emotional beats:
 - 4 season gates (one per season) — if time allows
 - Meltdown trigger — nice to have
 
-**Source: public-domain photo collage.** Cut out → halftone → one spot colour → layered into the layout. The craft is in cropping, screen and composition — design, not drawing.
+**Source: public-domain photo collage** (Library of Congress, Smithsonian Open Access, NYPL Digital Collections, Wikimedia Commons — PD only), recorded item by item in `CREDITS.md`: name / author / URL / licence / date. **Objects and scenes only — never recognisable faces**: PD photos of identifiable people still carry personality rights, and an unseen protagonist lets the player project themselves in. Newspaper photographs are drawn in code, never image files or generated images.
 
-Sources: Library of Congress, Smithsonian Open Access, NYPL Digital Collections, Wikimedia Commons (PD only). Record every item in `CREDITS.md`: name / author / URL / licence / date.
-
-**Objects and scenes only — never recognisable faces.** Microphones, flashbulbs, stage lights, crowd silhouettes, newsprint stacks, spotlights. Two reasons: PD photos of identifiable people still carry personality rights, and an unseen protagonist lets the player project themselves in.
-
-**Palette:** newsprint cream `#EDE6D6` · ink `#15120E` · tabloid red `#D92B1F`
-**Type:** two families only, Google Fonts — the cover is set in Playfair Display and the game matches it; fewer font files also serves the cold-load budget.
-- Playfair Display — masthead, headlines, card titles
-- Libre Franklin — UI, numbers, body
-
-**Texture:** halftone dot overlay, hard drop shadows, slight card rotation
+**Palette:** newsprint cream `#EDE6D6` · ink `#15120E` · tabloid red `#D92B1F`. **Type:** Playfair Display (mastheads, headlines, card titles) and Libre Franklin (UI, numbers, body), self-hosted — the game loads no web fonts. Everything else — the scene, components, colours, behaviour: [`docs/design/visual/README.md`](docs/design/visual/README.md).
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
 
@@ -390,5 +313,7 @@ npm run sim:managers   # the two managers side by side, and the message triggers
 npm run sim:variants   # appearances per line group → sim/appearances.json, and the variant gap list
 npm run sim:press      # front pages: lead papers, the fame meter, the rival, world-pool repeats
 ```
+
+Every `sim` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn).
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

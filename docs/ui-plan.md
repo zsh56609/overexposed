@@ -601,6 +601,11 @@ it.
 
 ## 14. Visual phase
 
+**[`design/visual/README.md`](design/visual/README.md) is the newer, fuller
+visual spec** — mockups v12, the cover, reference shots — **and wins
+wherever it and this section differ.** This section keeps the decisions in
+prose; it does not repeat the README.
+
 The visual direction the author approved through mockups (2026-09-30,
 rounds 2a and 2b). Recorded here so it survives until the visual phase;
 **none of it is built yet.** The phase designs for the one 1280×720 stage

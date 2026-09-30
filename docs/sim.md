@@ -5,6 +5,12 @@ Reference for `/sim` (AGENTS.md §5). Moved here verbatim from AGENTS.md on
 pointers (docs/decisions.md). Updated for the two-level endings and career
 lanes (phase 1 of the content expansion, docs/design/content-expansion.md §8).
 
+## Personas
+
+Moved from AGENTS.md §5 (round 2c).
+
+The personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`, `artisan`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `artisan` is the craft-leaning player (high craft, moderate hype, risk-averse; no weight is zero, so it stays player-like). `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on. N is a fixed persona parameter (`COMEBACK_SWITCH_AT` in `sim/personas.ts`, 5), deliberately not derived from content: an instrument that shifts when you tune the system it measures is not an instrument. The lane probes `screenseeker` and `celebseeker` pursue one career lane each (Tuning targets, below).
+
 ## Drafting (greedy personas)
 
 a card's draft value = the odds its `requires` holds when it comes up × its value per slot of one play. A one-shot (opportunity) is used up by its first play, so the repeatable part of its value counts min(1, 1 ÷ expected draws), where expected draws = remaining turns × hand size ÷ (cards owned + 1); setting a flag is permanent and counts in full either way. Odds, per clause, multiplied: a requirement met now = 1; an unmet minimum is projected at the run's growth so far and counts the share of the remaining turns in which it will hold (0 if it won't be reached in time, 0.5 on turn 1 with no history); a maximum exceeded now = 0.5; an act/turn window = the share of remaining turns inside it; a forbidden flag already held = 0 (flags are never unset); a required flag not held yet = 0.5. Reroll when the best card is worth less than the reroll's capital price; buy an extra pick when the best card left behind is worth more than its price. A free reroll (Dex's, round 2b) is taken when the offer is weak for the persona's strategy: its best card is worth less than the average draft value of the season's pool (the draftable cards whose `actMin` has been reached).
