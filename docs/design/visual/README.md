@@ -1,6 +1,6 @@
 # Overexposed — visual design reference
 
-**Status:** approved by the author through mockup rounds v1–v12 (2026-09-29 → 09-30).
+**Status:** approved by the author through mockup rounds v1–v15 (2026-09-29 → 09-30). v13 added the screens around the desk (§9); v14 refined their motion; v15 replaced the card-play animation and added the scandal flip; v16 put the pile in the desk's own plane and simplified stat changes; v17 made the notebook a real one and took the number off the phone; v18 gave the phone the player's own time and tied reactions to messages, not words.
 This folder is the source of truth for the **visual phase**. `docs/ui-plan.md` §14
 records the same decisions in prose; where the two differ, **this README is newer and wins**.
 
@@ -11,7 +11,7 @@ feature freeze, see `docs/status.md`). Content rounds may read it for context.
 
 | Path | What it is |
 |---|---|
-| `mockups/vanity.html` | The main game screen on the 1280×720 stage. Open it in a browser. The bar above the stage switches **fame** (unknown / rising / famous), **state** (calm / frenzy), **lane** (music / screen / celebrity) and **season**. Hover the stat cells for tooltips; click a back paper to pull it forward; click the metronome; click a manager message to react. |
+| `mockups/vanity.html` | The main game screen on the 1280×720 stage, and the screens around it. Open it in a browser. The first bar switches **fame**, **state** (calm / frenzy), **lane** and **season**. The second bar opens each **screen** (offers, season door, last door, text event, letter event, deck, endings, settings) and has **Play month end**. On the desk: hover the stat cells for tooltips; click a back paper to pull it forward; click the metronome; click a manager message to react; **click a card to play it**. |
 | `mockups/screens.html` | Title screen, manager choice (with perks), awards night. Tabs at the top. |
 | `cover/` | itch.io cover: `cover.html` (source), 630×500 and 1260×1000 renders, the three OFL font files it uses. |
 | `shots/` | PNG captures of the key states, for agents that cannot run a browser. |
@@ -31,6 +31,7 @@ the rules (`frontPages`, lanes, endings…). Port the **presentation**.
 
 - `/ui` displays only. Every value on screen comes from a `/core` read-only query. No rule is computed in the UI.
 - One fixed logical 1280×720 stage, scaled to fit, never cropped, nothing overflows it.
+- The stage and its container use `overflow: clip`: nothing may ever scroll the stage (a card's lower edge sits outside it, and `overflow: hidden` alone lets focus or scroll-into-view shift the whole scene).
 - Fonts are **self-hosted** (Playfair Display, Playfair Display Italic, Libre Franklin — all SIL OFL; the files are in `cover/`). The mockups load Google Fonts; the game must not.
 - No image files for the newspaper photographs and no image-generation models: they are drawn in code and screened into halftone dots in the browser (see Porting).
 
@@ -75,7 +76,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 ### 4. The desk
 
-- **Notebook** (centre): quiet, private work. It never reaches the press.
+- **Notebook** (centre): quiet, private work. It never reaches the press. A spiral-bound pad — metal coil along the top, stacked page edges and a card back beneath, a pencil beside it. When quiet work lands **the page stays**: the old line fades and the new one is written word by word, left to right.
 - **Lane props:** music — a **metronome** (standing) and two **different** sheets of music; screen — a **script** and a **clapperboard lying flat** between the notebook and the phone, its arm open (draw the arm inside the SVG's viewBox — it was clipped once); celebrity — a brush cup; no lane yet — a plain mug.
 - **Metronome:** swings by default (full period 2.4s calm, 1.3s in a frenzy). Click to stop: it finishes the current stroke, then eases to the centre and stops. Click again: it starts from the centre with a growing swing. Engine: `metroFrame` in `vanity.html`.
 - **The script's content improves with fame** — three tiers (unknown: bad soap, cheap horror, an advert; rising: competent TV; famous: prestige scenes in homage to classic scene types, all lines original). The player's lines are highlighted like an actor's copy. Copy: `SCRIPTS` in `vanity.html` (draft; imported by round 2c).
@@ -83,8 +84,9 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 ### 5. The phone and the manager
 
-- The phone lies flat on the desk with an unread badge. Messages rise above it in screen space, labelled with the manager's name. (Later: one bubble at a time, with an optional sound.)
+- The phone lies flat on the desk at the right, under the chat bubbles. **No number badge**: its lock screen shows the notifications, and the count is the number of bars. Calm: a dark blue screen and a couple of blue notifications (the manager). Frenzy: the screen glows red, notifications pile up — red press alerts among the blue — and it buzzes every few seconds. Each manager message that arrives adds a notification, lights the screen and buzzes the phone. The lock screen shows **the player's own local time**, formatted the way their phone would (24-hour regions 15:52, 12-hour regions 3:52, no AM/PM), refreshed every few seconds — the browser knows the time zone; no permission, no network. Messages rise above it in screen space, labelled with the manager's name.
 - **Each message is two bubbles: a longer one, then a short one.**
+- **A reaction belongs to one message** — its month and its place in that month — never to its words. A line that recurs later is a new message and starts with no reaction. (Lines come from the shuffle bags, so a repeat only happens once a pool is used up; 2c adds variants to the busiest groups.)
 - Bubbles scale up slightly on hover. **Tapback reactions:** clicking a bubble opens a row of three below it — calm ❤️ 😂 👍, frenzy 💔 😭 👍 (the thumbs-up never turns down). Choosing one leaves it as a badge on the bubble's corner; choosing it again removes it; choosing another replaces it. UI state only — no rule reads it. The bubble with the open row is raised above its neighbours.
 
 ### 6. The hand
@@ -112,6 +114,73 @@ desk; Famous overwhelms the page. See `shots/08-…tabloid-pulled-forward.jpg` a
 
 - **Title**, **manager choice** (two business cards; each shows its **perk** — Dex "Knows everyone: your first reroll each season is free", Mags "Calms things down: you lose 1 heat at the end of every month"), **awards night** (curtains, spotlight, plaques revealed in sequence, rival's closing line). "Play again" sits at the bottom, after the reveal.
 
+### 9. The screens around the desk
+
+Every screen happens *in the dressing room*: the scene dims behind it and the stat
+bar stays visible, so the player always sees what they have while they choose.
+Header pattern: amber small-caps kicker (usually the date), a Playfair title, an
+italic line.
+
+- **Offers (the draft).** "<Month Year> · offers" / "Take one." / "The rest go to
+  someone else." The offered cards at 1.1× in a row. Hovering a card shows the line it
+  would print, in its paper's voice — or the notebook, for quiet work. The preview
+  sits above the card and rises with it: same distance, same curve, same delay. Dex's extra card
+  wears a paper-clipped tag, "Dex knows someone". Clicking takes it (a TAKEN stamp; the
+  others fade). Below, ticket-shaped buttons: "Take one more £4,000", "Reroll the offer
+  £2,000" — greyed out when the player cannot afford them — and "You have £N".
+- **Season doors (gates).** Two invitations — cream card, a double gold rule, slight
+  opposite tilts: "You're invited", the name, the flavour, **Requires** (✓/✗ + icon +
+  threshold + "(you have N)"), **If you pass · if you fail** as effect chips, and a
+  Likely / Unlikely stamp. A requirement shows only the stat's icon and the
+  threshold, the number in the icon's colour — "★ 64+ (you have 104)" — never the
+  stat's name; a condition without a stat ("Signed to a label") is plain text. The last door adds **On the night** (the awards that choice
+  wins) and the header states the ending either way. Clicking accepts (ACCEPTED stamp).
+- **Events (phase 3) — two presentations, chosen by the voice.**
+  - *People who text* — the manager, friends, family, the rival: the phone comes up
+    and their messages arrive **one at a time**, each after a few typing dots; the
+    replies appear only once they have finished. The choices are **reply bubbles**, each showing its effects;
+    "↺ remembered" marks a choice that sets a flag a later event may call back. After
+    replying: typing dots, then their answer — the outcome line.
+  - *The press and institutions*: a **letter** — the paper's letterhead, a typed body,
+    the choices as tick boxes with effect chips. After choosing: a SENT stamp and the
+    outcome line.
+- **Playing a card — objects move like objects.** Lift, carry, set down; nothing ever
+  shrinks into a point. The card lifts out of the fan and straightens (0.2s), holds for a
+  beat so the player registers what they played, is carried to **this month's pile**,
+  on the desk just left of the phone — tilting back as it goes — and is set down with a
+  small settle (≈0.9s in all; a click fast-forwards). The card must lie **exactly in the
+  desk's plane**: it uses the desk's own perspective (1100px, vanishing point 640,140)
+  and tilts about the desk's own hinge (its front edge, 640,556) to the desk's 64°, so it
+  converges with the phone and the desk. Once down it sits beneath the hand, and the
+  nearest hand cards may hide part of it. As it lands its
+  line is **printed**: on the front paper a new item, "Just in", appears left to right
+  as if under a press roller, with a brief warm flash and the red margin rule; a paper
+  standing behind lifts for a moment; quiet work is written into the **notebook**.
+  One action bulb goes dark and the hand closes the gap. **Stat changes are quiet**: a
+  small signed figure ("+4", "−£1,000") appears just above the value in its resource's
+  colour and fades; the value itself rolls to its new number, briefly tinted — no icons,
+  nothing floating in from elsewhere. The pile shows the month's plays at a glance. The
+  phone stays at the right, under the chat bubbles. Crossing the line: the countdown turns to "N TO
+  NEXT" and END TURN reads "1 scandal will print". A scandal card cannot be played — it
+  shakes and says so. No actions left: "No actions left this month."
+- **Month end, in beats.** END TURN presses → the rest of the hand slides off the desk →
+  the front page is stamped PRINTED → in a frenzy, **news becomes a card**: each
+  scandal's headline lifts off the tabloid and holds so it can be read, turns over (a 3D
+  flip) into its scandal card, holds, then drops onto this month's pile, the stage
+  shaking as each lands — the mirror image of playing a card → the hand and the pile are
+  swept off the desk → the date flips → a new season gets a card (season name and its
+  opener) while the light changes → the papers show the new issue → a new hand is dealt
+  one card at a time and the bulbs relight → the manager's messages arrive as a chat
+  does: each new bubble grows in at the bottom and pushes the earlier ones up, and the
+  phone on the desk buzzes.
+- **Deck.** A panel: "Still to draw — sorted by name, not in the order you'll draw
+  them" and "Played — back into the deck when it runs out", as mini card faces;
+  scandals in red. Never reveal draw order.
+- **Endings.** A scrapbook: four columns for the majors with their goal lines; found
+  minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
+  "Endings found · N of 14".
+- **Settings — "House rules".** Mark my stories (on), Sound (on), Reduce motion (off).
+
 ## Porting notes
 
 Reusable code in `mockups/vanity.html`:
@@ -126,6 +195,13 @@ Reusable code in `mockups/vanity.html`:
 | `const TIP` | Tooltip copy (draft). |
 | `const SCRIPTS` | Desk script copy (draft). |
 | `function paintRx` | Tapback reactions. |
+| `planeCard`, `setPlane`, `layDown`, `nextSlot`, `playCard`, `land`, `sweepDesk` | Playing a card: lift, carry, set down flat in the desk's plane; the printed line; the month-end sweep. |
+| `delta`, `roll`, `applyFx` | Stat changes: the small figure above the value, the value rolling. |
+| `writeNotebook` | Quiet work written into the notebook, word by word. |
+| `phoneNotes`, `phonePing` | The phone's lock screen, and a message arriving. |
+| `function scandalFlip` | News becomes a card: the month-end scandal flip. |
+| `function monthEnd`, `dealIn`, `riseBubbles` | The month-end beats. |
+| `buildDraft`, `buildGate`, `buildPhone`, `buildLetter`, `buildDeck`, `buildEndings` | The screens in §9. |
 
 Replace the mockups' hard-coded state (`st`, `F`, `X`, `HANDS`, `compose`, the `lines`
 object for manager messages) with the real `/core` queries and `/i18n` keys.
@@ -134,4 +210,5 @@ object for manager messages) with the real `/core` queries and `/i18n` keys.
 
 - **Already in the game or in round 2b:** three papers and routing, prominence by fame, the rival, world sagas, managers and perks, scandals scaling with fame, the lead-paper rule, the goals-board fix.
 - **Round 2c (content and information display):** tooltips; card flavour lines; cost only above one; lane-weighted draft; new screen cards; craft icon by lane; month names and calendar; season marks; countdown icon and colours; stat bar order; the card face field; desk scripts; two-bubble manager messages and a quiet-month trigger; tier words on the goals board; scene tags.
-- **Visual phase:** everything else in this README.
+- **Visual phase:** everything else in this README — round 1 the desk (§1–§7), round 2 the screens around it (§8–§9).
+- **Phase 3:** the event presentations in §9 are the target look for events.

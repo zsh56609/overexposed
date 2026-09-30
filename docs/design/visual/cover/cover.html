@@ -19,15 +19,15 @@ html,body{margin:0;background:#111}
   background:linear-gradient(180deg,transparent 58.6%,rgba(0,0,0,.07) 59%,rgba(255,255,255,.4) 59.35%,transparent 60%),
              radial-gradient(ellipse at 30% 20%,transparent 60%,rgba(120,100,70,.12))}
 .mast{display:flex;align-items:center;gap:10px}
-.ear{flex:none;width:64px;border:1px solid #b8281c;color:#b8281c;font-size:6.6px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center;line-height:1.35;padding:3px 2px}
-.band{flex:1;background:#c8281c;color:#fff;text-align:center;padding:3px 0 5px;font-family:'Playfair Display';font-style:italic;font-weight:900;font-size:27px;letter-spacing:.2px;line-height:1.1}
-.dl{display:flex;justify-content:space-between;border-top:1.4px solid #15120E;border-bottom:1.4px solid #15120E;margin-top:7px;padding:2px 0;font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.ear{flex:none;width:64px;height:30px;box-sizing:border-box;border:1px solid #b8281c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.band{flex:1;height:30px;background:#c8281c}
+.dl{display:flex;justify-content:space-between;align-items:center;height:12px;border-top:1.4px solid #15120E;border-bottom:1.4px solid #15120E;margin-top:7px}
 .kick{margin-top:9px;font-size:9px;font-weight:900;letter-spacing:.26em;color:#c8281c}
 .head{font-family:'Playfair Display';font-weight:900;font-size:73px;line-height:.92;letter-spacing:-1.2px;margin-top:1px;white-space:nowrap}
 .photo{margin-top:8px;height:122px;background:#aaa center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(21,18,14,.35)}
 .cap{font-size:7px;font-style:italic;color:#4a443a;margin-top:3px}
-.body{margin-top:8px;columns:3;column-gap:14px}.body i{display:block;height:3px;margin:0 0 5px;background:rgba(21,18,14,.28)}
-.deck{margin-top:6px;font-family:'Playfair Display';font-weight:700;font-size:14.5px;line-height:1.2;max-width:360px}
+.body{margin-top:9px}.body i{display:block;width:100%;height:3px;margin:0 0 6px;background:rgba(21,18,14,.28)}
+.deck{margin-top:7px;font-family:'Playfair Display';font-style:italic;font-weight:500;font-size:19px;line-height:1.2;max-width:none;letter-spacing:0}
 /* the hand */
 .card{position:absolute;width:118px;height:160px;border-radius:5px;box-shadow:0 10px 18px rgba(0,0,0,.6);transform-origin:50% 140%;box-sizing:border-box;padding:10px 11px}
 .card b{display:block;font-family:'Playfair Display';font-weight:900;font-size:15px;line-height:1.05}
@@ -38,19 +38,27 @@ html,body{margin:0;background:#111}
 .script b{font-family:'Courier New',monospace;font-weight:700;font-size:13px}
 .scandal{background:#D92B1F;color:#FFF3EF;border:2px dashed #FFF3EF}
 .scandal .x{position:absolute;right:9px;top:5px;font-family:'Playfair Display';font-weight:900;font-size:22px}
+.g{display:inline-block;height:.62em;border-radius:1px;vertical-align:middle;background:currentColor;opacity:.85}
+.ear .g{display:block;height:3px;margin:0;background:#b8281c;opacity:1}.ear .e1{width:36px}.ear .e2{width:22px}
+.dl .g{height:4px;background:#15120E}
+.card .bar{display:block;width:64px;height:9px;border-radius:1px;background:currentColor;opacity:.82;margin:0 0 6px}
+.card .bar.s{width:42px;height:6px;opacity:.5}
+.scandal .x2{position:absolute;right:11px;top:11px;width:16px;height:16px}
+.scandal .x2::before,.scandal .x2::after{content:"";position:absolute;left:-2px;right:-2px;top:7px;height:3px;background:#FFF3EF;border-radius:1px;transform:rotate(45deg)}
+.scandal .x2::after{transform:rotate(-45deg)}
 .vign{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 55%,rgba(0,0,0,.45))}
 </style></head><body>
 <div id="c">
   <div class="glass"></div><div class="frame"></div><div id="bulbs"></div>
   <div class="paper">
-    <div class="mast"><span class="ear">World<br>exclusive</span><div class="band">The Daily Flash</div><span class="ear">Only<br>£1</span></div>
-    <div class="dl"><span>March 2027</span><span>A year in the spotlight</span><span>No. 1</span></div>
-    <div class="kick">EXCLUSIVE</div>
+    <div class="mast"><span class="ear"><i class="g e1"></i><i class="g e2"></i></span><div class="band"></div><span class="ear"><i class="g e1"></i><i class="g e2"></i></span></div>
+    <div class="dl"><i class="g" style="width:60px"></i><i class="g" style="width:112px"></i><i class="g" style="width:60px"></i></div>
+    <div class="kick"><i class="g" style="width:68px;height:6px"></i></div>
     <div class="head">OVEREXPOSED</div>
     <div class="photo" id="photo"></div>
-    <div class="cap">Photographed last night.</div>
-    <div class="deck">Four seasons. One career. And a press that never looks away.</div>
-    <div class="body"><i></i><i></i><i style="width:78%"></i></div>
+    <div class="cap"><i class="g" style="width:96px;height:3px;opacity:.5"></i></div>
+    <div class="deck">Four seasons. One career.<br>And a press that never looks away.</div>
+    <div class="body"><i></i><i></i></div>
   </div>
   <div id="hand"></div>
   <div class="vign"></div>
@@ -192,5 +200,5 @@ const cards=[['flyer','Open Mic'],['gloss','Viral Stunt'],['scandal','The Feud']
 const H=document.getElementById('hand');
 cards.forEach(([c,n],i)=>{const t=(i/(cards.length-1))*2-1,d=document.createElement('div');d.className='card '+c;
   d.style.left=(315-59+t*182)+'px';d.style.top=(428+Math.abs(t)*14)+'px';d.style.transform=`rotate(${t*11}deg)`;d.style.zIndex=10+(c==='scandal'?5:i);
-  d.innerHTML=(c==='scandal'?'<span class="x">✕</span>':'')+`<b>${n}</b>`;H.appendChild(d)});
+  d.innerHTML=(c==='scandal'?'<span class="x2"></span>':'')+'<span class="bar"></span><span class="bar s"></span>';H.appendChild(d)});
 </script></body></html>
