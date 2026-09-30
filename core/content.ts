@@ -103,6 +103,8 @@ export interface CardDef {
   readonly nameKey: string;
   /** Non-scandals: the card's rules. Scandals have none: the interface tells their rules from their effects. */
   readonly textKey?: string;
+  /** Non-scandals: the card's flavour line, italic on its face (round 2c). A scandal's is its in-hand line. */
+  readonly flavorKey?: string;
   /** Default true. Scandals are false: they only take up room in the hand. */
   readonly playable?: boolean;
   readonly tags?: readonly string[];
@@ -421,6 +423,32 @@ export interface ManagersDef {
   readonly messages: MessageRules;
 }
 
+// ---------------------------------------------------------------------------
+// Desk scripts (round 2c): the script on an actor's desk, by fame — shown in the visual phase.
+
+/** A band of fame tiers (rules.tiers.hype, 0-based): from its `from` to the next band's. */
+export interface FameBand {
+  readonly id: string;
+  readonly from: number;
+}
+
+export const SCRIPT_LINE_KINDS = ['you', 'other', 'action'] as const;
+export type ScriptLineKind = (typeof SCRIPT_LINE_KINDS)[number];
+
+export interface DeskScriptDef {
+  readonly id: string;
+  readonly band: string;
+  readonly headingKey: string;
+  /** In order: the player's own lines (`you`, highlighted like an actor's copy), others', and action lines. */
+  readonly lines: readonly { readonly key: string; readonly kind: ScriptLineKind }[];
+}
+
+/** content/scripts.json. */
+export interface DeskScriptsDef {
+  readonly bands: readonly FameBand[];
+  readonly scripts: readonly DeskScriptDef[];
+}
+
 /** The drafts inside each act. Prices are in capital; caps are per draft. */
 export interface DraftRules {
   /** Turn-within-act numbers (1-based) whose start opens a draft. */
@@ -542,6 +570,8 @@ export interface Content {
   readonly press?: PressDef;
   /** The managers (round 2b). Absent: no choice before month 1, and no messages. */
   readonly managers?: ManagersDef;
+  /** Desk scripts (round 2c), for the visual phase. */
+  readonly scripts?: DeskScriptsDef;
 }
 
 // ---------------------------------------------------------------------------

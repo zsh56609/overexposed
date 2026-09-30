@@ -26,7 +26,7 @@
       "lines": {
         "opening": ["manager.veteran.opening.1", "manager.veteran.opening.2"],
         "checkin.breakthrough": ["manager.veteran.checkin.breakthrough.1", "manager.veteran.checkin.breakthrough.2"],
-        "checkin.long_game": ["manager.veteran.checkin.long_game.1", "manager.veteran.checkin.long_game.2"],
+        "checkin.long_game": ["manager.veteran.checkin.long_game.1", "manager.veteran.checkin.long_game.2", "manager.veteran.checkin.long_game.3", "manager.veteran.checkin.long_game.4"],
         "checkin.overexposed": ["manager.veteran.checkin.overexposed.1", "manager.veteran.checkin.overexposed.2"],
         "checkin.hard_way": ["manager.veteran.checkin.hard_way.1", "manager.veteran.checkin.hard_way.2"],
         "first_scandal.low": ["manager.veteran.first_scandal.low.1", "manager.veteran.first_scandal.low.2"],
@@ -42,7 +42,7 @@
         "gate_passed": ["manager.veteran.gate_passed.1", "manager.veteran.gate_passed.2"],
         "gate_failed": ["manager.veteran.gate_failed.1", "manager.veteran.gate_failed.2"],
         "viral": ["manager.veteran.viral.1", "manager.veteran.viral.2"],
-        "rival": ["manager.veteran.rival.1", "manager.veteran.rival.2"]
+        "rival": ["manager.veteran.rival.1", "manager.veteran.rival.2", "manager.veteran.rival.3"]
       }
     },
     {
@@ -71,7 +71,7 @@
       "lines": {
         "opening": ["manager.guardian.opening.1", "manager.guardian.opening.2"],
         "checkin.breakthrough": ["manager.guardian.checkin.breakthrough.1", "manager.guardian.checkin.breakthrough.2"],
-        "checkin.long_game": ["manager.guardian.checkin.long_game.1", "manager.guardian.checkin.long_game.2"],
+        "checkin.long_game": ["manager.guardian.checkin.long_game.1", "manager.guardian.checkin.long_game.2", "manager.guardian.checkin.long_game.3", "manager.guardian.checkin.long_game.4"],
         "checkin.overexposed": ["manager.guardian.checkin.overexposed.1", "manager.guardian.checkin.overexposed.2"],
         "checkin.hard_way": ["manager.guardian.checkin.hard_way.1", "manager.guardian.checkin.hard_way.2"],
         "first_scandal.low": ["manager.guardian.first_scandal.low.1", "manager.guardian.first_scandal.low.2"],
@@ -87,7 +87,7 @@
         "gate_passed": ["manager.guardian.gate_passed.1", "manager.guardian.gate_passed.2"],
         "gate_failed": ["manager.guardian.gate_failed.1", "manager.guardian.gate_failed.2"],
         "viral": ["manager.guardian.viral.1", "manager.guardian.viral.2"],
-        "rival": ["manager.guardian.rival.1", "manager.guardian.rival.2"]
+        "rival": ["manager.guardian.rival.1", "manager.guardian.rival.2", "manager.guardian.rival.3"]
       }
     }
   ],

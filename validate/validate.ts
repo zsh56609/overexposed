@@ -24,6 +24,7 @@ import {
   COUNTDOWN_LEVELS,
   PROMINENCES,
   REGISTERS,
+  SCRIPT_LINE_KINDS,
   RESOURCE_KEYS,
   scandalGroup,
   YEAR_ONLY_KEYS,
@@ -63,6 +64,7 @@ export interface RawContent {
   readonly awards: unknown;
   readonly press?: unknown;
   readonly managers?: unknown;
+  readonly scripts?: unknown;
 }
 
 export interface ValidationResult {
@@ -87,7 +89,7 @@ const ID = /^[a-z][a-z0-9_]*$/;
 const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
-  'id', 'kind', 'cost', 'nameKey', 'textKey', 'headlineKeys', 'register', 'inHandKeys',
+  'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'headlineKeys', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
@@ -570,7 +572,12 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     // A card's rules text; a scandal has none — the interface tells its rules from its effects.
     if (c.kind === 'scandal') {
       if (c.textKey !== undefined) v.error('schema', `${where}.textKey`, 'a scandal has no rules text: its in-hand lines are inHandKeys');
-    } else v.key(c.textKey, `${where}.textKey`);
+      // Its flavour line is its in-hand line (round 2c).
+      if (c.flavorKey !== undefined) v.error('schema', `${where}.flavorKey`, "a scandal's flavour line is its in-hand line");
+    } else {
+      v.key(c.textKey, `${where}.textKey`);
+      if (c.flavorKey !== undefined) v.key(c.flavorKey, `${where}.flavorKey`);
+    }
     if (c.playable !== undefined && typeof c.playable !== 'boolean') v.error('schema', `${where}.playable`, 'must be a boolean');
     if (c.tags !== undefined && (!Array.isArray(c.tags) || !c.tags.every(isStr))) {
       v.error('schema', `${where}.tags`, 'must be an array of strings');
@@ -946,6 +953,7 @@ function checkProse(
     const headlines = Array.isArray(c.headlineKeys) ? c.headlineKeys.filter(written) : [];
     if (headlines.length === 0) v.warn('prose', where, c.register === undefined ? 'no headline and no register' : 'no headline');
     else if (c.register === undefined) v.warn('prose', where, 'headline has no register');
+    if (!written(c.flavorKey)) v.warn('prose', where, 'no flavour line');
   }
   // Endings, two levels: a major shows its name and goal line, a minor its name and text.
   for (const m of endings.majors) {
@@ -1115,6 +1123,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   checkReferences(v, rules, cards);
   checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)));
   checkManagers(v, raw.managers, rules, raw.endings);
+  checkScripts(v, raw.scripts, rules);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1374,6 +1383,39 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
     v.int(stuck.heatTierFrom, `${at}.stuck.heatTierFrom`, [0, Math.max(0, tierCount('heat') - 1)]);
     v.int(stuck.months, `${at}.stuck.months`, [1, v.totalTurns]);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Desk scripts (content/scripts.json, round 2c): the script on an actor's desk, by fame band.
+
+function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
+  const file = 'content/scripts.json';
+  if (raw === undefined) return;
+  if (!isObj(raw)) return v.error('schema', file, 'must be { bands, scripts }');
+  v.fields(raw, ['bands', 'scripts'], file);
+  const hype = rules && isObj(rules.tiers) && isObj(rules.tiers.hype) && Array.isArray(rules.tiers.hype.nameKeys) ? rules.tiers.hype.nameKeys.length : 1;
+  const bands = checkList(v, raw.bands, `${file} bands`, 'band', (b, where) => {
+    v.fields(b, ['id', 'from'], where);
+    v.int(b.from, `${where}.from`, [0, Math.max(0, hype - 1)]);
+  });
+  if (bands[0]?.from !== 0) v.error('ranges', `${file} bands`, 'the first band must start at tier 0, so every fame tier has one');
+  if (bands.some((b, i) => i > 0 && !((b.from as number) > (bands[i - 1]?.from as number)))) v.error('ranges', `${file} bands`, 'must rise strictly');
+  const bandIds = new Set(bands.map((b) => b.id));
+  const scripts = checkList(v, raw.scripts, `${file} scripts`, 'script', (s, where) => {
+    v.fields(s, ['id', 'band', 'headingKey', 'lines'], where);
+    if (!bandIds.has(s.band)) v.error('references', `${where}.band`, `no band ${q(s.band)}`);
+    v.key(s.headingKey, `${where}.headingKey`);
+    if (!Array.isArray(s.lines) || s.lines.length === 0) return v.error('schema', `${where}.lines`, 'must be a non-empty list of { key, kind }');
+    const kinds: readonly unknown[] = SCRIPT_LINE_KINDS;
+    s.lines.forEach((line, i) => {
+      const at = `${where}.lines[${i}]`;
+      if (!isObj(line)) return v.error('schema', at, 'must be { key, kind }');
+      v.fields(line, ['key', 'kind'], at);
+      v.key(line.key, `${at}.key`);
+      if (!kinds.includes(line.kind)) v.error('schema', `${at}.kind`, `must be one of ${SCRIPT_LINE_KINDS.join(', ')}, got ${q(line.kind)}`);
+    });
+  });
+  for (const b of bandIds) if (!scripts.some((s) => s.band === b)) v.warn('structure', `${file} band ${String(b)}`, 'has no script');
 }
 
 /** The content budget: a ceiling per kind (CONTENT_BUDGET), not a target. */

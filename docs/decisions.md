@@ -6,6 +6,48 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2c, Part B: draft v7
+
+Draft v7 is saved verbatim (docs/writing/draft-v7.md) and committed on its
+own (a82ba21) before any import. Part A imported its tooltips, date line
+and goals-board lines. Part B imports:
+- the variants for 14 cards and 4 scandals, and the two edge-variant
+  replacements;
+- a flavour line for every card (`flavorKey`);
+- 24 world stories and 9 fame filler lines;
+- the managers' extra check-in and rival lines, and the perk texts (the
+  choice between them is Part F's);
+- the desk scripts (`content/scripts.json`, for the visual phase).
+
+The sign-offs, quiet-month lines and last words land with Part C, and the
+three new screen cards with Part E.
+
+Read against voice.md — every variant correct in every branch and at
+every fame tier — seven lines may fail. They are imported as written, for
+the author:
+- **Apology Tour, "THE {SUBJECT} SAYS SORRY — AGAIN"**, and **Burnout,
+  "FRIENDS WORRY AS THE {SUBJECT} CANCELS AGAIN"**: on the run's first
+  Apology Tour, or its first Burnout, there was no earlier apology or
+  cancellation.
+- **Old Rumor's in-hand line, "Every advert you're in gets a comment about
+  it."**: Old Rumor is blamed on any money card, most often Side Gig or
+  Cover Single from the starting deck, so the player may have made no
+  advert. Cash Grab was reworded in v6 for the same reason.
+- **Dex's rival line, "Juno Vale had a better month than you. Fix that."**:
+  the rival trigger fires whenever her beat leads a paper. That includes
+  her bad months — the crash arc's meltdown and cancelled tour, the fade
+  arc's stall and "whatever happened" — and months the player out-shone
+  her.
+- **Public Feud's in-hand line, "Every interviewer wants you to take a
+  side."**: mild. While Unknown or Noticed the world barely notices a
+  scandal (fame amplifies scandal).
+- **"VILLAGE FETE'S GIANT MARROW DISQUALIFIED"** is an any-season story,
+  but a fete and a giant marrow belong to late summer: it can print in
+  December.
+- **World Tour's new variant** almost repeats its first one: "The tour is
+  announced; the first dates sell out before lunch." against "The tour is
+  announced. The first nights sold out before lunch."
+
 ## 2026-09-30 — Round 2c, Part A: the stat bar, the date, the goals board
 
 - **The order** is the author's: hype · craft · heat · next scandal · money ·

@@ -29,6 +29,8 @@ checks in round 2c (2026-09-30).
 `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
 `lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (display only: the press subject, the lead paper, the managers) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+`flavorKey` (round 2c): a non-scandal's flavour line, italic on its face; a
+scandal's flavour line is its in-hand line.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
@@ -195,6 +197,14 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
 - `calendar`: `startMonth` (1–12) and `startYear`, the date of the first
   month of play. /core's `calendarDate` gives each month its calendar
   month and year, its place in its season, and the months left.
+
+## Desk scripts — `content/scripts.json`
+
+Round 2c, for the visual phase: the script on an actor's desk improves with
+fame. `bands`: `{ id, from }`, fame tiers (0-based) from which a band holds
+— low from Unknown, mid from Rising, high from Known. `scripts`: `id`,
+`band`, `headingKey`, and `lines`, each `{ key, kind }` — `you` (the
+player's line, highlighted like an actor's copy), `other`, or `action`.
 
 ## i18n keys
 

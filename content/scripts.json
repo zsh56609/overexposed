@@ -1,0 +1,91 @@
+{
+  "bands": [
+    { "id": "low", "from": 0 },
+    { "id": "mid", "from": 2 },
+    { "id": "high", "from": 3 }
+  ],
+  "scripts": [
+    {
+      "id": "low_1",
+      "band": "low",
+      "headingKey": "script.low.1.heading",
+      "lines": [
+        { "key": "script.low.1.line.1", "kind": "other" },
+        { "key": "script.low.1.line.2", "kind": "you" },
+        { "key": "script.low.1.line.3", "kind": "other" }
+      ]
+    },
+    {
+      "id": "low_2",
+      "band": "low",
+      "headingKey": "script.low.2.heading",
+      "lines": [
+        { "key": "script.low.2.line.1", "kind": "you" },
+        { "key": "script.low.2.line.2", "kind": "action" }
+      ]
+    },
+    {
+      "id": "low_3",
+      "band": "low",
+      "headingKey": "script.low.3.heading",
+      "lines": [
+        { "key": "script.low.3.line.1", "kind": "you" },
+        { "key": "script.low.3.line.2", "kind": "action" }
+      ]
+    },
+    {
+      "id": "mid_1",
+      "band": "mid",
+      "headingKey": "script.mid.1.heading",
+      "lines": [
+        { "key": "script.mid.1.line.1", "kind": "other" },
+        { "key": "script.mid.1.line.2", "kind": "you" },
+        { "key": "script.mid.1.line.3", "kind": "other" }
+      ]
+    },
+    {
+      "id": "mid_2",
+      "band": "mid",
+      "headingKey": "script.mid.2.heading",
+      "lines": [
+        { "key": "script.mid.2.line.1", "kind": "you" }
+      ]
+    },
+    {
+      "id": "mid_3",
+      "band": "mid",
+      "headingKey": "script.mid.3.heading",
+      "lines": [
+        { "key": "script.mid.3.line.1", "kind": "you" },
+        { "key": "script.mid.3.line.2", "kind": "other" }
+      ]
+    },
+    {
+      "id": "high_1",
+      "band": "high",
+      "headingKey": "script.high.1.heading",
+      "lines": [
+        { "key": "script.high.1.line.1", "kind": "action" },
+        { "key": "script.high.1.line.2", "kind": "you" }
+      ]
+    },
+    {
+      "id": "high_2",
+      "band": "high",
+      "headingKey": "script.high.2.heading",
+      "lines": [
+        { "key": "script.high.2.line.1", "kind": "action" },
+        { "key": "script.high.2.line.2", "kind": "you" }
+      ]
+    },
+    {
+      "id": "high_3",
+      "band": "high",
+      "headingKey": "script.high.3.heading",
+      "lines": [
+        { "key": "script.high.3.line.1", "kind": "action" },
+        { "key": "script.high.3.line.2", "kind": "you" }
+      ]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ export const CONTENT_FILES = {
   awards: 'content/awards.json',
   press: 'content/press.json',
   managers: 'content/managers.json',
+  scripts: 'content/scripts.json',
 } as const satisfies Record<keyof RawContent, string>;
 
 export function readJson(relPath: string): unknown {
@@ -34,6 +35,7 @@ export function loadRawContent(): RawContent {
     awards: readJson(CONTENT_FILES.awards),
     press: readJson(CONTENT_FILES.press),
     managers: readJson(CONTENT_FILES.managers),
+    scripts: readJson(CONTENT_FILES.scripts),
   };
 }
 

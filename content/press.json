@@ -18,6 +18,11 @@
         { "key": "paper.flash.world.12" },
         { "key": "paper.flash.world.13" },
         { "key": "paper.flash.world.14" },
+        { "key": "paper.flash.world.21" },
+        { "key": "paper.flash.world.22" },
+        { "key": "paper.flash.world.23" },
+        { "key": "paper.flash.world.24" },
+        { "key": "paper.flash.world.25" },
         { "key": "paper.flash.world.15", "act": 1 },
         { "key": "paper.flash.world.16", "act": 2 },
         { "key": "paper.flash.world.17", "act": 2 },
@@ -29,7 +34,7 @@
         { "id": "wedding", "beats": ["paper.flash.saga.wedding.1", "paper.flash.saga.wedding.2", "paper.flash.saga.wedding.3", "paper.flash.saga.wedding.4"] },
         { "id": "hedge", "beats": ["paper.flash.saga.hedge.1", "paper.flash.saga.hedge.2", "paper.flash.saga.hedge.3", "paper.flash.saga.hedge.4"] }
       ],
-      "fillerKeys": ["paper.flash.filler.1", "paper.flash.filler.2", "paper.flash.filler.3", "paper.flash.filler.4", "paper.flash.filler.5"]
+      "fillerKeys": ["paper.flash.filler.1", "paper.flash.filler.2", "paper.flash.filler.3", "paper.flash.filler.4", "paper.flash.filler.5", "paper.flash.filler.6", "paper.flash.filler.7", "paper.flash.filler.8"]
     },
     {
       "id": "bside",
@@ -59,6 +64,12 @@
         { "key": "paper.bside.world.22" },
         { "key": "paper.bside.world.23" },
         { "key": "paper.bside.world.24" },
+        { "key": "paper.bside.world.29" },
+        { "key": "paper.bside.world.30" },
+        { "key": "paper.bside.world.31" },
+        { "key": "paper.bside.world.32" },
+        { "key": "paper.bside.world.33" },
+        { "key": "paper.bside.world.34" },
         { "key": "paper.bside.world.25", "act": 1 },
         { "key": "paper.bside.world.26", "act": 2 },
         { "key": "paper.bside.world.27", "act": 3 },
@@ -69,7 +80,7 @@
         { "id": "venue", "beats": ["paper.bside.saga.venue.1", "paper.bside.saga.venue.2", "paper.bside.saga.venue.3", "paper.bside.saga.venue.4"] }
       ],
       "spilloverKeys": ["paper.bside.spillover.1", "paper.bside.spillover.2", "paper.bside.spillover.3"],
-      "fillerKeys": ["paper.bside.filler.1", "paper.bside.filler.2", "paper.bside.filler.3", "paper.bside.filler.4"]
+      "fillerKeys": ["paper.bside.filler.1", "paper.bside.filler.2", "paper.bside.filler.3", "paper.bside.filler.4", "paper.bside.filler.5", "paper.bside.filler.6", "paper.bside.filler.7"]
     },
     {
       "id": "marquee",
@@ -95,6 +106,19 @@
         { "key": "paper.marquee.world.18" },
         { "key": "paper.marquee.world.19" },
         { "key": "paper.marquee.world.20" },
+        { "key": "paper.marquee.world.25" },
+        { "key": "paper.marquee.world.26" },
+        { "key": "paper.marquee.world.27" },
+        { "key": "paper.marquee.world.28" },
+        { "key": "paper.marquee.world.29" },
+        { "key": "paper.marquee.world.30" },
+        { "key": "paper.marquee.world.31" },
+        { "key": "paper.marquee.world.32" },
+        { "key": "paper.marquee.world.33" },
+        { "key": "paper.marquee.world.34" },
+        { "key": "paper.marquee.world.35" },
+        { "key": "paper.marquee.world.36" },
+        { "key": "paper.marquee.world.37" },
         { "key": "paper.marquee.world.21", "act": 1 },
         { "key": "paper.marquee.world.22", "act": 2 },
         { "key": "paper.marquee.world.23", "act": 3 },
@@ -105,7 +129,7 @@
         { "id": "streamer", "beats": ["paper.marquee.saga.streamer.1", "paper.marquee.saga.streamer.2", "paper.marquee.saga.streamer.3", "paper.marquee.saga.streamer.4"] }
       ],
       "spilloverKeys": ["paper.marquee.spillover.1", "paper.marquee.spillover.2", "paper.marquee.spillover.3"],
-      "fillerKeys": ["paper.marquee.filler.1", "paper.marquee.filler.2", "paper.marquee.filler.3", "paper.marquee.filler.4"]
+      "fillerKeys": ["paper.marquee.filler.1", "paper.marquee.filler.2", "paper.marquee.filler.3", "paper.marquee.filler.4", "paper.marquee.filler.5", "paper.marquee.filler.6", "paper.marquee.filler.7"]
     }
   ],
   "route": {
