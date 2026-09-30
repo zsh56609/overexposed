@@ -45,6 +45,7 @@ import {
   calendarLabel,
   cardName,
   cardFlavor,
+  offerLabels,
   cardRuleLines,
   cardText,
   costLabel,
@@ -742,6 +743,7 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
   const c = s.content;
   const cfg = c.rules.draft;
   if (!s.draft) return null;
+  const extraLabels = offerLabels(s);
   return (
     <div className="draft">
       <div className="row">
@@ -753,11 +755,12 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
           {rerollLabel(s)}
         </button>
       </div>
-      <div className="cards">
+      <div className="cards" style={{ '--n': s.draft.offer.length } as CSSProperties}>
         {s.draft.offer.map((id) => {
           const clauses = previewDraftCard(s, id);
           return (
-            <div key={id} className={`card offer face-${cardFace(c, id) ?? 'none'}`}>
+            <div key={id} className={`card offer face-${cardFace(c, id) ?? 'none'}${extraLabels.has(id) ? ' extra' : ''}`}>
+              {extraLabels.has(id) && <span className="extra-label">{extraLabels.get(id)}</span>}
               <span className="card-head">
                 <strong>{cardName(c, id)}</strong>
                 {costLabel(c, id) && <span className="muted">{costLabel(c, id)}</span>}

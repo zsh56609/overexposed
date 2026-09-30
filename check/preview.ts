@@ -61,7 +61,7 @@ import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
-import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, seasonLabel } from '../ui/text.ts';
+import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, seasonLabel } from '../ui/text.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -72,7 +72,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -282,6 +282,28 @@ function checkDraftPhase(s: GameState, seed: number): void {
     report('lane draft', seed, s.turn, `offer ${s.draft?.offer.join()} holds no ${lane} card`);
   }
   if (lane !== null) counts.laneOffers++;
+  // Dex knows someone (round 2c, F1): a fresh offer holds the draft's cards plus the manager's extra cards
+  // while the pool has them, the extras are on offer, and the draft panel labels exactly those cards with
+  // the manager's line.
+  const dr = s.draft;
+  if (dr) {
+    const perk = getManager(s.content, s.manager)?.perk;
+    const size = s.content.rules.draft.offerSize;
+    if (dr.extras.some((id) => !dr.offer.includes(id))) report('extra card', seed, s.turn, `extras ${dr.extras.join()} are not all on offer (${dr.offer.join()})`);
+    const dealt = s.events.find((e) => e.type === 'draftOffer');
+    if (dealt?.type === 'draftOffer') {
+      counts.offers++;
+      const want = Math.min(size + (perk?.extraOffer ?? 0), pool.length);
+      if (dr.offer.length !== want) report('extra card', seed, s.turn, `offer of ${dr.offer.length}, ${want} due`);
+      if (dr.extras.length !== Math.max(0, want - size)) report('extra card', seed, s.turn, `${dr.extras.length} extra cards, ${Math.max(0, want - size)} due`);
+      if (dealt.cardIds.join() !== dr.offer.join()) report('extra card', seed, s.turn, `the draftOffer event (${dealt.cardIds.join()}) is not the offer (${dr.offer.join()})`);
+      if (dr.extras.length > 0) counts.extraOffers++;
+    }
+    const labels = offerLabels(s);
+    const line = perk?.extraOfferKey ? t(perk.extraOfferKey) : '';
+    if (labels.size !== dr.extras.length || dr.extras.some((id) => labels.get(id) !== line) || (dr.extras.length > 0 && (line === '' || line.startsWith('manager.'))))
+      report('extra label', seed, s.turn, `labels ${[...labels].map(([id, l]) => `${id}: ${l}`).join('; ')} for extras ${dr.extras.join()}`);
+  }
   // The reroll's price and its free label (round 2b) against the real reroll.
   if (legalActions(s).some((a) => a.type === 'DRAFT_REROLL')) {
     counts.rerolls++;
@@ -518,7 +540,7 @@ console.log(
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
-    `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
+    `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

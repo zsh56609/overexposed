@@ -181,7 +181,7 @@ function draftPick(state: GameState, cardId: string): GameState {
   const card = addCard(d, cardId, 'deck');
   d.events.push({ type: 'draftPick', uid: card.uid, cardId });
   const offer = dr.offer.filter((id) => id !== cardId);
-  d.draft = { ...dr, offer, picksLeft: dr.picksLeft - 1 };
+  d.draft = { ...dr, offer, extras: dr.extras.filter((id) => id !== cardId), picksLeft: dr.picksLeft - 1 };
   if (d.draft.picksLeft === 0 || offer.length === 0) {
     d.draft = null;
     startTurn(d);
@@ -207,8 +207,8 @@ function draftReroll(state: GameState): GameState {
   const cost = rerollCost(state);
   addResource(d, 'capital', -cost);
   d.rerolls.push({ act: d.act, cost });
-  const offer = rollOffer(d);
-  d.draft = { ...dr, offer, picksLeft: Math.min(dr.picksLeft, offer.length), rerollsUsed: dr.rerollsUsed + 1 };
+  const { offer, extras } = rollOffer(d);
+  d.draft = { ...dr, offer, extras, picksLeft: Math.min(dr.picksLeft, offer.length), rerollsUsed: dr.rerollsUsed + 1 };
   d.events.push({ type: 'draftReroll', cost }, { type: 'draftOffer', act: d.act, cardIds: offer });
   if (d.draft.picksLeft === 0) {
     d.draft = null;
@@ -281,8 +281,10 @@ function endTurn(state: GameState): GameState {
 
   // 4. The manager's month-end effects (round 2b: Mags's relief), applied like a card's effects once the
   // month's check has resolved and its turnEnd is recorded: the heat formula is untouched, the END TURN
-  // preview's count stays exact, and the relief shows in the next month's starting heat.
-  applyEffects(d, getManager(d.content, d.manager)?.perk.monthEnd);
+  // preview's count stays exact, and the relief shows in the next month's starting heat. Only in the months
+  // the perk lists, when it lists them (round 2c: the ends of months 3, 6 and 9).
+  const perk = getManager(d.content, d.manager)?.perk;
+  if (!perk?.monthEndTurns || perk.monthEndTurns.includes(d.turn)) applyEffects(d, perk?.monthEnd);
 
   // 5. Next turn (its draft first, if it has one), or this act's Gate.
   if (turnInAct(d) >= rules.turnsPerAct) offerGates(d);
@@ -316,22 +318,23 @@ function chooseGate(state: GameState, gateId: string): GameState {
 export function beginTurn(d: Draft): void {
   const cfg = d.content.rules.draft;
   if (!cfg || cfg.picks <= 0 || !cfg.atTurns.includes(turnInAct(d))) return startTurn(d);
-  const offer = rollOffer(d);
+  const { offer, extras } = rollOffer(d);
   if (offer.length === 0) {
     fault(d, 'noDraftPool', String(d.act));
     return startTurn(d);
   }
   d.phase = 'draft';
-  d.draft = { offer, picksLeft: Math.min(cfg.picks, offer.length), extraPicksBought: 0, rerollsUsed: 0 };
+  d.draft = { offer, extras, picksLeft: Math.min(cfg.picks, offer.length), extraPicksBought: 0, rerollsUsed: 0 };
   d.events.push({ type: 'draftOffer', act: d.act, cardIds: offer });
 }
 
 /**
  * Seeded sample of distinct draftable cards whose actMin has been reached, in content order. Lane-weighted
  * (round 2c): once a lane is established, the offer holds at least `draft.laneCards` of that lane's cards
- * when the pool has them — drawn first — and the rest are drawn from the whole pool as before.
+ * when the pool has them — drawn first — and the rest are drawn from the whole pool as before. The
+ * manager's extra cards (round 2c: Dex knows someone) are drawn last, from what is left: `extras`.
  */
-function rollOffer(d: Draft): string[] {
+function rollOffer(d: Draft): { offer: string[]; extras: string[] } {
   const cfg = d.content.rules.draft;
   const pool = d.content.draftPool.filter((id) => (getCard(d.content, id)?.actMin ?? 1) <= d.act);
   const n = Math.min(cfg.offerSize, pool.length);
@@ -347,7 +350,9 @@ function rollOffer(d: Draft): string[] {
   const lane = d.establishedLane;
   if (lane !== null && (cfg.laneCards ?? 0) > 0) draw(pool.filter((id) => getCard(d.content, id)?.lane === lane), Math.min(cfg.laneCards ?? 0, n));
   draw(pool.filter((id) => !picked.has(id)), n - picked.size);
-  return pool.filter((id) => picked.has(id));
+  const before = new Set(picked);
+  draw(pool.filter((id) => !picked.has(id)), getManager(d.content, d.manager)?.perk.extraOffer ?? 0);
+  return { offer: pool.filter((id) => picked.has(id)), extras: pool.filter((id) => picked.has(id) && !before.has(id)) };
 }
 
 /** Refresh slots and draw to hand size. */

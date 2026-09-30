@@ -1,7 +1,7 @@
 // npm run sim:managers -- [--runs=1000] [--seed=20260929]
 //
 // The two managers side by side (round 2b): every persona plays the same seeds under each manager, and the
-// report shows per persona the major and minor endings, the scandals, the free rerolls taken (Dex) and the
+// report shows per persona the major and minor endings, the scandals, the picks of Dex's extra card and the
 // heat relieved (Mags) — so it can say whether either perk is strictly better — then how often each message
 // trigger fires, how many messages a month brings, and any trigger that never fires. Ids and numbers only.
 
@@ -34,6 +34,7 @@ interface Tally {
   scandalsHeld: number;
   crystallised: number;
   freeRerolls: number;
+  managerCardPicks: number;
   rerolls: number;
   heatRelieved: number;
   /** Per trigger line key: the times it fired (before the monthly cap), was shown, and the runs it fired in. */
@@ -44,7 +45,7 @@ interface Tally {
   perMonth: number[];
   capped: number;
 }
-const tally = (): Tally => ({ runs: 0, major: {}, minor: {}, scandalsHeld: 0, crystallised: 0, freeRerolls: 0, rerolls: 0, heatRelieved: 0, fired: {}, shown: {}, firedRuns: {}, perMonth: [], capped: 0 });
+const tally = (): Tally => ({ runs: 0, major: {}, minor: {}, scandalsHeld: 0, crystallised: 0, freeRerolls: 0, managerCardPicks: 0, rerolls: 0, heatRelieved: 0, fired: {}, shown: {}, firedRuns: {}, perMonth: [], capped: 0 });
 const add = (r: Record<string, number>, k: string, n = 1) => (r[k] = (r[k] ?? 0) + n);
 
 const results = new Map<string, Map<PersonaId | 'players', Tally>>();
@@ -74,6 +75,7 @@ for (const manager of managers) {
         target.scandalsHeld += record.scandalsAtEnd;
         target.crystallised += record.scandalsCrystallised;
         target.freeRerolls += record.freeRerolls;
+        target.managerCardPicks += record.managerCardPicks;
         target.rerolls += record.rerolls;
         target.heatRelieved += record.heatRelieved;
         const firedThisRun = new Set<string>();
@@ -104,14 +106,14 @@ const get = (m: string, p: PersonaId | 'players') => results.get(m)?.get(p) as T
 lines.push(`MANAGERS  seed=${SEED}  ${RUNS} runs x ${PERSONA_IDS.length} personas x ${managers.length} managers  (${((performance.now() - t0) / 1000).toFixed(1)}s)`);
 lines.push('every persona plays the same seeds under each manager; * = probe, not in "players"', '');
 
-lines.push('SIDE BY SIDE  (major endings; scandals held at year end and crystallised per run; free rerolls and heat relieved per run)');
-lines.push(pad('persona', 14) + pad('manager', 10) + majors.map((m) => m.padStart(13)).join('') + 'held'.padStart(7) + 'cryst.'.padStart(8) + 'rerolls'.padStart(9) + 'free'.padStart(7) + 'relief'.padStart(8));
+lines.push("SIDE BY SIDE  (major endings; scandals held at year end and crystallised per run; rerolls, free rerolls, picks of the manager's extra card and heat relieved per run)");
+lines.push(pad('persona', 14) + pad('manager', 10) + majors.map((m) => m.padStart(13)).join('') + 'held'.padStart(7) + 'cryst.'.padStart(8) + 'rerolls'.padStart(9) + 'free'.padStart(7) + 'extra'.padStart(7) + 'relief'.padStart(8));
 for (const p of rows) {
   for (const m of managers) {
     const t = get(m, p);
     lines.push(
       pad(label(p), 14) + pad(m, 10) + majors.map((id) => pct(t.major[id] ?? 0, t.runs).padStart(13)).join('') +
-        per(t.scandalsHeld, t.runs).padStart(7) + per(t.crystallised, t.runs).padStart(8) + per(t.rerolls, t.runs).padStart(9) + per(t.freeRerolls, t.runs).padStart(7) + per(t.heatRelieved, t.runs).padStart(8),
+        per(t.scandalsHeld, t.runs).padStart(7) + per(t.crystallised, t.runs).padStart(8) + per(t.rerolls, t.runs).padStart(9) + per(t.freeRerolls, t.runs).padStart(7) + per(t.managerCardPicks, t.runs).padStart(7) + per(t.heatRelieved, t.runs).padStart(8),
     );
   }
 }

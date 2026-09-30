@@ -8,7 +8,14 @@
       "quoteKey": "manager.veteran.quote",
       "descriptionKey": "manager.veteran.description",
       "tagKey": "manager.veteran.tag",
-      "perk": { "nameKey": "manager.veteran.perk.name", "effectKey": "manager.veteran.perk.effect", "freeRerollsPerAct": 1, "freeRerollKey": "manager.veteran.perk.reroll" },
+      "perk": {
+        "nameKey": "manager.veteran.perk.name",
+        "effectKey": "manager.veteran.perk.effect.d2",
+        "extraOffer": 1,
+        "extraOfferKey": "manager.veteran.perk.extra",
+        "freeRerollsPerAct": 1,
+        "freeRerollKey": "manager.veteran.perk.reroll"
+      },
       "sample": { "labelKey": "manager.veteran.sample.label", "key": "manager.veteran.sample.text" },
       "lines": {
         "opening": [["manager.veteran.opening.1", "manager.veteran.opening.1.b"], ["manager.veteran.opening.2", "manager.veteran.opening.2.b"]],
@@ -54,8 +61,9 @@
       "tagKey": "manager.guardian.tag",
       "perk": {
         "nameKey": "manager.guardian.perk.name",
-        "effectKey": "manager.guardian.perk.effect",
+        "effectKey": "manager.guardian.perk.effect.m1",
         "monthEnd": [{ "op": "resource", "target": "heat", "value": -1 }],
+        "monthEndTurns": [3, 6, 9],
         "monthEndKeys": ["manager.guardian.perk.relief.1", "manager.guardian.perk.relief.2", "manager.guardian.perk.relief.3"]
       },
       "sample": { "labelKey": "manager.guardian.sample.label", "key": "manager.guardian.sample.text" },

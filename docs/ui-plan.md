@@ -587,7 +587,9 @@ it.
     TURN preview names it by the perk ("Calms things down: Heat −1") and
     counts it in the heat carried. The reroll button shows Dex's free
     label while his free reroll lasts; the feed records a free reroll as
-    such. (2026-09-30)
+    such. Round 2c: Dex's extra card on each draft offer carries his
+    label ("Dex knows someone") above its name; Mags's relief prints
+    only at the ends of months 3, 6 and 9, where it lands. (2026-09-30)
 30. The world on the page (round 2b, Part D; design §3.3, §3.4). A saga's
     beat prints like any world story, in muted type; fame filler prints
     as the player's, in ink — it is about them. (2026-09-30)
@@ -612,7 +614,11 @@ it.
     two lines under the manager's name — the line, then its short second
     bubble. On the ending screen, after the rival's closing line and
     before "Play again", the manager has the last word: two bubbles for
-    the year's major, labelled with their name. (2026-09-30)
+    the year's major, labelled with their name. (2026-09-30) Round 2c,
+    Part F: with the last word, a four-award Headliner overflowed the
+    stage by 11px; the ending's story column now sits closer (tighter
+    gaps and padding, the awards at 0.86em), and five awards fit.
+    (2026-10-01)
 33. Cards (round 2c, Part D). Every card shows its flavour line in italics
     under its rules — a scandal's is its in-hand line. The cost shows only
     above one action ("2 actions"). The card's face and a lead story's
@@ -620,6 +626,12 @@ it.
     face is only a class on the card. A card without rules text (round
     2c's new screen cards) states its rules in the interface's words.
     (2026-09-30)
+34. The draft offer (round 2c, Part F). Dex's fourth card carries his
+    label above its name. The offer's type shrinks with its size — 0.95em
+    for three cards, 0.8em for four — and a draft card's requirements sit
+    under their label at the card's full width: the tallest cards (Indie
+    Label, Legal Team) otherwise pushed the offer into the season's gates
+    below it. (2026-10-01)
 
 ### Still open
 

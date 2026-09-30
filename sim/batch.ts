@@ -91,8 +91,10 @@ export interface RunRecord {
   readonly draftPicks: number;
   readonly extraPicks: number;
   readonly rerolls: number;
-  /** Rerolls that cost nothing: the manager's free reroll (Dex). */
+  /** Rerolls that cost nothing: a manager's free reroll (round 2b's Dex). */
   readonly freeRerolls: number;
+  /** Draft picks of a card the manager brought to the offer (round 2c: Dex knows someone). */
+  readonly managerCardPicks: number;
   /** Heat the manager's month-end effects took off (Mags's relief). */
   readonly heatRelieved: number;
   /** Capital spent on extra picks and rerolls. */
@@ -155,15 +157,29 @@ function removalCards(content: Content): ReadonlySet<string> {
 
 /** How a run is set up beyond its persona and seed: the manager chosen at the opening (round 2b). */
 export interface RunOptions {
-  /** Default: the first manager in content. The persona never chooses: the batch runs every band once per manager. */
+  /**
+   * Default: the first manager in content. The persona never chooses: the batch runs every band once per manager.
+   * `none` (round 2c): the base game — the run's content without managers, so no perk, no messages.
+   */
   readonly manager?: string;
 }
 
-/** The managers a sim run covers: the one asked for (--manager=<id>), or every manager in content, in order. */
+/** The manager id that runs the base game, without managers (--manager=none). */
+export const NO_MANAGER = 'none';
+
+/** The content a run under `manager` plays: without managers for the base game. */
+export function contentFor(content: Content, manager: string | undefined): Content {
+  if (manager !== NO_MANAGER) return content;
+  const { managers: _, ...bare } = content;
+  return bare;
+}
+
+/** The managers a sim run covers: the one asked for (--manager=<id>, or none), or every manager in content, in order. */
 export function managersToRun(content: Content, asked: string | undefined): (string | undefined)[] {
   const ids = (content.managers?.managers ?? []).map((m) => m.id);
   if (asked === undefined) return ids.length > 0 ? ids : [undefined];
-  if (!ids.includes(asked)) throw new Error(`unknown manager ${asked} (${ids.join(', ') || 'content has none'})`);
+  if (asked === NO_MANAGER) return [NO_MANAGER];
+  if (!ids.includes(asked)) throw new Error(`unknown manager ${asked} (${[...ids, NO_MANAGER].join(', ')})`);
   return [asked];
 }
 
@@ -180,6 +196,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   let extraPicks = 0;
   let rerolls = 0;
   let freeRerolls = 0;
+  let managerCardPicks = 0;
   let heatRelieved = 0;
   let draftSpend = 0;
   let scandalsCrystallised = 0;
@@ -257,7 +274,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   };
 
   try {
-    state = createInitialState(seed, content, { strict: true });
+    state = createInitialState(seed, contentFor(content, options.manager), { strict: true });
     tally(state, null);
     checkInvariants(state);
     trace?.(state, null);
@@ -279,6 +296,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
         state.phase === 'manager'
           ? (legal.find((a) => a.type === 'CHOOSE_MANAGER' && a.managerId === options.manager) ?? (legal[0] as Action))
           : policy.choose(state, legal, decisions);
+      if (action.type === 'DRAFT_PICK' && state.draft?.extras.includes(action.cardId)) managerCardPicks++;
       state = reduce(state, action);
       actions++;
       tally(state, action);
@@ -318,6 +336,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     extraPicks,
     rerolls,
     freeRerolls,
+    managerCardPicks,
     heatRelieved,
     draftSpend,
     capital,

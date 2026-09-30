@@ -25,10 +25,11 @@ export const BANDS = {
   /**
    * Player-like, pooled: every minor ending reached in at least this share of runs — "reachable", meaning
    * not effectively impossible, not "common". Rare minors are the collection's achievements; the axes are
-   * not bent to inflate them. 1.4% (round b59f9d6): The Redemption Arc needs a genuine comeback and sits at
-   * 1.46–1.84%, within seed noise of 1.5%.
+   * not bent to inflate them. 1.0%, one run in a hundred (round 2c, Part F; 1.4% from round b59f9d6): The
+   * Redemption Arc needs a genuine comeback, and under Mags, whose relief flattens the scandal peaks a
+   * comeback starts from, it sits at 1.20–1.46% — 5–7% of comeback-style runs.
    */
-  minorReachMin: 0.014,
+  minorReachMin: 0.01,
   /** A probe ignoring heat must end on the damaged side of the scandal axis in more than this share. */
   probeHeatCollapseMin: 0.8,
   /** A probe ignoring hype must end on the famous side of the hype axis in less than this share. */

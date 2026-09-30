@@ -62,6 +62,15 @@ export const cardFlavor = (c: ContentIndex, id: string): string | null => {
   const key = getCard(c, id)?.flavorKey;
   return key ? t(key) : null;
 };
+/**
+ * The labels on a draft offer (round 2c): each card the manager brought, with their line — "Dex knows
+ * someone" — read from the reducer's offer.
+ */
+export function offerLabels(s: { readonly content: ContentIndex; readonly manager: string | null; readonly draft: { readonly extras: readonly string[] } | null }): Map<string, string> {
+  const key = getManager(s.content, s.manager)?.perk.extraOfferKey;
+  return new Map((s.draft?.extras ?? []).map((id) => [id, key ? t(key) : '']));
+}
+
 /** A card's cost, shown only above one action (round 2c): "2 actions". */
 export const costLabel = (c: ContentIndex, id: string): string | null => {
   const cost = getCard(c, id)?.cost ?? 1;

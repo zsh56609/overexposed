@@ -6,6 +6,7 @@
 // and at every play state, with the floating preview open over each card position and over END TURN,
 // every card and END TURN — the hovered one included — must be the element a click at its centre, and
 // near each corner, would reach. A hover that opens no preview fails too, so the check is never vacuous.
+// At every draft (round 2c): at most one extra card — Dex's — labelled with his line, the label inside its card.
 //
 // Runs the Vite dev server in-process and needs Chrome or Edge (CHROME_PATH overrides the search).
 // Usage: node check/clicks.ts [--runs=4] [--size=1280x720]
@@ -48,7 +49,7 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const blocked = {};
   const note = (m) => { blocked[m] = (blocked[m] || 0) + 1; };
-  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0 };
+  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0 };
   const POINTS = [[0.5, 0.5], [0.12, 0.12], [0.88, 0.12], [0.12, 0.88], [0.88, 0.88]];
   const name = (el, cards, end) => (el === end ? 'END TURN' : 'card ' + (cards.indexOf(el) + 1) + ' of ' + cards.length);
   const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
@@ -71,6 +72,20 @@ const DRIVE = (runs: number) => `(async () => {
         const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
         take[rand(take.length)].click();
       } else if (document.querySelector('.draft')) {
+        // Dex knows someone (round 2c, F1): at most one extra card, labelled with the manager's line, inside its card.
+        stats.drafts++;
+        const extras = [...document.querySelectorAll('.draft .card.extra')];
+        if (extras.length > 0) stats.extraDrafts++;
+        if (extras.length > 1) note('a draft shows ' + extras.length + ' extra cards');
+        for (const x of extras) {
+          const label = x.querySelector('.extra-label');
+          const text = (label && label.textContent) || '';
+          if (!text || text.startsWith('manager.') || text.startsWith('TODO')) note('an extra card labelled "' + text + '"');
+          const a = label && label.getBoundingClientRect();
+          const b = x.getBoundingClientRect();
+          if (a && (a.left < b.left - 0.5 || a.right > b.right + 0.5 || a.top < b.top - 0.5 || a.bottom > b.bottom + 0.5)) note('an extra card label outside its card');
+        }
+        if (document.querySelectorAll('.draft .card.offer').length > 4) note('a draft shows more than four cards');
         const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled);
         take[rand(take.length)].click();
       } else if (document.querySelector('.gates')) {
@@ -150,11 +165,11 @@ try {
   const t0 = performance.now();
   const r = await send('Runtime.evaluate', { expression: DRIVE(RUNS), awaitPromise: true, returnByValue: true, timeout: 600_000 });
   if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? 'the page script failed');
-  const out = r.result?.result?.value as { runs: number; states: number; hovers: number; targets: number; points: number; blocked: [string, number][] };
+  const out = r.result?.result?.value as { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; blocked: [string, number][] };
   ws.close();
   console.log(
     `click-through check: ${out.runs} runs at ${WIDTH}x${HEIGHT}, ${out.states} states — ${out.hovers} previews opened, ` +
-      `${out.targets} targets hit-tested at ${out.points} points (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+      `${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
   );
   for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
   failed = out.blocked.length > 0 || out.runs < RUNS;

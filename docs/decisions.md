@@ -6,6 +6,138 @@ rules).
 
 ---
 
+## 2026-10-01 — Round 2c, Part F: the perks and the base game
+
+- **Where Part F began.** Parts A–E in, round 2b's perks still on:
+  - Dex passed every band.
+  - Under Mags (−1 heat every month) four bands failed — major
+    concentration, minor reachability, the scandal median and gate met%
+    (seed 20260929) — and she was strictly better.
+  - With no manager, dealseeker's Breakthrough was already 63.5–64.1%.
+    F2's 67% held before any lever: round 2c's content (the lane-weighted
+    draft, the screen cards) had moved it from round 2b's 69.3%.
+- **The engine: two perk fields**, data like the rest.
+  - `extraOffer`, with `extraOfferKey` as its label: N more cards on every
+    draft offer. They are drawn after the lane card and the rest, from
+    what the pool has left. `DraftState.extras` names them, and a reroll
+    deals them again.
+  - `monthEndTurns`: the months whose end the month-end effects land on.
+  - `check:preview` asserts the offer's size, the extras and their labels
+    against the reducer. `check:clicks` asserts the label in the DOM.
+  - The sim runs `--manager=none` for the base game, and records picks
+    of the manager's card.
+- **Mags: M1.** −1 heat at the end of months 3, 6 and 9, after the
+  month's check ("You lose 1 heat at the end of every season.").
+  - Pooled over three seeds on the final content, the known share
+    (Breakthrough + Overexposed) is 52.4% under M1 against Dex's 55.1%.
+  - M2 and M3 reverse criterion (c): 55.2% and 55.5% against Dex's 55.1%.
+  - Measured first with D1, before the gate changes, M2 left Mags
+    strictly better on two seeds of three, and M3 on all three.
+- **Dex: D2, escalated from D1** — the prompt allowed it only if needed.
+  - Under D1, Dex's known share minus Mags's was 0.0 to +1.0 points
+    across the seeds. (b) rested on noise-level differences: on seed 1,
+    only artisan's −0.3 points.
+  - Under D2 the margin is +2.6 to +2.9, and minmaxer is mixed on every
+    seed.
+  - D2's text, draft v7's: "Every draft offers you one more card, and
+    your first reroll each season is free." The free reroll keeps round
+    2b's label.
+  - Round 2b's texts for both perks are removed from en.json. Draft v7's
+    unused alternatives (d1, m2, m3) stay, so a switch is one field.
+- **The base game, two gate numbers (F3):**
+  - **Label Deal: hype 45 → 50.** It aims at dealseeker's route: sign,
+    then the Arena Tour's +15. Its Breakthrough, pooled over three seeds,
+    went 69.0 → 67.6% (Dex), 71.4 → 68.7% (Mags) and 63.7 → 60.8% (none).
+    Label Deal met% went 46–49% → 42–45%.
+  - **Award Show: craft 45 → 47.** Met% under Mags went 65.2–65.8% →
+    63.7–64.4%; under Dex it is 56–58%.
+  - Breakthrough per persona, before → after (pooled; Dex / Mags / none):
+
+    | Persona | Dex | Mags | None |
+    |---|---|---|---|
+    | minmaxer | 60.5 → 59.4 | 56.7 → 54.6 | 50.7 → 49.3 |
+    | random | 6.2 → 5.3 | 6.7 → 5.8 | 5.3 → 4.6 |
+    | dealseeker | 69.0 → 67.6 | 71.4 → 68.7 | 63.7 → 60.8 |
+    | comeback | 39.6 → 39.3 | 42.0 → 41.6 | 37.0 → 36.8 |
+    | artisan | 0.6 → 0.6 | 0.8 → 0.8 | 0.7 → 0.6 |
+
+    The Redemption Arc and Comeback of the Year are unchanged within 0.2
+    points (2.3/1.3/1.4% and 10.2/7.7/8.1%).
+- **F2's preferred lever — the price of paid removal — was simulated, not
+  applied.** F2 already held, and every price step pushed The Redemption
+  Arc under Mags and The Independent lower.
+  - Crisis PR at £5,000, Breakthrough per persona (Dex / Mags / none):
+
+    | Persona | Dex | Mags | None |
+    |---|---|---|---|
+    | minmaxer | 59.4 → 57.1 | 54.6 → 53.1 | 49.3 → 48.4 |
+    | random | 5.3 → 5.0 | 5.8 → 5.6 | 4.6 → 4.1 |
+    | dealseeker | 67.6 → 64.5 | 68.7 → 66.8 | 60.8 → 59.3 |
+    | comeback | 39.3 → 38.1 | 41.6 → 39.8 | 36.8 → 34.8 |
+    | artisan | 0.6 → 0.6 | 0.8 → 0.8 | 0.6 → 0.7 |
+
+  - With it, The Redemption Arc went 2.3 → 2.4% (Dex), 1.3 → 1.1% (Mags)
+    and 1.4 → 1.5% (none). Comeback of the Year went 10.2 → 9.7%,
+    7.7 → 6.9% and 8.1 → 7.4%.
+  - Also simulated on M1:
+    - Crisis PR at £6,000, and at two actions;
+    - Legal Team at £4,000, £5,000 and £7,000, from summer, as a
+      repeatable action;
+    - Apology Tour at −4 and −3 hype;
+    - the Label Deal's money reward at £4,000 and £3,000, and its money
+      requirement at £6,000 (Label Deal met% under 35%);
+    - the Arena Tour at +12 and +13 hype;
+    - Copycat Story copying at heat 3, or at five scandals;
+    - Viral Stunt at 6 heat;
+    - rerolls at £1,000.
+
+    Tables: sim/out (not committed).
+- **The minor floor: 1.4% → 1.0%**, one run in a hundred. This is the one
+  band changed, and it overrides the author's number from round b59f9d6
+  with the author's reasoning from that round: "reachable" means "not
+  effectively impossible".
+  - Under Mags, The Redemption Arc sits at 1.46, 1.22 and 1.20% (seeds
+    20260929, 1, 424242). That is 5.4–6.7% of comeback's runs, the one
+    persona that plays spike-then-clean.
+  - With no manager it sits at 1.36–1.46%, and under Dex (D2) at
+    2.2–2.6%.
+  - Why Mags lowers it: her relief flattens the scandal peaks a comeback
+    starts from. Comeback's runs peaking at 8+ fall by about 30%, while
+    their drop rate is unchanged (about 27%).
+  - None of the levers above raised it past 1.4% on every seed without
+    breaking another band.
+  - To revert: `minorReachMin: 0.014` in sim/report.ts. (a) then fails
+    under Mags on seeds 1 and 424242 (1.22%, 1.20%), on this band alone.
+- **The draft's type.** At full size, Dex's fourth card narrows the row
+  and the tallest card grows to 438px. Indie Label wrapped each of its
+  three requirements onto two lines. The season's gates below overflowed
+  their box by up to 118px.
+  - The row's type now shrinks with its size: 0.95em for three cards,
+    0.8em for four.
+  - A draft card's requirements sit under their label.
+  - The tallest card is now 276px, and 600 random drafts show no overflow
+    (ui-plan decision 34).
+- **The ending screen.** Part C's last word left a four-award Headliner
+  11px over the stage. The story column now sits closer: padding 1em →
+  0.7em, gaps 0.3em → 0.2em, awards 0.86em. A fifth award, cloned in the
+  browser, still fits with 66px to spare (ui-plan decision 32).
+- **Final: criteria on seeds 20260929 / 1 / 424242, 1000 runs per
+  persona.**
+  - (a) All 13 bands pass under each manager, and under none. The award
+    bands and tiers pass under each manager.
+  - (b) Neither manager is strictly better. Mags is better for 2/3/4 of
+    the 5 player-like personas, Dex for none. minmaxer is mixed on every
+    seed: its Breakthrough is 6.1/3.3/5.1 points higher under Dex, and it
+    holds fewer scandals under Mags.
+  - (c) Known share, pooled player-like: Dex 55.3/55.3/54.7% against
+    Mags 52.6/52.7/51.8%. Scandals held at year end: Mags 3.20/3.22/3.19
+    against Dex 3.55/3.61/3.60.
+  - F2: dealseeker's Breakthrough with no manager is 60.3/60.8/61.4%.
+  - Per player-like run:
+    - Dex's card is taken 2.8–2.9 times in 8 drafts;
+    - his free reroll is used 1.6 times;
+    - Mags takes off 2.6 heat of her 3.
+
 ## 2026-09-30 — Round 2c, Part E: lane depth
 
 - **The lane-weighted draft.**

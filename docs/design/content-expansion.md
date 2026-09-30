@@ -289,11 +289,16 @@ Guardian.
 - **The choice**, before month 1, on a screen showing each manager's
   perk. The choice is state; no GameEvent records it.
 - **One small perk each**, pulling toward the manager's philosophy — data
-  the engine applies, never a special case. Dex, "Knows everyone": the
-  first draft reroll each season is free. Mags, "Calms things down": −1
-  heat at the end of every month, after the month's check (the heat
-  formula is untouched; docs/decisions.md). Neither may be strictly
+  the engine applies, never a special case. Neither may be strictly
   better than the other.
+  - Dex, "Knows everyone" (round 2c, D2): every draft offers one more
+    card, labelled "Dex knows someone", and the first reroll each season
+    is free.
+  - Mags, "Calms things down" (round 2c, M1): −1 heat at the end of each
+    of the first three seasons (months 3, 6 and 9), after the month's
+    check (the heat formula is untouched; docs/decisions.md).
+  - Round 2b's perks — Dex's free reroll alone, Mags's −1 heat every
+    month — left Mags strictly better.
 - **Messages** are derived from the run's history each month, like the
   front pages. The triggers: the opening; a check-in at the first month
   of summer, autumn and winter, keyed by the major the year would end in

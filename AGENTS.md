@@ -95,7 +95,7 @@ End-of-turn resolution, in order:
 1. `onEndOfTurn` effects of every card still in hand, in hand order.
 2. The Heat → Scandal check (below).
 3. The whole hand, Scandals included, goes to the discard pile. The next turn draws back up to hand size.
-4. The manager's month-end effects (`perk.monthEnd`), after the `turnEnd` record: the heat formula is untouched.
+4. The manager's month-end effects (`perk.monthEnd`, in the months `perk.monthEndTurns` lists), after the `turnEnd` record: the heat formula is untouched.
 
 ### GameEvents (frozen)
 

@@ -21,6 +21,8 @@ export interface HeatLedger {
 export interface DraftState {
   /** Card ids on offer, distinct. */
   readonly offer: readonly string[];
+  /** The cards on offer the manager brought (round 2c: "Dex knows someone") — a subset of `offer`. */
+  readonly extras: readonly string[];
   readonly picksLeft: number;
   readonly extraPicksBought: number;
   readonly rerollsUsed: number;

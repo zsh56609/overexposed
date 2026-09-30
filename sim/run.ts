@@ -1,7 +1,8 @@
-// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--manager=<id>] [--out=path] [--no-json]
-// npm run sim -- --replay=<run seed> --persona=<id> [--manager=<id>]      one run, action by action
+// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--manager=<id>|none] [--out=path] [--no-json]
+// npm run sim -- --replay=<run seed> --persona=<id> [--manager=<id>|none]      one run, action by action
 //
 // Every band runs once per manager (round 2b): without --manager, one report per manager in content, in turn.
+// --manager=none runs the base game, without managers (round 2c).
 //
 // Exit code 1 if any run crashed or soft-locked. Out-of-band balance is reported, not fatal.
 

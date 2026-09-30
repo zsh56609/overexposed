@@ -165,18 +165,27 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .cards { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.5em; }
 /* Five cards take the full type size; a bigger hand (draw effects) shrinks it to stay one row. */
 .hand .cards { font-size: clamp(0.8em, calc(4.5em / var(--n, 5)), 0.9em); }
+/* A draft offer's type shrinks with its size — 0.95em for three, 0.8em for Dex's four (round 2c, F1) — so the
+   tallest card (Legal Team, Indie Label) leaves the feed and the season's gates their room below. */
+.draft .cards { font-size: clamp(0.8em, calc(2.85em / var(--n, 3)), 0.95em); }
 .card { display: flex; flex-direction: column; gap: 0.2em; min-width: 0; padding: 0.3em 0.4em; text-align: left; color: inherit; background: #fff; border: 1px solid var(--ink); }
 .card-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; column-gap: 0.4em; }
 .card.off { opacity: 0.55; }
 .card.scandal { background: #fbe1dd; border: 2px dashed var(--red); opacity: 1; }
 .card.scandal .card-head strong, .in-hand { font-style: italic; }
 .card .rules { font-size: 0.8em; }
+/* The manager's extra card on a draft offer (round 2c, F1): labelled above its name. */
+.card.extra { border-width: 2px; }
+.extra-label { font-size: 0.72em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: var(--page); background: var(--ink); align-self: flex-start; padding: 0 0.35em; }
 /* A card's flavour line (round 2c, D1): italic, the last line of its face. */
 .card .flavor { font-style: italic; color: var(--muted); font-size: 0.85em; }
 .end { font-size: 1.1em; padding: 0.2em 1.2em; }
 .end.printing { border: 2px solid var(--red); color: var(--red); font-weight: bold; }
 .take { margin-top: auto; }
 .req { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.4em; font-size: 0.85em; }
+/* On a draft card the requirements sit under their label, at the card's full width: beside it, a card with three
+   (Indie Label) wrapped each onto two lines and pushed the offer into the season's gates below. */
+.draft .req { grid-template-columns: minmax(0, 1fr); }
 .req .muted { font-size: 1em; }
 .req ul { list-style: none; padding: 0; }
 .gate-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
@@ -194,15 +203,16 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .deck-lists ul { list-style: none; padding: 0; column-count: 2; column-gap: 1.5em; }
 
 /* Ending */
-.ending { height: 100%; display: flex; flex-direction: column; gap: 0.6em; padding: 1em 4em; }
+.ending { height: 100%; display: flex; flex-direction: column; gap: 0.6em; padding: 0.7em 4em; }
 /* Below the awards and the rival's line (round 2b): read the ending first, then play again. Still the largest element. */
 .play-again { width: 100%; font-size: 2.2em; padding: 0.2em; flex: none; margin-top: 0.3em; }
-/* The story column holds the category, the ending, its text and up to five awards (four in The Breakthrough). */
+/* The story column holds the category, the ending, its text, up to five awards (four in The Breakthrough), the
+   rival's line and the manager's last word (round 2c): tight gaps and smaller awards keep five on the stage. */
 .ending-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5em; }
-.ending-story { display: flex; flex-direction: column; gap: 0.3em; }
+.ending-story { display: flex; flex-direction: column; gap: 0.2em; }
 .ending-text { line-height: 1.4; }
 .ending-story h2 { margin-top: 0.2em; }
-.awards { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.1em; font-size: 0.92em; }
+.awards { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.1em; font-size: 0.86em; }
 .ending-facts { display: flex; flex-direction: column; gap: 0.3em; font-size: 0.9em; }
 .category { font-weight: bold; text-transform: uppercase; letter-spacing: 0.06em; }
 .collection ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.2em; }

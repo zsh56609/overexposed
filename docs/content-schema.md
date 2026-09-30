@@ -167,11 +167,16 @@ Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
   `tagKey`; `sample` (`labelKey`, `key`), the choice screen's sample text;
   `perk`, and `lines`.
 - `perk`: `nameKey`, `effectKey` (its rule, plain like a card's), and what
-  it does — data the engine applies: `freeRerollsPerAct`, the first N
-  draft rerolls each season cost nothing (`freeRerollKey`: the reroll
-  button's label meanwhile); `monthEnd`, effects applied at every month
-  end after the `turnEnd` record (`monthEndKeys`: the feed's line when
-  they change something, a line group).
+  it does — data the engine applies:
+  - `extraOffer` (round 2c): N more cards on every draft offer, drawn
+    after the rest from what the pool has left; `extraOfferKey` labels
+    them on the offer;
+  - `freeRerollsPerAct`: the first N draft rerolls each season cost
+    nothing (`freeRerollKey`: the reroll button's label meanwhile);
+  - `monthEnd`: effects applied at a month end after the `turnEnd`
+    record — at every month end, or only at the ends of the months
+    `monthEndTurns` lists (round 2c). `monthEndKeys`: the feed's line
+    when they change something, a line group.
 - `lines`: per trigger case, its variants (a line group); each variant is
   its bubbles' keys, one or two (round 2c). The cases: `opening`,
   `checkin.<major>`, `first_scandal.low|high`, `frenzy.low|high`, `stuck`,

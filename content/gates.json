@@ -49,7 +49,7 @@
     "act": 3,
     "nameKey": "gate.label_deal.name",
     "flavorKeys": ["gate.label_deal.flavor.1"],
-    "requires": { "hype": { "min": 45 }, "capital": { "min": 4 } },
+    "requires": { "hype": { "min": 50 }, "capital": { "min": 4 } },
     "onPass": [
       { "op": "setFlag", "flag": "signed_label" },
       { "op": "resource", "target": "capital", "value": 6 }
@@ -82,7 +82,7 @@
     "act": 4,
     "nameKey": "gate.award_show.name",
     "flavorKeys": ["gate.award_show.flavor.1"],
-    "requires": { "craft": { "min": 45 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
+    "requires": { "craft": { "min": 47 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
     "onPass": [{ "op": "resource", "target": "craft", "value": 10 }],
     "onFail": [{ "op": "resource", "target": "hype", "value": -6 }]
   }

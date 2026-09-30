@@ -1358,7 +1358,7 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
 
 const MANAGERS_FIELDS = ['choice', 'managers', 'messages'];
 const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
-const PERK_FIELDS = ['nameKey', 'effectKey', 'freeRerollsPerAct', 'freeRerollKey', 'monthEnd', 'monthEndKeys'];
+const PERK_FIELDS = ['nameKey', 'effectKey', 'freeRerollsPerAct', 'freeRerollKey', 'extraOffer', 'extraOfferKey', 'monthEnd', 'monthEndKeys', 'monthEndTurns'];
 const MESSAGES_FIELDS = ['perMonth', 'priority', 'highFrom', 'knownAxis', 'signedFlag', 'viralFlag', 'stuck', 'hard', 'quietAfter'];
 
 /** Every trigger line key content must write, for its majors, lanes and fame bands (core/manager.ts). */
@@ -1416,11 +1416,18 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
       const free = v.int(perk.freeRerollsPerAct, `${where}.perk.freeRerollsPerAct`, LIMIT.draftCount, { optional: true }) && (perk.freeRerollsPerAct as number) > 0;
       if (free) v.key(perk.freeRerollKey, `${where}.perk.freeRerollKey`);
       else if (perk.freeRerollKey !== undefined) v.error('structure', `${where}.perk.freeRerollKey`, 'labels a free reroll the perk does not give');
+      const extra = v.int(perk.extraOffer, `${where}.perk.extraOffer`, LIMIT.draftCount, { optional: true }) && (perk.extraOffer as number) > 0;
+      if (extra) v.key(perk.extraOfferKey, `${where}.perk.extraOfferKey`);
+      else if (perk.extraOfferKey !== undefined) v.error('structure', `${where}.perk.extraOfferKey`, 'labels an extra card the perk does not bring');
       if (perk.monthEnd !== undefined) {
         checkEffects(v, perk.monthEnd, `${where}.perk.monthEnd`, { kind: 'manager', id: String(m.id) });
         v.keys(perk.monthEndKeys, `${where}.perk.monthEndKeys`);
-      } else if (perk.monthEndKeys !== undefined) v.error('structure', `${where}.perk.monthEndKeys`, 'lines for month-end effects the perk does not have');
-      if (!free && perk.monthEnd === undefined) v.warn('structure', `${where}.perk`, 'does nothing: no free rerolls, no month-end effects');
+        if (perk.monthEndTurns !== undefined) {
+          if (!Array.isArray(perk.monthEndTurns) || perk.monthEndTurns.length === 0) v.error('schema', `${where}.perk.monthEndTurns`, 'must list the months the effects land on');
+          else perk.monthEndTurns.forEach((t, i) => v.int(t, `${where}.perk.monthEndTurns[${i}]`, [1, v.totalTurns]));
+        }
+      } else if (perk.monthEndKeys !== undefined || perk.monthEndTurns !== undefined) v.error('structure', `${where}.perk`, 'month-end lines or months without month-end effects');
+      if (!free && !extra && perk.monthEnd === undefined) v.warn('structure', `${where}.perk`, 'does nothing: no free rerolls, no extra cards, no month-end effects');
     }
     // A line group for every trigger's case, and none for a case no trigger reads.
     if (!isObj(m.lines)) return v.error('schema', `${where}.lines`, 'must map each trigger line key to its variants');

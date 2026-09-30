@@ -398,11 +398,16 @@ export interface ManagerPerk {
   readonly freeRerollsPerAct?: number;
   /** The reroll button's label while a free reroll is available. */
   readonly freeRerollKey?: string;
+  /** More cards on every draft offer (round 2c: Dex's D1), drawn after the rest, and their label. */
+  readonly extraOffer?: number;
+  readonly extraOfferKey?: string;
   /**
    * Effects at the end of every month, after the month's check has resolved and its turnEnd is recorded —
    * applied like a card's effects, so the heat formula is untouched (decisions.md, round 2b).
    */
   readonly monthEnd?: readonly Effect[];
+  /** The months (turns) whose end the month-end effects land on (round 2c); absent, every month. */
+  readonly monthEndTurns?: readonly number[];
   /** The feed's line when the month-end effects change something: a line group on the shuffle bag. */
   readonly monthEndKeys?: readonly string[];
 }
