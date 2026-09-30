@@ -1,0 +1,86 @@
+/* The papers (round V1a; README §2), as the mockup (v18) sets them: real newsprint, the three mastheads with
+   their ears, the dateline, the lead with its photograph or the box office, the row of three, the margin
+   marks. The front paper stands lowest and straight; the two behind lift on hover and come forward on click. */
+
+.desk .news { position: absolute; left: 176px; top: 58px; width: 470px; height: 344px; z-index: 5; }
+.desk .baseShadow { position: absolute; left: 190px; top: 396px; width: 450px; height: 26px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 0, 0, .6), transparent 70%); z-index: 4; }
+.desk .pp {
+  position: absolute; width: 470px; height: 288px; padding: 8px 12px 10px; overflow: hidden; color: var(--newsprint-ink);
+  background-color: var(--newsprint);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .12  0 0 0 0 .10  0 0 0 0 .07  0 0 0 .32 0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), radial-gradient(ellipse at 50% 42%, rgba(255, 252, 242, .55) 0%, rgba(0, 0, 0, 0) 58%, rgba(125, 100, 62, .18) 100%);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(60, 48, 30, .12);
+  transition: left .5s, top .5s, transform .5s, filter .5s; outline: none;
+}
+.desk .pp::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 49.4%, rgba(0, 0, 0, .08) 49.9%, rgba(255, 255, 255, .45) 50.25%, transparent 50.9%),
+              linear-gradient(135deg, transparent 93%, rgba(0, 0, 0, .10) 96%, rgba(255, 255, 255, .2) 100%);
+}
+.desk .pp > * { position: relative; }
+.desk .pp.pos0 { left: 0; top: 56px; transform: rotate(-.8deg); z-index: 3; }
+.desk .pp.pos1 { left: -8px; top: 0; transform: rotate(-2deg); z-index: 1; filter: brightness(.84); cursor: pointer; }
+.desk .pp.pos2 { left: 12px; top: 28px; transform: rotate(1.6deg); z-index: 2; filter: brightness(.9); cursor: pointer; }
+.desk .pp.pos1:hover, .desk .pp.pos1:focus-visible { transform: rotate(-2deg) translateY(-5px); filter: brightness(.97); }
+.desk .pp.pos2:hover, .desk .pp.pos2:focus-visible { transform: rotate(1.6deg) translateY(-5px); filter: brightness(.99); }
+
+/* The masthead: two ears and the name; the dateline under it — date, issue number, tagline. */
+.desk .mhrow { display: flex; align-items: center; gap: 8px; }
+.desk .ear { flex: none; width: 62px; font-size: 6px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; line-height: 1.35; border: 1px solid currentColor; padding: 3px 4px; text-align: center; white-space: pre-line; }
+.desk .mh { flex: 1; text-align: center; }
+.desk .dl { display: flex; justify-content: space-between; font-size: 6.2px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; border-top: 1px solid var(--newsprint-ink); border-bottom: 1px solid var(--newsprint-ink); padding: 2px 1px; margin: 5px 0 7px; }
+
+/* The lead: kicker, headline, dek, a column of text; beside it the photograph and caption, or the box office. */
+.desk .ld { display: grid; grid-template-columns: 1.22fr 1fr; gap: 11px; }
+.desk .kk { font-size: 6.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 2px; }
+.desk .dk { font-size: 7.6px; font-style: italic; color: #3e372e; margin-top: 3px; line-height: 1.3; }
+.desk .txt { margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.desk .txt i { display: block; height: 26px; background: repeating-linear-gradient(180deg, #8a8276 0 1.25px, transparent 1.25px 3.9px); }
+.desk .txt i:last-child { height: 22px; }
+.desk .ph { height: 72px; background: #aaa295 center / cover no-repeat; position: relative; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(26, 23, 20, .25); }
+.desk .cp { font-size: 5.8px; font-style: italic; color: #4f473c; margin-top: 2px; }
+
+/* The row of three. */
+.desk .rw { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 7px; border-top: 1px solid var(--newsprint-ink); padding-top: 5px; }
+.desk .it { padding: 0 7px; border-left: 1px solid rgba(26, 23, 20, .4); min-width: 0; }
+.desk .it:first-child { border-left: none; padding-left: 0; }
+.desk .it .t2 { margin-top: 4px; height: 14px; background: repeating-linear-gradient(180deg, #8a8276 0 1.2px, transparent 1.2px 3.8px); }
+.desk .it.brief .h { font-size: 8px !important; font-weight: 700 !important; }
+.desk .red .hd, .desk .it.red .h { color: #b81f15; }
+
+/* The Daily Flash — red-top tabloid. */
+.desk .flash .mh { background: var(--paper-flash); color: #fff; padding: 5px 8px 6px; }
+.desk .flash .mh b { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-style: italic; font-size: 25px; line-height: 1; letter-spacing: -.01em; }
+.desk .flash .ear { color: var(--paper-flash); }
+.desk .flash .hd { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 16.5px; line-height: 1.02; }
+.desk .flash .it .h { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 9.4px; line-height: 1.1; }
+/* B-Side — music weekly: its name set lower-case, as its logo. */
+.desk .bside .mh { border-bottom: 3px solid var(--paper-bside); padding-bottom: 2px; }
+.desk .bside .mh b { font-family: 'Libre Franklin', system-ui, sans-serif; font-weight: 800; font-size: 30px; letter-spacing: -.05em; line-height: .9; text-transform: lowercase; }
+.desk .bside .mh small { display: block; font-size: 5.8px; font-weight: 800; letter-spacing: .32em; text-transform: uppercase; color: var(--paper-bside); margin-top: 2px; }
+.desk .bside .ear { color: var(--paper-bside); }
+.desk .bside .hd { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 15px; line-height: 1.1; }
+.desk .bside .it .h { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 9.4px; line-height: 1.14; }
+.desk .bside .kk { color: var(--paper-bside); }
+/* Marquee — trade paper: its name spaced capitals. */
+.desk .marquee .mh { border-top: 3px double var(--newsprint-ink); border-bottom: 3px double var(--newsprint-ink); padding: 2px 0 3px; }
+.desk .marquee .mh b { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 24px; letter-spacing: .2em; line-height: 1; text-transform: uppercase; }
+.desk .marquee .mh small { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 6.6px; letter-spacing: .04em; margin-top: 1px; }
+.desk .marquee .ear { color: var(--newsprint-ink); }
+.desk .marquee .hd { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 14px; line-height: 1.12; }
+.desk .marquee .it .h { font-family: 'Libre Franklin', system-ui, sans-serif; font-weight: 800; font-size: 8.8px; line-height: 1.15; }
+.desk .marquee .kk { color: var(--newsprint-ink); }
+
+/* The weekend box office. */
+.desk .bo { font-size: 6.4px; border: 1px solid var(--newsprint-ink); }
+.desk .bo b { display: block; background: var(--newsprint-ink); color: var(--newsprint); font-size: 6px; letter-spacing: .2em; text-transform: uppercase; padding: 2px 4px; }
+.desk .bo div { display: flex; justify-content: space-between; gap: 4px; padding: 2.5px 4px; border-top: 1px solid rgba(26, 23, 20, .3); font-weight: 600; }
+.desk .bo div span:first-child { min-width: 0; }
+.desk .bo div span:last-child { font-weight: 800; flex: none; }
+.desk .bo em { font-style: normal; font-size: 5.4px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--newsprint-ink); padding: 0 2px; margin-left: 3px; }
+.desk .bo div.me { font-weight: 800; }
+
+/* Mark my stories (a setting, on by default): the player's stories carry a red rule in the margin, the
+   rival's a purple one. */
+.desk.marks .bo div.me { box-shadow: inset 3px 0 0 var(--mark-you); }
+.desk.marks .pp .you { box-shadow: inset 3px 0 0 var(--mark-you); padding-left: 6px; }
+.desk.marks .pp .rival { box-shadow: inset 3px 0 0 var(--mark-rival); padding-left: 6px; }

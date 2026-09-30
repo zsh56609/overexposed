@@ -27,13 +27,11 @@ import {
   type ContentIndex,
   type GameState,
   type LineShow,
-  type MonthPress,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { Desk } from './desk/Desk.tsx';
 import { deskModel } from './desk/model.ts';
 import licenceUrl from './fonts/OFL.txt?url';
-import { feedLines, type FeedLine } from './feed.ts';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewDraftCard, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
@@ -41,7 +39,6 @@ import {
   awardCitation,
   awardName,
   blockerText,
-  calendarLabel,
   cardName,
   cardFlavor,
   offerLabels,
@@ -64,7 +61,6 @@ import {
   mastheadName,
   money,
   openingText,
-  pageItemText,
   resourceName,
   seasonName,
   signedAmount,
@@ -243,9 +239,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     <Desk model={model} on={on}>
       {/* V1a scaffolding: the plain play area over the new scene, until the desk's parts replace it. */}
       <div className="plain dock">
-        <div className="dock-feed">
-          <Feed c={c} steps={snap.steps} />
-        </div>
         {s.phase === 'play' && (
           <div className="dock-hand">
             <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />
@@ -288,86 +281,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
 // ---------------------------------------------------------------------------
 // Frame: feed, side panel (the stat bar is the desk's: ui/desk/StatBar.tsx)
-
-function Feed({ c, steps }: { c: ContentIndex; steps: readonly PlayedStep[] }) {
-  const box = useRef<HTMLDivElement>(null);
-  const lines = useMemo(() => feedLines(steps), [steps]);
-  useEffect(() => {
-    box.current?.scrollTo({ top: box.current.scrollHeight });
-  }, [lines.length]);
-  return (
-    <div className="feed" ref={box}>
-      <h2>{t('ui.feed.title')}</h2>
-      <ol>
-        {lines.map((line) => (
-          <FeedRow key={line.id} c={c} line={line} />
-        ))}
-      </ol>
-    </div>
-  );
-}
-
-function FeedRow({ c, line }: { c: ContentIndex; line: FeedLine }) {
-  if (line.page) return <FrontPageView c={c} month={line.page} />;
-  // The manager's messages (round 2b): their name, not a masthead; a message may be two bubbles.
-  if (line.kind === 'message') {
-    return (
-      <li className={prose(line.text, 'feed-message')}>
-        {line.speaker && <span className="speaker-label">{line.speaker}</span>}
-        {line.text.split('\n').map((bubble, i) => (
-          <span key={i} className="bubble">
-            {bubble}
-          </span>
-        ))}
-      </li>
-    );
-  }
-  const reg = line.register ? ` reg-${line.register}` : '';
-  // A line the press prints carries its paper's masthead (phase 2a); a quiet line is the player's notebook.
-  return (
-    <li className={prose(line.text, `feed-${line.kind}${reg}`)}>
-      {line.masthead && <span className="paper-label">{line.masthead}</span>}
-      {line.text}
-    </li>
-  );
-}
-
-/**
- * A month's front pages (Part E): the lead paper's, world stories marked as such, and a switch to the other
- * two — every paper is readable every month; each month opens on its own lead paper (E8, E9).
- */
-function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
-  const [shown, setShown] = useState(month.lead);
-  const page = month.pages.find((p) => p.paper === shown) ?? month.pages[0];
-  if (!page) return null;
-  return (
-    <li className="feed-page">
-      <p className="dateline muted">{calendarLabel(c, month.turn)}</p>
-      <div className="paper-switch">
-        {month.pages.map((p) => (
-          <button key={p.paper} className={p.paper === page.paper ? 'on' : undefined} aria-pressed={p.paper === page.paper} onClick={() => setShown(p.paper)}>
-            {mastheadName(c, p.paper)}
-          </button>
-        ))}
-      </div>
-      <ol className="page">
-        {page.items.map((item, i) => {
-          const text = pageItemText(c, item);
-          return (
-            <li key={i} className={prose(text, `page-${item.slot} ${item.kind === 'world' || item.kind === 'rival' || item.kind === 'saga' ? 'world' : 'mine'}`)}>
-              {text}
-            </li>
-          );
-        })}
-      </ol>
-    </li>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Goals (decision 10): the four major endings in narrative order, aspirations first (decision 22) — each
-// with its name, its goal line and its side of the 2×2 of fame and reputation, live. The marker names the
-// ending the year would resolve to today, major and minor, from /core (docs/design/content-expansion.md §1).
 
 // ---------------------------------------------------------------------------
 // Previews

@@ -21,6 +21,7 @@
 
 import {
   bagIndex,
+  boxOffice,
   calendarDate,
   countdownLevel,
   createInitialState,
@@ -67,7 +68,7 @@ import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
 import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
-import { deskIssue, deskModel } from '../ui/desk/model.ts';
+import { deskIssue, deskModel, PHOTO_VARIANTS } from '../ui/desk/model.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -78,7 +79,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -547,6 +548,60 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   // The frenzy's clipping: one of the month's scandal headlines, and only in a frenzy.
   const scandalTexts = (issue?.pages ?? []).flatMap((p) => p.items).filter((x) => x.kind === 'player' && x.line?.kind === 'scandal').map((x) => pageItemText(c, x));
   if ((mirror.clipping !== null) !== (m.crisis && scandalTexts.length > 0) || (mirror.clipping !== null && !scandalTexts.includes(mirror.clipping))) bad(`clipping "${mirror.clipping}" (crisis ${m.crisis}, ${scandalTexts.length} scandal stories)`);
+
+  // The papers (README §2, §7): /core's issue — its pages in order, its lead paper, each masthead's name, date and
+  // issue number, each story's words, kicker marks and slot; the photograph is the lead's scene, drawn by the
+  // shuffle bag on /core's count; the Marquee carries /core's box office unless its lead is photographed.
+  const papers = m.papers;
+  if ((papers === null) !== (issue === null)) bad(`papers ${papers === null ? 'missing' : 'without an issue'}`);
+  if (!papers || !issue) return;
+  if (papers.turn !== issue.turn || papers.lead !== issue.lead) bad(`papers for month ${papers.turn} led by ${papers.lead}, the issue is ${issue.turn} led by ${issue.lead}`);
+  const season = c.rules.seasons?.[issue.act - 1];
+  const bo = c.press?.boxOffice;
+  issue.pages.forEach((fp, pi) => {
+    const pm = papers.pages[pi];
+    if (!pm || pm.paper !== fp.paper) return bad(`page ${pi} is ${pm?.paper}, /core's is ${fp.paper}`);
+    const def = c.press?.papers.find((p) => p.id === fp.paper);
+    const n = ((def?.issue?.base ?? 0) + issue.turn * (def?.issue?.step ?? 1)).toLocaleString('en-GB');
+    if (pm.masthead.name !== t(def?.mastheadKey ?? '') || pm.masthead.date !== CALENDAR[issue.turn - 1] || !pm.masthead.issue.includes(n)) bad(`${fp.paper} masthead ${JSON.stringify(pm.masthead)}`);
+    const items = [pm.lead, ...pm.row];
+    if (items.length !== fp.items.length) bad(`${fp.paper}: ${items.length} stories, /core prints ${fp.items.length}`);
+    fp.items.forEach((x, i) => {
+      const it = items[i];
+      if (!it) return;
+      counts.paperStories++;
+      const scandal = x.kind === 'player' && x.line?.kind === 'scandal';
+      const mine = x.kind === 'player' || x.kind === 'filler' || x.kind === 'spillover';
+      if (it.text !== pageItemText(c, x) || it.kind !== x.kind || it.red !== scandal || it.brief !== (x.slot === 'brief') || it.mark !== (mine ? 'you' : x.kind === 'rival' ? 'rival' : null)) bad(`${fp.paper} story ${i}: ${JSON.stringify(it)} against ${x.kind} ${x.slot} ${x.key}`);
+      if (it.coming !== (x.line !== null && x.line.step >= history.length) || (it.coming && s.phase !== 'play')) bad(`${fp.paper} story ${i}: coming ${it.coming} in the ${s.phase} phase`);
+      if (!it.kicker || it.kicker.startsWith('⟦')) bad(`${fp.paper} story ${i}: kicker "${it.kicker}"`);
+    });
+    const lead = fp.items[0];
+    const photographed = lead !== undefined && (lead.kind === 'rival' || (lead.kind === 'player' && lead.line?.kind === 'scandal') || ((lead.kind === 'player' || lead.kind === 'filler' || lead.kind === 'spillover') && issue.fameTier < (bo?.player.fromTier ?? Infinity)));
+    const right = pm.right;
+    if (bo && fp.paper === bo.paper && !photographed) {
+      counts.boxOffices++;
+      const rows = boxOffice(c, s.seed, issue.turn, issue.fameTier, issue.lane);
+      if (right?.kind !== 'boxoffice') return bad(`${fp.paper}: no box office`);
+      if (right.rows.length !== rows.length || rows.some((r, k) => right.rows[k]?.title !== t(r.titleKey) || right.rows[k]?.gross !== `£${(r.gross / 10).toFixed(1)}m` || right.rows[k]?.player !== r.player || (right.rows[k]?.fresh !== null) !== r.fresh)) bad(`${fp.paper}: box office ${JSON.stringify(right.rows)}`);
+      if ((rows[0]?.player === true) !== (issue.fameTier >= bo.player.fromTier && issue.lane === bo.player.lane)) bad(`${fp.paper}: the player's film ${rows[0]?.player ? 'tops' : 'misses'} the box office at fame ${issue.fameTier} on ${issue.lane}`);
+    } else if (lead?.scene !== undefined) {
+      counts.photos++;
+      if (right?.kind !== 'photo' || right.scene !== lead.scene || right.season !== season || right.variant !== bagIndex(s.seed, `photo:${fp.paper}:${lead.scene}`, lead.photo ?? 0, PHOTO_VARIANTS)) bad(`${fp.paper}: photograph ${JSON.stringify(right)} for a ${lead.scene} lead (#${lead.photo})`);
+      if (lead.scene === 'paparazzi' && !(lead.kind === 'spillover' || (lead.kind === 'player' && lead.line?.kind === 'scandal'))) bad(`${fp.paper}: the paparazzi shot on a ${lead.kind} lead`);
+      if (s.phase === 'play' && right?.kind === 'photo') photos.set(`${issue.turn}:${fp.paper}`, `${right.scene}:${right.season}:${right.variant}`);
+    } else if (right !== null) bad(`${fp.paper}: a right column without a photographed lead`);
+  });
+}
+
+/** Each run's photographs by month and paper, as printed: the same picture never leads a paper two months running. */
+const photos = new Map<string, string>();
+function checkPhotos(seed: number): void {
+  for (const [key, picture] of photos) {
+    const [turn, paper] = key.split(':');
+    if (photos.get(`${Number(turn) + 1}:${paper}`) === picture) report('photo repeat', seed, Number(turn) + 1, `${paper} leads with ${picture} two months running`);
+  }
+  photos.clear();
 }
 
 /** The month a step belongs to: a month end belongs to the month it ends. */
@@ -630,6 +685,7 @@ for (let i = 0; i < RUNS; i++) {
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
   checkPages(history, seed);
   checkMessages(history, seed);
+  checkPhotos(seed);
 }
 
 console.log(
@@ -640,7 +696,7 @@ console.log(
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
     `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
-    `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed) ` +
+    `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

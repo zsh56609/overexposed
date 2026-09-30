@@ -145,7 +145,8 @@ export interface PapersModel {
   /** The lead paper, /core's: the one on the desk unless the player pulls another forward. */
   readonly lead: string;
   readonly pages: readonly PageModel[];
-  readonly forward: string;
+  /** A paper behind the front one: its title, what a click does. */
+  readonly forwardLabel: string;
 }
 
 export interface ScriptModel {
@@ -360,7 +361,7 @@ function papers(s: GameState, issue: MonthPress, history: readonly PlayedStep[],
       overwhelmed: fp.overwhelmed,
     };
   });
-  return { turn: issue.turn, lead: issue.lead, pages, forward: issue.lead };
+  return { turn: issue.turn, lead: issue.lead, pages, forwardLabel: t('ui.desk.paperForward') };
 }
 
 const isScandalLine = (x: PageItem): boolean => x.kind === 'player' && x.line?.kind === 'scandal';

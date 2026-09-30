@@ -6,6 +6,47 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part D: the papers
+
+- **As README §2 and the mockup set them**: three papers standing on the
+  desk, real newsprint, each masthead with its ears, the dateline (date,
+  issue number, tagline), the lead with its kicker, dek and photograph —
+  or, on the Marquee, the weekend box office — and the row of three. The
+  names are content's; the logos' lettering (b-side in lower case,
+  MARQUEE in spaced capitals) is the stylesheet's, as the mockup sets it.
+- **The front paper is /core's lead paper.** Clicking a paper behind
+  pulls it forward (it also answers Enter and Space); the choice lasts
+  until the issue or its lead changes. Switching re-renders only the
+  papers — measured: every DOM change lands inside the papers.
+- **Mark my stories** is on (the setting is round V2's): the player's
+  stories carry the red rule, the rival's the purple one, and the
+  player's film its rule in the box office.
+- **The photographs** are the mockup's drawings, three per scene: the
+  drawing itself, mirrored, and reframed closer, each with its crowds,
+  rain, lights and passers-by shifted by the seed; the street is drawn in
+  the issue's season, the paparazzi shot in the red duotone. The shuffle
+  bag runs on /core's count (Part A), so the same picture never leads a
+  paper two months running — `check:preview` checks it across every run.
+  Each picture is drawn the first time it is needed (about 7 ms) and
+  cached. A small blur in code replaces the canvas filter, which WebKit
+  lacks, so every browser draws the same picture. The director's chair
+  in the film-set picture reads "DIRECTOR", now a key.
+- **Left out**: the mockup's ★★★★☆ under the B-Side's review of the
+  player's single. It is a number, and the game has no review score to
+  give it; the author decides whether it should show one (craft's tier,
+  say).
+- **The plain feed is gone.** The papers show this month's issue; earlier
+  months are not on the desk. The manager's messages return as bubbles in
+  Part E.
+- **For the author** (not changed): README §7 says that once the player
+  is Known a scandal month puts the tabloid on the desk. /core's lead-paper
+  rule (round 2b) ranks the papers by the player's most prominent story
+  and breaks a tie for the lane's paper, so when the player also has a
+  lead story in their lane's paper that month, that paper stays in front
+  and the tabloid stands behind with the scandal leading it. It is /core's
+  rule and sim:press reports it; the author decides whether the tie
+  should go to the scandal.
+
 ## 2026-10-01 — Round V1a, Part C: the mirror
 
 - **As README §3 and the mockup set it**: the bulb frame (eight bulbs
