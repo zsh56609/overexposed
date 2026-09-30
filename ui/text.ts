@@ -14,6 +14,7 @@ import {
   type ContentIndex,
   type Effect,
   type LineShow,
+  type MajorClause,
   type PageItem,
   type PlayBlocker,
   type Range,
@@ -160,6 +161,15 @@ export function clauseText(clause: ClauseReport): string {
 /** With the verdict mark /core gave it. */
 export const clauseLine = (clause: ClauseReport): string =>
   t(clause.met ? 'ui.clause.met' : 'ui.clause.unmet', { text: clauseText(clause) });
+
+/**
+ * A goals-board clause: a requirement, or the state the player is in when an unlisted side fails — worded
+ * as a state, never a goal: "✗ Already known (hype 104)".
+ */
+export const majorClauseLine = (clause: MajorClause): string =>
+  clause.state !== undefined && 'value' in clause
+    ? t('ui.clause.unmet', { text: t(`ui.goals.state.${clause.state}`, { value: clause.value }) })
+    : clauseLine(clause);
 
 /** A condition as static words (for conditional effects), no verdict. */
 export function conditionText(c: ContentIndex, cond: Condition): string {

@@ -182,12 +182,18 @@ premise — the player begins as a singer — not a choice, and the lane must
 reflect choices.
 
 **The established lane** (phase 2a) is for display only. A single play
-should not change what the press calls the player, so `establishedLane(state)`
-returns the current lane once it has at least two plays and leads the next
-lane by two (`rules.laneEstablished`), and "early" before that. Chosen with
+should not change what the press calls the player, so a lane establishes
+itself once it has at least two plays and leads the next lane by two
+(`rules.laneEstablished`); before that the career is "early". Chosen with
 the sim so a lane settles around mid-summer: half of player-like runs are
-established by month 5–6. It drives the press subject now, and the managers
-and the vanity's lane props later; ending resolution keeps `currentLane`.
+established by month 5–6. **With hysteresis** (round 2b): once established
+it stays established while it still leads, by any margin; it changes only
+when another lane takes the lead and meets the establishing threshold; a
+lane that stops leading without another establishing itself falls back to
+early. Hysteresis needs the path, so it is read from the run's history
+(`establishedLanes`), and stays deterministic. It drives the press subject
+and the lead paper now, the managers' lines, and the vanity's lane props
+later; ending resolution keeps `currentLane`.
 
 **Content gap.** Screen has only two cards today (Film Cameo, Late Night Show).
 Two minor endings — Leading Role and The Character Actor — require the screen
@@ -302,19 +308,34 @@ in every paper at once.
   Known, and it leads — and may fill the page — once Famous. In another
   paper: at most a brief, whatever the fame; Famous, a secondary, as a
   crossover story. Early, a line's own paper stands for the lane's. A
-  scandal always leads The Daily Flash; a Money line is a business brief.
+  Money line is a business brief.
+- **Fame amplifies scandal** (round 2b; a design principle). A scandal's
+  prominence in The Daily Flash follows fame like every other story: a
+  brief while Unknown or Noticed, a secondary while Rising, the lead once
+  Known, and once Famous the lead of a page it overwhelms. An unknown's
+  scandal still costs them in full — the card still enters the deck — but
+  the world barely notices.
 - **World stories**: at least two on every page while Unknown or Noticed,
   at least one after — unless the page is overwhelmed: The Daily Flash in
-  a month a scandal printed, the lane's paper once the player is Famous.
-- **Frenzy spills over**: in a month two or more scandals print, each
-  other paper carries a spillover line as a brief.
+  a scandal's month once the player is Famous, the lane's paper once the
+  player is Famous.
+- **Frenzy spills over** only once the player is Known: in a month two or
+  more scandals print, each other paper carries a spillover line as a
+  brief.
 - **World pools** are drawn with a shuffle bag, no repeats until the pool
   is used; a seasonal story appears at most once a run, in its season.
 - **The lead paper** — the one on the desk in the visual phase — holds the
-  player's most prominent line: a scandal, then a lead, a secondary, a
-  brief. Ties go to the established lane's paper; a month with nothing of
-  the player's goes to The Daily Flash. All three papers are readable
-  every month; each month opens on its lead paper.
+  player's most prominent story: a lead, then a secondary, then a brief.
+  Money lines do not count: a side gig is a business footnote, not the
+  player's story. A scandal counts only as a lead story, so it takes the
+  desk only when it is the month's biggest story — once the player is
+  Known; an unknown's scandal month keeps the lane's paper in front, the
+  tabloid behind carrying the scandal as a brief. Ties go to the
+  established lane's paper, and so does a month with nothing of the
+  player's (early: B-Side). The lead paper is usually the player's own
+  lane's; The Daily Flash leads for celebrity careers and when a scandal
+  becomes the biggest story. All three papers are readable every month;
+  each month opens on its lead paper.
 
 ---
 

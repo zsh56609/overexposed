@@ -2,8 +2,8 @@ export * from './content.ts';
 export * from './rng.ts';
 export * from './state.ts';
 export { awardHolds, yearAwards } from './awards.ts';
-export { axisSide, endingIfYearEndedNow, majorNow, majorOf, majorRequirements, type EndingResult } from './endings.ts';
-export { currentLane, establishedLane, lanePlays, laneShares } from './lanes.ts';
+export { axisSide, endingIfYearEndedNow, majorNow, majorOf, majorRequirements, type EndingResult, type MajorClause } from './endings.ts';
+export { currentLane, establishedLanes, lanePlays, laneShares, nextEstablishedLane } from './lanes.ts';
 export {
   inHandGroup,
   LineCounter,
@@ -21,6 +21,7 @@ export { bagIndex, bagKey, hashId, onceIndex, onceItem, onceKey } from './varian
 export {
   fameTier,
   frontPages,
+  lanePaper,
   paperOf,
   playerShare,
   pressLines,

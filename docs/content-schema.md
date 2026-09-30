@@ -52,10 +52,12 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
 - `page`: the front page's `slots` (most prominent first); `worldMin`,
   world stories per page by fame tier; `loud.inLane` / `loud.offLane`,
   a LOUD line's prominence by fame tier in the established lane's paper
-  and in another; `money`, `scandal` and `spillover` prominences;
-  `frenzyAt`, the scandals in a month that spill over; `overwhelmLaneFrom`,
-  the fame tier from which the lane's paper is overwhelmed;
-  `defaultLead`, the lead paper of a month with nothing of the player's.
+  and in another; `scandal`, a scandal's prominence by fame tier; `money`
+  and `spillover` prominences; `frenzyAt`, the scandals in a month that
+  make a frenzy; `spilloverFrom`, the fame tier from which a frenzy
+  spills over; `overwhelmScandalFrom` and `overwhelmLaneFrom`, the fame
+  tiers from which the scandal paper (in a scandal's month) and the lane's
+  paper are overwhelmed.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), `endingKey`.
 

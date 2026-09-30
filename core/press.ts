@@ -3,7 +3,7 @@
 // private work. Read-only; ids, keys and numbers only — /ui renders the words.
 
 import { getCard, type ContentIndex, type PaperDef, type Prominence, type RivalArcDef } from './content.ts';
-import { establishedLane } from './lanes.ts';
+import { establishedLanes } from './lanes.ts';
 import { readLines, type HistoryStep, type PrintedLine } from './lines.ts';
 import { deriveSeed } from './rng.ts';
 import type { GameEvent, GameState } from './state.ts';
@@ -52,11 +52,13 @@ export interface PrintContext {
 
 /**
  * When a step's lines print: once its action has resolved. A month end prints at the turn's end — before
- * the next month's draw can move anything — so its lines read the turnEnd's resources.
+ * the next month's draw can move anything — so its lines read the turnEnd's resources. `lane`: the
+ * established lane after the step (core/lanes.ts establishedLanes: it has hysteresis, so it comes from the
+ * run's history).
  */
-export function printContext(after: GameState, events: readonly GameEvent[]): PrintContext {
+export function printContext(after: GameState, events: readonly GameEvent[], lane: string | null): PrintContext {
   const end = events.find((e) => e.type === 'turnEnd');
-  return { hype: end?.type === 'turnEnd' ? end.resources.hype : after.resources.hype, lane: establishedLane(after) };
+  return { hype: end?.type === 'turnEnd' ? end.resources.hype : after.resources.hype, lane };
 }
 
 /** A printed line with its press: the paper (null: the notebook), the fame and lane it printed at, the subject. */
@@ -75,11 +77,12 @@ export function pressOf(c: ContentIndex, cardId: string, at: PrintContext): Pick
 
 /** Every line the run has printed, with its variant and its press. */
 export function pressLines(history: readonly HistoryStep[]): PressLine[] {
+  const lanes = establishedLanes(history);
   const contexts = new Map<number, PrintContext>();
   return readLines(history).printed.map((line) => {
     const step = history[line.step] as HistoryStep;
     let at = contexts.get(line.step);
-    if (!at) contexts.set(line.step, (at = printContext(step.after, step.events)));
+    if (!at) contexts.set(line.step, (at = printContext(step.after, step.events, lanes[line.step] ?? null)));
     return { ...line, ...pressOf(step.after.content, line.cardId, at) };
   });
 }
@@ -92,7 +95,7 @@ export function pressLines(history: readonly HistoryStep[]): PressLine[] {
 
 const LEVEL: Readonly<Record<Prominence, number>> = { lead: 0, secondary: 1, brief: 2 };
 
-export type PageItemKind = 'player' | 'spillover' | 'world' | 'rival';
+export type PageItemKind = 'player' | 'spillover' | 'world' | 'rival' | 'saga';
 
 export interface PageItem {
   readonly slot: Prominence;
@@ -123,14 +126,17 @@ export interface MonthPress {
   readonly fameTier: number;
   readonly lane: string | null;
   readonly scandals: number;
-  /** Scandals enough to spill over into every other paper. */
+  /** Scandals enough for a frenzy; `spilled`: it reached every other paper (only once the player is known). */
   readonly frenzy: boolean;
+  readonly spilled: boolean;
   /** Every paper's page, in content order. */
   readonly pages: readonly FrontPage[];
   /** The paper on the desk: the one holding the player's most prominent line. */
   readonly lead: string;
   /** The rival's beat when this month carries it: its paper, its line, whether it made the page. */
   readonly rival: { readonly paper: string; readonly key: string; readonly printed: boolean } | null;
+  /** The world's sagas whose beat falls this month: each in its paper, and whether it made the page. */
+  readonly sagas: readonly { readonly paper: string; readonly key: string; readonly printed: boolean }[];
 }
 
 /** The rival's arc for a run, fixed by the seed at the start — never chosen to contrast the player's. */
@@ -150,7 +156,7 @@ export function prominenceOf(c: ContentIndex, line: PressLine): Prominence | nul
   const press = c.press;
   const page = press?.page;
   if (!press || !page || line.paper === null) return null;
-  if (line.kind === 'scandal') return page.scandal;
+  if (line.kind === 'scandal') return page.scandal[Math.min(line.fameTier, page.scandal.length - 1)] ?? 'brief';
   if (getCard(c, line.cardId)?.register === 'money') return page.money;
   // A LOUD line: in the established lane's paper, or off it. Early, its own paper stands for the lane's.
   const lanePaper = line.lane === null ? line.paper : (press.route.loud[line.lane] ?? line.paper);
@@ -200,6 +206,7 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
     const month = monthOf(history[line.step] as HistoryStep);
     byMonth.set(month, [...(byMonth.get(month) ?? []), line]);
   }
+  const lanes = establishedLanes(history);
   const printedWorld = new Map<string, Map<string, number>>(press.papers.map((p) => [p.id, new Map()]));
   const lastWorld = new Map<string, ReadonlySet<string>>(press.papers.map((p) => [p.id, new Set()]));
   const spilled = new Map<string, number>();
@@ -209,10 +216,12 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
     const end = step.events.find((e) => e.type === 'turnEnd');
     if (end?.type !== 'turnEnd') return;
     const tier = fameTier(c, end.resources.hype);
-    const lane = establishedLane(step.after);
+    const lane = lanes[index] ?? null;
     const mine = byMonth.get(end.turn) ?? [];
     const scandals = mine.filter((l) => l.kind === 'scandal').length;
     const frenzy = scandals >= page.frenzyAt;
+    // Fame amplifies scandal (round 2b): a frenzy spills over only once the player is known.
+    const spill = frenzy && tier >= page.spilloverFrom;
     const subjectKey = pressSubject(c, tier, lane);
     // The lane's paper: the established lane's; early, the paper of each LOUD line the player printed.
     const lanePapers = new Set(
@@ -224,12 +233,13 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
     let rivalPrinted = false;
 
     const pages = press.papers.map((paper): FrontPage => {
-      const overwhelmed = (paper.id === press.route.scandal && scandals > 0) || (tier >= page.overwhelmLaneFrom && lanePapers.has(paper.id));
+      const overwhelmed =
+        (paper.id === press.route.scandal && scandals > 0 && tier >= page.overwhelmScandalFrom) || (tier >= page.overwhelmLaneFrom && lanePapers.has(paper.id));
       // The player's candidates, in the order they claim slots: the spillover first (every other paper carries
       // it), then by prominence; at equal prominence a scandal, then a LOUD act before a Money line (a public
       // act is news, a fee is business); then in print order.
       const candidates: Candidate[] = [];
-      if (frenzy && paper.id !== press.route.scandal && (paper.spilloverKeys?.length ?? 0) > 0) {
+      if (spill && paper.id !== press.route.scandal && (paper.spilloverKeys?.length ?? 0) > 0) {
         const group = `spillover:${paper.id}`;
         const n = spilled.get(group) ?? 0;
         spilled.set(group, n + 1);
@@ -286,36 +296,44 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       lane,
       scandals,
       frenzy,
+      spilled: spill,
       pages,
       lead: leadPaper(c, pages, lane),
       rival: beat ? { paper: beat.paper, key: beat.key, printed: rivalPrinted } : null,
+      sagas: [],
     });
   });
   return months;
 }
 
+/** The paper of the established lane — the early lane's before one is established. */
+export function lanePaper(c: ContentIndex, lane: string | null): string | null {
+  const press = c.press;
+  return press ? (press.route.loud[lane ?? press.earlyLane] ?? null) : null;
+}
+
 /**
- * The month's lead paper — the one on the desk: the paper holding the player's most prominent line, a
- * scandal first, then a lead, a secondary, a brief. Ties go to the established lane's paper (the early
- * lane's before one is); a month with nothing of the player's goes to the default.
+ * The month's lead paper — the one on the desk (round 2b): the paper holding the player's most prominent
+ * story, a lead before a secondary before a brief. Money lines do not count — a side gig is a business
+ * footnote, not the player's story — and a scandal counts only as a lead story: it takes the desk only when
+ * it is the month's most prominent story, which means once the player is known. An unknown's scandal month
+ * keeps the lane's paper in front, the tabloid behind carrying the scandal as a brief. At equal prominence
+ * the established lane's paper wins; a month with nothing of the player's goes to the lane's paper too. The
+ * lead paper is usually the player's own lane's.
  */
 function leadPaper(c: ContentIndex, pages: readonly FrontPage[], lane: string | null): string {
-  const press = c.press;
-  const page = press?.page;
-  if (!press || !page) return '';
-  const rankOf = (fp: FrontPage) =>
-    Math.min(
-      Infinity,
-      ...fp.items.map((item) =>
-        item.kind === 'player' && item.line?.kind === 'scandal' ? 0 : item.kind === 'player' || item.kind === 'spillover' ? 1 + LEVEL[item.slot] : Infinity,
-      ),
-    );
+  const counts = (item: PageItem) =>
+    item.kind === 'spillover' ||
+    (item.kind === 'player' &&
+      getCard(c, item.line?.cardId ?? '')?.register !== 'money' &&
+      (item.line?.kind !== 'scandal' || item.slot === 'lead'));
+  const rankOf = (fp: FrontPage) => Math.min(Infinity, ...fp.items.filter(counts).map((item) => LEVEL[item.slot]));
   const ranks = pages.map((fp) => ({ paper: fp.paper, rank: rankOf(fp) }));
   const best = Math.min(...ranks.map((r) => r.rank));
-  if (best === Infinity) return page.defaultLead;
+  const preferred = lanePaper(c, lane) ?? pages[0]?.paper ?? '';
+  if (best === Infinity) return preferred;
   const tied = ranks.filter((r) => r.rank === best).map((r) => r.paper);
-  const preferred = press.route.loud[lane ?? press.earlyLane];
-  return preferred !== undefined && tied.includes(preferred) ? preferred : (tied[0] ?? page.defaultLead);
+  return tied.includes(preferred) ? preferred : (tied[0] ?? preferred);
 }
 
 /** How much of a page is the player's: their lines and the spillover, against its slots. */

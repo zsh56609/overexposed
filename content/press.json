@@ -70,11 +70,12 @@
       "offLane": ["brief", "brief", "brief", "brief", "secondary"]
     },
     "money": "brief",
-    "scandal": "lead",
+    "scandal": ["brief", "brief", "secondary", "lead", "lead"],
     "spillover": "brief",
     "frenzyAt": 2,
-    "overwhelmLaneFrom": 4,
-    "defaultLead": "flash"
+    "spilloverFrom": 3,
+    "overwhelmScandalFrom": 4,
+    "overwhelmLaneFrom": 4
   },
   "rival": {
     "arcs": [

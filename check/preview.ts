@@ -18,6 +18,7 @@ import {
   cursor,
   deriveSeed,
   endingIfYearEndedNow,
+  establishedLanes,
   evaluate,
   explainCondition,
   frontPages,
@@ -74,7 +75,7 @@ function feedFor(history: readonly PlayedStep[], action: Action, s: GameState, r
 
 function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep[]): void {
   const legal = new Set(legalActions(s).flatMap((a) => (a.type === 'PLAY_CARD' ? [a.uid] : [])));
-  const lines = readLines(history);
+  const lines = { ...readLines(history), lane: establishedLanes(history).at(-1) ?? null };
   for (const card of s.hand) {
     const p = previewPlay(s, card.uid, lines);
     if (p.ok !== legal.has(card.uid)) report('playable', seed, s.turn, `${card.cardId}: preview ok=${p.ok}, legal=${legal.has(card.uid)}`);
@@ -122,7 +123,7 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   }
   // END_TURN
   counts.endTurns++;
-  const pe = previewEndTurn(s, lines.counter);
+  const pe = previewEndTurn(s, lines.counter, lines.lane);
   const real = reduce(s, { type: 'END_TURN' });
   const end = turnEndOf(real.events);
   if (!pe || end?.type !== 'turnEnd') {
@@ -208,6 +209,12 @@ function checkGoals(s: GameState, seed: number): void {
   const met = s.content.majors.filter((m) => majorRequirements(m, s, true).every((c) => c.met)).map((m) => m.id);
   if (today === null || met.length !== 1 || met[0] !== today.majorId) report('goals', seed, s.turn, `marker ${today?.majorId}, requirements met for [${met.join()}]`);
   else if (majorOf(s.content, today.minorId) !== today.majorId) report('goals', seed, s.turn, `minor ${today.minorId} is not under ${today.majorId}`);
+  // No major looks achieved from the other side of an axis (round 2b): what the board shows all met is met.
+  for (const m of s.content.majors) {
+    const shown = majorRequirements(m, s).every((c) => c.met);
+    const real = majorRequirements(m, s, true).every((c) => c.met);
+    if (shown !== real) report('goals', seed, s.turn, `${m.id}: the board shows ${shown ? 'achieved' : 'not achieved'}, it is ${real ? '' : 'not '}met`);
+  }
 }
 
 /**

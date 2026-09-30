@@ -30,12 +30,10 @@ export function laneShares(s: LaneSubject): Readonly<Record<string, number>> {
 }
 
 /**
- * The lane the career has settled into, for display only — the press subject now, the managers and the
- * vanity's props later — or null while it is early: the current lane once it has rules.laneEstablished's
- * minimum plays and leads the next lane by its margin. A single play never establishes a lane. Endings
- * keep reading currentLane.
+ * Whether a lane establishes itself: it is the current lane, with rules.laneEstablished's minimum plays and
+ * its margin over the next lane. A single play never establishes a lane.
  */
-export function establishedLane(s: LaneSubject): string | null {
+function establishes(s: LaneSubject): string | null {
   const rule = s.content.rules.laneEstablished;
   const lane = currentLane(s);
   if (lane === null || !rule) return lane;
@@ -43,6 +41,32 @@ export function establishedLane(s: LaneSubject): string | null {
   const top = plays[lane] ?? 0;
   const next = Math.max(0, ...Object.entries(plays).filter(([l]) => l !== lane).map(([, n]) => n));
   return top >= rule.minPlays && top - next >= rule.lead ? lane : null;
+}
+
+/**
+ * The established lane after a play, given the one before it (hysteresis, round 2b): a lane once
+ * established stays established while it still leads, by any margin; it changes only when another lane
+ * takes the lead and itself meets the establishing threshold; a lane that stops leading without another
+ * establishing itself falls back to early (null). For display only — the press subject, the managers, the
+ * vanity's props; endings keep reading currentLane.
+ */
+export function nextEstablishedLane(s: LaneSubject, previous: string | null): string | null {
+  if (previous !== null) {
+    const plays = lanePlays(s);
+    const mine = plays[previous] ?? 0;
+    const others = Math.max(0, ...Object.entries(plays).filter(([l]) => l !== previous).map(([, n]) => n));
+    if (mine > others) return previous;
+  }
+  return establishes(s);
+}
+
+/**
+ * The established lane through a run, step by step (hysteresis needs the path, so it is read from history):
+ * the lane after each step. Only a play moves career plays, so only a play can move it.
+ */
+export function establishedLanes(history: readonly { readonly after: LaneSubject }[]): (string | null)[] {
+  let lane: string | null = null;
+  return history.map((step) => (lane = nextEstablishedLane(step.after, lane)));
 }
 
 /** The lane with the most plays. A tie resolves to the earlier lane in rules.lanes: music, the base. */

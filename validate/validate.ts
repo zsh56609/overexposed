@@ -1062,7 +1062,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 // The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
 
 const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'rival'];
-const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'overwhelmLaneFrom', 'defaultLead'];
+const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom'];
 
 function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>): void {
   const file = 'content/press.json';
@@ -1145,10 +1145,10 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
         perTier(page.loud.inLane, `${at}.loud.inLane`, prominence);
         perTier(page.loud.offLane, `${at}.loud.offLane`, prominence);
       }
-      for (const f of ['money', 'scandal', 'spillover'] as const) prominence(page[f], `${at}.${f}`);
+      for (const f of ['money', 'spillover'] as const) prominence(page[f], `${at}.${f}`);
+      perTier(page.scandal, `${at}.scandal`, prominence);
       v.int(page.frenzyAt, `${at}.frenzyAt`, [1, 100]);
-      v.int(page.overwhelmLaneFrom, `${at}.overwhelmLaneFrom`, [0, Math.max(tiers, 1)]);
-      paper(page.defaultLead, `${at}.defaultLead`);
+      for (const f of ['spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom'] as const) v.int(page[f], `${at}.${f}`, [0, Math.max(tiers, 1)]);
     }
   }
 

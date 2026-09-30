@@ -245,7 +245,10 @@ two axes — "Hype 80+", "Scandals 5 or fewer" — live via /core's
 `majorRequirements`. The two unknown-side majors list only their
 reputation requirement (the fame axis marks "unknown" unlisted): "Hype 79
 or fewer" read as if staying unknown were the goal, and the tier word and
-goal line carry the fame side. The player must always know what they are
+goal line carry the fame side. When the player is known, those majors show
+their fame line as a failing state, never a goal — "✗ Already known (hype
+104)" — so no major looks achieved from the other side of the fame axis
+(round 2b, decision 28). The player must always know what they are
 steering toward (decision 10). Narrative order, aspirations first — The
 Breakthrough, The Long Game, Overexposed, The Hard Way — the order of
 `majors` in content/endings.json. A marker labelled "If the year ended
@@ -277,7 +280,8 @@ docs/decisions.md). The ending decides the headline.
   ending alone and never fails. A completion record only; it changes
   nothing in play (decision 26)
 - **"Play again" is the largest element on the screen and restarts in
-  one click** once the screen has settled; a click during an animation
+  one click**; it sits below the awards and the rival's closing line, so
+  the player reads the ending first (round 2b, decision 28) once the screen has settled; a click during an animation
   only fast-forwards (decision 7)
 
 The Engagement rating criterion is literally "do you want another run?"
@@ -559,6 +563,13 @@ it.
     lead paper. World stories are marked by type alone: no label word was
     drafted. The three-paper desk is the visual phase's (below). The
     ending screen closes the rival's year under the awards. (2026-09-30)
+28. Round 2b's corrections on screen. The goals board never lets a major
+    look achieved from the other side of the fame axis: an unknown-side
+    major shows its fame line only when it fails, worded as the state the
+    player is in ("✗ Already known (hype 104)"). The ending page reads
+    top to bottom — category, ending, text, awards, the rival's closing
+    line — and then "Play again", still the largest element. The lead
+    paper follows the player's lane (design §3.4). (2026-09-30)
 
 ### Still open
 

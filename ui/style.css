@@ -157,7 +157,8 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 
 /* Ending */
 .ending { height: 100%; display: flex; flex-direction: column; gap: 0.6em; padding: 1em 4em; }
-.play-again { width: 100%; font-size: 2.2em; padding: 0.2em; flex: none; }
+/* Below the awards and the rival's line (round 2b): read the ending first, then play again. Still the largest element. */
+.play-again { width: 100%; font-size: 2.2em; padding: 0.2em; flex: none; margin-top: 0.3em; }
 /* The story column holds the category, the ending, its text and up to five awards (four in The Breakthrough). */
 .ending-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5em; }
 .ending-story { display: flex; flex-direction: column; gap: 0.3em; }

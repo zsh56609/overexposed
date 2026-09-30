@@ -8,6 +8,7 @@ import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import {
   createInitialState,
   endingIfYearEndedNow,
+  establishedLanes,
   explainCondition,
   getCard,
   getGate,
@@ -55,6 +56,7 @@ import {
   isPlaceholder,
   amount,
   lineText,
+  majorClauseLine,
   mastheadName,
   money,
   openingText,
@@ -181,8 +183,9 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const s = snap.state;
   const c = s.content;
   const legal = useMemo(() => legalOf(s), [s]);
-  // Every line printed so far, and the counter the next ones follow from (decision 15, revised).
-  const lines = useMemo(() => readLines(snap.steps), [snap.steps]);
+  // Every line printed so far, the counter the next ones follow from (decision 15, revised), and the
+  // established lane, which has hysteresis and so is read from history.
+  const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).at(-1) ?? null }), [snap.steps]);
 
   const act = (action: Action) => {
     if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
@@ -197,7 +200,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   if (s.phase === 'ended') return <Ending s={s} steps={snap.steps} onRestart={onRestart} />;
 
-  const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter) : null;
+  const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter, lines.lane) : null;
   const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
@@ -418,7 +421,7 @@ function GoalsBoard({ s }: { s: GameState }) {
             <div className="clauses">
               {majorRequirements(m, s).map((clause, i) => (
                 <span key={i} className={clause.met ? 'met' : 'unmet'}>
-                  {clauseLine(clause)}
+                  {majorClauseLine(clause)}
                 </span>
               ))}
             </div>
@@ -886,9 +889,6 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
   const rival = rivalArc(c, s.seed);
   return (
     <div className="ending">
-      <button className="play-again" onClick={onRestart}>
-        {t('ui.ending.playAgain')}
-      </button>
       <div className="ending-body">
         <div className="ending-story">
           <p className="muted">{t('ui.ending.title')}</p>
@@ -908,6 +908,10 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
             })}
           </ul>
           {rival && <p className={prose(t(rival.endingKey), 'rival-line')}>{t(rival.endingKey)}</p>}
+          {/* Below the ending the player has just read (round 2b), and still the largest thing on the page. */}
+          <button className="play-again" onClick={onRestart}>
+            {t('ui.ending.playAgain')}
+          </button>
         </div>
         <div className="ending-facts">
           <h2>{t('ui.ending.summary')}</h2>

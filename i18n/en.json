@@ -466,6 +466,7 @@
   "ui.card.atMonthEnd": "At month end: {effects}",
   "ui.goals.title": "Goals",
   "ui.goals.today": "If the year ended today",
+  "ui.goals.state.known": "Already known (hype {value})",
   "ui.deck.open": "Deck & discard",
   "ui.deck.title": "Your cards",
   "ui.deck.deck": "Deck — {n}",

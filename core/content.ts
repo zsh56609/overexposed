@@ -279,14 +279,20 @@ export interface PageRules {
   /** A LOUD line's prominence by fame tier: in the established lane's paper, and in another paper. */
   readonly loud: { readonly inLane: readonly Prominence[]; readonly offLane: readonly Prominence[] };
   readonly money: Prominence;
-  readonly scandal: Prominence;
+  /**
+   * A scandal's prominence in its paper by fame tier (round 2b): fame amplifies scandal — an unknown's
+   * scandal costs them in full, but the world barely notices.
+   */
+  readonly scandal: readonly Prominence[];
   readonly spillover: Prominence;
-  /** Scandals printed in a month that spill over into every other paper. */
+  /** Scandals printed in a month that make a frenzy. */
   readonly frenzyAt: number;
+  /** From this fame tier on, a frenzy spills over: a line in every other paper. */
+  readonly spilloverFrom: number;
+  /** From this fame tier on, the scandal paper is overwhelmed in a month a scandal printed. */
+  readonly overwhelmScandalFrom: number;
   /** From this fame tier on, the established lane's paper is overwhelmed: the player may fill it. */
   readonly overwhelmLaneFrom: number;
-  /** The lead paper of a month with nothing of the player's. */
-  readonly defaultLead: string;
 }
 
 /** One season's beat of the rival's arc: in which paper, and its line. */

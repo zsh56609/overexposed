@@ -13,6 +13,7 @@ import {
   legalActions,
   majorOf,
   monthsLeft,
+  nextEstablishedLane,
   playCheck,
   pressOf,
   printContext,
@@ -32,18 +33,20 @@ import {
   type ResourceKey,
 } from '../core/index.ts';
 
-/**
- * What the run has printed so far, as a preview needs it (core/lines.ts readLines): the counter the next
- * showing of every line group follows from, and each scandal's in-hand line. The preview advances a fork of
- * the counter over its hypothetical, exactly as the feed advances the real one over the real step — so the
- * headline shown before a decision is the one printed after it (decision 21).
- */
 /** Where a line prints and what it calls the player, as /core's press decides at the moment it prints. */
 export type LinePress = Pick<PressLine, 'paper' | 'fameTier' | 'lane' | 'subjectKey'>;
 
+/**
+ * What the run has printed so far, as a preview needs it (core/lines.ts readLines): the counter the next
+ * showing of every line group follows from, each scandal's in-hand line, and the established lane (it has
+ * hysteresis, so it comes from history: core/lanes.ts establishedLanes). The preview advances a fork of the
+ * counter over its hypothetical, exactly as the feed advances the real one over the real step — so the
+ * headline shown before a decision is the one printed after it (decision 21).
+ */
 export interface LinesSoFar {
   readonly counter: LineCounter;
   readonly inHand: ReadonlyMap<number, LineShow>;
+  readonly lane: string | null;
 }
 
 /** Where heat sits against the line, as /core reports it (decision 1). */
@@ -126,15 +129,15 @@ export function addedBy(state: GameState, cardId: string): string | null {
 
 /**
  * END_TURN on a hypothetical, cut at the turnEnd event. Only meaningful in the play phase. `counter`: the
- * line counter as the run stands (it is forked, never advanced).
+ * line counter as the run stands (it is forked, never advanced); `lane`: the established lane now.
  */
-export function previewEndTurn(state: GameState, counter: LineCounter): EndTurnPreview | null {
+export function previewEndTurn(state: GameState, counter: LineCounter, lane: string | null): EndTurnPreview | null {
   if (state.phase !== 'play') return null;
   const events = through(reduce(state, { type: 'END_TURN' }).events, 'turnEnd');
   const end = events.find((e) => e.type === 'turnEnd');
   const blamed = new Map(events.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
   const lines = counter.fork();
-  const at = printContext(state, events);
+  const at = printContext(state, events, lane);
   const scandalCards = events.flatMap((e) => {
     const printed = lines.take(e).find((x) => x.kind === 'scandal');
     if (e.type !== 'addCard' || !printed) return [];
@@ -187,7 +190,7 @@ export interface PlayPreview {
 export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): PlayPreview {
   const card = state.hand.find((c) => c.uid === uid);
   const check = playCheck(state, uid);
-  const endTurnNow = previewEndTurn(state, lines.counter);
+  const endTurnNow = previewEndTurn(state, lines.counter, lines.lane);
   const cardId = card?.cardId ?? '';
   const scandal = getCard(state.content, cardId)?.kind === 'scandal';
   const base = {
@@ -195,7 +198,7 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
     cardId,
     headline: scandal ? null : lines.counter.fork().play(cardId),
     // A card that can't be played prints nothing; its headline reads as the run stands now.
-    press: scandal ? null : pressOf(state.content, cardId, printContext(state, [])),
+    press: scandal ? null : pressOf(state.content, cardId, printContext(state, [], lines.lane)),
     inHand: scandal ? (lines.inHand.get(uid) ?? null) : null,
     register: getCard(state.content, cardId)?.register ?? null,
     ok: check.ok,
@@ -209,10 +212,11 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
   // The month end after this card: counted from the run's lines plus this play's own (a copy it adds prints).
   const counted = lines.counter.fork();
   for (const e of after.events) counted.take(e);
-  const endTurnAfter = previewEndTurn(after, counted);
+  const laneAfter = nextEstablishedLane(after, lines.lane);
+  const endTurnAfter = previewEndTurn(after, counted, laneAfter);
   return {
     ...base,
-    press: pressOf(state.content, cardId, printContext(after, after.events)),
+    press: pressOf(state.content, cardId, printContext(after, after.events, laneAfter)),
     outcome: outcomeOf(after.events),
     heatAfter: after.resources.heat,
     slotsAfter: after.slots,

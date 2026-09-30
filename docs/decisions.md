@@ -6,6 +6,45 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2b, Part A: corrections
+
+- **Fame amplifies scandal** — a design principle. A scandal's
+  prominence follows fame like every other story: a brief in The Daily
+  Flash while Unknown or Noticed, a secondary while Rising, the lead once
+  Known, and once Famous the lead of a page it overwhelms. A frenzy (two
+  or more scandals in a month) spills into the other papers only once the
+  player is Known. An unknown's scandal still costs them in full — the
+  card still enters the deck — but the world barely notices. This
+  replaces "a crystallised scandal always leads The Daily Flash" and "the
+  Flash is overwhelmed in any scandal month" (round 2a, Part E, 4).
+- **The lead paper**: Money lines do not count; a month with nothing of
+  the player's goes to the established lane's paper (early: B-Side); at
+  equal prominence the lane's paper wins. **One reading made explicit**: a
+  scandal counts for the desk only as a lead story. Read literally, an
+  unknown's scandal brief could still take the desk in a month the lane's
+  paper had nothing — it did in 44% of Unknown scandal months — against
+  "in practice once Known" and the visual note that the lane paper stays
+  in front in an unknown-scandal month. With the reading, the Flash is on
+  the desk in 2.4% of Unknown scandal months (for its other stories).
+  Result (player-like, seed 20260929, before managers and fame filler):
+  the lead paper is the lane's own — music → B-Side 70%, screen → Marquee
+  60%, celebrity → The Daily Flash 84%, early → B-Side 67% — and a scandal
+  leads the Flash in 0% of Unknown, Noticed and Rising months, 100% of
+  Known and Famous ones.
+- **The established lane has hysteresis**, read from the run's history
+  (`establishedLanes`): once established it stays while it still leads,
+  by any margin; it changes only when another lane takes the lead and
+  meets the threshold. After a lane first settles, 15.2% of later month
+  ends read early again (25.7% without hysteresis); it changes lane in
+  8.3% of runs.
+- **Goals board**: the unknown-side majors show their fame line only when
+  it fails, as a state — "✗ Already known (hype 104)" (the author's
+  wording). `check:preview` asserts that what the board shows as all met
+  is met, for every major at every state.
+- **Ending page**: "Play again" moves below the awards and the rival's
+  closing line; it stays the largest element (79px tall; a five-award
+  ending still fits, 668 of 680px).
+
 ## 2026-09-30 — Round b59f9d6 answered; round 2b begins
 
 Round 2b is the two managers, the corrections the numbers and the

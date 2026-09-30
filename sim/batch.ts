@@ -146,7 +146,12 @@ function removalCards(content: Content): ReadonlySet<string> {
   return ids;
 }
 
-export function runOne(content: Content, persona: PersonaId, seed: number, trace?: TraceFn): RunRecord {
+/** How a run is set up beyond its persona and seed: the manager chosen at the opening (round 2b). */
+export interface RunOptions {
+  readonly manager?: string;
+}
+
+export function runOne(content: Content, persona: PersonaId, seed: number, trace?: TraceFn, _options: RunOptions = {}): RunRecord {
   const policy = PERSONAS[persona];
   const decisions = cursor(seedRng(deriveSeed(seed, PERSONA_SALT[persona])));
   const draws: Record<string, number> = {};

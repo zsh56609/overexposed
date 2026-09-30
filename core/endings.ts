@@ -38,14 +38,24 @@ export function majorOf(content: ContentIndex, minorId: string): string | null {
 }
 
 /**
- * A major's requirements as clauses (the goals board): its side of each axis as a range, live. A side its
- * axis marks unlisted is left out — the tier word and the goal line carry it — unless `all` is asked for.
+ * A goals-board clause: a requirement with its verdict — or, for a side its axis leaves unlisted, `state`:
+ * the side the player is actually on, shown only when the unlisted side fails ("Already known").
  */
-export function majorRequirements(major: MajorDef, s: ConditionSubject, all = false): ClauseReport[] {
-  return s.content.axes.flatMap((axis) => {
+export type MajorClause = ClauseReport & { readonly state?: string };
+
+/**
+ * A major's requirements as clauses (the goals board): its side of each axis as a range, live. A side its
+ * axis marks unlisted is not listed as a goal — the tier word and the goal line carry it — but when it fails
+ * it shows, as the state the player is in, so no major looks achieved from the other side of the axis.
+ * `all`: every side as a plain requirement.
+ */
+export function majorRequirements(major: MajorDef, s: ConditionSubject, all = false): MajorClause[] {
+  return s.content.axes.flatMap((axis): MajorClause[] => {
     const side = major.on[axis.id];
-    if (!all && side !== undefined && axis.unlisted?.includes(side)) return [];
     const range: Range = side === axis.sides[1] ? { min: axis.from } : { max: axis.from - 1 };
-    return explainCondition({ [axis.key]: range }, s);
+    const clauses = explainCondition({ [axis.key]: range }, s);
+    if (all || side === undefined || !axis.unlisted?.includes(side)) return clauses;
+    const actual = axisSide(axis, s);
+    return clauses.filter((c) => !c.met).map((c) => ({ ...c, state: actual }));
   });
 }
