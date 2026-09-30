@@ -53,10 +53,10 @@ history — or from the history up to its own month end — is the same page.
   a month prints only one or two of the player's public lines in any one
   paper, so the share is capped by supply, not by slots. Where fame shows
   is prominence — the player's story is the lead paper's lead in 7%,
-  34%, 40%, 70% and 78–81% of months — and the lead page is overwhelmed
+  34%, 40%, 70% and 77–81% of months — and the lead page is overwhelmed
   in 7%, 34%, 40%, 34% and 80–83%.
-- **The rival**: each arc drawn in 23–27% of runs; her major differs from
-  the player's in 67–69% of runs (crash 81%, the others 62–66%).
+- **The rival**: each arc drawn in 22–28% of runs; her major differs from
+  the player's in 67–69% of runs (crash 79–81%, the others 61–66%).
 - **World pools repeat in every run**: a run prints on average 31 world
   stories in The Daily Flash, 42 in B-Side and 45 in Marquee (at most 46–
   48), against pools of 10; one story can print 7–8 times in a run.

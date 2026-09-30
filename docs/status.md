@@ -117,7 +117,7 @@ Round 2b's writing is drafted against it.
   23% → 30% → 39% → 39% → 44% from Unknown to Famous, flat from Rising to
   Known: a month prints only one or two of the player's lines in any one
   paper. Prominence climbs clearly: the player's story leads the lead
-  page in 7%, 34%, 40%, 70% and 78–81% of months.
+  page in 7%, 34%, 40%, 70% and 77–81% of months.
 - **World pools repeat in every run** (10 stories a paper; one story can
   print 7–8 times a run) until round 2b grows them.
 - **An established lane can lapse**: a quarter of later month ends read
