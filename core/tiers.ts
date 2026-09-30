@@ -3,7 +3,7 @@
 // never computes a boundary. Ids, keys and numbers only.
 
 import { heatOutlook, type ConditionSubject } from './conditions.ts';
-import type { HeatTiers, ValueTiers } from './content.ts';
+import type { ContentIndex, CountdownLevel, HeatTiers, ValueTiers } from './content.ts';
 
 export const TIER_STATS = ['hype', 'heat', 'craft'] as const;
 export type TierStat = (typeof TIER_STATS)[number];
@@ -45,6 +45,26 @@ function heatTier(t: HeatTiers, s: ConditionSubject): StatTier | null {
     if (crossed >= min) j = i;
   });
   return tier(t.nameKeys, t.toGoAtLeast.length + 1 + j);
+}
+
+/**
+ * A tier's tooltip line (round 2c), and the word for the set it speaks in: a lane's own set while that lane
+ * is established (craft reads as acting on the screen lane), else the stat's own. `lane`: the established
+ * lane (core/lanes.ts establishedLanes).
+ */
+export function tierTip(c: ContentIndex, stat: TierStat, index: number, lane: string | null): { readonly tipKey: string | null; readonly modeKey: string | null } {
+  const t = c.rules.tiers?.[stat];
+  if (!t) return { tipKey: null, modeKey: null };
+  const own = 'laneTips' in t && lane !== null ? t.laneTips?.[lane] : undefined;
+  const tipKeys = own?.tipKeys ?? t.tipKeys;
+  return { tipKey: tipKeys?.[index] ?? null, modeKey: own?.modeKey ?? ('modeKey' in t ? (t.modeKey ?? null) : null) };
+}
+
+/** How loud the next-scandal countdown is now (round 2c): by the heat tier, as content maps it. */
+export function countdownLevel(s: ConditionSubject): CountdownLevel {
+  const t = s.content.rules.tiers?.heat;
+  const tier = t ? heatTier(t, s) : null;
+  return (tier && t?.countdown?.[tier.index]) ?? 'calm';
 }
 
 /** Each stat's tier as the state stands; null for a stat content gives no tiers. */

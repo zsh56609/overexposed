@@ -480,12 +480,33 @@ export interface Rules {
    * lane has at least `minPlays` plays and leads the next by at least `lead`. Endings never read it.
    */
   readonly laneEstablished?: { readonly minPlays: number; readonly lead: number };
+  /** The year's calendar (round 2c): the month and year the first month falls in. */
+  readonly calendar?: { readonly startMonth: number; readonly startYear: number };
+  /** The stat bar's tooltip lines for the stats without tiers (round 2c): money, the countdown, actions. */
+  readonly statTips?: StatTips;
 }
+
+/** Tooltip lines for the stats that have no tiers: money, the next-scandal countdown (to go, or to the next once a line is crossed), actions. */
+export interface StatTips {
+  readonly capital: string;
+  readonly toGo: string;
+  readonly toNext: string;
+  readonly slots: string;
+}
+
+/** How loud the next-scandal countdown is (round 2c), per heat tier: plain, amber, red, and crossed. */
+export const COUNTDOWN_LEVELS = ['calm', 'amber', 'red', 'crossed'] as const;
+export type CountdownLevel = (typeof COUNTDOWN_LEVELS)[number];
 
 /** Tiers of a value, lowest first. `from[i]` is the lowest value of tier i: 0 first, then ascending. */
 export interface ValueTiers {
   readonly nameKeys: readonly string[];
   readonly from: readonly number[];
+  /** The tooltip line of each tier (round 2c), and the word naming the set the lines speak in ("singing"). */
+  readonly tipKeys?: readonly string[];
+  readonly modeKey?: string;
+  /** Another set of lines while a lane is established — craft reads as acting on the screen lane. */
+  readonly laneTips?: Readonly<Record<string, { readonly modeKey: string; readonly tipKeys: readonly string[] }>>;
 }
 
 /**
@@ -498,6 +519,10 @@ export interface HeatTiers {
   readonly nameKeys: readonly string[];
   readonly toGoAtLeast: readonly number[];
   readonly linesCrossed: readonly number[];
+  /** The tooltip line of each tier (round 2c). */
+  readonly tipKeys?: readonly string[];
+  /** The next-scandal countdown's level at each tier (round 2c). */
+  readonly countdown?: readonly CountdownLevel[];
 }
 
 export interface StatTierRules {

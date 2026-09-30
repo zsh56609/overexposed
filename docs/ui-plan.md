@@ -591,6 +591,23 @@ it.
 30. The world on the page (round 2b, Part D; design §3.3, §3.4). A saga's
     beat prints like any world story, in muted type; fame filler prints
     as the player's, in ink — it is about them. (2026-09-30)
+31. The stat bar, the date and the goals board (round 2c, Part A).
+    - The stat bar reads hype · craft · heat · next scandal · money ·
+      actions. Money is named "Money", and the pips "Actions".
+    - Every cell has a tooltip (hover; long-press on touch): a header with
+      stat, tier and value ("Craft · singing · Skilled · 58"), then its line
+      from draft v7. Craft's lines speak of acting once the established
+      lane is screen.
+    - The countdown has four levels, set in content per heat tier: 5 or
+      more to go plain; 3–4 amber; 2 or fewer red; crossed red and filled.
+    - The top bar shows the date, "March 2027", and beside it "Spring ·
+      month 1 of 3" (a text stand-in for the season marks). The date's
+      tooltip is draft v7's date line.
+    - Every front page carries the same date as its dateline, and the
+      feed's month header is the date.
+    - The goals board speaks the stat bar's language: "✓ Known · 80+ (you
+      have 104)", "✗ 5 or fewer scandals (you have 8)", "✗ Already known
+      (hype 104)". (2026-09-30)
 
 ### Still open
 

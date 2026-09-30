@@ -39,9 +39,17 @@ export function majorOf(content: ContentIndex, minorId: string): string | null {
 
 /**
  * A goals-board clause: a requirement with its verdict — or, for a side its axis leaves unlisted, `state`:
- * the side the player is actually on, shown only when the unlisted side fails ("Already known").
+ * the side the player is actually on, shown only when the unlisted side fails ("Already known"). On a stat
+ * with tiers, `tierKey` names the tier the split sits on (round 2c: "Known · 80+").
  */
-export type MajorClause = ClauseReport & { readonly state?: string };
+export type MajorClause = ClauseReport & { readonly state?: string; readonly tierKey?: string };
+
+/** The tier whose lowest value is `from`, on a stat with value tiers (the fame split sits on one: validate). */
+function tierAt(s: ConditionSubject, key: string, from: number | undefined): string | undefined {
+  const t = key === 'hype' || key === 'craft' ? s.content.rules.tiers?.[key] : undefined;
+  const i = from === undefined ? -1 : (t?.from.indexOf(from) ?? -1);
+  return i === -1 ? undefined : t?.nameKeys[i];
+}
 
 /**
  * A major's requirements as clauses (the goals board): its side of each axis as a range, live. A side its
@@ -53,7 +61,10 @@ export function majorRequirements(major: MajorDef, s: ConditionSubject, all = fa
   return s.content.axes.flatMap((axis): MajorClause[] => {
     const side = major.on[axis.id];
     const range: Range = side === axis.sides[1] ? { min: axis.from } : { max: axis.from - 1 };
-    const clauses = explainCondition({ [axis.key]: range }, s);
+    const clauses = explainCondition({ [axis.key]: range }, s).map((c): MajorClause => {
+      const tierKey = 'range' in c ? tierAt(s, c.key, c.range.min) : undefined;
+      return tierKey ? { ...c, tierKey } : c;
+    });
     if (all || side === undefined || !axis.unlisted?.includes(side)) return clauses;
     const actual = axisSide(axis, s);
     return clauses.filter((c) => !c.met).map((c) => ({ ...c, state: actual }));

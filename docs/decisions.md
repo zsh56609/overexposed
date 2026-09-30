@@ -6,6 +6,37 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2c, Part A: the stat bar, the date, the goals board
+
+- **The order** is the author's: hype · craft · heat · next scandal · money ·
+  actions. The capital resource is now named "Money" everywhere it is
+  shown, not only in the stat bar: the author calls it money throughout.
+  Slots are named "Actions".
+- **Tooltips.**
+  - The lines are content: `rules.tiers.<stat>.tipKeys`; craft's acting
+    set in `laneTips.screen`; the untiered stats in `rules.statTips`.
+  - The headers follow draft v7's examples ("Hype · Rising · 34", "Craft ·
+    singing · Skilled · 58", "Next scandal · 4 to go", "Actions · 2
+    left"). Money's is "Money · £3,000".
+  - Craft's header always names its set: singing, or acting on the screen
+    lane.
+  - `check:preview` holds every tooltip to its cell at every state.
+- **The countdown's levels are content** (`rules.tiers.heat.countdown`),
+  one per heat tier, not thresholds written in the UI. The heat tiers
+  already fall at 5 and 3 points to go and at a crossed line, so the
+  levels are exactly the author's: 5+ plain, 3–4 amber, 2 or fewer red,
+  crossed red and filled. `check:preview` asserts the mapping against A4.
+- **The calendar**:
+  - It is content (`rules.calendar`: March 2027). /core's `calendarDate`
+    derives the rest.
+  - The feed's month header is now the date ("— March 2027 —"). Every
+    front page carries it as a dateline.
+  - The date line's "{k} months left" reads "1 month left" in month 11:
+    the English singular of the author's line, flagged in the report.
+- **The goals board.** A hype clause names the tier its split sits on
+  (/core's `majorRequirements` carries `tierKey`), so the line reads
+  "Known · 80+" from content, never a word in the code.
+
 ## 2026-09-30 — Round f9c11fb answered; round 2c begins
 
 The author's answers to round 2b, and the terms of round 2c:

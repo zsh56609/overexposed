@@ -63,6 +63,19 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .stat .tier { font-weight: bold; }
 .stat .num { color: var(--muted); font-size: 0.75em; }
 .togo { font-weight: bold; font-size: 0.9em; }
+/* The next-scandal countdown's four levels (round 2c, A4): 5+ to go plain, 3–4 amber, 2 or fewer red, crossed
+   red and emphasised. The levels come from content (rules.tiers.heat.countdown), never from a number here. */
+.level-amber .togo { color: #a35f00; }
+.level-red .togo { color: var(--red); }
+.level-crossed .togo { color: var(--page); background: var(--red); padding: 0 0.35em; letter-spacing: 0.04em; }
+/* Tooltips (round 2c, A2): under the element, inside the stage; they never take a click. */
+.tipped { position: relative; }
+.tipped:focus { outline: none; }
+.tip { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; width: 300px; display: flex; flex-direction: column; gap: 0.2em; padding: 0.35em 0.55em; background: var(--page); color: var(--ink); border: 1px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 0.8rem; font-weight: normal; line-height: 1.3; white-space: normal; pointer-events: none; }
+.tip.right { left: auto; right: 0; }
+.tip strong { font-size: 1.05em; }
+.masthead .season { margin-left: 0.4em; }
+.dateline { margin: 0 0 0.15em; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.06em; }
 .pips { letter-spacing: 0.1em; }
 
 .body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }

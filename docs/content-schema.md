@@ -178,6 +178,24 @@ distance to the line, never the threshold. /core's `statTiers` picks;
 /ui never computes a boundary. A tier word is one word of at most 10
 characters.
 
+Round 2c adds the stat bar's tooltips and the countdown's levels:
+- `tipKeys`: each tier's tooltip line, in order. Craft's `modeKey` names
+  the set its lines speak in ("singing"); `laneTips` gives another set
+  while a lane is established — `{ "screen": { modeKey, tipKeys } }`,
+  acting. /core's `tierTip` picks the line.
+- heat's `countdown`: the next-scandal countdown's level at each heat
+  tier — `calm`, `amber`, `red` or `crossed`. /core's `countdownLevel`
+  reads it.
+
+## The stat bar and the calendar — `rules.statTips`, `rules.calendar`
+
+- `statTips`: the tooltip lines of the stats without tiers — `capital`
+  (money), `toGo` and `toNext` (the countdown before and after a line is
+  crossed), `slots` (actions).
+- `calendar`: `startMonth` (1–12) and `startYear`, the date of the first
+  month of play. /core's `calendarDate` gives each month its calendar
+  month and year, its place in its season, and the months left.
+
 ## i18n keys
 
 The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `ui.<area>.<label>`

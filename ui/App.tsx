@@ -14,7 +14,6 @@ import {
   getCard,
   getGate,
   getManager,
-  heatLine,
   majorOf,
   majorRequirements,
   readLines,
@@ -23,7 +22,6 @@ import {
   rivalArc,
   RESOURCE_KEYS,
   scandalCount,
-  statTiers,
   yearAwards,
   type Action,
   type CardInstance,
@@ -31,21 +29,23 @@ import {
   type GameState,
   type LineShow,
   type MonthPress,
-  type ResourceKey,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { feedLines, type FeedLine } from './feed.ts';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewDraftCard, previewEndTurn, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
+import { statCells } from './stats.ts';
 import {
   awardCitation,
   awardName,
   blockerText,
+  calendarLabel,
   cardName,
   cardRuleLines,
   cardText,
   clauseLine,
+  dateLine,
   effectsText,
   endingPair,
   majorGoal,
@@ -57,7 +57,6 @@ import {
   gateName,
   heatText,
   isPlaceholder,
-  amount,
   lineText,
   majorClauseLine,
   mastheadName,
@@ -65,6 +64,7 @@ import {
   openingText,
   pageItemText,
   resourceName,
+  seasonLabel,
   seasonName,
   signedAmount,
   zoneName,
@@ -210,7 +210,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   return (
     <div className="app">
       <Masthead s={s} onDeck={() => setDeckOpen(true)} />
-      <StatStrip s={s} />
+      <StatStrip s={s} lane={lines.lane} />
       {error && (
         <p className="error overlay">
           {t('ui.error.title')}: {error}
@@ -256,7 +256,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 // Frame: masthead, stat strip, feed, side panel
 
 function Masthead({ s, onDeck }: { s: GameState; onDeck: () => void }) {
-  const r = s.content.rules;
+  const c = s.content;
+  const date = calendarLabel(c, s.turn);
   return (
     <header className="masthead">
       <span className="name">{t('ui.masthead.name')}</span>
@@ -267,50 +268,89 @@ function Masthead({ s, onDeck }: { s: GameState; onDeck: () => void }) {
       <button className="deck-open" onClick={onDeck}>
         {t('ui.deck.open')}
       </button>
-      <span className="when">{t('ui.masthead.when', { season: seasonName(s.content, s.act), turn: s.turn, total: r.acts * r.turnsPerAct })}</span>
+      {/* The date (round 2c, A3): the month and year, then the season and the month's place in it. */}
+      <span className="when">
+        <HoverTip header={date} line={dateLine(c, s.turn)} align="right" className="date">
+          <strong>{date}</strong>
+        </HoverTip>{' '}
+        <span className="season muted">{seasonLabel(c, s.turn)}</span>
+      </span>
     </header>
   );
 }
 
 /**
- * The stat bar (decision 25): ambient state is words, decisions are numbers. Hype, craft and heat show the
- * tier /core picks, the number small beside it and in full on hover; capital stays a number; slots are
- * pips. Heat keeps its "N TO GO" (decision 1): the tier states pressure, never a scandal count.
+ * A tooltip (round 2c, A2): shown on hover, or on a long-press on touch until the next tap; a header, then
+ * a line. It never takes a click: pointer events pass through it.
  */
-function StatStrip({ s }: { s: GameState }) {
-  const tiers = statTiers(s);
-  const slots = s.content.rules.slotsPerTurn;
-  const stat = (k: ResourceKey) => {
-    const exact = t('ui.stat.value', { name: resourceName(k), value: amount(k, s.resources[k]) });
-    const tier = k === 'capital' ? null : tiers[k];
-    return (
-      <span className={`stat stat-${k}`} title={exact}>
-        {tier === null ? (
-          exact
-        ) : (
-          <>
-            <span className="stat-name">{resourceName(k)}</span> <strong className="tier">{t(tier.nameKey)}</strong>{' '}
-            <small className="num">{s.resources[k]}</small>
-          </>
-        )}
-      </span>
-    );
-  };
+function HoverTip({ header, line, className, align = 'left', children }: { header: string; line: string; className?: string; align?: 'left' | 'right'; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [open]);
+  return (
+    <span
+      className={`tipped${className ? ` ${className}` : ''}`}
+      tabIndex={0}
+      onPointerEnter={(e) => {
+        if (e.pointerType === 'mouse') setOpen(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === 'mouse') setOpen(false);
+      }}
+      onPointerDown={(e) => {
+        if (e.pointerType === 'mouse') return;
+        window.clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => setOpen(true), 450);
+      }}
+      onPointerUp={() => window.clearTimeout(timer.current)}
+      onPointerCancel={() => window.clearTimeout(timer.current)}
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
+    >
+      {children}
+      {open && (
+        <span className={`tip ${align}`} role="tooltip">
+          <strong>{header}</strong>
+          <span className={prose(line)}>{line}</span>
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * The stat bar (decision 25; round 2c, A1–A4): hype · craft · heat · next scandal · money · actions. Ambient
+ * state is words, decisions are numbers: the tier /core picks, the number small beside it. The countdown
+ * keeps its "N TO GO" (decision 1) in four levels. Every cell has a tooltip (ui/stats.ts); actions show in
+ * the play phase.
+ */
+function StatStrip({ s, lane }: { s: GameState; lane: string | null }) {
   return (
     <div className="stats">
-      {stat('hype')}
-      {stat('craft')}
-      {stat('capital')}
-      {stat('heat')}
-      <span className="stat togo">{heatText(heatLine(s))}</span>
-      {s.phase === 'play' && (
-        <span className="stat slots" title={t('ui.stat.slots', { n: s.slots })}>
-          <span className="stat-name">{t('ui.stat.slotsName')}</span>{' '}
-          <span className="pips" aria-label={t('ui.stat.slots', { n: s.slots })}>
-            {t('ui.stat.slotOn').repeat(s.slots)}
-            {t('ui.stat.slotOff').repeat(Math.max(0, slots - s.slots))}
-          </span>
-        </span>
+      {statCells(s, lane).map((cell) =>
+        cell.id === 'actions' && s.phase !== 'play' ? null : (
+          <HoverTip key={cell.id} header={cell.tipHeader} line={cell.tipLine} className={`stat stat-${cell.id}${cell.level ? ` level-${cell.level}` : ''}`}>
+            {cell.id === 'next' ? (
+              <strong className="togo">{cell.value}</strong>
+            ) : (
+              <>
+                <span className="stat-name">{cell.label}</span>{' '}
+                {cell.tier !== null ? (
+                  <>
+                    <strong className="tier">{cell.tier}</strong> <small className="num">{cell.value}</small>
+                  </>
+                ) : (
+                  <span className={cell.id === 'actions' ? 'pips' : 'value'}>{cell.value}</span>
+                )}
+              </>
+            )}
+          </HoverTip>
+        ),
       )}
     </div>
   );
@@ -369,6 +409,7 @@ function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
   if (!page) return null;
   return (
     <li className="feed-page">
+      <p className="dateline muted">{calendarLabel(c, month.turn)}</p>
       <div className="paper-switch">
         {month.pages.map((p) => (
           <button key={p.paper} className={p.paper === page.paper ? 'on' : undefined} aria-pressed={p.paper === page.paper} onClick={() => setShown(p.paper)}>

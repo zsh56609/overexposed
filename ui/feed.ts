@@ -29,6 +29,7 @@ import {
   flagName,
   gateName,
   isPlaceholder,
+  calendarLabel,
   lineText,
   managerName,
   mastheadName,
@@ -146,7 +147,7 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
       }
       if (turn !== lastMonth) {
         flush();
-        push('month', t('ui.feed.month', { season: seasonName(c, act), turn }));
+        push('month', t('ui.feed.month', { date: calendarLabel(c, turn) }));
         lastMonth = turn;
       }
     };

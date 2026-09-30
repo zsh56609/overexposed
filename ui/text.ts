@@ -2,6 +2,7 @@
 // Nothing here decides anything — a clause arrives already marked met or unmet by /core.
 
 import {
+  calendarDate,
   getCard,
   getGate,
   getMajor,
@@ -173,13 +174,46 @@ export const clauseLine = (clause: ClauseReport): string =>
   t(clause.met ? 'ui.clause.met' : 'ui.clause.unmet', { text: clauseText(clause) });
 
 /**
- * A goals-board clause: a requirement, or the state the player is in when an unlisted side fails — worded
- * as a state, never a goal: "✗ Already known (hype 104)".
+ * A goals-board clause in the stat bar's vocabulary (round 2c): "✓ Known · 80+ (you have 104)", "✗ 5 or
+ * fewer scandals (you have 8)" — or the state the player is in when an unlisted side fails, worded as a
+ * state, never a goal: "✗ Already known (hype 104)".
  */
-export const majorClauseLine = (clause: MajorClause): string =>
-  clause.state !== undefined && 'value' in clause
-    ? t('ui.clause.unmet', { text: t(`ui.goals.state.${clause.state}`, { value: clause.value }) })
-    : clauseLine(clause);
+export function majorClauseLine(clause: MajorClause): string {
+  if (clause.state !== undefined && 'value' in clause) return t('ui.clause.unmet', { text: t(`goals.state.${clause.state}`, { value: clause.value }) });
+  return t(clause.met ? 'ui.clause.met' : 'ui.clause.unmet', { text: goalText(clause) });
+}
+
+function goalText(clause: MajorClause): string {
+  if (!('range' in clause)) return clauseText(clause);
+  const { min, max } = clause.range;
+  if (clause.tierKey && min !== undefined && max === undefined) return t('goals.line.hypeMin', { tier: t(clause.tierKey), min, value: clause.value });
+  if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return t('goals.line.scandalsMax', { n: max, value: clause.value });
+  if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return t('goals.line.scandalsMin', { n: min, value: clause.value });
+  return clauseText(clause);
+}
+
+// ---------------------------------------------------------------------------
+// The calendar (round 2c, A3): the year starts in March 2027; January and February are 2028.
+
+/** "March 2027": the date of a month of play — the top bar's, every front page's dateline. */
+export function calendarLabel(c: ContentIndex, turn: number): string {
+  const d = calendarDate(c, turn);
+  return t('ui.masthead.date', { month: t(`ui.calendar.month.${d.month}`), year: d.year });
+}
+
+/** "Spring · month 1 of 3": the season and the month's place in it (a stand-in for the season marks). */
+export function seasonLabel(c: ContentIndex, turn: number): string {
+  const d = calendarDate(c, turn);
+  return t('ui.masthead.season', { season: seasonName(c, d.act), k: d.monthOfSeason, n: d.seasonMonths });
+}
+
+/** The date's tooltip (draft v7): "Month 4 of 12 — the first month of summer. 8 months left in the year." */
+export function dateLine(c: ContentIndex, turn: number): string {
+  const d = calendarDate(c, turn);
+  const part = d.monthOfSeason === 1 ? 'first' : d.monthOfSeason === d.seasonMonths ? 'last' : 'middle';
+  const left = d.monthsLeft === 0 ? t('date.left.none') : tp('date.left', d.monthsLeft, { k: d.monthsLeft });
+  return t('date.line', { n: d.turn, total: d.months, part: t(`date.part.${part}`), season: seasonName(c, d.act).toLocaleLowerCase('en'), left });
+}
 
 /** A condition as static words (for conditional effects), no verdict. */
 export function conditionText(c: ContentIndex, cond: Condition): string {

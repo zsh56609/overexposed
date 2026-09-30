@@ -10,7 +10,9 @@
 //   draft phase — the live requirement of every card on offer, and the reroll's price and free label
 //                 against the real reroll (round 2b);
 //   every state — the stat bar's tiers, and the goals board: the major the marker names is the one major
-//                whose requirements all show met.
+//                whose requirements all show met; the stat bar's order, each tooltip against its cell and
+//                the countdown's level against its thresholds; the date, the season line and the date's
+//                tooltip against the month (round 2c).
 // After each run: the front pages and the manager's messages are pure functions of history (round 2b),
 // and the feed prints every message and every month-end perk line.
 // Exit code 1 on any mismatch.
@@ -43,6 +45,7 @@ import {
   RESOURCE_KEYS,
   seedRng,
   statTiers,
+  turnInAct,
   yearAwards,
   type Action,
   type Content,
@@ -54,7 +57,9 @@ import { loadRawContent } from '../validate/load.ts';
 import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
 import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
-import { lineText } from '../ui/text.ts';
+import { t } from '../ui/i18n.ts';
+import { statCells } from '../ui/stats.ts';
+import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, seasonLabel } from '../ui/text.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
 const SEED = 20260929;
@@ -65,7 +70,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -225,6 +230,14 @@ function checkGoals(s: GameState, seed: number): void {
   const met = s.content.majors.filter((m) => majorRequirements(m, s, true).every((c) => c.met)).map((m) => m.id);
   if (today === null || met.length !== 1 || met[0] !== today.majorId) report('goals', seed, s.turn, `marker ${today?.majorId}, requirements met for [${met.join()}]`);
   else if (majorOf(s.content, today.minorId) !== today.majorId) report('goals', seed, s.turn, `minor ${today.minorId} is not under ${today.majorId}`);
+  // The goals board speaks the stat bar's language (round 2c, A5): "Known · 80+ (you have 104)".
+  for (const m of s.content.majors) {
+    for (const clause of majorRequirements(m, s)) {
+      const text = majorClauseLine(clause);
+      if ('range' in clause && clause.key === 'hype' && clause.range.min !== undefined && !text.includes(`Known · ${clause.range.min}+ (you have ${clause.value})`)) report('goals', seed, s.turn, `${m.id}: "${text}"`);
+      if ('range' in clause && clause.key === 'scandalCount' && clause.range.max !== undefined && !text.includes(`${clause.range.max} or fewer scandals (you have ${clause.value})`)) report('goals', seed, s.turn, `${m.id}: "${text}"`);
+    }
+  }
   // No major looks achieved from the other side of an axis (round 2b): what the board shows all met is met.
   for (const m of s.content.majors) {
     const shown = majorRequirements(m, s).every((c) => c.met);
@@ -326,6 +339,68 @@ function checkMessages(history: readonly PlayedStep[], seed: number): void {
   if (perkShown !== perk.length) report('feed perk', seed, 12, `the feed prints ${perkShown} month-end lines, ${perk.length} are due`);
 }
 
+/**
+ * The stat bar (round 2c, A1–A4): hype · craft · heat · next scandal · money · actions; each tooltip's
+ * header carries its cell's tier and value; craft's lines speak of acting exactly while the established
+ * lane is screen; the countdown's level follows A4 — 5 or more to go plain, 3–4 amber, 2 or fewer red,
+ * crossed crossed.
+ */
+function checkStatBar(s: GameState, seed: number, lane: string | null): void {
+  counts.statBars++;
+  const cells = statCells(s, lane);
+  const order = cells.map((c) => c.id).join(' · ');
+  if (order !== 'hype · craft · heat · next · money · actions') report('stat bar', seed, s.turn, `order ${order}`);
+  const tiers = statTiers(s);
+  for (const id of ['hype', 'craft', 'heat'] as const) {
+    const cell = cells.find((c) => c.id === id);
+    const tier = tiers[id];
+    if (!cell || !tier) {
+      report('stat bar', seed, s.turn, `${id}: no cell or no tier`);
+      continue;
+    }
+    if (cell.value !== String(s.resources[id])) report('stat bar', seed, s.turn, `${id}: shows ${cell.value}, is ${s.resources[id]}`);
+    if (cell.tier !== t(tier.nameKey)) report('stat bar', seed, s.turn, `${id}: shows tier ${cell.tier}, is ${t(tier.nameKey)}`);
+    if (!cell.tipHeader.startsWith(cell.label) || !cell.tipHeader.includes(` · ${cell.tier} · `) || !cell.tipHeader.endsWith(` · ${cell.value}`)) {
+      report('tooltip', seed, s.turn, `${id}: header "${cell.tipHeader}" against the cell ${cell.tier} ${cell.value}`);
+    }
+    if (!cell.tipLine || cell.tipLine.startsWith('⟦')) report('tooltip', seed, s.turn, `${id}: no line for tier ${tier.index + 1}`);
+  }
+  const craft = cells.find((c) => c.id === 'craft');
+  if (craft && craft.tipHeader.includes(` · ${t('tip.craft.mode.acting')} · `) !== (lane === 'screen')) report('tooltip', seed, s.turn, `craft: "${craft.tipHeader}" with the lane ${lane}`);
+  const next = cells.find((c) => c.id === 'next');
+  const line = heatLine(s);
+  const level = line.crossed ? 'crossed' : line.toNext >= 5 ? 'calm' : line.toNext >= 3 ? 'amber' : 'red';
+  if (!next || next.value !== heatText(line)) report('stat bar', seed, s.turn, `countdown shows ${next?.value}, is ${heatText(line)}`);
+  else {
+    if (next.level !== level) report('countdown', seed, s.turn, `level ${next.level} at ${line.toNext} ${line.crossed ? 'to next' : 'to go'}, A4 says ${level}`);
+    if (!next.tipHeader.endsWith(` · ${line.toNext} ${line.crossed ? 'to next' : 'to go'}`)) report('tooltip', seed, s.turn, `countdown header "${next.tipHeader}"`);
+  }
+  const cash = cells.find((c) => c.id === 'money');
+  if (!cash || cash.value !== money(s.resources.capital) || !cash.tipHeader.endsWith(` · ${cash.value}`)) report('tooltip', seed, s.turn, `money "${cash?.tipHeader}" against ${money(s.resources.capital)}`);
+  const actions = cells.find((c) => c.id === 'actions');
+  const lit = actions ? [...actions.value].filter((ch) => ch === t('ui.stat.slotOn')).length : -1;
+  if (!actions || lit !== s.slots || !actions.tipHeader.endsWith(` · ${s.slots} left`)) report('tooltip', seed, s.turn, `actions "${actions?.tipHeader}" (${lit} lit) against ${s.slots}`);
+  counts.dates++;
+  checkDate(s, seed);
+}
+
+/** The calendar (round 2c, A3): month 1 is March 2027, month 10 December 2027, months 11 and 12 January and February 2028. */
+const CALENDAR = ['March 2027', 'April 2027', 'May 2027', 'June 2027', 'July 2027', 'August 2027', 'September 2027', 'October 2027', 'November 2027', 'December 2027', 'January 2028', 'February 2028'];
+
+/** The date, the season line and the date's tooltip (draft v7) against the month. */
+function checkDate(s: GameState, seed: number): void {
+  const c = s.content;
+  if (calendarLabel(c, s.turn) !== CALENDAR[s.turn - 1]) report('date', seed, s.turn, `month ${s.turn} reads ${calendarLabel(c, s.turn)}`);
+  const k = turnInAct(s);
+  const season = t(c.rules.actNameKeys[s.act - 1] ?? '');
+  if (seasonLabel(c, s.turn) !== `${season} · month ${k} of 3`) report('date', seed, s.turn, `season line ${seasonLabel(c, s.turn)}`);
+  const part = k === 1 ? 'the first month of' : k === 3 ? 'the last month of' : 'the middle of';
+  const left = 12 - s.turn;
+  const tail = left === 0 ? 'The last month of the year.' : `${left} month${left === 1 ? '' : 's'} left in the year.`;
+  const expected = `Month ${s.turn} of 12 — ${part} ${season.toLowerCase()}. ${tail}`;
+  if (dateLine(c, s.turn) !== expected) report('date line', seed, s.turn, `"${dateLine(c, s.turn)}", expected "${expected}"`);
+}
+
 /** The random persona's choice: any playable card before ending the turn; otherwise any legal action. */
 function choose(s: GameState, rng: ReturnType<typeof cursor>): Action {
   const legal = legalActions(s);
@@ -367,6 +442,7 @@ for (let i = 0; i < RUNS; i++) {
   for (let steps = 0; s.phase !== 'ended' && steps < 1000; steps++) {
     counts.states++;
     checkTiers(s, seed);
+    checkStatBar(s, seed, establishedLanes(history).at(-1) ?? null);
     checkGoals(s, seed);
     if (s.phase === 'play') checkPlayPhase(s, seed, history);
     else if (s.phase === 'gate') checkGatePhase(s, seed);
@@ -388,7 +464,7 @@ console.log(
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages, ${counts.perkLines} month-end lines) re-read, ` +
-    `${counts.rerolls} reroll prices (${counts.freeRerolls} free) ` +
+    `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

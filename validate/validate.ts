@@ -21,6 +21,7 @@ import {
   NEUTRAL_LANE,
   onceItem,
   playGroup,
+  COUNTDOWN_LEVELS,
   PROMINENCES,
   REGISTERS,
   RESOURCE_KEYS,
@@ -105,7 +106,7 @@ const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major:
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished',
+  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -392,13 +393,33 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.int(raw.draft.extraPickCost, 'rules.draft.extraPickCost', LIMIT.price);
     v.int(raw.draft.rerollCost, 'rules.draft.rerollCost', LIMIT.price);
   }
-  checkTiers(v, raw.tiers);
   if (!Array.isArray(raw.lanes) || raw.lanes.length === 0) v.error('schema', 'rules.lanes', 'must be a non-empty array of lane ids, the base first');
   else {
     raw.lanes.forEach((lane, i) => v.id(lane, `rules.lanes[${i}]`));
     if (new Set(raw.lanes).size !== raw.lanes.length) v.error('schema', 'rules.lanes', 'lists a lane twice');
     if (raw.lanes.includes(NEUTRAL_LANE)) v.error('schema', 'rules.lanes', `"${NEUTRAL_LANE}" is not a career lane: it is what counts toward none`);
     v.lanes = raw.lanes.filter(isStr);
+  }
+  checkTiers(v, raw.tiers);
+  // The calendar (round 2c): the month and year the first month of play falls in.
+  if (raw.calendar !== undefined) {
+    const cal = raw.calendar;
+    if (!isObj(cal)) v.error('schema', 'rules.calendar', 'must be { startMonth, startYear }');
+    else {
+      v.fields(cal, ['startMonth', 'startYear'], 'rules.calendar');
+      v.int(cal.startMonth, 'rules.calendar.startMonth', [1, 12]);
+      v.int(cal.startYear, 'rules.calendar.startYear', [1, 9999]);
+    }
+  }
+  // The tooltip lines of the stats without tiers (round 2c).
+  if (raw.statTips !== undefined) {
+    const tips = raw.statTips;
+    const fields = ['capital', 'toGo', 'toNext', 'slots'];
+    if (!isObj(tips)) v.error('schema', 'rules.statTips', `must be { ${fields.join(', ')} }`);
+    else {
+      v.fields(tips, fields, 'rules.statTips');
+      for (const f of fields) v.key(tips[f], `rules.statTips.${f}`);
+    }
   }
   if (raw.laneStartingDeck !== undefined && typeof raw.laneStartingDeck !== 'boolean') v.error('schema', 'rules.laneStartingDeck', 'must be a boolean');
   if (raw.laneEstablished !== undefined) {
@@ -443,6 +464,13 @@ function checkTiers(v: Ctx, raw: unknown): void {
       v.error('ranges', at, rise ? 'must rise strictly' : 'must fall strictly');
     }
   };
+  // Tooltip lines (round 2c): one per tier, in order.
+  const tipKeys = (list: unknown, at: string, n: number) => {
+    if (list === undefined) return;
+    if (!Array.isArray(list)) return v.error('schema', at, 'must be an array of i18n keys, one per tier');
+    if (n > 0 && list.length !== n) v.error('structure', at, `has ${list.length} lines for ${n} tiers`);
+    list.forEach((k, i) => v.key(k, `${at}[${i}]`));
+  };
   for (const stat of ['hype', 'craft'] as const) {
     const t = raw[stat];
     const at = `${where}.${stat}`;
@@ -450,8 +478,25 @@ function checkTiers(v: Ctx, raw: unknown): void {
       v.error('schema', at, 'must be { nameKeys, from }');
       continue;
     }
-    v.fields(t, ['nameKeys', 'from'], at);
+    v.fields(t, ['nameKeys', 'from', 'tipKeys', 'modeKey', 'laneTips'], at);
     const n = words(t, at);
+    tipKeys(t.tipKeys, `${at}.tipKeys`, n);
+    if (t.modeKey !== undefined) v.key(t.modeKey, `${at}.modeKey`);
+    if (t.laneTips !== undefined) {
+      if (!isObj(t.laneTips)) v.error('schema', `${at}.laneTips`, 'must map a lane to { modeKey, tipKeys }');
+      else
+        for (const [lane, own] of Object.entries(t.laneTips)) {
+          const w = `${at}.laneTips.${lane}`;
+          if (!v.lanes.includes(lane)) v.error('references', w, `no lane ${q(lane)} in rules.lanes`);
+          if (!isObj(own)) {
+            v.error('schema', w, 'must be { modeKey, tipKeys }');
+            continue;
+          }
+          v.fields(own, ['modeKey', 'tipKeys'], w);
+          v.key(own.modeKey, `${w}.modeKey`);
+          tipKeys(own.tipKeys, `${w}.tipKeys`, n);
+        }
+    }
     const from = ints(t.from, `${at}.from`, 0);
     if (!from) continue;
     if (from[0] !== 0) v.error('ranges', `${at}.from`, 'must start at 0, so some tier always applies');
@@ -461,8 +506,17 @@ function checkTiers(v: Ctx, raw: unknown): void {
   const heat = raw.heat;
   const at = `${where}.heat`;
   if (!isObj(heat)) return v.error('schema', at, 'must be { nameKeys, toGoAtLeast, linesCrossed }');
-  v.fields(heat, ['nameKeys', 'toGoAtLeast', 'linesCrossed'], at);
+  v.fields(heat, ['nameKeys', 'toGoAtLeast', 'linesCrossed', 'tipKeys', 'countdown'], at);
   const n = words(heat, at);
+  tipKeys(heat.tipKeys, `${at}.tipKeys`, n);
+  // The next-scandal countdown's level per heat tier (round 2c).
+  if (heat.countdown !== undefined) {
+    const levels: readonly unknown[] = COUNTDOWN_LEVELS;
+    if (!Array.isArray(heat.countdown) || (n > 0 && heat.countdown.length !== n)) v.error('structure', `${at}.countdown`, `must give one level per heat tier (${n})`);
+    else heat.countdown.forEach((x, i) => {
+      if (!levels.includes(x)) v.error('schema', `${at}.countdown[${i}]`, `must be one of ${COUNTDOWN_LEVELS.join(', ')}, got ${q(x)}`);
+    });
+  }
   const toGo = ints(heat.toGoAtLeast, `${at}.toGoAtLeast`, 1);
   const lines = ints(heat.linesCrossed, `${at}.linesCrossed`, 1);
   if (toGo) strictly(toGo, `${at}.toGoAtLeast`, false);

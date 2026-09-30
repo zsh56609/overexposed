@@ -10,6 +10,8 @@
   "lanes": ["music", "screen", "celebrity"],
   "laneStartingDeck": false,
   "laneEstablished": { "minPlays": 2, "lead": 2 },
+  "calendar": { "startMonth": 3, "startYear": 2027 },
+  "statTips": { "capital": "tip.money", "toGo": "tip.next.togo", "toNext": "tip.next.tonext", "slots": "tip.actions" },
   "heatThreshold": [7, 6, 6, 5],
   "degradePerScandal": 0.5,
   "thresholdFloor": [7, 6, 5, 4.5],
@@ -38,16 +40,22 @@
   "tiers": {
     "hype": {
       "nameKeys": ["tier.hype.1", "tier.hype.2", "tier.hype.3", "tier.hype.4", "tier.hype.5"],
-      "from": [0, 15, 30, 80, 105]
+      "from": [0, 15, 30, 80, 105],
+      "tipKeys": ["tip.hype.1", "tip.hype.2", "tip.hype.3", "tip.hype.4", "tip.hype.5"]
     },
     "heat": {
       "nameKeys": ["tier.heat.1", "tier.heat.2", "tier.heat.3", "tier.heat.4", "tier.heat.5", "tier.heat.6"],
       "toGoAtLeast": [5, 3, 2],
-      "linesCrossed": [1, 2]
+      "linesCrossed": [1, 2],
+      "tipKeys": ["tip.heat.1", "tip.heat.2", "tip.heat.3", "tip.heat.4", "tip.heat.5", "tip.heat.6"],
+      "countdown": ["calm", "amber", "red", "red", "crossed", "crossed"]
     },
     "craft": {
       "nameKeys": ["tier.craft.1", "tier.craft.2", "tier.craft.3", "tier.craft.4", "tier.craft.5", "tier.craft.6"],
-      "from": [0, 10, 20, 40, 55, 90]
+      "from": [0, 10, 20, 40, 55, 90],
+      "tipKeys": ["tip.craft.singing.1", "tip.craft.singing.2", "tip.craft.singing.3", "tip.craft.singing.4", "tip.craft.singing.5", "tip.craft.singing.6"],
+      "modeKey": "tip.craft.mode.singing",
+      "laneTips": { "screen": { "modeKey": "tip.craft.mode.acting", "tipKeys": ["tip.craft.acting.1", "tip.craft.acting.2", "tip.craft.acting.3", "tip.craft.acting.4", "tip.craft.acting.5", "tip.craft.acting.6"] } }
     }
   }
 }
