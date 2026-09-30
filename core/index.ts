@@ -39,14 +39,17 @@ export {
   type PressLine,
   type PrintContext,
 } from './press.ts';
-export { countdownLevel, statTiers, TIER_STATS, tierTip, type StatTier, type TierStat } from './tiers.ts';
+export { countdownLevel, fameBand, statTiers, TIER_STATS, tierTip, type StatTier, type TierStat } from './tiers.ts';
 export { calendarDate, type CalendarDate } from './calendar.ts';
 export {
+  lastWord,
   managerMessages,
   messageGroup,
+  moodOf,
   monthEndEffects,
   monthEndGroup,
   monthEndLines,
+  signoffGroup,
   type ManagerMessage,
   type MonthEndLine,
   type MonthMessages,

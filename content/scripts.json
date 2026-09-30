@@ -1,9 +1,4 @@
 {
-  "bands": [
-    { "id": "low", "from": 0 },
-    { "id": "mid", "from": 2 },
-    { "id": "high", "from": 3 }
-  ],
   "scripts": [
     {
       "id": "low_1",

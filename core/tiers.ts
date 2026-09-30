@@ -67,6 +67,13 @@ export function countdownLevel(s: ConditionSubject): CountdownLevel {
   return (tier && t?.countdown?.[tier.index]) ?? 'calm';
 }
 
+/** The fame band (rules.fameBands) a fame tier sits in: the last band whose `from` it reaches. */
+export function fameBand(c: ContentIndex, tier: number): string | null {
+  let band: string | null = null;
+  for (const b of c.rules.fameBands ?? []) if (tier >= b.from) band = b.id;
+  return band;
+}
+
 /** Each stat's tier as the state stands; null for a stat content gives no tiers. */
 export function statTiers(s: ConditionSubject): Readonly<Record<TierStat, StatTier | null>> {
   const t = s.content.rules.tiers;

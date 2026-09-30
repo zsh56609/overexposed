@@ -14,6 +14,7 @@ import {
   getCard,
   getGate,
   getManager,
+  lastWord,
   majorOf,
   majorRequirements,
   readLines,
@@ -59,6 +60,7 @@ import {
   isPlaceholder,
   lineText,
   majorClauseLine,
+  managerName,
   mastheadName,
   money,
   openingText,
@@ -998,6 +1000,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
   const awards = yearAwards(s);
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
   const rival = rivalArc(c, s.seed);
+  const last = lastWord(s);
   return (
     <div className="ending">
       <div className="ending-body">
@@ -1019,6 +1022,17 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
             })}
           </ul>
           {rival && <p className={prose(t(rival.endingKey), 'rival-line')}>{t(rival.endingKey)}</p>}
+          {/* The manager's last word (round 2c, C3): two bubbles for the year's major, under their name. */}
+          {last && (
+            <div className="last-word">
+              <span className="speaker-label">{managerName(c, last.manager)}</span>
+              {last.bubbles.map((key) => (
+                <span key={key} className={prose(t(key), 'bubble')}>
+                  {t(key)}
+                </span>
+              ))}
+            </div>
+          )}
           {/* Below the ending the player has just read (round 2b), and still the largest thing on the page. */}
           <button className="play-again" onClick={onRestart}>
             {t('ui.ending.playAgain')}

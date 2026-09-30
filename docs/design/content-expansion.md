@@ -299,6 +299,14 @@ Guardian.
   last month end is left to the ending.
 - Each manager's lines for each trigger case are a line group on the
   shuffle bag; a message may hold two bubbles.
+- **Round 2c**: every message is two bubbles, a longer one and a short
+  one. A one-bubble line takes a sign-off from the manager's pool for its
+  mood — hard after bad news (the first scandal, a frenzy, stuck, a failed
+  gate, a check-in on the Overexposed or Hard Way course), easy otherwise.
+  A month nothing fired in, after a silent month, brings a quiet-month
+  line for the player's fame band (low, mid, high). The winter gate gets
+  no reaction; the manager has the last word on the ending screen instead,
+  keyed by the major.
 
 ### 3.3 Rival
 

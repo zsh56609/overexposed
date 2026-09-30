@@ -18,6 +18,7 @@ import {
   MESSAGE_TRIGGERS,
   messageGroup,
   monthEndGroup,
+  signoffGroup,
   NEUTRAL_LANE,
   onceItem,
   playGroup,
@@ -108,7 +109,7 @@ const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major:
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips',
+  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -147,6 +148,8 @@ class Ctx {
   readonly keysUsed = new Map<string, string>();
   /** rules.lanes, once checked: what a card's lane and a lane test may name. */
   lanes: readonly string[] = [];
+  /** rules.fameBands' ids, once checked (round 2c). */
+  fameBands: readonly string[] = [];
 
   error(check: CheckId, where: string, message: string): void {
     this.issues.push({ level: 'error', check, where, message });
@@ -403,6 +406,17 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.lanes = raw.lanes.filter(isStr);
   }
   checkTiers(v, raw.tiers);
+  // Fame bands (round 2c): low, mid, high — what the quiet trigger and the desk scripts read.
+  if (raw.fameBands !== undefined) {
+    const hype = isObj(raw.tiers) && isObj(raw.tiers.hype) && Array.isArray(raw.tiers.hype.nameKeys) ? raw.tiers.hype.nameKeys.length : 1;
+    const bands = checkList(v, raw.fameBands, 'rules.fameBands', 'fame band', (b, where) => {
+      v.fields(b, ['id', 'from'], where);
+      v.int(b.from, `${where}.from`, [0, Math.max(0, hype - 1)]);
+    });
+    if (bands[0]?.from !== 0) v.error('ranges', 'rules.fameBands', 'the first band must start at tier 0, so every fame tier has one');
+    if (bands.some((b, i) => i > 0 && !((b.from as number) > (bands[i - 1]?.from as number)))) v.error('ranges', 'rules.fameBands', 'must rise strictly');
+    v.fameBands = bands.map((b) => b.id).filter(isStr);
+  }
   // The calendar (round 2c): the month and year the first month of play falls in.
   if (raw.calendar !== undefined) {
     const cal = raw.calendar;
@@ -1010,7 +1024,7 @@ export function variantsNeeded(perRun: number): number {
 /** An item shown once per run needs two, so different runs read differently. */
 export const ONCE_VARIANTS_NEEDED = 2;
 
-export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'filler' | 'world' | 'once' | 'manager' | 'monthEnd';
+export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'filler' | 'world' | 'once' | 'manager' | 'signoff' | 'monthEnd';
 
 /** A line group and its variants, as content lists them. */
 export interface VariantGroup {
@@ -1061,7 +1075,13 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
   for (const m of list(managers.managers)) {
     if (!isStr(m.id)) continue;
     const lines = isObj(m.lines) ? m.lines : {};
-    for (const [lineKey, keys] of Object.entries(lines)) groups.push({ id: messageGroup(m.id, lineKey), kind: 'manager', owner: m.id, keys: keyList(keys), register: null, lane: null });
+    // A variant counts by its first bubble.
+    for (const [lineKey, variants] of Object.entries(lines)) {
+      const firsts = (Array.isArray(variants) ? variants : []).map((x) => (Array.isArray(x) ? x[0] : undefined));
+      groups.push({ id: messageGroup(m.id, lineKey), kind: 'manager', owner: m.id, keys: keyList(firsts), register: null, lane: null });
+    }
+    const signoffs = isObj(m.signoffs) ? m.signoffs : {};
+    for (const mood of ['easy', 'hard'] as const) groups.push({ id: signoffGroup(m.id, mood), kind: 'signoff', owner: m.id, keys: keyList(signoffs[mood]), register: null, lane: null });
     const perk = isObj(m.perk) ? m.perk : {};
     if (perk.monthEnd !== undefined) groups.push({ id: monthEndGroup(m.id), kind: 'monthEnd', owner: m.id, keys: keyList(perk.monthEndKeys), register: null, lane: null });
   }
@@ -1293,15 +1313,29 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
 // engine applies — and a line group per message trigger.
 
 const MANAGERS_FIELDS = ['choice', 'managers', 'messages'];
-const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'perk', 'sample', 'lines'];
+const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
 const PERK_FIELDS = ['nameKey', 'effectKey', 'freeRerollsPerAct', 'freeRerollKey', 'monthEnd', 'monthEndKeys'];
-const MESSAGES_FIELDS = ['perMonth', 'priority', 'highFrom', 'knownAxis', 'signedFlag', 'viralFlag', 'stuck'];
+const MESSAGES_FIELDS = ['perMonth', 'priority', 'highFrom', 'knownAxis', 'signedFlag', 'viralFlag', 'stuck', 'hard', 'quietAfter'];
 
-/** Every trigger line key content must write, for its majors and lanes (core/manager.ts). */
-export function messageLineKeys(majorIds: readonly string[], lanes: readonly string[]): string[] {
+/** Every trigger line key content must write, for its majors, lanes and fame bands (core/manager.ts). */
+export function messageLineKeys(majorIds: readonly string[], lanes: readonly string[], bands: readonly string[] = []): string[] {
   return MESSAGE_TRIGGERS.flatMap((t) =>
-    t === 'frenzy' || t === 'first_scandal' ? [`${t}.low`, `${t}.high`] : t === 'checkin' ? majorIds.map((m) => `checkin.${m}`) : t === 'lane' ? lanes.map((l) => `lane.${l}`) : [t],
+    t === 'frenzy' || t === 'first_scandal'
+      ? [`${t}.low`, `${t}.high`]
+      : t === 'checkin'
+        ? majorIds.map((m) => `checkin.${m}`)
+        : t === 'lane'
+          ? lanes.map((l) => `lane.${l}`)
+          : t === 'quiet'
+            ? bands.map((b) => `quiet.${b}`)
+            : [t],
   );
+}
+
+/** A message variant: its bubbles' keys, one or two (round 2c). */
+function checkBubbles(v: Ctx, variant: unknown, where: string): void {
+  if (!Array.isArray(variant) || variant.length < 1 || variant.length > 2) return v.error('schema', where, 'a variant is its bubbles: an array of one or two i18n keys');
+  variant.forEach((k, i) => v.key(k, `${where}[${i}]`));
 }
 
 function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown): void {
@@ -1317,7 +1351,7 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
   }
   const ends = isObj(endings) ? endings : {};
   const majorIds = (Array.isArray(ends.majors) ? ends.majors : []).filter(isObj).map((m) => m.id).filter(isStr);
-  const needed = messageLineKeys(majorIds, v.lanes);
+  const needed = messageLineKeys(majorIds, v.lanes, v.fameBands);
   const managers = checkList(v, raw.managers, `${file} managers`, 'manager', (m, where) => {
     v.fields(m, MANAGER_FIELDS, where);
     for (const f of ['nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey'] as const) v.key(m[f], `${where}.${f}`);
@@ -1346,11 +1380,31 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
     }
     // A line group for every trigger's case, and none for a case no trigger reads.
     if (!isObj(m.lines)) return v.error('schema', `${where}.lines`, 'must map each trigger line key to its variants');
-    for (const [lineKey, keys] of Object.entries(m.lines)) {
-      if (!needed.includes(lineKey)) v.error('references', `${where}.lines.${lineKey}`, `no trigger reads it (triggers: ${needed.join(', ')})`);
-      else v.keys(keys, `${where}.lines.${lineKey}`);
+    for (const [lineKey, variants] of Object.entries(m.lines)) {
+      const at = `${where}.lines.${lineKey}`;
+      if (!needed.includes(lineKey)) v.error('references', at, `no trigger reads it (triggers: ${needed.join(', ')})`);
+      else if (!Array.isArray(variants) || variants.length === 0) v.error('schema', at, 'must be a non-empty list of variants');
+      else variants.forEach((variant, i) => checkBubbles(v, variant, `${at}[${i}]`));
     }
     for (const lineKey of needed) if (!Object.hasOwn(m.lines, lineKey)) v.warn('prose', `${where}.lines`, `no lines for ${lineKey}: that message would print its key`);
+    // Two bubbles, always (round 2c): the sign-off pools, easy and hard.
+    if (!isObj(m.signoffs)) v.error('schema', `${where}.signoffs`, 'must be { easy, hard }: the second bubble of a one-bubble message');
+    else {
+      v.fields(m.signoffs, ['easy', 'hard'], `${where}.signoffs`);
+      v.keys(m.signoffs.easy, `${where}.signoffs.easy`);
+      v.keys(m.signoffs.hard, `${where}.signoffs.hard`);
+    }
+    // The last word on the ending screen (round 2c), for every major.
+    if (m.lastWord !== undefined) {
+      if (!isObj(m.lastWord)) v.error('schema', `${where}.lastWord`, 'must map each major id to two bubbles');
+      else {
+        for (const [major, bubbles] of Object.entries(m.lastWord)) {
+          if (!majorIds.includes(major)) v.error('references', `${where}.lastWord.${major}`, `no major ending with id ${q(major)}`);
+          checkBubbles(v, bubbles, `${where}.lastWord.${major}`);
+        }
+        for (const major of majorIds) if (!Object.hasOwn(m.lastWord, major)) v.warn('prose', `${where}.lastWord`, `no last word for ${major}`);
+      }
+    } else v.warn('prose', `${where}.lastWord`, 'no last word on the ending screen');
   });
   if (managers.length === 0) v.error('structure', `${file} managers`, 'needs at least one manager: the choice before month 1');
 
@@ -1383,6 +1437,11 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
     v.int(stuck.heatTierFrom, `${at}.stuck.heatTierFrom`, [0, Math.max(0, tierCount('heat') - 1)]);
     v.int(stuck.months, `${at}.stuck.months`, [1, v.totalTurns]);
   }
+  // The sign-off's mood (round 2c): the hard triggers, by name or by line key; and the quiet lookback.
+  if (!Array.isArray(msg.hard)) v.error('schema', `${at}.hard`, 'must list the triggers (or trigger line keys) with hard sign-offs');
+  else for (const h of msg.hard) if (!known.includes(h) && !needed.includes(h as string)) v.error('references', `${at}.hard`, `${q(h)} is no trigger and no trigger line key`);
+  v.int(msg.quietAfter, `${at}.quietAfter`, [1, v.totalTurns]);
+  if (v.fameBands.length === 0) v.warn('structure', `${at}`, 'no rules.fameBands: the quiet trigger never fires');
 }
 
 // ---------------------------------------------------------------------------
@@ -1391,19 +1450,13 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
 function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
   const file = 'content/scripts.json';
   if (raw === undefined) return;
-  if (!isObj(raw)) return v.error('schema', file, 'must be { bands, scripts }');
-  v.fields(raw, ['bands', 'scripts'], file);
-  const hype = rules && isObj(rules.tiers) && isObj(rules.tiers.hype) && Array.isArray(rules.tiers.hype.nameKeys) ? rules.tiers.hype.nameKeys.length : 1;
-  const bands = checkList(v, raw.bands, `${file} bands`, 'band', (b, where) => {
-    v.fields(b, ['id', 'from'], where);
-    v.int(b.from, `${where}.from`, [0, Math.max(0, hype - 1)]);
-  });
-  if (bands[0]?.from !== 0) v.error('ranges', `${file} bands`, 'the first band must start at tier 0, so every fame tier has one');
-  if (bands.some((b, i) => i > 0 && !((b.from as number) > (bands[i - 1]?.from as number)))) v.error('ranges', `${file} bands`, 'must rise strictly');
-  const bandIds = new Set(bands.map((b) => b.id));
+  if (!isObj(raw)) return v.error('schema', file, 'must be { scripts }');
+  v.fields(raw, ['scripts'], file);
+  void rules;
+  const bandIds = new Set(v.fameBands);
   const scripts = checkList(v, raw.scripts, `${file} scripts`, 'script', (s, where) => {
     v.fields(s, ['id', 'band', 'headingKey', 'lines'], where);
-    if (!bandIds.has(s.band)) v.error('references', `${where}.band`, `no band ${q(s.band)}`);
+    if (!bandIds.has(s.band as string)) v.error('references', `${where}.band`, `no fame band ${q(s.band)} in rules.fameBands`);
     v.key(s.headingKey, `${where}.headingKey`);
     if (!Array.isArray(s.lines) || s.lines.length === 0) return v.error('schema', `${where}.lines`, 'must be a non-empty list of { key, kind }');
     const kinds: readonly unknown[] = SCRIPT_LINE_KINDS;

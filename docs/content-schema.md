@@ -157,17 +157,25 @@ Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
   button's label meanwhile); `monthEnd`, effects applied at every month
   end after the `turnEnd` record (`monthEndKeys`: the feed's line when
   they change something, a line group).
-- `lines`: per trigger case, its variants (a line group). A variant may
-  hold two bubbles, split by a line break. The cases: `opening`,
+- `lines`: per trigger case, its variants (a line group); each variant is
+  its bubbles' keys, one or two (round 2c). The cases: `opening`,
   `checkin.<major>`, `first_scandal.low|high`, `frenzy.low|high`, `stuck`,
   `signed`, `known`, `lane.<lane>`, `gate_passed`, `gate_failed`, `viral`,
-  `rival`. Validate errors on a case no trigger reads, and warns on one
-  without lines.
+  `rival`, `quiet.<fame band>`. Validate errors on a case no trigger reads,
+  and warns on one without lines.
+- `signoffs` (round 2c): `easy` and `hard`, the pools a one-bubble message
+  takes its second, short bubble from, each a line group on the shuffle
+  bag. `lastWord`: per major id, the two bubbles of the manager's last
+  word on the ending screen.
 - `messages`: `perMonth`, messages a month at most; `priority`, every
   trigger, highest first; `highFrom`, the fame tier from which the scandal
   triggers are `.high`; `knownAxis`, the ending axis whose split `known`
   fires on; `signedFlag`, `viralFlag`; `stuck` (`heatTierFrom`, the heat
-  tier counted as over the line; `months`, how many month ends running).
+  tier counted as over the line; `months`, how many month ends running);
+  `hard`, the triggers or trigger line keys whose sign-off is from the hard
+  pool; `quietAfter`, how many silent months before a month with no
+  trigger brings a quiet-month line. The quiet line's case is the fame band
+  (`rules.fameBands`) at the month's opening.
 
 /core's `managerMessages` derives each month's messages from the run's
 history; `monthEndLines` the perk's line at each month end.
@@ -201,10 +209,13 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
 ## Desk scripts — `content/scripts.json`
 
 Round 2c, for the visual phase: the script on an actor's desk improves with
-fame. `bands`: `{ id, from }`, fame tiers (0-based) from which a band holds
-— low from Unknown, mid from Rising, high from Known. `scripts`: `id`,
-`band`, `headingKey`, and `lines`, each `{ key, kind }` — `you` (the
-player's line, highlighted like an actor's copy), `other`, or `action`.
+fame. `scripts`: `id`, `band` (a `rules.fameBands` id), `headingKey`, and
+`lines`, each `{ key, kind }` — `you` (the player's line, highlighted like
+an actor's copy), `other`, or `action`.
+
+`rules.fameBands` (round 2c): `{ id, from }` — the fame tiers (0-based)
+from which a band holds: low from Unknown, mid from Rising, high from
+Known. The quiet-month trigger and the desk scripts read them.
 
 ## i18n keys
 

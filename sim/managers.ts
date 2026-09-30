@@ -22,7 +22,7 @@ const content = loadContent();
 const managers = managersToRun(content, undefined).filter((m): m is string => m !== undefined);
 const majors = content.endings.majors.map((m) => m.id);
 const minors = content.endings.minors.map((m) => m.id);
-const lineKeys = messageLineKeys(majors, content.rules.lanes ?? []);
+const lineKeys = messageLineKeys(majors, content.rules.lanes ?? [], (content.rules.fameBands ?? []).map((b) => b.id));
 const months = content.rules.acts * content.rules.turnsPerAct;
 const seeds = runSeeds(SEED, RUNS);
 const players = PERSONA_IDS.filter((p) => !isProbe(p));

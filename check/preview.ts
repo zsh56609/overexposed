@@ -29,6 +29,8 @@ import {
   freeRerollAvailable,
   frontPages,
   getCard,
+  lastWord,
+  moodOf,
   getGate,
   getManager,
   heatLine,
@@ -70,7 +72,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -327,6 +329,29 @@ function checkMessages(history: readonly PlayedStep[], seed: number): void {
     const ranks = month.messages.map((m) => rules?.priority.indexOf(m.trigger) ?? 0);
     if (ranks.some((r, i) => i > 0 && r < (ranks[i - 1] as number))) report('messages', seed, month.turn, `out of priority order: ${month.messages.map((m) => m.trigger)}`);
     if (month.turn === 1 && !month.fired.includes('opening')) report('messages', seed, 1, 'the first month opens without the opening');
+    // Two bubbles, always (round 2c): the variant's own, and a one-bubble variant's sign-off.
+    for (const m of month.messages) {
+      const bubbles = m.bubbles.length + (m.signoff ? 1 : 0);
+      if (bubbles !== 2 || (m.signoff !== null) !== (m.bubbles.length === 1) || (m.signoff && m.signoff.key === null)) report('messages', seed, month.turn, `${m.lineKey}: ${m.bubbles.length} bubble(s) and ${m.signoff ? 'a' : 'no'} sign-off`);
+      if (m.signoff && rules && !m.signoff.group.endsWith(`:${moodOf(rules, m.trigger, m.lineKey)}`)) report('messages', seed, month.turn, `${m.lineKey}: sign-off from ${m.signoff.group}`);
+    }
+    // A quiet month (round 2c): only when nothing else fired and the months before it were silent.
+    if (month.fired.includes(`quiet.${month.fired.find((f) => f.startsWith('quiet.'))?.slice(6)}`)) {
+      counts.quiet++;
+      const before = final.filter((m) => m.turn < month.turn).slice(-(rules?.quietAfter ?? 2));
+      if (month.fired.length !== 1 || before.length < (rules?.quietAfter ?? 2) || before.some((m) => m.messages.length > 0)) report('quiet', seed, month.turn, `fired ${month.fired.join()} after ${before.map((m) => m.messages.length).join('/')}`);
+    } else if (month.fired.length === 0) {
+      const before = final.filter((m) => m.turn < month.turn).slice(-(rules?.quietAfter ?? 2));
+      if (before.length === (rules?.quietAfter ?? 2) && before.every((m) => m.messages.length === 0)) report('quiet', seed, month.turn, 'a silent month after silent ones, and no quiet line');
+    }
+  }
+  // The last word (round 2c, C3): two bubbles on the ending screen, for the major the year ended in.
+  const end = history.at(-1)?.after;
+  if (end?.phase === 'ended' && end.manager !== null) {
+    const last = lastWord(end);
+    const major = end.endingId === null ? null : majorOf(end.content, end.endingId);
+    if (!last || last.bubbles.length !== 2 || !last.bubbles.every((k) => k.includes(`.last.${major}`))) report('last word', seed, 12, `${JSON.stringify(last)} for ${major}`);
+    else counts.lastWords++;
   }
   const perk = monthEndLines(history);
   counts.perkLines += perk.length;
@@ -463,7 +488,7 @@ console.log(
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed, ` +
-    `${counts.messageMonths} months of manager messages (${counts.messages} messages, ${counts.perkLines} month-end lines) re-read, ` +
+    `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
     `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );

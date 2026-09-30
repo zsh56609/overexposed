@@ -608,6 +608,11 @@ it.
     - The goals board speaks the stat bar's language: "✓ Known · 80+ (you
       have 104)", "✗ 5 or fewer scandals (you have 8)", "✗ Already known
       (hype 104)". (2026-09-30)
+32. The manager's two bubbles (round 2c, Part C). Every message shows as
+    two lines under the manager's name — the line, then its short second
+    bubble. On the ending screen, after the rival's closing line and
+    before "Play again", the manager has the last word: two bubbles for
+    the year's major, labelled with their name. (2026-09-30)
 
 ### Still open
 

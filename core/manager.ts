@@ -5,32 +5,43 @@
 //
 // A month's messages arrive as it opens: the manager reacts to what the month before brought — its scandals,
 // its paper, the season's gate — and a new season opens with a check-in. The first month opens with the
-// opening line. What the year's last month brings is never messaged: the ending speaks instead.
+// opening line; a month nothing happened in, after two silent ones, brings a quiet-month line. Every message
+// is two bubbles (round 2c): a one-bubble line takes a sign-off from the manager's pool for its mood. What the
+// year's last month brings is never messaged: the manager has the last word on the ending screen instead.
 
-import { getManager, RESOURCE_KEYS, type MessageTrigger, type ResourceKey } from './content.ts';
-import { endingIfYearEndedNow } from './endings.ts';
+import { getManager, RESOURCE_KEYS, type ContentIndex, type ManagerDef, type MessageRules, type MessageTrigger, type ResourceKey } from './content.ts';
+import { endingIfYearEndedNow, majorOf } from './endings.ts';
 import { establishedLanes } from './lanes.ts';
 import type { HistoryStep } from './lines.ts';
 import { frontPages, pressLines } from './press.ts';
 import type { GameEvent } from './state.ts';
-import { statTiers } from './tiers.ts';
-import { bagKey } from './variants.ts';
+import { fameTier } from './press.ts';
+import { fameBand, statTiers } from './tiers.ts';
+import { bagIndex, bagKey } from './variants.ts';
 
 /** The line group of a manager's lines for a trigger line key ("checkin.breakthrough", "opening"). */
 export const messageGroup = (managerId: string, lineKey: string): string => `manager:${managerId}:${lineKey}`;
 /** The line group of a manager's month-end perk line. */
 export const monthEndGroup = (managerId: string): string => `monthEnd:${managerId}`;
+/** The line group of a manager's sign-offs for a mood (round 2c). */
+export const signoffGroup = (managerId: string, mood: 'easy' | 'hard'): string => `signoff:${managerId}:${mood}`;
 
 export interface ManagerMessage {
   readonly trigger: MessageTrigger;
   /** The trigger's line key: its suffix names the case ("first_scandal.high", "lane.music", "checkin.long_game"). */
   readonly lineKey: string;
-  /** Its line group on the shuffle bag, how many times it was shown before, and the variant's key. */
+  /** Its line group on the shuffle bag, and how many times it was shown before. */
   readonly group: string;
   readonly show: number;
-  /** Null when the manager has no lines for it (a content gap validate reports). */
-  readonly key: string | null;
+  /** The variant's bubbles, one or two keys; empty when the manager has no lines for it (validate reports it). */
+  readonly bubbles: readonly string[];
+  /** A one-bubble variant's second bubble: a sign-off for the trigger's mood, on its own shuffle bag. */
+  readonly signoff: { readonly group: string; readonly show: number; readonly key: string | null } | null;
 }
+
+/** A trigger's mood (round 2c): hard for the bad news the rules list, by trigger or by line key; else easy. */
+export const moodOf = (rules: MessageRules, trigger: MessageTrigger, lineKey: string): 'easy' | 'hard' =>
+  rules.hard.includes(trigger) || rules.hard.includes(lineKey) ? 'hard' : 'easy';
 
 export interface MonthMessages {
   /** The month they arrive in — as it opens. */
@@ -128,7 +139,7 @@ export function managerMessages(history: readonly HistoryStep[]): MonthMessages[
       const month = opens(e, step, opened);
       if (month === null) return;
       opened = month;
-      const manager = getManager(c, step.after.manager);
+      const manager: ManagerDef | undefined = getManager(c, step.after.manager);
       const due = new Map<MessageTrigger, string>();
       while (next < byPlace.length && ((byPlace[next] as Fired).step < i || ((byPlace[next] as Fired).step === i && (byPlace[next] as Fired).event <= j))) {
         const f = byPlace[next++] as Fired;
@@ -139,13 +150,33 @@ export function managerMessages(history: readonly HistoryStep[]): MonthMessages[
         const major = endingIfYearEndedNow(step.after)?.majorId;
         if (major) due.set('checkin', `checkin.${major}`);
       }
+      // A quiet month (round 2c): nothing fired, and the months before it were silent too.
+      const silent = months.length >= rules.quietAfter && months.slice(-rules.quietAfter).every((m) => m.messages.length === 0);
+      if (due.size === 0 && silent) {
+        const band = fameBand(c, fameTier(c, step.after.resources.hype));
+        if (band) due.set('quiet', `quiet.${band}`);
+      }
       if (!manager) return;
+      const take = (group: string) => {
+        const n = shown.get(group) ?? 0;
+        shown.set(group, n + 1);
+        return n;
+      };
       const ranked = [...due].sort(([a], [b]) => priority(a) - priority(b));
       const messages = ranked.slice(0, rules.perMonth).map(([trigger, lineKey]): ManagerMessage => {
         const group = messageGroup(manager.id, lineKey);
-        const n = shown.get(group) ?? 0;
-        shown.set(group, n + 1);
-        return { trigger, lineKey, group, show: n, key: bagKey(manager.lines[lineKey], seed, group, n) };
+        const n = take(group);
+        const variants = manager.lines[lineKey] ?? [];
+        const bubbles = variants.length === 0 ? [] : (variants[bagIndex(seed, group, n, variants.length)] ?? []);
+        // Two bubbles, always: a one-bubble line takes a sign-off for its mood.
+        let signoff: ManagerMessage['signoff'] = null;
+        if (bubbles.length === 1) {
+          const mood = moodOf(rules, trigger, lineKey);
+          const sGroup = signoffGroup(manager.id, mood);
+          const sn = take(sGroup);
+          signoff = { group: sGroup, show: sn, key: bagKey(manager.signoffs?.[mood], seed, sGroup, sn) };
+        }
+        return { trigger, lineKey, group, show: n, bubbles, signoff };
       });
       months.push({
         turn: month,
@@ -159,6 +190,17 @@ export function managerMessages(history: readonly HistoryStep[]): MonthMessages[
     });
   });
   return months;
+}
+
+/**
+ * The manager's last word on the ending screen (round 2c): their two bubbles for the major the year ended
+ * in. Null before the ending, or without a manager or a line for that major.
+ */
+export function lastWord(s: { readonly content: ContentIndex; readonly manager: string | null; readonly endingId: string | null }): { readonly manager: string; readonly bubbles: readonly string[] } | null {
+  const manager = getManager(s.content, s.manager);
+  const major = s.endingId === null ? null : majorOf(s.content, s.endingId);
+  const bubbles = major === null ? undefined : manager?.lastWord?.[major];
+  return manager && bubbles ? { manager: manager.id, bubbles } : null;
 }
 
 /**

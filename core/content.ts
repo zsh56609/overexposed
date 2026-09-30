@@ -365,7 +365,7 @@ export interface PressDef {
  * In priority order is content's (messages.priority). Their line keys: `frenzy` and `first_scandal` take a
  * `.low` or `.high` fame suffix, `checkin` the major's id, `lane` the lane's; the rest are bare.
  */
-export const MESSAGE_TRIGGERS = ['frenzy', 'first_scandal', 'checkin', 'known', 'signed', 'viral', 'lane', 'gate_failed', 'gate_passed', 'stuck', 'rival', 'opening'] as const;
+export const MESSAGE_TRIGGERS = ['frenzy', 'first_scandal', 'checkin', 'known', 'signed', 'viral', 'lane', 'gate_failed', 'gate_passed', 'stuck', 'rival', 'opening', 'quiet'] as const;
 export type MessageTrigger = (typeof MESSAGE_TRIGGERS)[number];
 
 /** A manager's perk. Each field is optional: a perk is what its fields say, applied by the engine. */
@@ -396,8 +396,12 @@ export interface ManagerDef {
   readonly perk: ManagerPerk;
   /** The choice screen's sample message and its label. */
   readonly sample: { readonly labelKey: string; readonly key: string };
-  /** Message variants by trigger line key; a variant may hold two bubbles, split by a line break. */
-  readonly lines: Readonly<Record<string, readonly string[]>>;
+  /** Message variants by trigger line key; each variant is its bubbles' keys, one or two (round 2c). */
+  readonly lines: Readonly<Record<string, readonly (readonly string[])[]>>;
+  /** Each message has two bubbles: a one-bubble variant takes a sign-off from the pool for its mood (round 2c). */
+  readonly signoffs?: { readonly easy: readonly string[]; readonly hard: readonly string[] };
+  /** The last word on the ending screen, keyed by major id: two bubbles (round 2c). */
+  readonly lastWord?: Readonly<Record<string, readonly string[]>>;
 }
 
 /** When the managers speak (core/manager.ts): the triggers' parameters and the monthly cap. */
@@ -414,6 +418,10 @@ export interface MessageRules {
   readonly viralFlag: string;
   /** `stuck`: heat at this pressure tier (rules.tiers.heat, 0-based) or above at this many month ends running. */
   readonly stuck: { readonly heatTierFrom: number; readonly months: number };
+  /** The triggers, or trigger line keys, whose sign-off is from the hard pool; the rest are easy. */
+  readonly hard: readonly string[];
+  /** `quiet` fires in a month no other trigger does, when this many months before it brought no message. */
+  readonly quietAfter: number;
 }
 
 /** content/managers.json. */
@@ -443,9 +451,8 @@ export interface DeskScriptDef {
   readonly lines: readonly { readonly key: string; readonly kind: ScriptLineKind }[];
 }
 
-/** content/scripts.json. */
+/** content/scripts.json. The bands are rules.fameBands. */
 export interface DeskScriptsDef {
-  readonly bands: readonly FameBand[];
   readonly scripts: readonly DeskScriptDef[];
 }
 
@@ -508,6 +515,11 @@ export interface Rules {
    * lane has at least `minPlays` plays and leads the next by at least `lead`. Endings never read it.
    */
   readonly laneEstablished?: { readonly minPlays: number; readonly lead: number };
+  /**
+   * Bands of fame tiers (round 2c), lowest first: low from Unknown, mid from Rising, high from Known. The
+   * quiet-month trigger and the desk scripts read them (core/tiers.ts fameBand).
+   */
+  readonly fameBands?: readonly FameBand[];
   /** The year's calendar (round 2c): the month and year the first month falls in. */
   readonly calendar?: { readonly startMonth: number; readonly startYear: number };
   /** The stat bar's tooltip lines for the stats without tiers (round 2c): money, the countdown, actions. */

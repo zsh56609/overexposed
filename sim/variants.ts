@@ -63,7 +63,11 @@ for (const persona of players) {
       }
     }
     // The manager: each message's line group, and the month-end perk line's.
-    for (const month of managerMessages(history)) for (const m of month.messages) shown.set(m.group, (shown.get(m.group) ?? 0) + 1);
+    for (const month of managerMessages(history))
+      for (const m of month.messages) {
+        shown.set(m.group, (shown.get(m.group) ?? 0) + 1);
+        if (m.signoff) shown.set(m.signoff.group, (shown.get(m.signoff.group) ?? 0) + 1);
+      }
     for (const line of monthEndLines(history)) shown.set(line.group, (shown.get(line.group) ?? 0) + 1);
     for (const [group, n] of shown) {
       sum.set(group, (sum.get(group) ?? 0) + n);
@@ -77,7 +81,7 @@ const round = (x: number) => Math.round(x * 100) / 100;
 // A manager's groups ('manager:<id>:…', 'monthEnd:<id>') over that manager's runs; the rest over every run.
 const runsFor = (group: string): number => {
   const [kind, owner] = group.split(':');
-  return (kind === 'manager' || kind === 'monthEnd') && owner !== undefined ? (managerRuns.get(owner) ?? runs) : runs;
+  return (kind === 'manager' || kind === 'monthEnd' || kind === 'signoff') && owner !== undefined ? (managerRuns.get(owner) ?? runs) : runs;
 };
 const appearances: Appearances = {
   measured: `npm run sim:variants — player-like personas (${players.join(', ')}), ${RUNS} runs each under each manager (${managers.join(', ')}), seed ${SEED}`,
@@ -96,7 +100,7 @@ const paperFor = (kind: string, owner: string): string =>
       ? 'hand'
       : kind === 'world' || kind === 'spillover' || kind === 'filler'
         ? owner
-        : kind === 'manager'
+        : kind === 'manager' || kind === 'signoff'
           ? 'phone'
           : kind === 'monthEnd'
             ? 'feed'

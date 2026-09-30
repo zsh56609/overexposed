@@ -84,8 +84,15 @@ export const endingPair = (c: ContentIndex, majorId: string, minorId: string): s
   t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });
 /** A manager's name (round 2b): the label on their messages. */
 export const managerName = (c: ContentIndex, id: string): string => t(getManager(c, id)?.nameKey ?? `manager.${id}.name`);
-/** A manager's message as it reads: its variant — or, with none written, its key, loudly. Bubbles split on line breaks. */
-export const messageText = (managerId: string, m: ManagerMessage): string => t(m.key ?? `manager.${managerId}.${m.lineKey}`);
+/**
+ * A manager's message as it reads (round 2c): two bubbles — the variant's own, and a one-bubble variant's
+ * sign-off — one per line. With nothing written, its key, loudly.
+ */
+export function messageBubbles(managerId: string, m: ManagerMessage): string[] {
+  const own = m.bubbles.length > 0 ? m.bubbles.map((key) => t(key)) : [t(`manager.${managerId}.${m.lineKey}`)];
+  return m.signoff ? [...own, t(m.signoff.key ?? `manager.${managerId}.signoff`)] : own;
+}
+export const messageText = (managerId: string, m: ManagerMessage): string => messageBubbles(managerId, m).join('\n');
 /** The line for the manager's month-end perk (Mags's relief). */
 export const monthEndText = (line: MonthEndLine): string => t(line.key ?? `manager.${line.manager}.perk.monthEnd`);
 

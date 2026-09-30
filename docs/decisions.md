@@ -6,6 +6,43 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2c, Part C: the managers
+
+- **Two bubbles, always.**
+  - A manager's lines are now variants of one or two bubbles, each bubble
+    its own key. Round 2b's two-bubble lines are split at their line break:
+    the first bubble keeps its key, the second takes `<key>.b`.
+  - A one-bubble variant takes a sign-off from its manager's pool for the
+    trigger's mood. `messages.hard` lists the hard triggers: first_scandal,
+    frenzy, stuck, gate_failed, and the Overexposed and Hard Way
+    check-ins. Every other trigger is easy.
+  - Each pool is a line group on the shuffle bag, counted only when a
+    sign-off is used.
+- **Quiet months: one silent month, not two** (a change under the standing
+  instruction).
+  - As written — no other trigger, and neither of the two previous months
+    had a message — the trigger can never fire. Month 1 always opens with
+    the opening, and the first month of every other season with a
+    check-in. So a month is never preceded by two silent ones in which it
+    could itself be silent. The sim confirmed it: 0 quiet months in 3,000
+    runs.
+  - `messages.quietAfter` is content, and set to 1. A month with no
+    trigger after a silent month brings a quiet-month line: it fills the
+    second month of a two-month silence.
+  - It fires about 0.7 times a run, in about half of all runs. Months
+    without a message fall from 32% to 26%.
+  - The band is the player's fame at the month's opening, from the new
+    shared `rules.fameBands`: low Unknown–Noticed, mid Rising, high
+    Known–Famous. The desk scripts use the same bands.
+- **The last word**:
+  - It is content (`lastWord`, keyed by major), two bubbles.
+  - /core's `lastWord` reads it for the major the year ended in.
+  - The ending screen shows it under the manager's name, after the
+    rival's line and before Play again.
+- **Mags's relief line** already prints only when the relief changes
+  something. With a season-end perk (Part F) that is only the months it
+  lands in.
+
 ## 2026-09-30 — Round 2c, Part B: draft v7
 
 Draft v7 is saved verbatim (docs/writing/draft-v7.md) and committed on its
