@@ -230,8 +230,8 @@ gives the same ending, one plain line says so: "Either way, the year
 ends as <ending>."; otherwise each option shows "This ends the year as:
 <ending>". Awards are the ending screen's to reveal: they appear on the
 options only when the options bring different awards, each option with
-its own ("Awards: Critics' Choice"), because then they bear on the
-choice (decision 23, revised).
+its own ("On the night: Critics' Choice" — awards night), because then
+they bear on the choice (decision 23, revised).
 
 **Goals board** — visible from the first turn, and through every
 decision: it holds the right rail on its own (§3). The four endings, each
