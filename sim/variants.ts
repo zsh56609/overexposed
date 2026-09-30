@@ -8,7 +8,7 @@
 
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { frontPages, onceItem, readLines, type GameState, type HistoryStep } from '../core/index.ts';
+import { frontPages, indexContent, onceItem, paperOf, readLines, type GameState, type HistoryStep } from '../core/index.ts';
 import { runOne, runSeeds } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS } from './personas.ts';
@@ -66,7 +66,11 @@ const appearances: Appearances = {
 };
 writeFileSync(join(ROOT, 'sim/appearances.json'), `${JSON.stringify(appearances, null, 2)}\n`);
 
-// The gap list: one row per line group, the shortest of variants first.
+// The gap list: one row per line group, the shortest of variants first — with the paper it prints in
+// ('notebook': a quiet line no paper prints; 'hand': a scandal's in-hand line; '-': shown once a run).
+const index = indexContent(content);
+const paperFor = (kind: string, owner: string): string =>
+  kind === 'card' || kind === 'scandal' ? (paperOf(index, owner) ?? 'notebook') : kind === 'inHand' ? 'hand' : kind === 'world' || kind === 'spillover' ? owner : '-';
 const rows = variantGroups(loadRawContent()).map((g) => {
   const perRun = g.kind === 'once' ? (appearances.perRun[g.id] ?? 0) : (appearances.perRun[g.id] ?? 0);
   const needs = groupNeeds(g, appearances);
@@ -78,10 +82,10 @@ const lines = [
   `VARIANT GAP LIST  ${appearances.measured}  (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
   'needs: seen 4+ a run → 4 · 2 to 4 → 3 · under 2 → 2 · once-per-run items → 2 · a world pool → the stories a run prints on average',
   '',
-  `${pad('group', 30)}${pad('register', 10)}${'per run'.padStart(8)}${'max'.padStart(6)}${'have'.padStart(6)}${'needs'.padStart(7)}${'short'.padStart(7)}`,
+  `${pad('group', 30)}${pad('paper', 10)}${pad('register', 10)}${'per run'.padStart(8)}${'max'.padStart(6)}${'have'.padStart(6)}${'needs'.padStart(7)}${'short'.padStart(7)}`,
   ...rows.map(
     (r) =>
-      `${pad(r.g.id, 30)}${pad(r.g.register ?? '-', 10)}${r.perRun.toFixed(2).padStart(8)}${String(appearances.maxPerRun?.[r.g.id] ?? 0).padStart(6)}${String(r.have).padStart(6)}${String(r.needs).padStart(7)}${String(r.short).padStart(7)}`,
+      `${pad(r.g.id, 30)}${pad(paperFor(r.g.kind, r.g.owner), 10)}${pad(r.g.kind === 'scandal' ? 'scandal' : (r.g.register ?? '-'), 10)}${r.perRun.toFixed(2).padStart(8)}${String(appearances.maxPerRun?.[r.g.id] ?? 0).padStart(6)}${String(r.have).padStart(6)}${String(r.needs).padStart(7)}${String(r.short).padStart(7)}`,
   ),
   '',
   `${rows.filter((r) => r.short > 0).length} of ${rows.length} groups short, ${rows.reduce((n, r) => n + r.short, 0)} variants to write. Wrote sim/appearances.json.`,
