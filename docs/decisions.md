@@ -6,6 +6,39 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2b, Part D: the world
+
+- **Sagas.** Each paper follows two stories across the year, a beat a
+  season (draft v6). Like the rival's beat, each saga's beat prints in one
+  month of its season that the seed chooses (`sagaBeatTurn`). For a slot,
+  the rival's beat outranks a saga's, and a saga's outranks the one-off
+  stories. `MonthPress.sagas` records each beat due and whether it made
+  the page.
+- **Six v5 stories became saga beats.** The draft says the six spring
+  beats were v5 one-offs. Five were: the hedge war, the Static Saints,
+  the venue, the sequel, the streamer. The sixth, "REALITY STAR'S WEDDING:
+  SEE THE GUEST LIST", is the wedding saga's summer beat; its spring beat
+  ("ENGAGED — AFTER THREE WEEKS") is new. All six left the one-off pools.
+  The pools are renumbered: The Daily Flash 20 (six seasonal), B-Side 28
+  and Marquee 24 (four seasonal each).
+- **Fame filler, read explicitly.**
+  - "Ranks below the player's real stories" is read as the order in
+    which stories claim slots: filler claims only after every real story
+    (and the spillover) has claimed its own.
+  - Its cap is the lead only on a page with nothing real of the player's,
+    and a secondary otherwise. A filler line can sit above a real brief
+    (a Money line), never take a real story's slot, and never lead over
+    one.
+  - The lane's paper is `lanePaper` (early: B-Side).
+  - Famous: filler fills the lane's paper, but leaves the slots for the
+    rival's and sagas' beats due that month. The one filler line in The
+    Daily Flash is added whatever the lane; for a celebrity career the
+    Flash is the lane's paper, and filler fills it.
+  - Filler does not count toward the lead paper, which still follows the
+    player's real stories. It does count in the fame meter's share: it is
+    about the player.
+  - The thresholds are content (`page.filler`).
+
 ## 2026-09-30 — Round 2b, Part C: the managers
 
 - **The choice is state.** Before month 1 the run waits in a new phase,

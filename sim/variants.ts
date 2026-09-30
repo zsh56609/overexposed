@@ -57,7 +57,7 @@ for (const persona of players) {
     for (const month of frontPages(history)) {
       for (const page of month.pages) {
         for (const item of page.items) {
-          const group = item.kind === 'world' ? `world:${page.paper}` : item.kind === 'spillover' ? `spillover:${page.paper}` : null;
+          const group = item.kind === 'world' ? `world:${page.paper}` : item.kind === 'spillover' ? `spillover:${page.paper}` : item.kind === 'filler' ? `filler:${page.paper}` : null;
           if (group) shown.set(group, (shown.get(group) ?? 0) + 1);
         }
       }
@@ -94,7 +94,7 @@ const paperFor = (kind: string, owner: string): string =>
     ? (paperOf(index, owner) ?? 'notebook')
     : kind === 'inHand'
       ? 'hand'
-      : kind === 'world' || kind === 'spillover'
+      : kind === 'world' || kind === 'spillover' || kind === 'filler'
         ? owner
         : kind === 'manager'
           ? 'phone'

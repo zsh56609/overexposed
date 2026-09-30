@@ -31,6 +31,7 @@ export {
   prominenceOf,
   rivalArc,
   rivalBeatTurn,
+  sagaBeatTurn,
   type FrontPage,
   type MonthPress,
   type PageItem,

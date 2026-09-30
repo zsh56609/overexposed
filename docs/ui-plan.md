@@ -588,6 +588,9 @@ it.
     counts it in the heat carried. The reroll button shows Dex's free
     label while his free reroll lasts; the feed records a free reroll as
     such. (2026-09-30)
+30. The world on the page (round 2b, Part D; design §3.3, §3.4). A saga's
+    beat prints like any world story, in muted type; fame filler prints
+    as the player's, in ink — it is about them. (2026-09-30)
 
 ### Still open
 

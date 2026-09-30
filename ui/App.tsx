@@ -380,7 +380,7 @@ function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
         {page.items.map((item, i) => {
           const text = pageItemText(c, item);
           return (
-            <li key={i} className={prose(text, `page-${item.slot} ${item.kind === 'world' || item.kind === 'rival' ? 'world' : 'mine'}`)}>
+            <li key={i} className={prose(text, `page-${item.slot} ${item.kind === 'world' || item.kind === 'rival' || item.kind === 'saga' ? 'world' : 'mine'}`)}>
               {text}
             </li>
           );

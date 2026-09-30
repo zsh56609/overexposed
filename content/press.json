@@ -10,11 +10,26 @@
         { "key": "paper.flash.world.4" },
         { "key": "paper.flash.world.5" },
         { "key": "paper.flash.world.6" },
-        { "key": "paper.flash.world.7", "act": 1 },
-        { "key": "paper.flash.world.8", "act": 2 },
-        { "key": "paper.flash.world.9", "act": 3 },
-        { "key": "paper.flash.world.10", "act": 4 }
-      ]
+        { "key": "paper.flash.world.7" },
+        { "key": "paper.flash.world.8" },
+        { "key": "paper.flash.world.9" },
+        { "key": "paper.flash.world.10" },
+        { "key": "paper.flash.world.11" },
+        { "key": "paper.flash.world.12" },
+        { "key": "paper.flash.world.13" },
+        { "key": "paper.flash.world.14" },
+        { "key": "paper.flash.world.15", "act": 1 },
+        { "key": "paper.flash.world.16", "act": 2 },
+        { "key": "paper.flash.world.17", "act": 2 },
+        { "key": "paper.flash.world.18", "act": 3 },
+        { "key": "paper.flash.world.19", "act": 4 },
+        { "key": "paper.flash.world.20", "act": 4 }
+      ],
+      "sagas": [
+        { "id": "wedding", "beats": ["paper.flash.saga.wedding.1", "paper.flash.saga.wedding.2", "paper.flash.saga.wedding.3", "paper.flash.saga.wedding.4"] },
+        { "id": "hedge", "beats": ["paper.flash.saga.hedge.1", "paper.flash.saga.hedge.2", "paper.flash.saga.hedge.3", "paper.flash.saga.hedge.4"] }
+      ],
+      "fillerKeys": ["paper.flash.filler.1", "paper.flash.filler.2", "paper.flash.filler.3", "paper.flash.filler.4", "paper.flash.filler.5"]
     },
     {
       "id": "bside",
@@ -26,12 +41,35 @@
         { "key": "paper.bside.world.4" },
         { "key": "paper.bside.world.5" },
         { "key": "paper.bside.world.6" },
-        { "key": "paper.bside.world.7", "act": 1 },
-        { "key": "paper.bside.world.8", "act": 2 },
-        { "key": "paper.bside.world.9", "act": 3 },
-        { "key": "paper.bside.world.10", "act": 4 }
+        { "key": "paper.bside.world.7" },
+        { "key": "paper.bside.world.8" },
+        { "key": "paper.bside.world.9" },
+        { "key": "paper.bside.world.10" },
+        { "key": "paper.bside.world.11" },
+        { "key": "paper.bside.world.12" },
+        { "key": "paper.bside.world.13" },
+        { "key": "paper.bside.world.14" },
+        { "key": "paper.bside.world.15" },
+        { "key": "paper.bside.world.16" },
+        { "key": "paper.bside.world.17" },
+        { "key": "paper.bside.world.18" },
+        { "key": "paper.bside.world.19" },
+        { "key": "paper.bside.world.20" },
+        { "key": "paper.bside.world.21" },
+        { "key": "paper.bside.world.22" },
+        { "key": "paper.bside.world.23" },
+        { "key": "paper.bside.world.24" },
+        { "key": "paper.bside.world.25", "act": 1 },
+        { "key": "paper.bside.world.26", "act": 2 },
+        { "key": "paper.bside.world.27", "act": 3 },
+        { "key": "paper.bside.world.28", "act": 4 }
       ],
-      "spilloverKeys": ["paper.bside.spillover.1", "paper.bside.spillover.2", "paper.bside.spillover.3"]
+      "sagas": [
+        { "id": "saints", "beats": ["paper.bside.saga.saints.1", "paper.bside.saga.saints.2", "paper.bside.saga.saints.3", "paper.bside.saga.saints.4"] },
+        { "id": "venue", "beats": ["paper.bside.saga.venue.1", "paper.bside.saga.venue.2", "paper.bside.saga.venue.3", "paper.bside.saga.venue.4"] }
+      ],
+      "spilloverKeys": ["paper.bside.spillover.1", "paper.bside.spillover.2", "paper.bside.spillover.3"],
+      "fillerKeys": ["paper.bside.filler.1", "paper.bside.filler.2", "paper.bside.filler.3", "paper.bside.filler.4"]
     },
     {
       "id": "marquee",
@@ -43,12 +81,31 @@
         { "key": "paper.marquee.world.4" },
         { "key": "paper.marquee.world.5" },
         { "key": "paper.marquee.world.6" },
-        { "key": "paper.marquee.world.7", "act": 1 },
-        { "key": "paper.marquee.world.8", "act": 2 },
-        { "key": "paper.marquee.world.9", "act": 3 },
-        { "key": "paper.marquee.world.10", "act": 4 }
+        { "key": "paper.marquee.world.7" },
+        { "key": "paper.marquee.world.8" },
+        { "key": "paper.marquee.world.9" },
+        { "key": "paper.marquee.world.10" },
+        { "key": "paper.marquee.world.11" },
+        { "key": "paper.marquee.world.12" },
+        { "key": "paper.marquee.world.13" },
+        { "key": "paper.marquee.world.14" },
+        { "key": "paper.marquee.world.15" },
+        { "key": "paper.marquee.world.16" },
+        { "key": "paper.marquee.world.17" },
+        { "key": "paper.marquee.world.18" },
+        { "key": "paper.marquee.world.19" },
+        { "key": "paper.marquee.world.20" },
+        { "key": "paper.marquee.world.21", "act": 1 },
+        { "key": "paper.marquee.world.22", "act": 2 },
+        { "key": "paper.marquee.world.23", "act": 3 },
+        { "key": "paper.marquee.world.24", "act": 4 }
       ],
-      "spilloverKeys": ["paper.marquee.spillover.1", "paper.marquee.spillover.2", "paper.marquee.spillover.3"]
+      "sagas": [
+        { "id": "sequel", "beats": ["paper.marquee.saga.sequel.1", "paper.marquee.saga.sequel.2", "paper.marquee.saga.sequel.3", "paper.marquee.saga.sequel.4"] },
+        { "id": "streamer", "beats": ["paper.marquee.saga.streamer.1", "paper.marquee.saga.streamer.2", "paper.marquee.saga.streamer.3", "paper.marquee.saga.streamer.4"] }
+      ],
+      "spilloverKeys": ["paper.marquee.spillover.1", "paper.marquee.spillover.2", "paper.marquee.spillover.3"],
+      "fillerKeys": ["paper.marquee.filler.1", "paper.marquee.filler.2", "paper.marquee.filler.3", "paper.marquee.filler.4"]
     }
   ],
   "route": {
@@ -75,7 +132,8 @@
     "frenzyAt": 2,
     "spilloverFrom": 3,
     "overwhelmScandalFrom": 4,
-    "overwhelmLaneFrom": 4
+    "overwhelmLaneFrom": 4,
+    "filler": { "laneFrom": 3, "laneBelow": 2, "fillLaneFrom": 4, "scandalPaperFrom": 4 }
   },
   "rival": {
     "arcs": [

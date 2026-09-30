@@ -111,7 +111,7 @@ export function withSubject(text: string, subjectKey: string | null): string {
   return text.replace(/\{(subject|Subject|SUBJECT)\}/g, (_, form: string) => (form === 'SUBJECT' ? noun.toUpperCase() : form === 'Subject' ? titleCase(noun) : noun));
 }
 
-/** A story on a front page as words: the player's line as it printed, the spillover, a world story, the rival. */
+/** A story on a front page as words: the player's line as it printed, the spillover, fame filler, a world story, the rival, a saga. */
 export function pageItemText(c: ContentIndex, item: PageItem): string {
   if (item.kind === 'player' && item.line) return lineText(c, item.line, item.line.cardId, item.subjectKey);
   return item.key ? withSubject(t(item.key), item.subjectKey) : '';

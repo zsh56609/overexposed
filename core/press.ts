@@ -95,11 +95,14 @@ export function pressLines(history: readonly HistoryStep[]): PressLine[] {
 
 const LEVEL: Readonly<Record<Prominence, number>> = { lead: 0, secondary: 1, brief: 2 };
 
-export type PageItemKind = 'player' | 'spillover' | 'world' | 'rival' | 'saga';
+export type PageItemKind = 'player' | 'spillover' | 'filler' | 'world' | 'rival' | 'saga';
 
 export interface PageItem {
   readonly slot: Prominence;
-  /** The player's own line, the frenzy spilling over into this paper, a world story, or the rival's beat. */
+  /**
+   * The player's own line, the frenzy spilling over into this paper, fame filler about the player, a world
+   * story, the rival's beat, or a saga's.
+   */
   readonly kind: PageItemKind;
   /** The i18n key of its text: a player line's printed variant. */
   readonly key: string | null;
@@ -149,6 +152,12 @@ export function rivalArc(c: ContentIndex, seed: number): RivalArcDef | null {
 export function rivalBeatTurn(c: ContentIndex, seed: number, act: number): number {
   const perAct = c.rules.turnsPerAct;
   return (act - 1) * perAct + 1 + (deriveSeed(seed, hashId(`rival:${act}`)) % perAct);
+}
+
+/** The month of a season that carries a saga's beat (seeded, like the rival's; round 2b). */
+export function sagaBeatTurn(c: ContentIndex, seed: number, paper: string, saga: string, act: number): number {
+  const perAct = c.rules.turnsPerAct;
+  return (act - 1) * perAct + 1 + (deriveSeed(seed, hashId(`saga:${paper}:${saga}:${act}`)) % perAct);
 }
 
 /** How prominent the player's line may be on its paper's front page: its cap (it may always sit lower). */
@@ -210,6 +219,8 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
   const printedWorld = new Map<string, Map<string, number>>(press.papers.map((p) => [p.id, new Map()]));
   const lastWorld = new Map<string, ReadonlySet<string>>(press.papers.map((p) => [p.id, new Set()]));
   const spilled = new Map<string, number>();
+  const filled = new Map<string, number>();
+  const filler = page.filler;
   const months: MonthPress[] = [];
 
   history.forEach((step, index) => {
@@ -231,6 +242,15 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
     );
     const beat = arc && end.turn === rivalBeatTurn(c, seed, end.act) ? (arc.beats[end.act - 1] ?? null) : null;
     let rivalPrinted = false;
+    // The world's own timeline: each saga's beat for this season, in the month the seed chose.
+    const sagas = press.papers.flatMap((paper) =>
+      (paper.sagas ?? []).flatMap((saga) => {
+        const key = saga.beats[end.act - 1];
+        return key !== undefined && end.turn === sagaBeatTurn(c, seed, paper.id, saga.id, end.act) ? [{ paper: paper.id, key, printed: false }] : [];
+      }),
+    );
+    // Fame filler goes to the established lane's paper, and once famous also to the scandal paper.
+    const fillerPaper = lanePaper(c, lane);
 
     const pages = press.papers.map((paper): FrontPage => {
       const overwhelmed =
@@ -262,19 +282,47 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       const worldMin = overwhelmed ? 0 : (page.worldMin[Math.min(tier, page.worldMin.length - 1)] ?? 0);
       const slots: (PageItem | null)[] = page.slots.map(() => null);
       let placed = 0;
-      for (const cand of candidates) {
-        if (placed >= page.slots.length - worldMin) break;
+      const place = (cand: Candidate): boolean => {
+        if (placed >= page.slots.length - worldMin) return false;
         const at = page.slots.findIndex((slot, i) => slots[i] === null && LEVEL[slot] >= LEVEL[cand.cap]);
-        if (at === -1) continue;
+        if (at === -1) return false;
         slots[at] = { ...cand.item, slot: page.slots[at] as Prominence };
         placed++;
+        return true;
+      };
+      for (const cand of candidates) place(cand);
+      // The world's beats due on this page: the rival's first, then the sagas'.
+      const beats: Omit<PageItem, 'slot'>[] = [
+        ...(beat && beat.paper === paper.id ? [{ kind: 'rival' as const, key: beat.key, subjectKey: null, line: null }] : []),
+        ...sagas.filter((s) => s.paper === paper.id).map((s) => ({ kind: 'saga' as const, key: s.key, subjectKey: null, line: null })),
+      ];
+      // Fame filler (round 2b): what the paper prints about a known or famous player who did nothing
+      // newsworthy. Known: one line in the lane's paper while the player has fewer than two stories there.
+      // Famous: the lane's paper filled — the world's due beats keep their slots — and one line in the scandal
+      // paper whatever the lane. It claims after the player's real stories, and leads only a page with
+      // nothing real of theirs.
+      const real = placed;
+      let wanted = 0;
+      if (filler && (paper.fillerKeys?.length ?? 0) > 0) {
+        if (paper.id === fillerPaper && tier >= filler.fillLaneFrom) wanted = page.slots.length - real - beats.length;
+        else if (paper.id === fillerPaper && tier >= filler.laneFrom && real < filler.laneBelow) wanted = 1;
+        else if (paper.id === press.route.scandal && tier >= filler.scandalPaperFrom) wanted = 1;
       }
-      // The world fills the rest: the rival's beat first when it is her month in this paper, then the bag.
+      for (let k = 0; k < wanted; k++) {
+        const group = `filler:${paper.id}`;
+        const n = filled.get(group) ?? 0;
+        const cand: Candidate = { cap: real === 0 ? 'lead' : 'secondary', order: k, item: { kind: 'filler', key: bagKey(paper.fillerKeys, seed, group, n), subjectKey, line: null } };
+        if (!place(cand)) break;
+        filled.set(group, n + 1);
+      }
+      // The world fills the rest: the rival's beat first when it is her month in this paper, then the sagas'
+      // beats, then the bag.
       const open = slots.flatMap((item, i) => (item === null ? [i] : []));
-      const world: Omit<PageItem, 'slot'>[] = [];
-      if (beat && beat.paper === paper.id && open.length > 0) {
-        world.push({ kind: 'rival', key: beat.key, subjectKey: null, line: null });
-        rivalPrinted = true;
+      const world: Omit<PageItem, 'slot'>[] = beats.slice(0, open.length);
+      for (const item of world) {
+        if (item.kind === 'rival') rivalPrinted = true;
+        const saga = sagas.find((s) => s.paper === paper.id && s.key === item.key);
+        if (saga) saga.printed = true;
       }
       const printed = printedWorld.get(paper.id) as Map<string, number>;
       const stories = worldStories(seed, paper, end.act, printed, lastWorld.get(paper.id) as ReadonlySet<string>, open.length - world.length);
@@ -300,7 +348,7 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       pages,
       lead: leadPaper(c, pages, lane),
       rival: beat ? { paper: beat.paper, key: beat.key, printed: rivalPrinted } : null,
-      sagas: [],
+      sagas,
     });
   });
   return months;
@@ -336,7 +384,10 @@ function leadPaper(c: ContentIndex, pages: readonly FrontPage[], lane: string | 
   return tied.includes(preferred) ? preferred : (tied[0] ?? preferred);
 }
 
-/** How much of a page is the player's: their lines and the spillover, against its slots. */
-export function playerShare(fp: FrontPage, slots: number): number {
-  return slots === 0 ? 0 : fp.items.filter((i) => i.kind === 'player' || i.kind === 'spillover').length / slots;
+/**
+ * How much of a page is the player's, against its slots: their lines and the spillover — and with `filler`,
+ * the fame filler written about them too (round 2b).
+ */
+export function playerShare(fp: FrontPage, slots: number, filler = true): number {
+  return slots === 0 ? 0 : fp.items.filter((i) => i.kind === 'player' || i.kind === 'spillover' || (filler && i.kind === 'filler')).length / slots;
 }

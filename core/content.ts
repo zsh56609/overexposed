@@ -254,13 +254,27 @@ export interface WorldStoryDef {
   readonly act?: number;
 }
 
+/**
+ * A story the world tells across the year, in one paper (round 2b): a beat per season, each printed in one
+ * month of its season chosen by the seed — the world has its own timeline, like the rival's.
+ */
+export interface SagaDef {
+  readonly id: string;
+  /** One i18n key per season, in order. */
+  readonly beats: readonly string[];
+}
+
 export interface PaperDef {
   readonly id: string;
   readonly mastheadKey: string;
   /** Its world news: what fills a front page around the player (drawn with a shuffle bag). */
   readonly world?: readonly WorldStoryDef[];
+  /** Its sagas: the world's stories that develop across the year. */
+  readonly sagas?: readonly SagaDef[];
   /** Its frenzy-spillover lines: the scandal reaching this paper too. */
   readonly spilloverKeys?: readonly string[];
+  /** Its fame filler: what it prints about a famous player who did nothing newsworthy (a line group, with the subject). */
+  readonly fillerKeys?: readonly string[];
 }
 
 /** How prominent a story is on a front page, most first. */
@@ -293,6 +307,13 @@ export interface PageRules {
   readonly overwhelmScandalFrom: number;
   /** From this fame tier on, the established lane's paper is overwhelmed: the player may fill it. */
   readonly overwhelmLaneFrom: number;
+  /**
+   * Fame filler (round 2b): from `laneFrom`, the established lane's paper gets a filler line when the player
+   * has fewer than `laneBelow` stories in it; from `fillLaneFrom`, filler fills it; from `scandalPaperFrom`,
+   * the scandal paper (The Daily Flash) gets one filler line whatever the lane. Filler ranks below the
+   * player's real stories, and leads only a page with nothing real of the player's.
+   */
+  readonly filler?: { readonly laneFrom: number; readonly laneBelow: number; readonly fillLaneFrom: number; readonly scandalPaperFrom: number };
 }
 
 /** One season's beat of the rival's arc: in which paper, and its line. */

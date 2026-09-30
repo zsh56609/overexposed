@@ -34,12 +34,12 @@ const ledBy = new Map<PersonaId, { months: number; led: Record<string, number> }
 const byLane = Object.fromEntries(lanes.map((l) => [l, { months: 0, led: zeros(papers) }]));
 const byTier = Array.from({ length: tierCount }, () => ({ months: 0, led: zeros(papers) }));
 const scandalLead = Array.from({ length: tierCount }, () => ({ months: 0, leadsFlash: 0, flashOnDesk: 0 }));
-const meter = Array.from({ length: tierCount }, () => ({ months: 0, share: 0, leadOverwhelmed: 0, pages: 0, overwhelmedPages: 0, playerLeads: 0, allShare: 0, papersIn: 0 }));
+const meter = Array.from({ length: tierCount }, () => ({ months: 0, share: 0, realShare: 0, leadOverwhelmed: 0, pages: 0, overwhelmedPages: 0, playerLeads: 0, fillerLeads: 0, allShare: 0, papersIn: 0, filler: 0 }));
 const fallback = { runs: 0, established: 0, laterEnds: 0, earlyEnds: 0, runsFallingBack: 0, changes: 0 };
 const arcs = new Map<string, { runs: number; differs: number }>();
 let rivalBeats = 0;
 let rivalShown = 0;
-const sagas = { beats: 0, printed: 0 };
+const sagas = { beats: 0, printed: 0, byPaper: {} as Record<string, { beats: number; printed: number }> };
 const world = new Map<string, { runs: number; printed: number; distinct: number; repeatedRuns: number; repeats: number; maxPrinted: number; maxOneStory: number }>(
   papers.map((p) => [p, { runs: 0, printed: 0, distinct: 0, repeatedRuns: 0, repeats: 0, maxPrinted: 0, maxOneStory: 0 }]),
 );
@@ -89,10 +89,13 @@ for (const persona of PERSONA_IDS) {
       if (m && lead) {
         m.months++;
         m.share += playerShare(lead, slots);
+        m.realShare += playerShare(lead, slots, false);
+        m.filler += month.pages.reduce((n, p) => n + p.items.filter((i) => i.kind === 'filler').length, 0);
         if (lead.overwhelmed) m.leadOverwhelmed++;
         m.pages += month.pages.length;
         m.overwhelmedPages += month.pages.filter((p) => p.overwhelmed).length;
-        if (lead.items[0] && lead.items[0].kind !== 'world' && lead.items[0].kind !== 'rival' && lead.items[0].kind !== 'saga') m.playerLeads++;
+        if (lead.items[0]?.kind === 'player' || lead.items[0]?.kind === 'spillover') m.playerLeads++;
+        if (lead.items[0]?.kind === 'filler') m.fillerLeads++;
         m.allShare += month.pages.reduce((n, p) => n + playerShare(p, slots), 0) / Math.max(1, month.pages.length);
         m.papersIn += month.pages.filter((p) => playerShare(p, slots) > 0).length;
       }
@@ -103,6 +106,9 @@ for (const persona of PERSONA_IDS) {
       for (const beat of month.sagas ?? []) {
         sagas.beats++;
         if (beat.printed) sagas.printed++;
+        const p = (sagas.byPaper[beat.paper] ??= { beats: 0, printed: 0 });
+        p.beats++;
+        if (beat.printed) p.printed++;
       }
     }
     // The established lane at each month end: after it first settles, how often it reads early again.
@@ -175,11 +181,12 @@ lines.push('A SCANDAL IN THE DAILY FLASH  (player-like; months in which a scanda
 lines.push(`  ${'tier'.padEnd(14)}${'months'.padStart(8)}${'scandal leads the Flash'.padStart(26)}${'the Flash on the desk'.padStart(24)}`);
 scandalLead.forEach((s, i) => lines.push(`  ${(tierKeys[i] ?? `tier ${i + 1}`).padEnd(14)}${String(s.months).padStart(8)}${pct(s.leadsFlash, s.months).padStart(26)}${pct(s.flashOnDesk, s.months).padStart(24)}`));
 lines.push('');
-lines.push("THE FAME METER  (player-like runs pooled; by the fame tier at the month's end)");
-lines.push(`  ${'tier'.padEnd(14)}${'months'.padStart(8)}${"player's share of the lead page".padStart(34)}${'lead page overwhelmed'.padStart(24)}${'pages overwhelmed'.padStart(20)}${'player leads it'.padStart(18)}${'share of all 3'.padStart(16)}${'papers in'.padStart(11)}`);
+lines.push("THE FAME METER  (player-like runs pooled; by the fame tier at the month's end; share = the player's stories, fame filler included, and without it)");
+lines.push(`  ${'tier'.padEnd(14)}${'months'.padStart(8)}${'share of lead page'.padStart(20)}${'(real only)'.padStart(13)}${'lead overwhelmed'.padStart(18)}${'pages overwhelmed'.padStart(19)}${'player leads it'.padStart(17)}${'filler leads it'.padStart(17)}${'filler/month'.padStart(14)}${'share of all 3'.padStart(16)}${'papers in'.padStart(11)}`);
+const mean = (x: number, n: number) => (n ? `${((100 * x) / n).toFixed(1)}%` : '-');
 meter.forEach((m, i) =>
   lines.push(
-    `  ${(tierKeys[i] ?? `tier ${i + 1}`).padEnd(14)}${String(m.months).padStart(8)}${(m.months ? `${((100 * m.share) / m.months).toFixed(1)}%` : '-').padStart(34)}${pct(m.leadOverwhelmed, m.months).padStart(24)}${pct(m.overwhelmedPages, m.pages).padStart(20)}${pct(m.playerLeads, m.months).padStart(18)}${(m.months ? `${((100 * m.allShare) / m.months).toFixed(1)}%` : '-').padStart(16)}${(m.months ? (m.papersIn / m.months).toFixed(2) : '-').padStart(11)}`,
+    `  ${(tierKeys[i] ?? `tier ${i + 1}`).padEnd(14)}${String(m.months).padStart(8)}${mean(m.share, m.months).padStart(20)}${mean(m.realShare, m.months).padStart(13)}${pct(m.leadOverwhelmed, m.months).padStart(18)}${pct(m.overwhelmedPages, m.pages).padStart(19)}${pct(m.playerLeads, m.months).padStart(17)}${pct(m.fillerLeads, m.months).padStart(17)}${(m.months ? (m.filler / m.months).toFixed(2) : '-').padStart(14)}${mean(m.allShare, m.months).padStart(16)}${(m.months ? (m.papersIn / m.months).toFixed(2) : '-').padStart(11)}`,
   ),
 );
 lines.push('');
@@ -192,7 +199,10 @@ lines.push('THE RIVAL  (player-like runs; her major is fixed by her arc)');
 for (const [id, a] of [...arcs].sort(([x], [y]) => x.localeCompare(y))) lines.push(`  ${id.padEnd(14)} drawn ${pct(a.runs, playerRuns).padStart(6)}   her major differs from the player's in ${pct(a.differs, a.runs)}`);
 const allDiffer = [...arcs.values()].reduce((n, a) => n + a.differs, 0);
 lines.push(`  all arcs: her major differs from the player's in ${pct(allDiffer, playerRuns)}; her beats made the page ${pct(rivalShown, rivalBeats)} of the time`);
-if (sagas.beats > 0) lines.push(`  world sagas: ${(sagas.beats / playerRuns).toFixed(1)} beats due a run; ${pct(sagas.printed, sagas.beats)} of them made the page`);
+if (sagas.beats > 0) {
+  lines.push(`  world sagas: ${(sagas.beats / playerRuns).toFixed(1)} beats due a run; ${pct(sagas.printed, sagas.beats)} of them made the page`);
+  for (const [paper, p] of Object.entries(sagas.byPaper)) lines.push(`    ${paper.padEnd(10)} ${(p.beats / playerRuns).toFixed(1)} beats due a run, ${pct(p.printed, p.beats)} printed`);
+}
 lines.push('');
 lines.push('WORLD POOLS  (player-like runs; one-off stories; every paper is readable every month)');
 lines.push(`  ${'paper'.padEnd(10)}${'pool'.padStart(6)}${'printed/run'.padStart(13)}${'distinct/run'.padStart(14)}${'runs with a repeat'.padStart(20)}${'repeats/run'.padStart(13)}${'most/run'.padStart(10)}${'one story, most/run'.padStart(21)}`);

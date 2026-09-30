@@ -948,7 +948,7 @@ export function variantsNeeded(perRun: number): number {
 /** An item shown once per run needs two, so different runs read differently. */
 export const ONCE_VARIANTS_NEEDED = 2;
 
-export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'world' | 'once' | 'manager' | 'monthEnd';
+export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'filler' | 'world' | 'once' | 'manager' | 'monthEnd';
 
 /** A line group and its variants, as content lists them. */
 export interface VariantGroup {
@@ -990,6 +990,7 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
   for (const p of list(press.papers)) {
     if (!isStr(p.id)) continue;
     if (Array.isArray(p.spilloverKeys)) groups.push({ id: `spillover:${p.id}`, kind: 'spillover', owner: p.id, keys: keyList(p.spilloverKeys), register: null, lane: null });
+    if (Array.isArray(p.fillerKeys)) groups.push({ id: `filler:${p.id}`, kind: 'filler', owner: p.id, keys: keyList(p.fillerKeys), register: null, lane: null });
     const world = list(p.world).map((s) => s.key).filter(isStr);
     if (world.length > 0) groups.push({ id: `world:${p.id}`, kind: 'world', owner: p.id, keys: world, register: null, lane: null });
   }
@@ -1080,7 +1081,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 // The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
 
 const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'rival'];
-const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom'];
+const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom', 'filler'];
 
 function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>): void {
   const file = 'content/press.json';
@@ -1088,7 +1089,7 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
   if (!isObj(raw)) return v.error('schema', file, 'must be an object: { papers, route, subjects, earlyLane }');
   v.fields(raw, PRESS_FIELDS, file);
   const papers = checkList(v, raw.papers, `${file} papers`, 'paper', (p, where) => {
-    v.fields(p, ['id', 'mastheadKey', 'world', 'spilloverKeys'], where);
+    v.fields(p, ['id', 'mastheadKey', 'world', 'sagas', 'spilloverKeys', 'fillerKeys'], where);
     v.key(p.mastheadKey, `${where}.mastheadKey`);
     // Its world news: a pool of stories, each for any season or only its own.
     if (p.world !== undefined) {
@@ -1103,6 +1104,24 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
         });
     }
     if (p.spilloverKeys !== undefined) v.keys(p.spilloverKeys, `${where}.spilloverKeys`);
+    // Its sagas (round 2b): the world's stories across the year, a beat per season.
+    if (p.sagas !== undefined) {
+      const ids = new Set<unknown>();
+      if (!Array.isArray(p.sagas)) v.error('schema', `${where}.sagas`, 'must be a list of { id, beats }');
+      else
+        p.sagas.forEach((saga, i) => {
+          const at = `${where}.sagas[${i}]`;
+          if (!isObj(saga)) return v.error('schema', at, 'must be { id, beats }');
+          v.fields(saga, ['id', 'beats'], at);
+          if (v.id(saga.id, `${at}.id`)) {
+            if (ids.has(saga.id)) v.error('schema', at, `duplicate saga id ${q(saga.id)}`);
+            ids.add(saga.id);
+          }
+          if (!Array.isArray(saga.beats) || saga.beats.length !== v.acts) v.error('structure', `${at}.beats`, `must give one beat per season (${v.acts})`);
+          else saga.beats.forEach((k, j) => v.key(k, `${at}.beats[${j}]`));
+        });
+    }
+    if (p.fillerKeys !== undefined) v.keys(p.fillerKeys, `${where}.fillerKeys`);
   });
   const paperIds = new Set(papers.map((p) => p.id).filter(isStr));
   const paper = (x: unknown, where: string) => {
@@ -1167,6 +1186,17 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
       perTier(page.scandal, `${at}.scandal`, prominence);
       v.int(page.frenzyAt, `${at}.frenzyAt`, [1, 100]);
       for (const f of ['spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom'] as const) v.int(page[f], `${at}.${f}`, [0, Math.max(tiers, 1)]);
+      // Fame filler (round 2b): from which fame tiers, and how many stories the lane's paper is held to.
+      if (page.filler !== undefined) {
+        const f = page.filler;
+        if (!isObj(f)) v.error('schema', `${at}.filler`, 'must be { laneFrom, laneBelow, fillLaneFrom, scandalPaperFrom }');
+        else {
+          v.fields(f, ['laneFrom', 'laneBelow', 'fillLaneFrom', 'scandalPaperFrom'], `${at}.filler`);
+          for (const k of ['laneFrom', 'fillLaneFrom', 'scandalPaperFrom'] as const) v.int(f[k], `${at}.filler.${k}`, [0, Math.max(tiers, 1)]);
+          v.int(f.laneBelow, `${at}.filler.laneBelow`, [1, Math.max(slots.length, 1)]);
+          if (papers.every((p) => !Array.isArray(p.fillerKeys))) v.warn('structure', `${at}.filler`, 'no paper has fillerKeys: filler never prints');
+        }
+      }
     }
   }
 

@@ -313,6 +313,17 @@ Overexposed, fade in The Long Game). The arc is fixed at the start, so it
 cannot be chosen to contrast the player's outcome; with four arcs it often
 does so by chance. The full life arc is full-version scope.
 
+**The world has its own timeline** (round 2b). Beside the rival, each
+paper follows two **sagas** — stories that develop across the year, a beat
+a season: in The Daily Flash a reality star's whirlwind marriage and a TV
+chef's hedge war; in B-Side The Static Saints' reunion and a basement
+venue's fight to stay open; in Marquee a sequel nobody asked for and a
+struggling streamer. Like the rival's, each season one month chosen by the
+seed carries each saga's beat as a world story in its paper. For a slot,
+the rival's beat outranks a saga's, and a saga's beat outranks the one-off
+world stories. The sagas run whatever the player does: the world does not
+wait for them.
+
 ### 3.4 The front page
 
 The papers are not about the player alone. How much of a front page is
@@ -347,6 +358,18 @@ in every paper at once.
   brief.
 - **World pools** are drawn with a shuffle bag, no repeats until the pool
   is used; a seasonal story appears at most once a run, in its season.
+  Round 2b doubled them or more (The Daily Flash 20, B-Side 28, Marquee 24)
+  and moved the stories that became saga beats out of them.
+- **Fame filler** (round 2b): once the player is Known, the press writes
+  about them even in a month they did nothing newsworthy. Known: if the
+  player has fewer than two stories in their established lane's paper, it
+  adds one filler line. Famous: filler fills the lane's paper — the
+  world's due beats keep their slots — and The Daily Flash, whatever the
+  lane, adds one. Filler ranks below the player's real stories: it claims
+  a slot after them, and it may lead only a page with nothing real of
+  theirs. It carries the press subject, and it does not decide the lead
+  paper. With it, the player's share of the lead paper climbs clearly from
+  Rising through Known to Famous.
 - **The lead paper** — the one on the desk in the visual phase — holds the
   player's most prominent story: a lead, then a secondary, then a brief.
   Money lines do not count: a side gig is a business footnote, not the

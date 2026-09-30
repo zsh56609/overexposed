@@ -47,8 +47,11 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   noun `{subject}` becomes; `earlyLane` is the column read while no lane
   is established.
 - A paper's `world`: its world news, `{ key, act? }` — any season, or
-  only its own (once a run); `spilloverKeys`: the frenzy spilling over
-  into it.
+  only its own (once a run); `sagas` (round 2b): `{ id, beats }`, one
+  beat key per season, each printed in a month of its season the seed
+  chooses; `spilloverKeys`: the frenzy spilling over into it;
+  `fillerKeys` (round 2b): its fame filler, a line group with the subject
+  slot.
 - `page`: the front page's `slots` (most prominent first); `worldMin`,
   world stories per page by fame tier; `loud.inLane` / `loud.offLane`,
   a LOUD line's prominence by fame tier in the established lane's paper
@@ -57,7 +60,11 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   make a frenzy; `spilloverFrom`, the fame tier from which a frenzy
   spills over; `overwhelmScandalFrom` and `overwhelmLaneFrom`, the fame
   tiers from which the scandal paper (in a scandal's month) and the lane's
-  paper are overwhelmed.
+  paper are overwhelmed; `filler` (round 2b): `laneFrom` and `laneBelow`
+  — from this tier the lane's paper gets one filler line while the player
+  has fewer stories there than this — `fillLaneFrom`, the tier from which
+  filler fills the lane's paper, and `scandalPaperFrom`, the tier from
+  which the scandal paper gets one filler line whatever the lane.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), `endingKey`.
 

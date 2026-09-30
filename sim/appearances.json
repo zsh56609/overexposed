@@ -48,6 +48,9 @@
     "ending:tabloid_royalty": 0.06,
     "ending:the_independent": 0.03,
     "ending:the_one_to_watch": 0.04,
+    "filler:bside": 1.01,
+    "filler:flash": 0.73,
+    "filler:marquee": 0.59,
     "gate:gate_arena_tour": 1,
     "gate:gate_audition": 1,
     "gate:gate_award_show": 1,
@@ -77,7 +80,7 @@
     "manager:guardian:lane.music": 0.38,
     "manager:guardian:lane.screen": 0.23,
     "manager:guardian:opening": 1,
-    "manager:guardian:rival": 2.4,
+    "manager:guardian:rival": 2.35,
     "manager:guardian:signed": 0.43,
     "manager:guardian:stuck": 0.08,
     "manager:guardian:viral": 0.75,
@@ -96,7 +99,7 @@
     "manager:veteran:lane.music": 0.36,
     "manager:veteran:lane.screen": 0.27,
     "manager:veteran:opening": 1,
-    "manager:veteran:rival": 2.39,
+    "manager:veteran:rival": 2.35,
     "manager:veteran:signed": 0.39,
     "manager:veteran:stuck": 0.11,
     "manager:veteran:viral": 0.71,
@@ -114,9 +117,9 @@
     "scandal:tabloid_story": 0.99,
     "spillover:bside": 0.16,
     "spillover:marquee": 0.16,
-    "world:bside": 42.37,
-    "world:flash": 33.27,
-    "world:marquee": 45.54
+    "world:bside": 33.37,
+    "world:flash": 24.85,
+    "world:marquee": 36.94
   },
   "maxPerRun": {
     "card:acting_class": 13,
@@ -166,6 +169,9 @@
     "ending:tabloid_royalty": 1,
     "ending:the_independent": 1,
     "ending:the_one_to_watch": 1,
+    "filler:bside": 14,
+    "filler:flash": 13,
+    "filler:marquee": 18,
     "gate:gate_arena_tour": 1,
     "gate:gate_audition": 1,
     "gate:gate_award_show": 1,
@@ -232,8 +238,8 @@
     "scandal:tabloid_story": 7,
     "spillover:bside": 6,
     "spillover:marquee": 6,
-    "world:bside": 48,
-    "world:flash": 46,
-    "world:marquee": 48
+    "world:bside": 40,
+    "world:flash": 38,
+    "world:marquee": 40
   }
 }
