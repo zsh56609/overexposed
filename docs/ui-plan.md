@@ -237,8 +237,11 @@ they bear on the choice (decision 23, revised).
 decision: it holds the right rail on its own (§3). The four major
 endings, each with its name, its goal line (goalKey) and its side of the
 two axes — "Hype 80+", "Scandals 5 or fewer" — live via /core's
-`majorRequirements`. The player must always know what they are steering
-toward (decision 10). Narrative order, aspirations first — The
+`majorRequirements`. The two unknown-side majors list only their
+reputation requirement (the fame axis marks "unknown" unlisted): "Hype 79
+or fewer" read as if staying unknown were the goal, and the tier word and
+goal line carry the fame side. The player must always know what they are
+steering toward (decision 10). Narrative order, aspirations first — The
 Breakthrough, The Long Game, Overexposed, The Hard Way — the order of
 `majors` in content/endings.json. A marker labelled "If the year ended
 today" sits on the major the year would resolve to now and names the

@@ -192,6 +192,11 @@ export interface AxisDef {
   readonly key: ConditionRangeKey;
   readonly from: number;
   readonly sides: readonly [string, string];
+  /**
+   * Sides the goals board does not list as a requirement: the tier word and the goal line carry them
+   * ("Hype 79 or fewer" would read as if staying unknown were the goal).
+   */
+  readonly unlisted?: readonly string[];
 }
 
 export interface MajorDef {
@@ -287,6 +292,11 @@ export interface Rules {
    * cards the player added — the starting deck is where every career begins, the same in every run.
    */
   readonly laneStartingDeck?: boolean;
+  /**
+   * When the career lane counts as established, for display (core/lanes.ts establishedLane): the leading
+   * lane has at least `minPlays` plays and leads the next by at least `lead`. Endings never read it.
+   */
+  readonly laneEstablished?: { readonly minPlays: number; readonly lead: number };
 }
 
 /** Tiers of a value, lowest first. `from[i]` is the lowest value of tier i: 0 first, then ascending. */

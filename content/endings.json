@@ -1,6 +1,6 @@
 {
   "axes": [
-    { "id": "fame", "key": "hype", "from": 80, "sides": ["unknown", "known"] },
+    { "id": "fame", "key": "hype", "from": 80, "sides": ["unknown", "known"], "unlisted": ["unknown"] },
     { "id": "reputation", "key": "scandalCount", "from": 6, "sides": ["clean", "damaged"] }
   ],
   "majors": [
@@ -62,7 +62,7 @@
     {
       "id": "redemption_arc",
       "major": "overexposed",
-      "conditions": { "scandalDrop": { "min": 1 } },
+      "conditions": { "scandalDrop": { "min": 2 } },
       "nameKey": "ending.redemption_arc.name",
       "textKey": "ending.redemption_arc.text"
     },
@@ -87,6 +87,13 @@
       "conditions": { "craft": { "min": 55 }, "lane": { "any": ["screen"] } },
       "nameKey": "ending.character_actor.name",
       "textKey": "ending.character_actor.text"
+    },
+    {
+      "id": "the_one_to_watch",
+      "major": "long_game",
+      "conditions": { "lane": { "any": ["celebrity"] } },
+      "nameKey": "ending.the_one_to_watch.name",
+      "textKey": "ending.the_one_to_watch.text"
     },
     {
       "id": "craftsman",

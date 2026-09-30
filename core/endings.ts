@@ -37,10 +37,15 @@ export function majorOf(content: ContentIndex, minorId: string): string | null {
   return getMinor(content, minorId)?.major ?? null;
 }
 
-/** A major's requirements as clauses (the goals board): its side of each axis as a range, live. */
-export function majorRequirements(major: MajorDef, s: ConditionSubject): ClauseReport[] {
+/**
+ * A major's requirements as clauses (the goals board): its side of each axis as a range, live. A side its
+ * axis marks unlisted is left out — the tier word and the goal line carry it — unless `all` is asked for.
+ */
+export function majorRequirements(major: MajorDef, s: ConditionSubject, all = false): ClauseReport[] {
   return s.content.axes.flatMap((axis) => {
-    const range: Range = major.on[axis.id] === axis.sides[1] ? { min: axis.from } : { max: axis.from - 1 };
+    const side = major.on[axis.id];
+    if (!all && side !== undefined && axis.unlisted?.includes(side)) return [];
+    const range: Range = side === axis.sides[1] ? { min: axis.from } : { max: axis.from - 1 };
     return explainCondition({ [axis.key]: range }, s);
   });
 }

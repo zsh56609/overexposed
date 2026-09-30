@@ -8,6 +8,7 @@
   "gatesOffered": 2,
   "lanes": ["music", "screen", "celebrity"],
   "laneStartingDeck": false,
+  "laneEstablished": { "minPlays": 2, "lead": 2 },
   "heatThreshold": [7, 6, 6, 5],
   "degradePerScandal": 0.5,
   "thresholdFloor": [7, 6, 5, 4.5],

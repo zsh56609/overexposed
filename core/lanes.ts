@@ -29,6 +29,22 @@ export function laneShares(s: LaneSubject): Readonly<Record<string, number>> {
   return Object.fromEntries(Object.entries(plays).map(([lane, n]) => [lane, total === 0 ? 0 : n / total]));
 }
 
+/**
+ * The lane the career has settled into, for display only — the press subject now, the managers and the
+ * vanity's props later — or null while it is early: the current lane once it has rules.laneEstablished's
+ * minimum plays and leads the next lane by its margin. A single play never establishes a lane. Endings
+ * keep reading currentLane.
+ */
+export function establishedLane(s: LaneSubject): string | null {
+  const rule = s.content.rules.laneEstablished;
+  const lane = currentLane(s);
+  if (lane === null || !rule) return lane;
+  const plays = lanePlays(s);
+  const top = plays[lane] ?? 0;
+  const next = Math.max(0, ...Object.entries(plays).filter(([l]) => l !== lane).map(([, n]) => n));
+  return top >= rule.minPlays && top - next >= rule.lead ? lane : null;
+}
+
 /** The lane with the most plays. A tie resolves to the earlier lane in rules.lanes: music, the base. */
 export function currentLane(s: LaneSubject): string | null {
   const plays = lanePlays(s);

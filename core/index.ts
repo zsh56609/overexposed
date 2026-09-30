@@ -3,7 +3,7 @@ export * from './rng.ts';
 export * from './state.ts';
 export { awardHolds, yearAwards } from './awards.ts';
 export { axisSide, endingIfYearEndedNow, majorNow, majorOf, majorRequirements, type EndingResult } from './endings.ts';
-export { currentLane, lanePlays, laneShares } from './lanes.ts';
+export { currentLane, establishedLane, lanePlays, laneShares } from './lanes.ts';
 export { statTiers, TIER_STATS, type StatTier, type TierStat } from './tiers.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
 export {

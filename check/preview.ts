@@ -183,7 +183,7 @@ function checkGatePhase(s: GameState, seed: number): void {
  */
 function checkGoals(s: GameState, seed: number): void {
   const today = endingIfYearEndedNow(s);
-  const met = s.content.majors.filter((m) => majorRequirements(m, s).every((c) => c.met)).map((m) => m.id);
+  const met = s.content.majors.filter((m) => majorRequirements(m, s, true).every((c) => c.met)).map((m) => m.id);
   if (today === null || met.length !== 1 || met[0] !== today.majorId) report('goals', seed, s.turn, `marker ${today?.majorId}, requirements met for [${met.join()}]`);
   else if (majorOf(s.content, today.minorId) !== today.majorId) report('goals', seed, s.turn, `minor ${today.minorId} is not under ${today.majorId}`);
 }

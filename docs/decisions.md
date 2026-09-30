@@ -6,6 +6,32 @@ rules).
 
 ---
 
+## 2026-09-30 — Phase 2a, Part B: endings and the established lane
+
+Measured with the sim, 1000 runs per persona on seeds 20260929, 1 and
+424242.
+
+- **The One to Watch** (The Long Game, celebrity lane; before The
+  Musician's Musician) brings artisan's The Musician's Musician to
+  66.4% / 67.8% / 67.0%, under the 70% line without tuning a number. It
+  holds 3.8–4.5% of player-like runs.
+- **Flash in the Pan tied to the fame split** (peak hype 80) fell to
+  1.20% / 1.38% / 1.22%, below the 1.5% reachability line, so it keeps
+  peak hype 75, as the author asked.
+- **The Redemption Arc at scandals down 2** (as Comeback of the Year)
+  lands at 1.46% / 1.46% / 1.84%: on two seeds just under the 1.5% line.
+  Kept at 2 as the author asked; reported, not tuned around.
+- **The established lane: at least 2 plays and a lead of 2**
+  (`rules.laneEstablished`). Of the candidates measured (2–5 plays, lead
+  1–3), it is the one that settles around mid-summer: half of player-like
+  runs have an established lane by month 5–6 (by month 5: 49%, by 6:
+  58%; 88% by the year's end). Once settled, the lane changes to another
+  in 5.4% of runs, but the lead can shrink again: a quarter of later
+  month ends (25.7%) read "early" once more. A lead of 1 settled earlier
+  but switched lanes in 26% of runs; 3 plays settled in early autumn.
+- **Goals board**: the fame axis lists "unknown" as unlisted, so The Long
+  Game and The Hard Way show only their scandal requirement.
+
 ## 2026-09-30 — Round a83fa88 answered; phase 2a begins
 
 Phase 2 of the content expansion is split in two: 2a, the press (this

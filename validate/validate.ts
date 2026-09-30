@@ -79,7 +79,7 @@ const CARD_FIELDS = [
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKey', 'requires', 'onPass', 'onFail'];
 const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
-const AXIS_FIELDS = ['id', 'key', 'from', 'sides'];
+const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
 const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey'];
 const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKey', 'goalKey'];
 const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
@@ -89,11 +89,11 @@ const MAX_AWARDS = 8;
  * The content budget (AGENTS.md → Content budget): a ceiling per kind, not a target. Raised for phase 1 of
  * the content expansion — five screen cards, and endings as 4 majors × 13 minors.
  */
-const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 13 } as const;
+const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major: 4, minor: 14 } as const;
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck',
+  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -377,6 +377,15 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.lanes = raw.lanes.filter(isStr);
   }
   if (raw.laneStartingDeck !== undefined && typeof raw.laneStartingDeck !== 'boolean') v.error('schema', 'rules.laneStartingDeck', 'must be a boolean');
+  if (raw.laneEstablished !== undefined) {
+    const le = raw.laneEstablished;
+    if (!isObj(le)) v.error('schema', 'rules.laneEstablished', 'must be { minPlays, lead }');
+    else {
+      v.fields(le, ['minPlays', 'lead'], 'rules.laneEstablished');
+      v.int(le.minPlays, 'rules.laneEstablished.minPlays', [1, 100]);
+      v.int(le.lead, 'rules.laneEstablished.lead', [1, 100]);
+    }
+  }
   return raw;
 }
 
@@ -598,6 +607,11 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
     const fromOk = v.int(a.from, `${where}.from`, LIMIT.conditionBound);
     if (!Array.isArray(a.sides) || a.sides.length !== 2 || !a.sides.every(isStr) || a.sides[0] === a.sides[1]) {
       v.error('schema', `${where}.sides`, 'must be two different names: [below "from", from "from" on]');
+    }
+    if (a.unlisted !== undefined) {
+      const sides: unknown[] = Array.isArray(a.sides) ? a.sides : [];
+      if (!Array.isArray(a.unlisted) || !a.unlisted.every((x) => sides.includes(x))) v.error('schema', `${where}.unlisted`, 'must list some of the axis sides');
+      else if (a.unlisted.length >= sides.length) v.error('structure', `${where}.unlisted`, 'cannot hide every side: a major would show nothing of this axis');
     }
     const t = isStr(a.key) ? tiers[a.key] : undefined;
     const bounds: unknown[] = isObj(t) && Array.isArray(t.from) ? t.from : [];

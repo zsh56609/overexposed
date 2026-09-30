@@ -84,17 +84,20 @@ their ids, so their text, award references and sim records survive.
 |  | household_name | Household Name | lane is celebrity |
 |  | star | Headliner | lane is music, signed |
 |  | the_independent | The Independent | *fallback* — famous on your own, no label |
-| Overexposed | redemption_arc | The Redemption Arc | peak scandals minus year-end scandals ≥ N |
+| Overexposed | redemption_arc | The Redemption Arc | peak scandals minus year-end scandals ≥ 2, as for Comeback of the Year, so this ending always carries that award |
 |  | tabloid_royalty | Tabloid Royalty | lane is celebrity — scandal became the brand |
 |  | meltdown | Cautionary Tale | *fallback* |
 | The Long Game | character_actor | The Character Actor | high craft, lane is screen |
+|  | the_one_to_watch | The One to Watch | lane is celebrity — seen everywhere, not yet known |
 |  | craftsman | The Musician's Musician | high craft |
 |  | nobody | Nobody Yet | *fallback* |
-| The Hard Way | flash_in_the_pan | Flash in the Pan | peak hype high, year-end hype low |
+| The Hard Way | flash_in_the_pan | Flash in the Pan | peak hype high (75), year-end hype low. Tied to the fame split (80) it fell below 1.5%, so it keeps 75 |
 |  | running_on_empty | Running on Empty | burnout held, or craft very low |
 |  | starting_over | Starting Over | *fallback* |
 
-Four majors, thirteen minors. Nobody Yet's text now describes its whole
+Four majors, fourteen minors. The One to Watch (phase 2a) corrects a
+narrative error the sim showed: celebrity-lane players landing in The Long
+Game were called The Musician's Musician. Nobody Yet's text now describes its whole
 population: unknown, clean, and without the craft to be respected — genuinely
 "no headlines, good or bad".
 
@@ -129,12 +132,15 @@ minor = first minor of that major whose condition holds  // by priority
 
 - **Goals board** shows the four majors in narrative order: The
   Breakthrough, The Long Game, Overexposed, The Hard Way. Aspirations first.
+  The two unknown-side majors list only their reputation requirement: "Hype
+  79 or fewer" read as if staying unknown were the goal. The tier word and
+  the goal line carry the fame side; the known-side majors keep "Hype 80+".
 - **"If the year ended today"** shows major and minor. When it reads "The
   Breakthrough · Leading Role", it is telling the player they are becoming
   an actor. The marker is itself lane guidance (section 4).
 - **Ending screen**: the major as the night's category, the minor as the
   ending with its text, then awards, then the year in review (section 6).
-- **Collection**: "You have found 3 of 13 endings", grouped by major, found
+- **Collection**: "You have found 3 of 14 endings", grouped by major, found
   minors named and the rest shown as undiscovered. Stored in localStorage,
   wrapped in try/catch, renders correctly when empty. A completion record
   only — it changes nothing in play, so it is not meta-progression.
@@ -174,6 +180,14 @@ held — the résumé is what you did. /core provides `currentLane(state)` and
 The starting deck does not count (`rules.laneStartingDeck`: false): it is the
 premise — the player begins as a singer — not a choice, and the lane must
 reflect choices.
+
+**The established lane** (phase 2a) is for display only. A single play
+should not change what the press calls the player, so `establishedLane(state)`
+returns the current lane once it has at least two plays and leads the next
+lane by two (`rules.laneEstablished`), and "early" before that. Chosen with
+the sim so a lane settles around mid-summer: half of player-like runs are
+established by month 5–6. It drives the press subject now, and the managers
+and the vanity's lane props later; ending resolution keeps `currentLane`.
 
 **Content gap.** Screen has only two cards today (Film Cameo, Late Night Show).
 Two minor endings — Leading Role and The Character Actor — require the screen
@@ -325,7 +339,7 @@ The core mechanical freeze stays. Two things unfreeze, deliberately.
 
 | Area | Change | Kind |
 |---|---|---|
-| Endings | Flat four → four majors × thirteen minors, two-level resolution | **Unfreeze** |
+| Endings | Flat four → four majors × fourteen minors, two-level resolution | **Unfreeze** |
 | GameEvent list | New types for story events and voice lines | **Additive** — existing types unchanged, existing UI unaffected |
 | Card schema | `lane` field | Content |
 | /core | currentLane, laneShares, major/minor resolution, press subject, year-in-review moments | Read-only queries |
@@ -363,7 +377,7 @@ only, and variety belongs at the minor level.
 
 | Jam — before the 10/15 freeze | Full version |
 |---|---|
-| Two-level endings (4 × 13) | More minors per major |
+| Two-level endings (4 × 14) | More minors per major |
 | Three emergent lanes, five new screen cards | More lane content throughout |
 | Both manager profiles, chosen at the opening | Event-driven change of manager mid-year |
 | Rival, light | The rival's full year |

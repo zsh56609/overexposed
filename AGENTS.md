@@ -153,7 +153,7 @@ All four numbers live in `content/rules.json`; `heatThreshold` and `thresholdFlo
 
 `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
-`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLane` (display only: the press subject, later the managers) is the current lane once `rules.laneEstablished` holds, "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): `headlineKeys` (non-scandals) are the feed headline variants for playing the card — the UI picks one by a hash of run seed, month and card instance, never the game RNG — and `register` (`loud` | `quiet` | `money`) is the voice it is printed in. A scandal has `headlineKey`, printed when it crystallises, and its `textKey` is its in-hand line: the interface shows its rules from its effects.
@@ -197,9 +197,9 @@ Requirements are evaluated at resolution. Prefer conditions on state at that mom
 
 ### Endings (two levels)
 
-Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Thirteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
+Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Fourteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
 
-`content/endings.json`: `axes` (`id`, `key` — a condition key —, `from` — where the high side starts —, `sides` low then high), `majors` (`id`, `on` — a side per axis —, `nameKey`, `goalKey`) in board order, and `minors` (`id`, `major`, `nameKey`, `textKey`, optional `goalKey`, and either `conditions` or `fallback: true`, last in its major). Minor conditions are **year conditions**: the condition shape plus `lane` (`any`/`not`), `holds` (card ids in the deck, `all`/`any`/`not`), `anyOf` (alternatives), and the year stats `peakHype`, `peakScandals`, `scandalDrop` (peak minus now), `bestMonthHype` — kept in `state.year` at each month end.
+`content/endings.json`: `axes` (`id`, `key` — a condition key —, `from` — where the high side starts —, `sides` low then high, optional `unlisted` — sides the goals board does not list as a requirement), `majors` (`id`, `on` — a side per axis —, `nameKey`, `goalKey`) in board order, and `minors` (`id`, `major`, `nameKey`, `textKey`, optional `goalKey`, and either `conditions` or `fallback: true`, last in its major). Minor conditions are **year conditions**: the condition shape plus `lane` (`any`/`not`), `holds` (card ids in the deck, `all`/`any`/`not`), `anyOf` (alternatives), and the year stats `peakHype`, `peakScandals`, `scandalDrop` (peak minus now), `bestMonthHype` — kept in `state.year` at each month end.
 
 ### Awards
 
@@ -211,7 +211,7 @@ Four **major** endings are a 2×2 of fame (hype at year end against a split that
 
 ### Content budget
 
-25 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 13 minor endings = 64 pieces (raised for the content expansion; its events get their own budget).
+25 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 14 minor endings = 65 pieces (raised for the content expansion; its events get their own budget).
 A ceiling, not a target; validate enforces it.
 
 Card design rules: a card must create an interaction (tags, `conditional`, `requires`), not just add a resource. Keep cards that convert between axes (spend craft to cool heat, spend capital or hype to exhaust a scandal) so the two engines connect. Scandals vary in how they hurt: taking a hand slot, draining at end of turn, and worsening while left in the deck.
