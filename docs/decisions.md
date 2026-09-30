@@ -6,6 +6,37 @@ rules).
 
 ---
 
+## 2026-09-30 — Phase 2a, Part D: three newspapers, and the press subject
+
+- **Papers are content** (`content/press.json`): The Daily Flash
+  (mass-market tabloid; ALL CAPS, loud, cruel, fond of a pun), B-Side
+  (music weekly; sentence case, measured, notices the results of craft),
+  Marquee (showbiz trade paper; Title Case, insider deal talk). The voices
+  are in docs/writing/voice.md.
+- **Routing, by register first.** LOUD → the paper of the card's lane
+  (music → B-Side, screen → Marquee, celebrity and neutral → The Daily
+  Flash); every scandal → The Daily Flash, whatever the lane; Money → The
+  Daily Flash business section; quiet → no paper. The papers print the
+  public acts; the notebook keeps the private work (design §3.1).
+- **Headlines are stored as authored**, in their paper's case; the
+  interface never recases one. Draft v5 converted the music headlines to
+  B-Side's sentence case and the screen headlines to Marquee's Title Case.
+  Every LOUD line now matches its paper's case. Still naming the player
+  outright in The Daily Flash, where the subject slot would fit (for the
+  author): Apology Tour `THE APOLOGY: SINGER FACES THE CAMERAS`, Tabloid
+  Bait `SINGER FEEDS THE PAPERS A STORY — AND THEY BITE`, Street Team
+  `POSTERS APPEAR OVERNIGHT: WHO IS THIS SINGER?`, and two scandals,
+  Burnout `SHOWS CANCELLED: "EXHAUSTION," SAYS SINGER'S CAMP` and Old
+  Rumor `CASH GRAB? FANS TURN ON SINGER OVER BRAND DEALS`.
+- **The press subject** replaces `{subject}` / `{Subject}` / `{SUBJECT}`
+  with the noun for the player's fame tier and established lane, in the
+  placeholder's case, computed when the line prints (after the act
+  resolves; a month's scandals at the turn's end). The preview uses the
+  same computation; `check:preview` asserts that the preview's paper,
+  subject and variant each equal the feed's.
+- **The feed** labels every LOUD, Money and scandal line with its paper's
+  masthead; a quiet line carries none.
+
 ## 2026-09-30 — Phase 2a, Part C: variants, single-word tiers, money
 
 - **Decision 15 revised: variants by shuffle bag.** Within a run each

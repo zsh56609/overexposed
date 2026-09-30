@@ -14,6 +14,8 @@ import {
   majorOf,
   monthsLeft,
   playCheck,
+  pressOf,
+  printContext,
   reduce,
   RESOURCE_KEYS,
   yearAwards,
@@ -24,6 +26,7 @@ import {
   type GameState,
   type LineCounter,
   type LineShow,
+  type PressLine,
   type PlayBlocker,
   type Register,
   type ResourceKey,
@@ -35,6 +38,9 @@ import {
  * the counter over its hypothetical, exactly as the feed advances the real one over the real step — so the
  * headline shown before a decision is the one printed after it (decision 21).
  */
+/** Where a line prints and what it calls the player, as /core's press decides at the moment it prints. */
+export type LinePress = Pick<PressLine, 'paper' | 'fameTier' | 'lane' | 'subjectKey'>;
+
 export interface LinesSoFar {
   readonly counter: LineCounter;
   readonly inHand: ReadonlyMap<number, LineShow>;
@@ -102,7 +108,7 @@ export interface EndTurnPreview {
    * Every scandal card month end would add, from any cause, in order: the one scandal count the player sees
    * (docs/ui-plan.md §13, decision 2) — each with the headline it would print.
    */
-  readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause; readonly line: LineShow }[];
+  readonly scandalCards: readonly { readonly cardId: string; readonly cause: ScandalCause; readonly line: LineShow; readonly press: LinePress }[];
   /** Heat left after the vent: it carries into the next month. */
   readonly heatAfter: number;
   /** Whether there is a next month to carry it into: not in the year's last month (/core's monthsLeft). */
@@ -128,13 +134,14 @@ export function previewEndTurn(state: GameState, counter: LineCounter): EndTurnP
   const end = events.find((e) => e.type === 'turnEnd');
   const blamed = new Map(events.flatMap((e) => (e.type === 'scandal' ? [[e.uid, e.cause] as const] : [])));
   const lines = counter.fork();
+  const at = printContext(state, events);
   const scandalCards = events.flatMap((e) => {
     const printed = lines.take(e).find((x) => x.kind === 'scandal');
     if (e.type !== 'addCard' || !printed) return [];
     const cause: ScandalCause = blamed.has(e.uid)
       ? { kind: 'crystallised', cardId: blamed.get(e.uid) ?? null }
       : { kind: 'added', byCardId: addedBy(state, e.cardId) };
-    return [{ cardId: e.cardId, cause, line: printed.line }];
+    return [{ cardId: e.cardId, cause, line: printed.line, press: pressOf(state.content, e.cardId, at) }];
   });
   return {
     crystallised: end?.type === 'turnEnd' ? end.crystallised : 0,
@@ -156,6 +163,8 @@ export interface PlayPreview {
    * Null for a scandal, which prints nothing when held: its in-hand line is `inHand`.
    */
   readonly headline: LineShow | null;
+  /** The headline's paper and subject: as it would print — after the play, so its fame and lane. */
+  readonly press: LinePress | null;
   readonly inHand: LineShow | null;
   readonly register: Register | null;
   readonly ok: boolean;
@@ -185,6 +194,8 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
     uid,
     cardId,
     headline: scandal ? null : lines.counter.fork().play(cardId),
+    // A card that can't be played prints nothing; its headline reads as the run stands now.
+    press: scandal ? null : pressOf(state.content, cardId, printContext(state, [])),
     inHand: scandal ? (lines.inHand.get(uid) ?? null) : null,
     register: getCard(state.content, cardId)?.register ?? null,
     ok: check.ok,
@@ -201,6 +212,7 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
   const endTurnAfter = previewEndTurn(after, counted);
   return {
     ...base,
+    press: pressOf(state.content, cardId, printContext(after, after.events)),
     outcome: outcomeOf(after.events),
     heatAfter: after.resources.heat,
     slotsAfter: after.slots,

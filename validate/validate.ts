@@ -27,7 +27,7 @@ import {
 
 export const CHECKS = {
   unknownOp: 'unknown effect ops',
-  references: 'references to card / gate / ending / lane ids',
+  references: 'references to card / gate / ending / lane / paper ids',
   i18n: 'missing i18n keys',
   prose: 'player-facing prose not yet written (warnings)',
   variants: 'variants per line group (warnings)',
@@ -56,6 +56,7 @@ export interface RawContent {
   readonly gates: unknown;
   readonly endings: unknown;
   readonly awards: unknown;
+  readonly press?: unknown;
 }
 
 export interface ValidationResult {
@@ -1024,6 +1025,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
   const awards = checkAwards(v, raw.awards, endingIds);
   checkReferences(v, rules, cards);
+  checkPress(v, raw.press, rules);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1038,6 +1040,55 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
     earliestAct,
     counts: { cards: cards.length, gates: gates.length, majors: endings.majors.length, minors: endings.minors.length, awards: awards.length, i18nKeys },
   };
+}
+
+// ---------------------------------------------------------------------------
+// The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
+
+const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane'];
+
+function checkPress(v: Ctx, raw: unknown, rules: Obj | null): void {
+  const file = 'content/press.json';
+  if (raw === undefined) return v.error('schema', file, 'is missing: the papers every line prints in');
+  if (!isObj(raw)) return v.error('schema', file, 'must be an object: { papers, route, subjects, earlyLane }');
+  v.fields(raw, PRESS_FIELDS, file);
+  const papers = checkList(v, raw.papers, `${file} papers`, 'paper', (p, where) => {
+    v.fields(p, ['id', 'mastheadKey'], where);
+    v.key(p.mastheadKey, `${where}.mastheadKey`);
+  });
+  const paperIds = new Set(papers.map((p) => p.id).filter(isStr));
+  const paper = (x: unknown, where: string) => {
+    if (!paperIds.has(x as string)) v.error('references', where, `no paper with id ${q(x)}`);
+  };
+  const lanes = [...v.lanes, NEUTRAL_LANE];
+  const route = raw.route;
+  if (!isObj(route)) v.error('schema', `${file} route`, 'must be { loud, money, scandal }');
+  else {
+    v.fields(route, ['loud', 'money', 'scandal'], `${file} route`);
+    if (!isObj(route.loud)) v.error('schema', `${file} route.loud`, 'must map every lane to a paper');
+    else {
+      v.fields(route.loud, lanes, `${file} route.loud`);
+      for (const lane of lanes) paper(route.loud[lane], `${file} route.loud.${lane}`);
+    }
+    paper(route.money, `${file} route.money`);
+    paper(route.scandal, `${file} route.scandal`);
+  }
+  // A subject for every lane at every fame tier: the press always has a word for the player.
+  const tiers = rules && isObj(rules.tiers) && isObj(rules.tiers.hype) && Array.isArray(rules.tiers.hype.nameKeys) ? rules.tiers.hype.nameKeys.length : 0;
+  if (!isObj(raw.subjects)) v.error('schema', `${file} subjects`, 'must give each lane its subjects, one per hype tier');
+  else {
+    v.fields(raw.subjects, v.lanes, `${file} subjects`);
+    for (const lane of v.lanes) {
+      const list = raw.subjects[lane];
+      const at = `${file} subjects.${lane}`;
+      if (!Array.isArray(list)) v.error('schema', at, 'must list one subject key per hype tier');
+      else {
+        if (tiers > 0 && list.length !== tiers) v.error('structure', at, `has ${list.length} subjects for ${tiers} hype tiers`);
+        list.forEach((k, i) => v.key(k, `${at}[${i}]`));
+      }
+    }
+  }
+  if (!v.lanes.includes(raw.earlyLane as string)) v.error('references', `${file} earlyLane`, `must be one of ${v.lanes.join(', ')}, got ${q(raw.earlyLane)}`);
 }
 
 /** The content budget: a ceiling per kind (CONTENT_BUDGET), not a target. */

@@ -12,6 +12,7 @@ export const CONTENT_FILES = {
   gates: 'content/gates.json',
   endings: 'content/endings.json',
   awards: 'content/awards.json',
+  press: 'content/press.json',
 } as const satisfies Record<keyof RawContent, string>;
 
 export function readJson(relPath: string): unknown {
@@ -30,6 +31,7 @@ export function loadRawContent(): RawContent {
     gates: readJson(CONTENT_FILES.gates),
     endings: readJson(CONTENT_FILES.endings),
     awards: readJson(CONTENT_FILES.awards),
+    press: readJson(CONTENT_FILES.press),
   };
 }
 

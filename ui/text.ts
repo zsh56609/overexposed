@@ -81,9 +81,27 @@ export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards
 /**
  * A line group's showing as words: the variant /core's shuffle bag picked from the run's history (decision 15,
  * revised) — the same in the preview and the feed. A group with no variants shows the card's name, loudly.
+ * `subjectKey`: the press subject /core chose when the line printed (fame tier and established lane).
  */
-export const lineText = (c: ContentIndex, show: LineShow | null | undefined, cardId: string): string =>
-  show?.key ? t(show.key) : t('ui.feed.noHeadline', { card: cardName(c, cardId) });
+export const lineText = (c: ContentIndex, show: LineShow | null | undefined, cardId: string, subjectKey: string | null = null): string =>
+  show?.key ? withSubject(t(show.key), subjectKey) : t('ui.feed.noHeadline', { card: cardName(c, cardId) });
+
+const titleCase = (s: string): string => s.replace(/(^|\s)(\p{L})/gu, (_, gap: string, ch: string) => gap + ch.toUpperCase());
+
+/**
+ * The press subject in a headline (phase 2a): {subject}, {Subject} or {SUBJECT} becomes the noun, rendered in
+ * the placeholder's own case — as written for B-Side, Title Case for Marquee, capitals for The Daily Flash.
+ * Headlines are stored as authored; only the subject is cased. Without a subject the slot stays, loudly.
+ */
+export function withSubject(text: string, subjectKey: string | null): string {
+  if (subjectKey === null) return text;
+  const noun = t(subjectKey);
+  return text.replace(/\{(subject|Subject|SUBJECT)\}/g, (_, form: string) => (form === 'SUBJECT' ? noun.toUpperCase() : form === 'Subject' ? titleCase(noun) : noun));
+}
+
+/** A paper's name, as its masthead prints it. */
+export const mastheadName = (c: ContentIndex, paperId: string): string =>
+  t(c.press?.papers.find((p) => p.id === paperId)?.mastheadKey ?? `paper.${paperId}.masthead`);
 
 // ---------------------------------------------------------------------------
 // The heat display (decision 1): where heat sits against the line. It counts no scandals.

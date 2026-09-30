@@ -1,0 +1,18 @@
+{
+  "papers": [
+    { "id": "flash", "mastheadKey": "paper.flash.masthead" },
+    { "id": "bside", "mastheadKey": "paper.bside.masthead" },
+    { "id": "marquee", "mastheadKey": "paper.marquee.masthead" }
+  ],
+  "route": {
+    "loud": { "music": "bside", "screen": "marquee", "celebrity": "flash", "neutral": "flash" },
+    "money": "flash",
+    "scandal": "flash"
+  },
+  "subjects": {
+    "music": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.singer", "press.subject.pop_star"],
+    "screen": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.actor", "press.subject.film_star"],
+    "celebrity": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.celebrity", "press.subject.celebrity"]
+  },
+  "earlyLane": "music"
+}

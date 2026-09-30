@@ -87,6 +87,8 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .reg-loud { font-weight: bold; }
 .reg-quiet { font-style: italic; }
 .reg-money { font-weight: normal; }
+/* The paper a line prints in (phase 2a): a small masthead before it. A quiet line has none: it is the notebook. */
+.paper-label { font-size: 0.7em; font-weight: bold; font-style: normal; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); border: 1px solid var(--rule); padding: 0 0.3em; margin-right: 0.45em; white-space: nowrap; }
 
 /* Goals (decision 10) */
 .goals { display: flex; flex-direction: column; gap: 0.25em; font-size: 0.85em; }

@@ -110,9 +110,13 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
     if (p.linesCrossed !== 0) counts.crossings++;
     // Decision 21: the headline the preview leads with is the one the feed prints once the card is played —
     // the real feed code, run on the whole history and the real step, so the variant is the same too.
-    const shown = lineText(s.content, p.headline, card.cardId);
-    const printed = feedFor(history, { type: 'PLAY_CARD', uid: card.uid }, s, real).find((l) => l.kind === 'headline')?.text;
-    if (shown !== printed) report('headline', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(shown)}, feed ${JSON.stringify(printed)}`);
+    // Paper, subject and variant, each as the feed prints them (phase 2a, D6).
+    const shown = lineText(s.content, p.headline, card.cardId, p.press?.subjectKey ?? null);
+    const line = feedFor(history, { type: 'PLAY_CARD', uid: card.uid }, s, real).find((l) => l.kind === 'headline');
+    if (shown !== line?.text) report('headline', seed, s.turn, `${card.cardId}: preview ${JSON.stringify(shown)}, feed ${JSON.stringify(line?.text)}`);
+    if ((p.headline?.key ?? null) !== line?.key) report('headline variant', seed, s.turn, `${card.cardId}: preview ${p.headline?.key}, feed ${line?.key}`);
+    if ((p.press?.paper ?? null) !== line?.paper) report('headline paper', seed, s.turn, `${card.cardId}: preview ${p.press?.paper}, feed ${line?.paper}`);
+    if ((p.press?.subjectKey ?? null) !== line?.subjectKey) report('headline subject', seed, s.turn, `${card.cardId}: preview ${p.press?.subjectKey}, feed ${line?.subjectKey}`);
     counts.headlines++;
   }
   // END_TURN
@@ -142,8 +146,8 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   const previewed = pe.scandalCards.map(({ cardId, cause }) => ({ cardId, cause }));
   if (!same(previewed, realCards)) report('endTurn scandal cards', seed, s.turn, `preview ${JSON.stringify(previewed)}, real ${JSON.stringify(realCards)}`);
   // Each scandal's headline in the preview is the one the feed leads the month end with, variant and all.
-  const leads = feedFor(history, { type: 'END_TURN' }, s, real).filter((l) => l.kind === 'lead').map((l) => l.text);
-  const previewLeads = pe.scandalCards.map((x) => lineText(s.content, x.line, x.cardId));
+  const leads = feedFor(history, { type: 'END_TURN' }, s, real).filter((l) => l.kind === 'lead').map((l) => [l.text, l.paper, l.subjectKey]);
+  const previewLeads = pe.scandalCards.map((x) => [lineText(s.content, x.line, x.cardId, x.press.subjectKey), x.press.paper, x.press.subjectKey]);
   if (!same(previewLeads, leads)) report('endTurn headlines', seed, s.turn, `preview ${JSON.stringify(previewLeads)}, feed ${JSON.stringify(leads)}`);
   if (pe.heatAfter !== end.resources.heat) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${end.resources.heat}`);
   // Heat carries into a next month unless this month end leads straight to the year's end.

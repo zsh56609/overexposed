@@ -4,7 +4,7 @@
 // event that caused it: the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
-import { getCard, lineMoved, monthsLeft, readLines, RESOURCE_KEYS, type GameEvent, type PrintedLine, type Register, type ResourceKey } from '../core/index.ts';
+import { getCard, lineMoved, monthsLeft, pressLines, RESOURCE_KEYS, type GameEvent, type PressLine, type Register, type ResourceKey } from '../core/index.ts';
 import { t, tp } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
@@ -14,6 +14,7 @@ import {
   gateName,
   isPlaceholder,
   lineText,
+  mastheadName,
   resourceName,
   seasonName,
   money,
@@ -31,6 +32,12 @@ export interface FeedLine {
   readonly text: string;
   /** A played card's voice (decision 15): how its headline is set. */
   readonly register: Register | null;
+  /** The paper a line prints in and its masthead (phase 2a); null: the player's own notebook, or not a line. */
+  readonly paper: string | null;
+  readonly masthead: string | null;
+  /** For a printed line: the variant and the press subject it printed with. */
+  readonly key: string | null;
+  readonly subjectKey: string | null;
   /** Prose the author has not written yet: shown as a placeholder, never hidden. */
   readonly placeholder: boolean;
 }
@@ -53,19 +60,30 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
   let lastAct = 0;
   let lastMonth = 0;
   if (steps.length === 0) return out;
-  // Every printed line's variant, counted through the whole run (decision 15, revised).
-  const printed = readLines(steps).printed;
+  // Every printed line's variant, counted through the whole run (decision 15, revised), and its press.
+  const printed = pressLines(steps);
   let next = 0;
 
   for (const [index, step] of steps.entries()) {
     const c = step.after.content;
     // This step's printed lines: a play by its card instance, a scandal by its card instance.
-    const mine: PrintedLine[] = [];
-    while (next < printed.length && printed[next]?.step === index) mine.push(printed[next++] as PrintedLine);
-    const printedFor = (kind: PrintedLine['kind'], uid: number) => mine.find((l) => l.kind === kind && l.uid === uid);
+    const mine: PressLine[] = [];
+    while (next < printed.length && printed[next]?.step === index) mine.push(printed[next++] as PressLine);
+    const printedFor = (kind: PressLine['kind'], uid: number) => mine.find((l) => l.kind === kind && l.uid === uid);
     let n = 0;
-    const push = (kind: FeedLineKind, text: string, register: Register | null = null) =>
-      out.push({ id: `${step.id}.${n++}`, kind, text, register, placeholder: isPlaceholder(text) });
+    const push = (kind: FeedLineKind, text: string, register: Register | null = null, line: PressLine | null = null) =>
+      out.push({
+        id: `${step.id}.${n++}`,
+        kind,
+        text,
+        register,
+        placeholder: isPlaceholder(text),
+        paper: line?.paper ?? null,
+        masthead: line?.paper ? mastheadName(c, line.paper) : null,
+        key: line?.key ?? null,
+        subjectKey: line?.subjectKey ?? null,
+      });
+    const printedText = (line: PressLine | undefined, cardId: string) => lineText(c, line, cardId, line?.subjectKey ?? null);
 
     let block: Block | null = null;
     const open = (): Block => (block ??= emptyBlock());
@@ -107,11 +125,13 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     const isScandal = (cardId: string) => getCard(c, cardId)?.kind === 'scandal';
     const leadFor = (e: GameEvent) => {
       if (e.type === 'scandal') {
-        push('lead', lineText(c, printedFor('scandal', e.uid), e.cardId));
+        const line = printedFor('scandal', e.uid);
+        push('lead', printedText(line, e.cardId), null, line ?? null);
         push('detail', e.cause === null ? t('ui.feed.unblamed', { card: cardName(c, e.cardId) }) : t('ui.feed.blamed', { card: cardName(c, e.cardId), cause: cardName(c, e.cause) }));
       } else if (e.type === 'addCard') {
         const by = step.action?.type === 'CHOOSE_GATE' || !step.before ? null : addedBy(step.before, e.cardId);
-        push('lead', lineText(c, printedFor('scandal', e.uid), e.cardId));
+        const line = printedFor('scandal', e.uid);
+        push('lead', printedText(line, e.cardId), null, line ?? null);
         push('detail', by === null ? t('ui.feed.addedScandal', { card: cardName(c, e.cardId) }) : by === e.cardId ? t('ui.feed.copiedSelf', { card: cardName(c, e.cardId) }) : t('ui.feed.copied', { card: cardName(c, e.cardId), source: cardName(c, by) }));
       }
     };
@@ -159,7 +179,8 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
           break;
         case 'play': {
           flush();
-          push('headline', lineText(c, printedFor('play', e.uid), e.cardId), getCard(c, e.cardId)?.register ?? null);
+          const line = printedFor('play', e.uid);
+          push('headline', printedText(line, e.cardId), getCard(c, e.cardId)?.register ?? null, line ?? null);
           block = emptyBlock();
           break;
         }

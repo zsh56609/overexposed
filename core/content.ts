@@ -243,6 +243,36 @@ export interface AwardDef {
   readonly fallback?: boolean;
 }
 
+// ---------------------------------------------------------------------------
+// The press (docs/design/content-expansion.md §3.1, phase 2a): three papers, which one prints a line, and
+// what they call the player. Papers print the public acts; the notebook keeps the private work.
+
+export interface PaperDef {
+  readonly id: string;
+  readonly mastheadKey: string;
+}
+
+/**
+ * Which paper prints a line — by register first: a LOUD line by the card's lane, Money and every scandal by
+ * name. A quiet line has no paper: it goes in the player's own notebook.
+ */
+export interface PressRoute {
+  /** Card lane → paper id, for LOUD lines. */
+  readonly loud: Readonly<Record<string, string>>;
+  readonly money: string;
+  readonly scandal: string;
+}
+
+/** content/press.json. */
+export interface PressDef {
+  readonly papers: readonly PaperDef[];
+  readonly route: PressRoute;
+  /** The noun the press uses for the player: per lane, one i18n key per hype tier, lowest first. */
+  readonly subjects: Readonly<Record<string, readonly string[]>>;
+  /** The subjects column read while no lane is established. */
+  readonly earlyLane: string;
+}
+
 /** The drafts inside each act. Prices are in capital; caps are per draft. */
 export interface DraftRules {
   /** Turn-within-act numbers (1-based) whose start opens a draft. */
@@ -335,6 +365,8 @@ export interface Content {
   readonly endings: EndingsDef;
   /** A separate list, capped at 8 (decision 20). Absent: no awards. */
   readonly awards?: readonly AwardDef[];
+  /** The press (phase 2a). Absent: no papers — every line is the player's own. */
+  readonly press?: PressDef;
 }
 
 // ---------------------------------------------------------------------------
@@ -355,6 +387,7 @@ export interface ContentIndex {
   readonly minorsByMajor: Readonly<Record<string, readonly MinorDef[]>>;
   /** Awards in content order. */
   readonly awards: readonly AwardDef[];
+  readonly press: PressDef | null;
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
   /** Tags every scandal carries (e.g. the marker removal cards target). They say nothing about the kind of trouble. */
@@ -381,6 +414,7 @@ export function indexContent(content: Content): ContentIndex {
     minors: content.endings.minors,
     minorsByMajor,
     awards: content.awards ?? [],
+    press: content.press ?? null,
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
   };

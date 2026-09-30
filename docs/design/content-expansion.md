@@ -212,11 +212,37 @@ what is true.
 
 ### 3.1 Press
 
-- Headlines that name their subject gain a `{subject}` slot. The subject
-  depends on fame tier and lane: NEWCOMER at low fame; SINGER, ACTOR or STAR
-  as fame and lane change. This is where "newcomer" returns, now correct.
-- Only headlines that already name a subject are touched.
-- Subject choice follows the existing rule: deterministic, never the game RNG.
+Built in phase 2a as three papers (content/press.json):
+
+| Paper | Kind | Voice |
+|---|---|---|
+| The Daily Flash | Mass-market tabloid | ALL CAPS. Loud, cruel, fond of a pun. |
+| B-Side | Music weekly | Sentence case. Measured, critical, knowing. |
+| Marquee | Showbiz trade paper | Title Case. Insider deal talk. |
+
+- **Routing, by register first.** A LOUD line prints in the paper of its
+  card's lane — music in B-Side, screen in Marquee, celebrity and neutral
+  in The Daily Flash. Every scandal prints in The Daily Flash, whatever
+  the lane. Money prints in The Daily Flash business section. A quiet line
+  prints in no paper: private work is the player's own notebook, in diary
+  voice. **The papers print the public acts; the notebook keeps the
+  private work** — the mass press never sees the practice, which is the
+  thesis.
+- **The press subject.** Headlines that name the player carry a
+  `{subject}` slot — `{subject}`, `{Subject}` or `{SUBJECT}`, rendered in
+  the placeholder's case. The noun follows the fame tier and the
+  established lane (§2): newcomer while Unknown or Noticed; singer while
+  Rising, whatever the lane — until Known the press still calls a
+  crossing-over singer a singer; then singer, actor or celebrity at Known,
+  and pop star, film star or celebrity at Famous. Before a lane is
+  established, the music column. This is where "newcomer" returns, now
+  correct. It is computed at the moment the line prints — after the act
+  resolves; at a month's end, at the turn's end — and the preview uses the
+  same computation.
+- Headlines are authored in their paper's case and voice and stored as
+  authored; the interface never recases them.
+- Subject and variant choice follow the existing rule: deterministic,
+  never the game RNG.
 
 ### 3.2 Manager
 

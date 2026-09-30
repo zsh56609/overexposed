@@ -41,7 +41,7 @@
   resolve.ts   effect application
   reducer.ts   (state, action) => state — pure, the only place state changes
 
-/content     JSON. Cards, gates, endings. String KEYS only, never prose.
+/content     JSON. Cards, gates, endings, awards, the press. String KEYS only, never prose.
 /i18n        en.json (ships), zh-CN.json (reserved, not a jam deliverable)
 /sim         Node harness. Imports /core. Never imports /ui or /i18n.
 /ui          React. Renders what /core returns. Holds no game rules.
@@ -199,15 +199,9 @@ Requirements are evaluated at resolution. Prefer conditions on state at that mom
 
 Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Fourteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
 
-`content/endings.json`: `axes` (`id`, `key` — a condition key —, `from` — where the high side starts —, `sides` low then high, optional `unlisted` — sides the goals board does not list as a requirement), `majors` (`id`, `on` — a side per axis —, `nameKey`, `goalKey`) in board order, and `minors` (`id`, `major`, `nameKey`, `textKey`, optional `goalKey`, and either `conditions` or `fallback: true`, last in its major). Minor conditions are **year conditions**: the condition shape plus `lane` (`any`/`not`), `holds` (card ids in the deck, `all`/`any`/`not`), `anyOf` (alternatives), and the year stats `peakHype`, `peakScandals`, `scandalDrop` (peak minus now), `bestMonthHype` — kept in `state.year` at each month end.
+### Awards, the press, stat tiers
 
-### Awards
-
-`content/awards.json`: `id`, `nameKey`, `citationKey`, and `conditions` — year conditions plus `ending` (`any`/`not` major or minor ids; a major matches each of its minors) — or `fallback: true`, won only when nothing else is. Every award whose conditions hold is won. /core's `yearAwards` is a read-only query on the final state, never a GameEvent. Awards change no play: outside the content budget, capped at 8.
-
-### Stat tiers
-
-`rules.tiers` (decision 25): per stat, `nameKeys` lowest first plus boundaries — `from` for hype and craft; for heat `toGoAtLeast` and `linesCrossed`, from the distance to the line, never the threshold. /core's `statTiers` picks; /ui never computes a boundary.
+Every award whose conditions hold is won, a fallback only when none is; /core's `yearAwards` is a read-only query, never a GameEvent, and awards change no play (capped at 8). The press prints a LOUD line in its card's lane's paper, Money and every scandal in theirs, a quiet line in none (the notebook); /core's `pressLines` fixes each line's paper and subject when it prints. /core's `statTiers` picks the stat bar's tier words; /ui never computes a boundary. **The content shapes of endings, awards, the press and tiers: [`docs/content-schema.md`](docs/content-schema.md).**
 
 ### Content budget
 
@@ -223,7 +217,7 @@ Card design rules: a card must create an interaction (tags, `conditional`, `requ
 English ships. Chinese is scaffolded only.
 
 - Every user-facing string lives in `/i18n/en.json`, keyed. Never hardcode prose in `.tsx` or `/content`.
-- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `ui.<area>.<label>`
+- Key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `ui.<area>.<label>`
 - Prose the author has not written yet is a value starting `TODO(prose)`: the game shows it as a placeholder and `npm run validate` warns. Agents never replace one with invented prose.
 - A missing key renders as the key itself, loudly — never blank, never a crash.
 - **Do not spend jam time on translation.**

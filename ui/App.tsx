@@ -53,6 +53,7 @@ import {
   isPlaceholder,
   amount,
   lineText,
+  mastheadName,
   money,
   openingText,
   resourceName,
@@ -325,7 +326,13 @@ function Feed({ steps }: { steps: readonly PlayedStep[] }) {
 
 function FeedRow({ line }: { line: FeedLine }) {
   const reg = line.register ? ` reg-${line.register}` : '';
-  return <li className={prose(line.text, `feed-${line.kind}${reg}`)}>{line.text}</li>;
+  // A line the press prints carries its paper's masthead (phase 2a); a quiet line is the player's notebook.
+  return (
+    <li className={prose(line.text, `feed-${line.kind}${reg}`)}>
+      {line.masthead && <span className="paper-label">{line.masthead}</span>}
+      {line.text}
+    </li>
+  );
 }
 
 /** This season's gates, live. Not shown at a gate: the gate panel shows them in full there. */
@@ -412,8 +419,13 @@ function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outc
 
 /** The headline a card would print, in its register: the preview's first line (decision 21). */
 function PreviewHeadline({ c, p }: { c: ContentIndex; p: PlayPreview }) {
-  const text = lineText(c, p.headline, p.cardId);
-  return <p className={prose(text, `preview-headline${p.register ? ` reg-${p.register}` : ''}`)}>{text}</p>;
+  const text = lineText(c, p.headline, p.cardId, p.press?.subjectKey ?? null);
+  return (
+    <p className={prose(text, `preview-headline${p.register ? ` reg-${p.register}` : ''}`)}>
+      {p.press?.paper && <span className="paper-label">{mastheadName(c, p.press.paper)}</span>}
+      {text}
+    </p>
+  );
 }
 
 function PlayPreviewView({ c, p }: { c: ContentIndex; p: PlayPreview }) {
@@ -463,7 +475,7 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
           <ul className="scandal-list">
             {p.scandalCards.map((sc, i) => {
               const card = cardName(c, sc.cardId);
-              const headline = lineText(c, sc.line, sc.cardId);
+              const headline = lineText(c, sc.line, sc.cardId, sc.press.subjectKey);
               const line =
                 sc.cause.kind === 'crystallised'
                   ? sc.cause.cardId === null
@@ -476,7 +488,10 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
                       : t('ui.preview.endAdded', { card, source: cardName(c, sc.cause.byCardId) });
               return (
                 <li key={i}>
-                  <span className={prose(headline, 'lead')}>{headline}</span>
+                  <span className={prose(headline, 'lead')}>
+                    {sc.press.paper && <span className="paper-label">{mastheadName(c, sc.press.paper)}</span>}
+                    {headline}
+                  </span>
                   <span className="muted cause">{line}</span>
                 </li>
               );

@@ -25,9 +25,31 @@ networking is private, so quiet, even though it builds a career.
 
 | Register | Used for | How it is written | Layer 2 typography |
 |---|---|---|---|
-| **LOUD** | public acts — anything done where the press, a crowd or a camera can see it | Tabloid headline. All caps, third person, present tense, a little cruel. | Large serif headline |
-| **quiet** | private work — practice, recovery, the favours and rooms nobody reports on | Diary voice. Second person, restrained. | Small italic, like a margin note |
-| **Money** | transactions — fees, deals, hires and purchases | Business-page voice. Plain, occasionally dry. | Business-section styling |
+| **LOUD** | public acts — anything done where the press, a crowd or a camera can see it | A headline in its paper's voice (below): the card's lane picks the paper. Third person, present tense. | Large serif headline |
+| **quiet** | private work — practice, recovery, the favours and rooms nobody reports on | Diary voice. Second person, restrained. The player's own notebook: no paper prints it. | Small italic, like a margin note |
+| **Money** | transactions — fees, deals, hires and purchases | Business-page voice, The Daily Flash business section. Plain, occasionally dry; sentence case. | Business-section styling |
+
+## Three papers (phase 2a)
+
+The papers print the public acts; the notebook keeps the private work.
+That is the thesis: the mass press never sees the practice.
+
+| Paper | Kind | Voice | Prints |
+|---|---|---|---|
+| **The Daily Flash** | Mass-market tabloid | ALL CAPS. Loud, cruel, fond of a pun. | LOUD lines of the celebrity lane and of neutral cards; every scandal, whatever the lane; Money, in its business section |
+| **B-Side** | Music weekly | Sentence case. Measured, critical, knowing; notices the results of craft. | LOUD lines of the music lane |
+| **Marquee** | Showbiz trade paper | Title Case. Insider voice, deal talk and trade jargon — inks, in talks, greenlit, boards, attached, set to star. | LOUD lines of the screen lane |
+
+- **Headlines are written in their paper's case and voice**, and stored as
+  written — the interface never recases a headline. Only the press
+  subject is cased, to match its placeholder.
+- **The press subject.** A headline that names the player uses
+  `{subject}`, `{Subject}` or `{SUBJECT}` — lower, Title or upper case, as
+  the paper sets it. The noun follows fame and the established lane:
+  newcomer (Unknown, Noticed); singer (Rising, and Known in music); actor
+  or celebrity (Known in screen or celebrity); pop star, film star or
+  celebrity (Famous). Before a lane is established, the music column.
+  Never write the noun itself ("SINGER") where the subject slot fits.
 
 ## Rules
 
@@ -44,9 +66,8 @@ networking is private, so quiet, even though it builds a career.
   over the weak one too. Reporting an opinion ("fans say …") is true in
   either branch.
 - **Time-neutral headlines.** A card can be played in any month and at
-  any fame, so its headlines assume neither: no "newcomer", no "debut".
-  Fame-aware press labels are planned for content expansion, where
-  "newcomer" can return as the low-fame form (draft v3).
+  any fame, so its headlines assume neither: no "newcomer", no "debut" —
+  except through the press subject, which is fame-aware (phase 2a).
 - **Every flag reads two ways.** A flag has a positive label (once set)
   and a negative label (while it is not), both written as prose; the
   interface never builds one from a template (draft v3).
