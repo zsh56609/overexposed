@@ -16,7 +16,7 @@
 - A design decision made in conversation is written to [`docs/decisions.md`](docs/decisions.md) in the same session.
 - Every AI-assisted commit identifies the tool. Claude Code adds its Co-Authored-By trailer automatically; any other tool adds a Co-Authored-By trailer naming itself.
 - Agents never invent player-facing prose: they build fields, keys and placeholders and import prose the author has approved (see [`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15).
-- Keep this file under ~28 KiB: some agents read only its first 32 KiB and drop the rest silently. Past that, move reference material (the per-event GameEvent spec, band definitions) to `docs/` and link to it; hard rules and FROZEN items stay near the top.
+- Keep this file under ~28 KiB: some agents read only its first 32 KiB and drop the rest silently. It carries only rules, the frozen summary and pointers; detailed specifications live in `docs/` (the GameEvent spec, the sim's bands, the content expansion design) and are linked from here.
 
 ---
 
@@ -62,12 +62,12 @@ The UI is built around the items below. Changing any of them now means reworking
 |---|---|
 | Run structure | 4 acts × 3 turns = 12 turns. The acts are seasons — spring, summer, autumn, winter — named through `rules.actNameKeys` |
 | Gates | 8 gates, two per season. After each season's last turn, 2 are offered and the player picks 1 |
-| Endings | 4, ids fixed: `meltdown`, `star`, `craftsman`, `nobody`. Their condition numbers stay tunable |
+| Endings | **Unfrozen 2026-09-30** for the content expansion (docs/decisions.md): two levels, see "Endings" below. The four old ids live on as minors |
 | Resources | `hype`, `craft`, `capital`, `heat`; 3 slots per turn; a hand of 5. No new resources |
 | Starting deck | 11 cards: `vocal_coaching` ×2, `side_gig` ×2, `open_mic`, `cover_single`, `press_junket`, `viral_stunt`, `lay_low`, `networking`, `crisis_pr` |
 | Heat formula | the formula in "The Heat → Scandal loop", with `heatThreshold` [7, 6, 6, 5], `thresholdFloor` [7, 6, 5, 4.5], `degradePerScandal` 0.5, `vent` 4. No further changes to any of the four |
 | Heat display | whole numbers only: points until the next scandal (see "Displayed heat") — never the effective threshold |
-| GameEvent list | the events and fields in [`docs/game-events.md`](docs/game-events.md) ("GameEvents" below) |
+| GameEvent list | the events and fields in [`docs/game-events.md`](docs/game-events.md) ("GameEvents" below); phase 3 of the content expansion adds new types only |
 
 ### Premise
 
@@ -193,23 +193,9 @@ Conditions use one shape everywhere:
 `flavorKey`: the gate's flavour line (prose). Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
-### Ending schema
+### Endings (two levels)
 
-```json
-{
-  "id": "craftsman",
-  "priority": 100,
-  "conditions": { "craft": { "min": 55 }, "hype": { "min": 25 }, "scandalCount": { "max": 2 } },
-  "textKey": "ending.craftsman.text"
-}
-```
-
-Prose keys: `nameKey`, `goalKey` (its goals-board line, also the hint for a locked ending), `textKey`. `boardOrder`: its place on the goals board (narrative order, aspirations first), never its `priority`.
-Resolved after turn 12 by descending `priority`; first match wins.
-**`priority: 0` is an unconditional fallback. It must always exist.**
-**No other ending may be a single-axis threshold:** at least two condition keys (validate enforces). A lone threshold makes one resource a dominant strategy. Star rewards surviving the spiral (hype + signed + a scandal ceiling); meltdown's scandal bar sits above star's ceiling so it never preempts a controlled hype run.
-
-Target endings: `craftsman`, `star`, `meltdown`, `nobody`.
+Four **major** endings are a 2×2 of fame (hype at year end against a split that sits on the "Known" tier boundary) and reputation (scandals at year end against a split). Thirteen **minors** refine them by lane, signing, craft and the shape of the year: within its major, the first minor whose condition holds, else the major's fallback — exhaustive at both levels. /core's `endingIfYearEndedNow` returns major and minor, and the reducer resolves the real ending through it. The full table: [`docs/design/content-expansion.md`](docs/design/content-expansion.md) §1.
 
 ### Awards
 
@@ -268,7 +254,7 @@ The primary QA instrument, not an extra. Build it in week one.
 
 - Runs N complete playthroughs headless, seeded, in Node
 - Personas: `minmaxer`, `random`, `crafter`, `hypechaser`, `dealseeker`, `comeback`, `artisan`. The greedy personas value flags by what they unlock: a flag some condition requires scores `flagUnlock`, one a condition forbids costs `flagLock`, each weighted by what reads it — ending 1.0 > gate 0.4 > card condition 0.1, summed over distinct tiers (per-flag overrides in `sim/personas.ts`); `dealseeker` weights flags heavily. `artisan` is the craft-leaning player (high craft, moderate hype, risk-averse; no weight is zero, so it stays player-like). `comeback` tests the design thesis — spike hype, then pay to clean up: it plays hype-heavy while holding fewer than N scandals and removal-heavy from N on. N is a fixed persona parameter (`COMEBACK_SWITCH_AT` in `sim/personas.ts`, 5), deliberately not derived from content: an instrument that shifts when you tune the system it measures is not an instrument.
-- Drafting (greedy personas): a card's draft value = the odds its `requires` holds when it comes up × its value per slot of one play. A one-shot (opportunity) is used up by its first play, so the repeatable part of its value counts min(1, 1 ÷ expected draws), where expected draws = remaining turns × hand size ÷ (cards owned + 1); setting a flag is permanent and counts in full either way. Odds, per clause, multiplied: a requirement met now = 1; an unmet minimum is projected at the run's growth so far and counts the share of the remaining turns in which it will hold (0 if it won't be reached in time, 0.5 on turn 1 with no history); a maximum exceeded now = 0.5; an act/turn window = the share of remaining turns inside it; a forbidden flag already held = 0 (flags are never unset); a required flag not held yet = 0.5. Reroll when the best card is worth less than the reroll's capital price; buy an extra pick when the best card left behind is worth more than its price.
+- Drafting (greedy personas): the draft-value heuristics are in [`docs/sim.md`](docs/sim.md#drafting-greedy-personas).
 - Report: ending distribution per persona, per-card play and draft rates, resource curves by turn, scandals held and crystallised, the cascade by act (effective threshold, crystallisations per turn, scandal cards drawn), gate met/pick/pass rates, flags held, draft and capital, run length, soft-lock count
 - Console table + JSON output
 - Every run records its seed so any anomaly replays alone
@@ -277,26 +263,7 @@ The primary QA instrument, not an extra. Build it in week one.
 
 ### Tuning targets
 
-**Band population:** the player-like personas in `sim/personas.ts`, 1000 runs each on the same run seeds (`npm run sim -- --runs=1000`). Per-persona bands are checked on each persona separately; pooled bands pool the player-like personas with equal weight (equal runs each). Probes run on the same seeds but never count towards a pooled band: their draws must not set gate difficulty. A pass counts only after it also holds on two alternate batch seeds (`--seed=`).
-
-**Two persona classes**, derived from weights, never from ids. A persona that gives an axis zero weight in every mode ignores that axis entirely and is a **control probe**: ignoring heat = heat, scandal and risk weights all 0 (today `hypechaser`); ignoring hype = hype weight 0 (today `crafter`). Every other persona is **player-like** (`minmaxer`, `dealseeker`, `comeback`, `artisan`, and `random`, which weighs nothing). Probes are not player models but experiments on the design thesis: a deterministic outcome means the experiment worked, so they are exempt from the concentration band and carry inverted assertions that fail if the thesis breaks. The endings those assertions name are derived from content too: the collapse ending sets a scandal floor; the top-hype ending demands the most hype among the endings that don't.
-
-| Metric | Population | Band |
-|---|---|---|
-| Ending concentration | each player-like persona separately | no single ending above 70% of that persona's runs |
-| Thesis: ignoring heat collapses | each probe that ignores heat | the collapse ending (meltdown) in more than 80% of its runs |
-| Thesis: ignoring hype never makes a star | each probe that ignores hype | the top-hype ending (star) in fewer than 5% of its runs |
-| Clogging: dead cards (scandals) drawn per turn, averaged per act | player-like runs, pooled | rising act by act — lowest in spring, highest in winter |
-| Scandals held at run end | player-like runs, pooled | median 2–5 |
-| Gate difficulty: met% (requirement already satisfied when offered) | offers to player-like personas, pooled | 35–65% per gate |
-| Card play rate (played ÷ drawn) | player-like runs, pooled | every playable card > 2% |
-| minmaxer vs random ending distribution | those two personas | significantly different (χ² p < 0.01 and total variation ≥ 0.2) |
-| Soft-locks | all runs | 0 |
-| Crashes | all runs | 0 |
-
-"The spiral lands in winter" means clogging: the player never sees a crystallisation rate, they see how many of their five cards are dead this turn. Where crystallisation peaks is not a target.
-
-Diagnostics, reported but not bands: the pooled ending distribution and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.
+Band population, persona classes, the band table and diagnostics: [`docs/sim.md`](docs/sim.md#tuning-targets).
 
 ---
 
@@ -410,7 +377,8 @@ npm run build          # production browser build
 npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
-npm run check:preview  # every UI preview against the real reducer outcome
+npm run check:preview  # every UI preview against the real reducer outcome, then check:clicks
+npm run check:clicks   # no click on a card or END TURN is swallowed (headless Chrome)
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
 ```

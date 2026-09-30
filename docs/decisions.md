@@ -6,6 +6,26 @@ rules).
 
 ---
 
+## 2026-09-30 — Endings deliberately unfrozen for the content expansion
+
+The endings list, frozen for the UI since 2026-09-29, is **deliberately
+unfrozen** for the content expansion (docs/design/content-expansion.md).
+The flat four become two levels: four majors from a 2×2 of fame and
+reputation, and thirteen minors (design §1). The four old ids — meltdown,
+star, craftsman, nobody — live on as minors, so their text, award
+references and sim records survive.
+
+The **GameEvent list will be unfrozen additively in phase 3**: new event
+types for story events and voice lines; existing types and fields stay
+as they are, and the existing UI is unaffected.
+
+**Still frozen:** resources, act structure, the heat formula, the
+starting deck and the gates.
+
+AGENTS.md now carries only rules, the frozen summary and pointers; the
+draft heuristics and the band table moved to docs/sim.md verbatim
+(28,634 bytes before, 24,810 after).
+
 ## 2026-09-30 — Round 1fddbd6 answered; the preview swallowed clicks
 
 The content expansion design (docs/design/content-expansion.md) is
