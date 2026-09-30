@@ -1,8 +1,55 @@
 {
   "papers": [
-    { "id": "flash", "mastheadKey": "paper.flash.masthead" },
-    { "id": "bside", "mastheadKey": "paper.bside.masthead" },
-    { "id": "marquee", "mastheadKey": "paper.marquee.masthead" }
+    {
+      "id": "flash",
+      "mastheadKey": "paper.flash.masthead",
+      "world": [
+        { "key": "paper.flash.world.1" },
+        { "key": "paper.flash.world.2" },
+        { "key": "paper.flash.world.3" },
+        { "key": "paper.flash.world.4" },
+        { "key": "paper.flash.world.5" },
+        { "key": "paper.flash.world.6" },
+        { "key": "paper.flash.world.7", "act": 1 },
+        { "key": "paper.flash.world.8", "act": 2 },
+        { "key": "paper.flash.world.9", "act": 3 },
+        { "key": "paper.flash.world.10", "act": 4 }
+      ]
+    },
+    {
+      "id": "bside",
+      "mastheadKey": "paper.bside.masthead",
+      "world": [
+        { "key": "paper.bside.world.1" },
+        { "key": "paper.bside.world.2" },
+        { "key": "paper.bside.world.3" },
+        { "key": "paper.bside.world.4" },
+        { "key": "paper.bside.world.5" },
+        { "key": "paper.bside.world.6" },
+        { "key": "paper.bside.world.7", "act": 1 },
+        { "key": "paper.bside.world.8", "act": 2 },
+        { "key": "paper.bside.world.9", "act": 3 },
+        { "key": "paper.bside.world.10", "act": 4 }
+      ],
+      "spilloverKeys": ["paper.bside.spillover.1", "paper.bside.spillover.2", "paper.bside.spillover.3"]
+    },
+    {
+      "id": "marquee",
+      "mastheadKey": "paper.marquee.masthead",
+      "world": [
+        { "key": "paper.marquee.world.1" },
+        { "key": "paper.marquee.world.2" },
+        { "key": "paper.marquee.world.3" },
+        { "key": "paper.marquee.world.4" },
+        { "key": "paper.marquee.world.5" },
+        { "key": "paper.marquee.world.6" },
+        { "key": "paper.marquee.world.7", "act": 1 },
+        { "key": "paper.marquee.world.8", "act": 2 },
+        { "key": "paper.marquee.world.9", "act": 3 },
+        { "key": "paper.marquee.world.10", "act": 4 }
+      ],
+      "spilloverKeys": ["paper.marquee.spillover.1", "paper.marquee.spillover.2", "paper.marquee.spillover.3"]
+    }
   ],
   "route": {
     "loud": { "music": "bside", "screen": "marquee", "celebrity": "flash", "neutral": "flash" },
@@ -14,5 +61,47 @@
     "screen": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.actor", "press.subject.film_star"],
     "celebrity": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.celebrity", "press.subject.celebrity"]
   },
-  "earlyLane": "music"
+  "earlyLane": "music",
+  "page": {
+    "slots": ["lead", "secondary", "secondary", "brief"],
+    "worldMin": [2, 2, 1, 1, 1],
+    "loud": {
+      "inLane": ["brief", "brief", "secondary", "lead", "lead"],
+      "offLane": ["brief", "brief", "brief", "brief", "secondary"]
+    },
+    "money": "brief",
+    "scandal": "lead",
+    "spillover": "brief",
+    "frenzyAt": 2,
+    "overwhelmLaneFrom": 4,
+    "defaultLead": "flash"
+  },
+  "rival": {
+    "arcs": [
+      {
+        "id": "breakthrough",
+        "major": "breakthrough",
+        "beats": [{ "paper": "bside", "key": "rival.breakthrough.1" }, { "paper": "flash", "key": "rival.breakthrough.2" }, { "paper": "bside", "key": "rival.breakthrough.3" }, { "paper": "flash", "key": "rival.breakthrough.4" }],
+        "endingKey": "rival.breakthrough.ending"
+      },
+      {
+        "id": "crash",
+        "major": "overexposed",
+        "beats": [{ "paper": "flash", "key": "rival.crash.1" }, { "paper": "flash", "key": "rival.crash.2" }, { "paper": "flash", "key": "rival.crash.3" }, { "paper": "flash", "key": "rival.crash.4" }],
+        "endingKey": "rival.crash.ending"
+      },
+      {
+        "id": "crossover",
+        "major": "breakthrough",
+        "beats": [{ "paper": "bside", "key": "rival.crossover.1" }, { "paper": "marquee", "key": "rival.crossover.2" }, { "paper": "marquee", "key": "rival.crossover.3" }, { "paper": "marquee", "key": "rival.crossover.4" }],
+        "endingKey": "rival.crossover.ending"
+      },
+      {
+        "id": "fade",
+        "major": "long_game",
+        "beats": [{ "paper": "bside", "key": "rival.fade.1" }, { "paper": "bside", "key": "rival.fade.2" }, { "paper": "flash", "key": "rival.fade.3" }, { "paper": "bside", "key": "rival.fade.4" }],
+        "endingKey": "rival.fade.ending"
+      }
+    ]
+  }
 }

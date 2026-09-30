@@ -70,9 +70,14 @@ A fixed 1280×720 logical stage, scaled to fit the viewport (§9).
 The stat strip is words first (decision 25): hype, craft and heat show
 their tier — fame, skill, pressure — with the number small beside it and
 in full on hover; capital stays a number; slots are pips (●●○). Heat
-keeps its integers (§5): after its tier, "N TO GO", or "LINE CROSSED · N
-TO THE NEXT" once heat is over a line. It counts no scandals; the count
-lives only in the END TURN preview.
+keeps its integers (§5): after its tier, "N TO GO", or "N TO NEXT" once
+heat is over a line (the tier word — Breaking, Frenzy — already says it).
+It counts no scandals; the count lives only in the END TURN preview.
+
+The feed carries the press (phase 2a, decision 27): every LOUD, Money and
+scandal line with its paper's masthead, a quiet line without one (the
+notebook), and at each month's end that month's front page — the lead
+paper's, with a switch to the other two.
 There is no proportional heat bar: a bar needs a denominator, which is the effective
 threshold, which the frozen rules forbid displaying.
 
@@ -544,6 +549,16 @@ it.
     awards, then the run summary and the endings collection, which
     replaces the list of locked endings; the old endings' goal lines are
     no longer shown (their keys are kept). (2026-09-30)
+27. The press in the feed (phase 2a; design §3.1, §3.4). Every LOUD,
+    Money and scandal line carries a small masthead label — The Daily
+    Flash, B-Side, Marquee; a quiet line has none: it is the player's
+    notebook. At each month's end the feed prints that month's front
+    page: the lead paper's by default, a lead, two secondaries and a
+    brief, world stories in muted type and the player's in ink, with a
+    minimal switch to the other two papers — each month opens on its own
+    lead paper. World stories are marked by type alone: no label word was
+    drafted. The three-paper desk is the visual phase's (below). The
+    ending screen closes the rival's year under the awards. (2026-09-30)
 
 ### Still open
 

@@ -201,7 +201,7 @@ Four **major** endings are a 2×2 of fame (hype at year end against a split that
 
 ### Awards, the press, stat tiers
 
-Every award whose conditions hold is won, a fallback only when none is; /core's `yearAwards` is a read-only query, never a GameEvent, and awards change no play (capped at 8). The press prints a LOUD line in its card's lane's paper, Money and every scandal in theirs, a quiet line in none (the notebook); /core's `pressLines` fixes each line's paper and subject when it prints. /core's `statTiers` picks the stat bar's tier words; /ui never computes a boundary. **The content shapes of endings, awards, the press and tiers: [`docs/content-schema.md`](docs/content-schema.md).**
+Every award whose conditions hold is won, a fallback only when none is; /core's `yearAwards` is a read-only query, never a GameEvent, and awards change no play (capped at 8). The press prints a LOUD line in its card's lane's paper, Money and every scandal in theirs, a quiet line in none (the notebook); /core's `pressLines` fixes each line's paper and subject when it prints, and `frontPages` composes each month's front page per paper — the player placed by fame and lane, the world and the rival around them (design §3.4). /core's `statTiers` picks the stat bar's tier words; /ui never computes a boundary. **The content shapes of endings, awards, the press and tiers: [`docs/content-schema.md`](docs/content-schema.md).**
 
 ### Content budget
 
@@ -384,6 +384,7 @@ npm run check:clicks   # no click on a card or END TURN is swallowed (headless C
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
 npm run sim:variants   # appearances per line group → sim/appearances.json, and the variant gap list
+npm run sim:press      # front pages: lead papers, the fame meter, the rival, world-pool repeats
 ```
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

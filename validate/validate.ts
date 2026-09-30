@@ -18,6 +18,7 @@ import {
   NEUTRAL_LANE,
   onceItem,
   playGroup,
+  PROMINENCES,
   REGISTERS,
   RESOURCE_KEYS,
   scandalGroup,
@@ -939,7 +940,7 @@ export function variantsNeeded(perRun: number): number {
 /** An item shown once per run needs two, so different runs read differently. */
 export const ONCE_VARIANTS_NEEDED = 2;
 
-export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'once';
+export type VariantGroupKind = 'card' | 'scandal' | 'inHand' | 'spillover' | 'world' | 'once';
 
 /** A line group and its variants, as content lists them. */
 export interface VariantGroup {
@@ -976,13 +977,27 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
   for (const g of list(raw.gates)) if (isStr(g.id)) groups.push({ id: onceItem.gate(g.id), kind: 'once', owner: g.id, keys: keyList(g.flavorKeys), register: null, lane: null });
   const endings = isObj(raw.endings) ? raw.endings : {};
   for (const m of list(endings.minors)) if (isStr(m.id)) groups.push({ id: onceItem.ending(m.id), kind: 'once', owner: m.id, keys: keyList(m.textKeys), register: null, lane: null });
+  // The press: each paper's frenzy spillover, and its world pool.
+  const press = isObj(raw.press) ? raw.press : {};
+  for (const p of list(press.papers)) {
+    if (!isStr(p.id)) continue;
+    if (Array.isArray(p.spilloverKeys)) groups.push({ id: `spillover:${p.id}`, kind: 'spillover', owner: p.id, keys: keyList(p.spilloverKeys), register: null, lane: null });
+    const world = list(p.world).map((s) => s.key).filter(isStr);
+    if (world.length > 0) groups.push({ id: `world:${p.id}`, kind: 'world', owner: p.id, keys: world, register: null, lane: null });
+  }
   return groups;
 }
 
-/** Variants a group needs: two for a once-per-run item, otherwise by how often it is seen. */
+/**
+ * Variants a group needs: two for a once-per-run item; for a world pool, as many stories as a run prints on
+ * average, so a typical run never repeats one (every paper is readable every month); otherwise by how often
+ * it is seen.
+ */
 export function groupNeeds(group: VariantGroup, appearances: Appearances | undefined): number {
   if (group.kind === 'once') return ONCE_VARIANTS_NEEDED;
-  return variantsNeeded(appearances?.perRun[group.id] ?? 0);
+  const perRun = appearances?.perRun[group.id] ?? 0;
+  if (group.kind === 'world') return Math.max(ONCE_VARIANTS_NEEDED, Math.ceil(perRun));
+  return variantsNeeded(perRun);
 }
 
 function checkVariants(v: Ctx, raw: RawContent, i18n: Obj, appearances: Appearances | undefined): void {
@@ -993,7 +1008,8 @@ function checkVariants(v: Ctx, raw: RawContent, i18n: Obj, appearances: Appearan
     const need = groupNeeds(group, appearances);
     if (have >= need) continue;
     const seen = group.kind === 'once' ? 'shown once a run' : `seen ${(appearances?.perRun[group.id] ?? 0).toFixed(1)} times a run`;
-    v.warn('variants', group.id, `${have} variant${have === 1 ? '' : 's'}, ${seen}: needs at least ${need}`);
+    const what = group.kind === 'world' ? (have === 1 ? 'story' : 'stories') : have === 1 ? 'variant' : 'variants';
+    v.warn('variants', group.id, `${have} ${what}, ${seen}: needs at least ${need}`);
   }
 }
 
@@ -1025,7 +1041,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
   const awards = checkAwards(v, raw.awards, endingIds);
   checkReferences(v, rules, cards);
-  checkPress(v, raw.press, rules);
+  checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)));
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1045,16 +1061,30 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 // ---------------------------------------------------------------------------
 // The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
 
-const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane'];
+const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'rival'];
+const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'overwhelmLaneFrom', 'defaultLead'];
 
-function checkPress(v: Ctx, raw: unknown, rules: Obj | null): void {
+function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>): void {
   const file = 'content/press.json';
   if (raw === undefined) return v.error('schema', file, 'is missing: the papers every line prints in');
   if (!isObj(raw)) return v.error('schema', file, 'must be an object: { papers, route, subjects, earlyLane }');
   v.fields(raw, PRESS_FIELDS, file);
   const papers = checkList(v, raw.papers, `${file} papers`, 'paper', (p, where) => {
-    v.fields(p, ['id', 'mastheadKey'], where);
+    v.fields(p, ['id', 'mastheadKey', 'world', 'spilloverKeys'], where);
     v.key(p.mastheadKey, `${where}.mastheadKey`);
+    // Its world news: a pool of stories, each for any season or only its own.
+    if (p.world !== undefined) {
+      if (!Array.isArray(p.world) || p.world.length === 0) v.error('schema', `${where}.world`, 'must be a non-empty list of { key, act? }');
+      else
+        p.world.forEach((story, i) => {
+          const at = `${where}.world[${i}]`;
+          if (!isObj(story)) return v.error('schema', at, 'must be { key, act? }');
+          v.fields(story, ['key', 'act'], at);
+          v.key(story.key, `${at}.key`);
+          v.int(story.act, `${at}.act`, [1, v.acts], { optional: true });
+        });
+    }
+    if (p.spilloverKeys !== undefined) v.keys(p.spilloverKeys, `${where}.spilloverKeys`);
   });
   const paperIds = new Set(papers.map((p) => p.id).filter(isStr));
   const paper = (x: unknown, where: string) => {
@@ -1089,6 +1119,62 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null): void {
     }
   }
   if (!v.lanes.includes(raw.earlyLane as string)) v.error('references', `${file} earlyLane`, `must be one of ${v.lanes.join(', ')}, got ${q(raw.earlyLane)}`);
+
+  // The front page: its slots, and how prominent the player's lines may be at each fame tier.
+  const prominence = (x: unknown, where: string) => {
+    if (!(PROMINENCES as readonly unknown[]).includes(x)) v.error('schema', where, `must be one of ${PROMINENCES.join(', ')}, got ${q(x)}`);
+  };
+  const perTier = (x: unknown, where: string, each: (y: unknown, at: string) => void) => {
+    if (!Array.isArray(x)) return v.error('schema', where, 'must list one value per hype tier');
+    if (tiers > 0 && x.length !== tiers) v.error('structure', where, `has ${x.length} entries for ${tiers} hype tiers`);
+    x.forEach((y, i) => each(y, `${where}[${i}]`));
+  };
+  const page = raw.page;
+  if (page !== undefined) {
+    const at = `${file} page`;
+    if (!isObj(page)) v.error('schema', at, 'must be an object');
+    else {
+      v.fields(page, PAGE_FIELDS, at);
+      const slots: unknown[] = Array.isArray(page.slots) ? page.slots : [];
+      if (slots.length === 0) v.error('schema', `${at}.slots`, 'must list the page slots, most prominent first');
+      slots.forEach((x, i) => prominence(x, `${at}.slots[${i}]`));
+      perTier(page.worldMin, `${at}.worldMin`, (x, w) => v.int(x, w, [0, slots.length]));
+      if (!isObj(page.loud)) v.error('schema', `${at}.loud`, 'must be { inLane, offLane }');
+      else {
+        v.fields(page.loud, ['inLane', 'offLane'], `${at}.loud`);
+        perTier(page.loud.inLane, `${at}.loud.inLane`, prominence);
+        perTier(page.loud.offLane, `${at}.loud.offLane`, prominence);
+      }
+      for (const f of ['money', 'scandal', 'spillover'] as const) prominence(page[f], `${at}.${f}`);
+      v.int(page.frenzyAt, `${at}.frenzyAt`, [1, 100]);
+      v.int(page.overwhelmLaneFrom, `${at}.overwhelmLaneFrom`, [0, Math.max(tiers, 1)]);
+      paper(page.defaultLead, `${at}.defaultLead`);
+    }
+  }
+
+  // The rival: one arc per run, a beat per season in a named paper, a closing line, the major she ends in.
+  const rival = raw.rival;
+  if (rival !== undefined) {
+    const at = `${file} rival`;
+    if (!isObj(rival)) v.error('schema', at, 'must be { arcs }');
+    else {
+      v.fields(rival, ['arcs'], at);
+      checkList(v, rival.arcs, `${at} arcs`, 'arc', (arc, where) => {
+        v.fields(arc, ['id', 'major', 'beats', 'endingKey'], where);
+        if (!majorIds.has(arc.major)) v.error('references', `${where}.major`, `no major ending with id ${q(arc.major)}`);
+        v.key(arc.endingKey, `${where}.endingKey`);
+        if (!Array.isArray(arc.beats) || arc.beats.length !== v.acts) v.error('structure', `${where}.beats`, `must give one beat per season (${v.acts})`);
+        else
+          arc.beats.forEach((beat, i) => {
+            const b = `${where}.beats[${i}]`;
+            if (!isObj(beat)) return v.error('schema', b, 'must be { paper, key }');
+            v.fields(beat, ['paper', 'key'], b);
+            paper(beat.paper, `${b}.paper`);
+            v.key(beat.key, `${b}.key`);
+          });
+      });
+    }
+  }
 }
 
 /** The content budget: a ceiling per kind (CONTENT_BUDGET), not a target. */

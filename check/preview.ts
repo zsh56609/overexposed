@@ -20,6 +20,7 @@ import {
   endingIfYearEndedNow,
   evaluate,
   explainCondition,
+  frontPages,
   getCard,
   getGate,
   heatLine,
@@ -54,7 +55,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -243,6 +244,24 @@ function checkDraftPhase(s: GameState, seed: number): void {
   }
 }
 
+/**
+ * The front pages (Part E, E11) are a pure function of state and history: composing a month twice from the
+ * same history gives the same page, and a month's page is the same whether it is composed at its own month
+ * end or at the year's end — nothing later rewrites it.
+ */
+function checkPages(history: readonly PlayedStep[], seed: number): void {
+  const final = frontPages(history);
+  if (!same(final, frontPages(history))) report('page purity', seed, 12, 'composing the same history twice gave different pages');
+  for (const month of final) {
+    counts.months++;
+    const atTheTime = frontPages(history.slice(0, month.step + 1)).at(-1);
+    if (!same(atTheTime, month)) report('page purity', seed, month.turn, `month ${month.turn}: composed at its end differs from composed at the year's end`);
+    counts.pages += month.pages.length;
+    // Every page is full, and the lead paper holds the player's most prominent story (or is the default).
+    for (const fp of month.pages) if (fp.items.length !== (history[0]?.after.content.press?.page?.slots.length ?? 0)) report('page', seed, month.turn, `${fp.paper}: ${fp.items.length} stories`);
+  }
+}
+
 /** The random persona's choice: any playable card before ending the turn; otherwise any legal action. */
 function choose(s: GameState, rng: ReturnType<typeof cursor>): Action {
   const legal = legalActions(s);
@@ -294,6 +313,7 @@ for (let i = 0; i < RUNS; i++) {
     s = next;
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
+  checkPages(history, seed);
 }
 
 console.log(
@@ -301,7 +321,7 @@ console.log(
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
-    `${bagSequences} shuffle-bag sequences ` +
+    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,
 );
 console.log(mismatches === 0 ? 'PASS: every preview matched the real outcome' : `FAIL: ${mismatches} mismatch(es)`);

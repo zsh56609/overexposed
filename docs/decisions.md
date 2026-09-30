@@ -6,6 +6,63 @@ rules).
 
 ---
 
+## 2026-09-30 — Phase 2a, Part E: the front page, the world, the rival
+
+Built as the author specified (design §3.3, §3.4): /core's `frontPages`
+composes, from the run's history alone, every month's front page for each
+paper — a lead, two secondaries, a brief — the player's lines placed by
+prominence, then world stories from each paper's pool by shuffle bag, the
+frenzy spilling over, the rival fixed by the seed. The page rules are
+content (`content/press.json` → `page`). The feed prints each month's
+front page at the month's end: the lead paper's, with a switch to the
+other two; `check:preview` asserts a month recomposed from the same
+history — or from the history up to its own month end — is the same page.
+
+**Where the brief was silent, these choices (for the author to confirm):**
+- A **Money** line is a business brief in The Daily Flash, whatever the
+  fame: the business section is not front-page news.
+- At equal prominence a **scandal comes first, then a LOUD act, then a
+  Money line**, then print order: a public act is news, a fee is
+  business. The **spillover claims its brief first**, since every other
+  paper carries it. A line may always sit lower than its cap.
+- The **rival's beat is the first world story** in her month and paper, so
+  it takes the most prominent free slot. It made the page 98% of the time;
+  only a page the player filled pushed her off.
+- **Overwhelmed**: The Daily Flash in a month any scandal printed —
+  crystallised or copied; before a lane is established, the paper of each
+  LOUD line the player printed that month stands for the lane's paper.
+- A lead-paper **tie while early** goes to the early lane's paper,
+  B-Side, as for the press subject.
+- **World stories are marked by type alone** (muted, the player's in ink):
+  no label word was drafted.
+- **The rival's majors**: breakthrough and crossover end in The
+  Breakthrough, crash in Overexposed, fade in The Long Game. Crossover's
+  is a reading of her closing line: she ends on a studio feature, known.
+
+**The numbers** (`npm run sim:press`, 1000 runs per persona; seeds 20260929,
+1 and 424242):
+- **Months led by each paper**: The Daily Flash 79–81% for minmaxer,
+  random, dealseeker and artisan, 86–87% for comeback; B-Side 10–19%;
+  Marquee 1–5% (screenseeker 9%). The starting deck prints mostly in the
+  Flash — two Side Gigs, Press Junket, Viral Stunt, Crisis PR against
+  B-Side's Open Mic and Cover Single — most of a music career is quiet
+  work no paper prints, and a scandal month always goes to the Flash.
+- **The fame meter**, the player's share of the lead paper's front page
+  by fame tier at the month's end: Unknown 23%, Noticed 30%, Rising 39%,
+  Known 39%, Famous 44–45%. It climbs, but flattens from Rising to Known:
+  a month prints only one or two of the player's public lines in any one
+  paper, so the share is capped by supply, not by slots. Where fame shows
+  is prominence — the player's story is the lead paper's lead in 7%,
+  34%, 40%, 70% and 78–81% of months — and the lead page is overwhelmed
+  in 7%, 34%, 40%, 34% and 80–83%.
+- **The rival**: each arc drawn in 23–27% of runs; her major differs from
+  the player's in 67–69% of runs (crash 81%, the others 62–66%).
+- **World pools repeat in every run**: a run prints on average 31 world
+  stories in The Daily Flash, 42 in B-Side and 45 in Marquee (at most 46–
+  48), against pools of 10; one story can print 7–8 times in a run.
+  Pages the player is not on are all world news, so the estimate of ~25
+  per paper is short: about 32, 42 and 45 per paper cover an average run.
+
 ## 2026-09-30 — Phase 2a, Part D: three newspapers, and the press subject
 
 - **Papers are content** (`content/press.json`): The Daily Flash

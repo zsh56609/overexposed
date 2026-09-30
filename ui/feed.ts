@@ -4,7 +4,7 @@
 // event that caused it: the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
-import { getCard, lineMoved, monthsLeft, pressLines, RESOURCE_KEYS, type GameEvent, type PressLine, type Register, type ResourceKey } from '../core/index.ts';
+import { frontPages, getCard, lineMoved, monthsLeft, pressLines, RESOURCE_KEYS, type GameEvent, type MonthPress, type PressLine, type Register, type ResourceKey } from '../core/index.ts';
 import { t, tp } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
@@ -24,7 +24,7 @@ import {
   zoneName,
 } from './text.ts';
 
-export type FeedLineKind = 'month' | 'opener' | 'headline' | 'lead' | 'detail' | 'note';
+export type FeedLineKind = 'month' | 'opener' | 'headline' | 'lead' | 'detail' | 'note' | 'page';
 
 export interface FeedLine {
   readonly id: string;
@@ -38,6 +38,8 @@ export interface FeedLine {
   /** For a printed line: the variant and the press subject it printed with. */
   readonly key: string | null;
   readonly subjectKey: string | null;
+  /** A month's front pages (Part E), printed at the month's end: kind 'page'. */
+  readonly page: MonthPress | null;
   /** Prose the author has not written yet: shown as a placeholder, never hidden. */
   readonly placeholder: boolean;
 }
@@ -60,8 +62,10 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
   let lastAct = 0;
   let lastMonth = 0;
   if (steps.length === 0) return out;
-  // Every printed line's variant, counted through the whole run (decision 15, revised), and its press.
+  // Every printed line's variant, counted through the whole run (decision 15, revised), and its press; every
+  // month's front pages, by the step that ended the month.
   const printed = pressLines(steps);
+  const pages = new Map(frontPages(steps).map((m) => [m.step, m]));
   let next = 0;
 
   for (const [index, step] of steps.entries()) {
@@ -71,8 +75,9 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     while (next < printed.length && printed[next]?.step === index) mine.push(printed[next++] as PressLine);
     const printedFor = (kind: PressLine['kind'], uid: number) => mine.find((l) => l.kind === kind && l.uid === uid);
     let n = 0;
-    const push = (kind: FeedLineKind, text: string, register: Register | null = null, line: PressLine | null = null) =>
+    const push = (kind: FeedLineKind, text: string, register: Register | null = null, line: PressLine | null = null, page: MonthPress | null = null) =>
       out.push({
+        page,
         id: `${step.id}.${n++}`,
         kind,
         text,
@@ -161,6 +166,9 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
       else if (carry !== 0) push('detail', t('ui.feed.carry', { n: carry }));
       for (const x of b.details) push('detail', x);
       tellLine();
+      // The month's papers come out: its front pages, the lead paper first (E8).
+      const month = pages.get(index);
+      if (month) push('page', '', null, null, month);
     }
 
     // A draft purchase's price is in its own line; its capital event would only repeat it.

@@ -8,7 +8,7 @@
 
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { onceItem, readLines, type GameState, type HistoryStep } from '../core/index.ts';
+import { frontPages, onceItem, readLines, type GameState, type HistoryStep } from '../core/index.ts';
 import { runOne, runSeeds } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS } from './personas.ts';
@@ -41,6 +41,15 @@ for (const persona of players) {
     if (last?.endingId) shown.set(onceItem.ending(last.endingId), 1);
     for (const gate of last?.gateHistory ?? []) for (const id of gate.offered) shown.set(onceItem.gate(id), 1);
     shown.set(onceItem.opening, 1);
+    // The press: each paper's world stories and frenzy spillovers printed this run (every paper is readable).
+    for (const month of frontPages(history)) {
+      for (const page of month.pages) {
+        for (const item of page.items) {
+          const group = item.kind === 'world' ? `world:${page.paper}` : item.kind === 'spillover' ? `spillover:${page.paper}` : null;
+          if (group) shown.set(group, (shown.get(group) ?? 0) + 1);
+        }
+      }
+    }
     for (const [group, n] of shown) {
       sum.set(group, (sum.get(group) ?? 0) + n);
       max.set(group, Math.max(max.get(group) ?? 0, n));
@@ -67,7 +76,7 @@ rows.sort((a, b) => b.short - a.short || b.perRun - a.perRun || a.g.id.localeCom
 const pad = (s: string, n: number) => s.padEnd(n);
 const lines = [
   `VARIANT GAP LIST  ${appearances.measured}  (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
-  'needs: seen 4+ a run → 4 · 2 to 4 → 3 · under 2 → 2 · once-per-run items → 2',
+  'needs: seen 4+ a run → 4 · 2 to 4 → 3 · under 2 → 2 · once-per-run items → 2 · a world pool → the stories a run prints on average',
   '',
   `${pad('group', 30)}${pad('register', 10)}${'per run'.padStart(8)}${'max'.padStart(6)}${'have'.padStart(6)}${'needs'.padStart(7)}${'short'.padStart(7)}`,
   ...rows.map(

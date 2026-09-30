@@ -46,9 +46,22 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
 - `subjects`: per lane, one i18n key per hype tier, lowest first — the
   noun `{subject}` becomes; `earlyLane` is the column read while no lane
   is established.
+- A paper's `world`: its world news, `{ key, act? }` — any season, or
+  only its own (once a run); `spilloverKeys`: the frenzy spilling over
+  into it.
+- `page`: the front page's `slots` (most prominent first); `worldMin`,
+  world stories per page by fame tier; `loud.inLane` / `loud.offLane`,
+  a LOUD line's prominence by fame tier in the established lane's paper
+  and in another; `money`, `scandal` and `spillover` prominences;
+  `frenzyAt`, the scandals in a month that spill over; `overwhelmLaneFrom`,
+  the fame tier from which the lane's paper is overwhelmed;
+  `defaultLead`, the lead paper of a month with nothing of the player's.
+- `rival.arcs`: `id`, `major` (the major ending her year ends in), one
+  `beats` entry per season (`paper`, `key`), `endingKey`.
 
 /core's `pressLines` gives each printed line its variant, paper and
-subject, fixed at the moment it prints.
+subject, fixed at the moment it prints; `frontPages` composes every
+month's front pages from the run's history.
 
 ## Stat tiers — `rules.tiers`
 

@@ -16,6 +16,7 @@ import {
   majorRequirements,
   readLines,
   reduce,
+  rivalArc,
   RESOURCE_KEYS,
   scandalCount,
   statTiers,
@@ -25,6 +26,7 @@ import {
   type ContentIndex,
   type GameState,
   type LineShow,
+  type MonthPress,
   type ResourceKey,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
@@ -56,6 +58,7 @@ import {
   mastheadName,
   money,
   openingText,
+  pageItemText,
   resourceName,
   seasonName,
   signedAmount,
@@ -210,7 +213,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       <div className="body">
         <div className="main">
           <div className={s.phase === 'gate' ? 'middle wide' : 'middle'}>
-            <Feed steps={snap.steps} />
+            <Feed c={c} steps={snap.steps} />
             {s.phase !== 'gate' && (
               <aside className="side">
                 <Side s={s} />
@@ -306,7 +309,7 @@ function StatStrip({ s }: { s: GameState }) {
   );
 }
 
-function Feed({ steps }: { steps: readonly PlayedStep[] }) {
+function Feed({ c, steps }: { c: ContentIndex; steps: readonly PlayedStep[] }) {
   const box = useRef<HTMLDivElement>(null);
   const lines = useMemo(() => feedLines(steps), [steps]);
   useEffect(() => {
@@ -317,20 +320,52 @@ function Feed({ steps }: { steps: readonly PlayedStep[] }) {
       <h2>{t('ui.feed.title')}</h2>
       <ol>
         {lines.map((line) => (
-          <FeedRow key={line.id} line={line} />
+          <FeedRow key={line.id} c={c} line={line} />
         ))}
       </ol>
     </div>
   );
 }
 
-function FeedRow({ line }: { line: FeedLine }) {
+function FeedRow({ c, line }: { c: ContentIndex; line: FeedLine }) {
+  if (line.page) return <FrontPageView c={c} month={line.page} />;
   const reg = line.register ? ` reg-${line.register}` : '';
   // A line the press prints carries its paper's masthead (phase 2a); a quiet line is the player's notebook.
   return (
     <li className={prose(line.text, `feed-${line.kind}${reg}`)}>
       {line.masthead && <span className="paper-label">{line.masthead}</span>}
       {line.text}
+    </li>
+  );
+}
+
+/**
+ * A month's front pages (Part E): the lead paper's, world stories marked as such, and a switch to the other
+ * two — every paper is readable every month; each month opens on its own lead paper (E8, E9).
+ */
+function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
+  const [shown, setShown] = useState(month.lead);
+  const page = month.pages.find((p) => p.paper === shown) ?? month.pages[0];
+  if (!page) return null;
+  return (
+    <li className="feed-page">
+      <div className="paper-switch">
+        {month.pages.map((p) => (
+          <button key={p.paper} className={p.paper === page.paper ? 'on' : undefined} aria-pressed={p.paper === page.paper} onClick={() => setShown(p.paper)}>
+            {mastheadName(c, p.paper)}
+          </button>
+        ))}
+      </div>
+      <ol className="page">
+        {page.items.map((item, i) => {
+          const text = pageItemText(c, item);
+          return (
+            <li key={i} className={prose(text, `page-${item.slot} ${item.kind === 'world' || item.kind === 'rival' ? 'world' : 'mine'}`)}>
+              {text}
+            </li>
+          );
+        })}
+      </ol>
     </li>
   );
 }
@@ -847,6 +882,8 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
   const name = minorName(c, id);
   const text = minorText(c, s.seed, id);
   const awards = yearAwards(s);
+  // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
+  const rival = rivalArc(c, s.seed);
   return (
     <div className="ending">
       <button className="play-again" onClick={onRestart}>
@@ -870,6 +907,7 @@ function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedS
               );
             })}
           </ul>
+          {rival && <p className={prose(t(rival.endingKey), 'rival-line')}>{t(rival.endingKey)}</p>}
         </div>
         <div className="ending-facts">
           <h2>{t('ui.ending.summary')}</h2>

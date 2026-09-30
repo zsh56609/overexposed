@@ -89,6 +89,19 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .reg-money { font-weight: normal; }
 /* The paper a line prints in (phase 2a): a small masthead before it. A quiet line has none: it is the notebook. */
 .paper-label { font-size: 0.7em; font-weight: bold; font-style: normal; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink); border: 1px solid var(--rule); padding: 0 0.3em; margin-right: 0.45em; white-space: nowrap; }
+/* A month's front page (Part E): the lead paper's by default, a switch to the other two; the player's
+   stories in ink, the world's muted. The visual phase turns this into the desk (docs/ui-plan.md). */
+.feed-page { margin: 0.4em 0 0.3em !important; padding: 0.3em 0.4em; border: 1px solid var(--rule); }
+.paper-switch { display: flex; gap: 0.3em; margin-bottom: 0.2em; }
+.paper-switch button { font-size: 0.7em; padding: 0.05em 0.4em; text-transform: uppercase; letter-spacing: 0.04em; }
+.paper-switch button.on { font-weight: bold; border-color: var(--ink); }
+.page { list-style: none; padding: 0; }
+.page li { margin-top: 0.1em; }
+.page-lead { font-weight: bold; font-size: 1.05em; }
+.page-secondary { font-size: 0.9em; }
+.page-brief { font-size: 0.8em; }
+.page .world { color: var(--muted); font-weight: normal; }
+.rival-line { font-style: italic; color: var(--muted); }
 
 /* Goals (decision 10) */
 .goals { display: flex; flex-direction: column; gap: 0.25em; font-size: 0.85em; }

@@ -247,9 +247,60 @@ export interface AwardDef {
 // The press (docs/design/content-expansion.md §3.1, phase 2a): three papers, which one prints a line, and
 // what they call the player. Papers print the public acts; the notebook keeps the private work.
 
+/** A story from beyond the player, in one paper's own pool: any season, or only its own (once a run). */
+export interface WorldStoryDef {
+  readonly key: string;
+  /** The season (act) it belongs to; absent: any. */
+  readonly act?: number;
+}
+
 export interface PaperDef {
   readonly id: string;
   readonly mastheadKey: string;
+  /** Its world news: what fills a front page around the player (drawn with a shuffle bag). */
+  readonly world?: readonly WorldStoryDef[];
+  /** Its frenzy-spillover lines: the scandal reaching this paper too. */
+  readonly spilloverKeys?: readonly string[];
+}
+
+/** How prominent a story is on a front page, most first. */
+export const PROMINENCES = ['lead', 'secondary', 'brief'] as const;
+export type Prominence = (typeof PROMINENCES)[number];
+
+/**
+ * How a month's front page is composed (phase 2a, Part E): its slots, and how prominent the player's lines
+ * may be — the front page is itself a fame meter. Per hype tier, lowest first, where a list is given.
+ */
+export interface PageRules {
+  /** The page's slots, most prominent first. */
+  readonly slots: readonly Prominence[];
+  /** World stories on every page, by fame tier — unless the page is overwhelmed. */
+  readonly worldMin: readonly number[];
+  /** A LOUD line's prominence by fame tier: in the established lane's paper, and in another paper. */
+  readonly loud: { readonly inLane: readonly Prominence[]; readonly offLane: readonly Prominence[] };
+  readonly money: Prominence;
+  readonly scandal: Prominence;
+  readonly spillover: Prominence;
+  /** Scandals printed in a month that spill over into every other paper. */
+  readonly frenzyAt: number;
+  /** From this fame tier on, the established lane's paper is overwhelmed: the player may fill it. */
+  readonly overwhelmLaneFrom: number;
+  /** The lead paper of a month with nothing of the player's. */
+  readonly defaultLead: string;
+}
+
+/** One season's beat of the rival's arc: in which paper, and its line. */
+export interface RivalBeatDef {
+  readonly paper: string;
+  readonly key: string;
+}
+
+/** The rival's year, fixed by the seed at the run's start: a beat per season, a closing line, her major. */
+export interface RivalArcDef {
+  readonly id: string;
+  readonly major: string;
+  readonly beats: readonly RivalBeatDef[];
+  readonly endingKey: string;
 }
 
 /**
@@ -271,6 +322,9 @@ export interface PressDef {
   readonly subjects: Readonly<Record<string, readonly string[]>>;
   /** The subjects column read while no lane is established. */
   readonly earlyLane: string;
+  readonly page?: PageRules;
+  /** The rival (design §3.3): the jam's light rival, introduced through the press. */
+  readonly rival?: { readonly arcs: readonly RivalArcDef[] };
 }
 
 /** The drafts inside each act. Prices are in capital; caps are per draft. */

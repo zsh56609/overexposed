@@ -273,9 +273,48 @@ the pair has replay value.
 
 ### 3.3 Rival
 
-Light for the jam: another rising singer who appears in several events and
-headlines. Their year ends in a major ending chosen to contrast the player's,
-shown on the ending screen. The full life arc is full-version scope.
+Light for the jam, and introduced through the press in phase 2a rather
+than with the events of phase 3: **Juno Vale**, another singer who started
+the same year. At the run's start the seed chooses one of four arcs —
+breakthrough, crash, crossover, fade — and each season one month (seeded)
+carries that season's beat as a world story in the paper named. The
+ending screen shows the arc's closing line under the awards. Each arc ends
+in a major (breakthrough and crossover in The Breakthrough, crash in
+Overexposed, fade in The Long Game). The arc is fixed at the start, so it
+cannot be chosen to contrast the player's outcome; with four arcs it often
+does so by chance. The full life arc is full-version scope.
+
+### 3.4 The front page
+
+The papers are not about the player alone. How much of a front page is
+about them is how famous they are — the front page is itself a fame
+meter, and at the top of the scale the player is literally overexposed:
+in every paper at once.
+
+- **Game feedback and press coverage are separate.** Every action still
+  shows its effect in the feed; whether it makes a paper, and how
+  prominently, depends on fame and lane.
+- **Each month every paper composes a front page**: a lead, two secondary
+  stories, a brief. The player's lines are placed by prominence, then the
+  rest is filled from the paper's world pool.
+- **Prominence of a LOUD line** in the established lane's paper: a brief
+  while Unknown or Noticed, a secondary while Rising, it may lead once
+  Known, and it leads — and may fill the page — once Famous. In another
+  paper: at most a brief, whatever the fame; Famous, a secondary, as a
+  crossover story. Early, a line's own paper stands for the lane's. A
+  scandal always leads The Daily Flash; a Money line is a business brief.
+- **World stories**: at least two on every page while Unknown or Noticed,
+  at least one after — unless the page is overwhelmed: The Daily Flash in
+  a month a scandal printed, the lane's paper once the player is Famous.
+- **Frenzy spills over**: in a month two or more scandals print, each
+  other paper carries a spillover line as a brief.
+- **World pools** are drawn with a shuffle bag, no repeats until the pool
+  is used; a seasonal story appears at most once a run, in its season.
+- **The lead paper** — the one on the desk in the visual phase — holds the
+  player's most prominent line: a scandal, then a lead, a secondary, a
+  brief. Ties go to the established lane's paper; a month with nothing of
+  the player's goes to The Daily Flash. All three papers are readable
+  every month; each month opens on its lead paper.
 
 ---
 
@@ -419,7 +458,7 @@ only, and variety belongs at the minor level.
 |---|---|---|
 | **1. Endings & lanes** | 2×2 majors, minors, resolution, lane tags on every card, lane queries, **five new screen cards**, goals board and marker, ending screen, endings collection, award remap, tier boundaries realigned to the new thresholds, new bands | Major goal lines; the nine new minor texts; screen-card names and headlines; collection labels |
 | **2. Voices & guidance** | Manager profile system with **both profiles** and the opening choice, season check-ins, big-moment lines, press subject slot | Both managers' lines; press subjects |
-| **3. Events** | Event engine (additive GameEvents), ~15 events, callbacks, lane weighting, rival appearances | Events; rival |
+| **3. Events** | Event engine (additive GameEvents), ~15 events, callbacks, lane weighting, rival appearances in events (her press arc landed in phase 2a) | Events; rival |
 | **4. Review & freeze** | Year in review, full retuning across all new content | Year-in-review framing |
 
 Endings and lanes come first because everything else refers to them. The

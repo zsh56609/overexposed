@@ -18,7 +18,25 @@ export {
   type TakenLine,
 } from './lines.ts';
 export { bagIndex, bagKey, hashId, onceIndex, onceItem, onceKey } from './variants.ts';
-export { fameTier, paperOf, pressLines, pressOf, pressSubject, printContext, type PressLine, type PrintContext } from './press.ts';
+export {
+  fameTier,
+  frontPages,
+  paperOf,
+  playerShare,
+  pressLines,
+  pressOf,
+  pressSubject,
+  printContext,
+  prominenceOf,
+  rivalArc,
+  rivalBeatTurn,
+  type FrontPage,
+  type MonthPress,
+  type PageItem,
+  type PageItemKind,
+  type PressLine,
+  type PrintContext,
+} from './press.ts';
 export { statTiers, TIER_STATS, type StatTier, type TierStat } from './tiers.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
 export {

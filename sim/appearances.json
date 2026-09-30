@@ -72,7 +72,12 @@
     "scandal:copycat_story": 2.43,
     "scandal:old_rumor": 0.16,
     "scandal:public_feud": 0.29,
-    "scandal:tabloid_story": 1.14
+    "scandal:tabloid_story": 1.14,
+    "spillover:bside": 0.95,
+    "spillover:marquee": 0.95,
+    "world:bside": 41.93,
+    "world:flash": 31.38,
+    "world:marquee": 44.91
   },
   "maxPerRun": {
     "card:acting_class": 13,
@@ -146,6 +151,11 @@
     "scandal:copycat_story": 19,
     "scandal:old_rumor": 3,
     "scandal:public_feud": 3,
-    "scandal:tabloid_story": 8
+    "scandal:tabloid_story": 8,
+    "spillover:bside": 8,
+    "spillover:marquee": 8,
+    "world:bside": 48,
+    "world:flash": 46,
+    "world:marquee": 48
   }
 }

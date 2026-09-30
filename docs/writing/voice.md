@@ -40,6 +40,9 @@ That is the thesis: the mass press never sees the practice.
 | **B-Side** | Music weekly | Sentence case. Measured, critical, knowing; notices the results of craft. | LOUD lines of the music lane |
 | **Marquee** | Showbiz trade paper | Title Case. Insider voice, deal talk and trade jargon — inks, in talks, greenlit, boards, attached, set to star. | LOUD lines of the screen lane |
 
+- **World news and the rival** are written in the voice of the paper they
+  run in, like everything else. World stories are about other people —
+  never the player — and stay time-neutral within their season.
 - **Headlines are written in their paper's case and voice**, and stored as
   written — the interface never recases a headline. Only the press
   subject is cased, to match its placeholder.
