@@ -17,8 +17,16 @@ export const BANDS = {
   personaEndingMax: 0.7,
   /** Per player-like persona: no single major ending may take more than this share of its runs. */
   personaMajorMax: 0.7,
-  /** Player-like, pooled: every minor ending reached in at least this share of runs. */
-  minorReachMin: 0.03,
+  /**
+   * Exempt from the major band only (the author, round a83fa88): a cautious, craft-led player is playing the
+   * long game — the major reflects the approach, and variety belongs at the minor level, where it stays.
+   */
+  personaMajorExempt: ['artisan'] as readonly PersonaId[],
+  /**
+   * Player-like, pooled: every minor ending reached in at least this share of runs — "reachable", not
+   * "common". Rare minors are the collection's achievements; the axes are not bent to inflate them.
+   */
+  minorReachMin: 0.015,
   /** A probe ignoring heat must end on the damaged side of the scandal axis in more than this share. */
   probeHeatCollapseMin: 0.8,
   /** A probe ignoring hype must end on the famous side of the hype axis in less than this share. */
@@ -429,23 +437,28 @@ export function buildReport(batch: BatchResult): Report {
   // Bands
   const pct = (x: number | null) => (x === null ? 'n/a' : `${(x * 100).toFixed(1)}%`);
   const bands: BandCheck[] = [];
-  const concentration = (ids: readonly string[], sh: Record<Group, Record<string, number>>, max: number, what: string): BandCheck => {
+  const concentration = (ids: readonly string[], sh: Record<Group, Record<string, number>>, max: number, what: string, exempt: readonly PersonaId[] = []): BandCheck => {
     const top = (p: PersonaId) => ids.map((id) => ({ id, share: sh[p][id] ?? 0 })).reduce((a, b) => (b.share > a.share ? b : a));
+    const held = players.filter((p) => !exempt.includes(p));
+    const excused = players.filter((p) => exempt.includes(p));
     return {
-      target: `player-like personas: no single ${what} > ${pct(max)} of its runs`,
-      pass: players.length === 0 ? null : players.every((p) => top(p).share <= max),
+      target: `player-like personas: no single ${what} > ${pct(max)} of its runs${excused.length ? ` (exempt: ${excused.join(', ')})` : ''}`,
+      pass: held.length === 0 ? null : held.every((p) => top(p).share <= max),
       actual:
         players.length === 0
           ? 'no player-like persona in this batch'
           : players
               .map((p) => {
                 const t = top(p);
-                return `${p} ${t.id} ${pct(t.share)}${t.share > max ? ' (over)' : ''}`;
+                return `${p} ${t.id} ${pct(t.share)}${exempt.includes(p) ? ' (exempt)' : t.share > max ? ' (over)' : ''}`;
               })
               .join(', '),
     };
   };
-  bands.push(concentration(majorIds, majorShare, BANDS.personaMajorMax, 'major ending'), concentration(endingIds, share, BANDS.personaEndingMax, 'minor ending'));
+  bands.push(
+    concentration(majorIds, majorShare, BANDS.personaMajorMax, 'major ending', BANDS.personaMajorExempt),
+    concentration(endingIds, share, BANDS.personaEndingMax, 'minor ending'),
+  );
   const rare = endingIds.filter((id) => (share.players[id] ?? 0) < BANDS.minorReachMin);
   bands.push({
     target: `every minor ending reached in >= ${pct(BANDS.minorReachMin)} of runs (player-like, pooled)`,

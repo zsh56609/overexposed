@@ -17,9 +17,9 @@ a card's draft value = the odds its `requires` holds when it comes up × its val
 
 | Metric | Population | Band |
 |---|---|---|
-| Major concentration | each player-like persona separately | no single major ending above 70% of that persona's runs |
+| Major concentration | each player-like persona separately, artisan exempt | no single major ending above 70% of that persona's runs |
 | Ending concentration | each player-like persona separately | no single minor ending above 70% of that persona's runs |
-| Minor reachability | player-like runs, pooled | every minor ending in at least 3% of runs |
+| Minor reachability | player-like runs, pooled | every minor ending in at least 1.5% of runs |
 | Thesis: ignoring heat collapses | each probe that ignores heat | the collapse majors (Overexposed, The Hard Way) in more than 80% of its runs |
 | Thesis: ignoring hype never makes it big | each probe that ignores hype | the top-hype majors (The Breakthrough, Overexposed) in fewer than 5% of its runs |
 | Lane reachability | each lane probe | ends the year in its own lane (`currentLane`) in more than 50% of its runs |
@@ -33,6 +33,6 @@ a card's draft value = the odds its `requires` holds when it comes up × its val
 
 "The spiral lands in winter" means clogging: the player never sees a crystallisation rate, they see how many of their five cards are dead this turn. Where crystallisation peaks is not a target.
 
-The artisan persona leans hard toward The Long Game by design (docs/design/content-expansion.md §8): if it cannot come under 70% the result is reported, not tuned away by changing the persona.
+The artisan persona leans hard toward The Long Game by design (docs/design/content-expansion.md §8). The author accepted it (round a83fa88): a cautious, craft-led player is playing the long game, so artisan is exempt from the major concentration band — and only that band; variety belongs at the minor level, where it is held to 70% like everyone. Minor reachability means "reachable", not "common": the rare minors are the collection's achievements, and the axes are not bent to inflate them.
 
 Diagnostics, reported but not bands: the pooled major, minor and lane distributions and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.

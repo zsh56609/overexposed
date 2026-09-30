@@ -6,6 +6,61 @@ rules).
 
 ---
 
+## 2026-09-30 — Round a83fa88 answered; phase 2a begins
+
+Phase 2 of the content expansion is split in two: 2a, the press (this
+round), and 2b, the two managers, written on the variant system built in
+2a. The author's answers to round a83fa88:
+
+1. **Lanes count cards played from the career, not the starting deck —
+   confirmed.** The starting deck is the premise: the player begins as a
+   singer. It is not a choice, and the lane must reflect choices.
+   `rules.laneStartingDeck` stays false.
+2. **The three failing bands:**
+   - Artisan in The Long Game (~99%): **accepted.** A cautious,
+     craft-led player is playing the long game; the major reflects the
+     approach, and variety belongs at the minor level. Artisan is exempt
+     from the major concentration band only; it stays in the minor band.
+   - Artisan's The Musician's Musician (~70%): fixed structurally, not by
+     tuning. The data showed a narrative error — celebrity-lane players
+     landing in The Long Game were called The Musician's Musician
+     (celebseeker 25% on seed 20260929). A new minor, The One to Watch,
+     gives them their own ending.
+   - Minor reachability: **1.5%, meaning "reachable", not "common".**
+     The Hard Way's minors and The Independent are meant to be rare — the
+     first needs poor play, the second a deliberate refusal to sign. In a
+     collection, rare endings are the achievements. The axes are not bent
+     to inflate them.
+3. **Lane and register are independent axes**: register is visibility,
+   lane is career direction. Reinvent Image moves to neutral — it is a
+   cleanup tool, and utility is neutral — and stays LOUD. The principle
+   for the rest: selling your image (Brand Deal, Sellout Ad) is
+   celebrity; selling your labour (Side Gig) is neutral; promotion toward
+   fame (Street Team, Press Junket) is celebrity; television (Late Night
+   Show) is screen.
+4. "Household name" colliding with the minor Household Name: resolved by
+   single-word tiers, where the top hype tier is "Famous".
+5. SINGER hard-coded in two screen headlines, and the three career-stage
+   headlines: resolved by the press subject slot.
+6. Design concerns:
+   - Flash in the Pan is tied to the fame split — peak hype at least the
+     split: "was famous, then lost it", so the player must actually have
+     been Known. If that drops it below 1.5%, it keeps 75 and the rate is
+     reported.
+   - The Redemption Arc needs scandals down 2 from the peak, matching
+     Comeback of the Year, so the ending always carries that award.
+   - A lane decided by a single play: an **established lane**, for display
+     only (press subjects now; the vanity's props and the managers later).
+     Ending resolution keeps the current lane.
+   - The abrupt switch at hype 80 stays; in round 2b it becomes a story
+     beat — the manager marks the moment the player stops being unknown.
+   - "Hype 79 or fewer" on The Long Game read as if staying unknown were
+     the goal. The two unknown-side majors show only their reputation
+     requirement; the tier word and the goal line carry the fame side.
+     The known-side majors keep "Hype 80+".
+   - Final-gate line wrapping and the heavy "Undiscovered" placeholders:
+     visual craft.
+
 ## 2026-09-30 — Phase 1: two-level endings and career lanes
 
 Phase 1 of the content expansion (docs/design/content-expansion.md §1,

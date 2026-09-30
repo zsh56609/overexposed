@@ -275,7 +275,7 @@
   },
   {
     "id": "reinvent_image",
-    "lane": "celebrity",
+    "lane": "neutral",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.reinvent_image.name",

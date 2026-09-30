@@ -162,10 +162,18 @@ they pose — artist, actor, or star? — is the question the endings answer.
 
 **Tagging.** Every card carries `lane: music | screen | celebrity | neutral`.
 Utility cards (draws, heat relief, scandal removal) are neutral and never count.
+Lane and register are independent axes: register is visibility, lane is
+career direction (Reinvent Image is neutral and LOUD). Selling your image
+(Brand Deal, Sellout Ad) is celebrity; selling your labour (Side Gig) is
+neutral; promotion toward fame (Street Team, Press Junket) is celebrity;
+television (Late Night Show) is screen.
 
 **Determination.** The lane is decided by the cards the player *played*, not
 held — the résumé is what you did. /core provides `currentLane(state)` and
 `laneShares(state)` as read-only queries. Ties resolve to music, the base.
+The starting deck does not count (`rules.laneStartingDeck`: false): it is the
+premise — the player begins as a singer — not a choice, and the lane must
+reflect choices.
 
 **Content gap.** Screen has only two cards today (Film Cameo, Late Night Show).
 Two minor endings — Leading Role and The Character Actor — require the screen
@@ -338,15 +346,16 @@ New or changed:
 | Band | Target |
 |---|---|
 | Major concentration | Per player-like persona, no major above 70% |
-| Minor reachability | Every minor reached in at least a few percent of player-like runs |
+| Minor reachability | Every minor reached in at least 1.5% of player-like runs: "reachable", not "common". The Hard Way's minors and The Independent are meant to be rare; in a collection, rare endings are the achievements, and the axes are not bent to inflate them |
 | Lane reachability | Each lane reachable by a persona that pursues it — add lane-seeking personas |
 | Event balance | No event choice dominant; every choice taken in a meaningful share of runs |
 | Run length | Estimated story beats per run within the under-20-minute target |
 
 Kept: probe assertions, scandal median, gate met%, card play rate, skill
-divergence, zero soft-locks, zero crashes. The artisan persona will lean hard
-toward The Long Game; tune the splits, and report it if it cannot come under
-70%.
+divergence, zero soft-locks, zero crashes. The artisan persona leans hard
+toward The Long Game (~99%). Accepted (round a83fa88): a cautious, craft-led
+player is playing the long game; artisan is exempt from major concentration
+only, and variety belongs at the minor level.
 
 ---
 
