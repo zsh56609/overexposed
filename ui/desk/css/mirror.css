@@ -1,0 +1,51 @@
+/* The mirror (round V1a; README §3), as the mockup (v18) sets it: the bulb frame, the glass, the black card, the
+   sticky notes (their colours from content: majors[].note), and the frenzy's dark and flickering bulbs and
+   red clipping. Requirement lines have an integer line height (11px) so icons and text stay aligned. */
+
+.desk .mirror { position: absolute; left: 688px; top: 52px; width: 420px; height: 350px; z-index: 5; }
+.desk .mShadow { position: absolute; left: 700px; top: 396px; width: 400px; height: 24px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 0, 0, .6), transparent 70%); z-index: 4; }
+.desk .mframe { position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(145deg, #735839, #3f2e1f 60%, #5c4530); box-shadow: 0 20px 34px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(255, 220, 170, .15); }
+.desk .glass {
+  position: absolute; left: 30px; top: 30px; right: 30px; bottom: 30px; border-radius: 4px; overflow: hidden;
+  background: radial-gradient(ellipse at 70% 30%, var(--glass), transparent 58%), linear-gradient(160deg, #2c3238, #15191d 70%, #1c2226); transition: background .7s;
+}
+.desk .glass::before { content: ""; position: absolute; right: 16%; top: 10%; width: 26%; height: 44%; background: linear-gradient(180deg, var(--glass), transparent); border: 2px solid rgba(255, 255, 255, .05); }
+.desk .glass::after { content: ""; position: absolute; left: -30%; top: -10%; width: 40%; height: 140%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .06), transparent); transform: rotate(18deg); }
+.desk.crisis .glass { background: radial-gradient(ellipse at 40% 35%, rgba(217, 43, 31, .26), transparent 55%), linear-gradient(160deg, #2a1c1c, #150e0e 70%, #1c1313); }
+
+/* The bulbs: in a frenzy some flicker or go dark. */
+.desk .bulb { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 11px 4px rgba(255, 214, 130, .55), 0 0 26px 8px rgba(255, 200, 110, .16); transition: all .35s; }
+.desk .bulb.off { background: radial-gradient(circle at 40% 35%, #6b6258, #3a342e 70%); box-shadow: none; }
+.desk .bulb.harsh { background: radial-gradient(circle at 40% 35%, #fff, #ffd6d0 45%, #e2584a); box-shadow: 0 0 13px 5px rgba(255, 120, 100, .55), 0 0 30px 10px rgba(217, 43, 31, .2); }
+.desk .bulb.flicker { animation: desk-flick 1.3s infinite; }
+@keyframes desk-flick { 0%, 100% { opacity: 1; } 8% { opacity: .25; } 12% { opacity: 1; } 55% { opacity: 1; } 58% { opacity: .35; } 62% { opacity: .9; } }
+
+/* The black card: "If the year ended today" · major · minor. */
+.desk .today { position: absolute; left: 40px; top: 40px; width: 150px; background: var(--ink); color: var(--cream); padding: 7px 9px; box-shadow: 0 5px 9px rgba(0, 0, 0, .4); transform: rotate(-3deg); transition: transform .28s ease; }
+.desk .today:hover { transform: rotate(-3deg) scale(1.04); z-index: 6; }
+.desk .today small { display: block; font-size: 7px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #ffcf85; margin-bottom: 2px; }
+.desk .today b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 13px; line-height: 1.05; }
+.desk .today span { display: block; font-size: 9px; }
+
+/* The sticky notes: the other three majors. */
+.desk .sticky { position: absolute; width: 118px; padding: 8px 9px 9px; font-size: 8.3px; line-height: 1.28; color: var(--ink); box-shadow: 0 5px 9px rgba(0, 0, 0, .35); transform: rotate(var(--r, 0deg)); transition: transform .28s ease, box-shadow .28s; }
+.desk .sticky:hover { transform: rotate(var(--r, 0deg)) scale(1.05); box-shadow: 0 8px 14px rgba(0, 0, 0, .42); z-index: 6; }
+.desk .sticky.yellow { background: #fff1a0; }
+.desk .sticky.green { background: #d3ebc6; }
+.desk .sticky.blue { background: #c6e4ff; }
+.desk .sticky.pink { background: #ffc6dc; }
+.desk .sticky b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 11.5px; line-height: 1.05; margin-bottom: 3px; }
+.desk .sticky .req { display: flex; align-items: center; gap: 3px; height: 11px; line-height: 11px; font-size: 7.8px; font-weight: 700; margin-top: 2px; color: #2a241c; white-space: nowrap; }
+.desk .sticky .req i { font-style: normal; font-weight: 900; width: 8px; flex: none; }
+.desk .sticky .req.ok i { color: #2e7d32; }
+.desk .sticky .req.no i { color: #b8281c; }
+.desk .sticky .req svg { width: 9px; height: 9px; flex: none; display: block; }
+.desk .sticky .req .rh { color: #8a6a00; }
+.desk .sticky .req .rs { color: #c0392b; transform: translateY(-.4px); }
+
+/* A frenzy's red clipping, stuck to the glass. */
+.desk .clipM { position: absolute; left: 300px; top: 118px; width: 104px; background: var(--red); color: #FFF3EF; padding: 6px 8px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 10px; line-height: 1.05; text-transform: uppercase; box-shadow: 0 6px 12px rgba(0, 0, 0, .5); transform: rotate(-8deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .desk .bulb.flicker { animation: none; }
+}

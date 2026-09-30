@@ -66,7 +66,7 @@ import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
-import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, seasonLabel } from '../ui/text.ts';
+import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
 import { deskIssue, deskModel } from '../ui/desk/model.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
@@ -516,6 +516,37 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   const frenzyAt = c.press?.page?.frenzyAt ?? Infinity;
   const scandals = pressLines(withEnd).filter((l) => l.kind === 'scandal' && monthOfStep(withEnd, l.step) === issue?.turn).length;
   if (m.crisis !== (issue?.frenzy ?? false) || (issue !== null && m.crisis !== scandals >= frenzyAt)) bad(`crisis ${m.crisis} with ${scandals} scandals this month (frenzy at ${frenzyAt})`);
+
+  // The mirror (README §3): the black card names /core's ending if the year ended now; the three notes are the
+  // other majors in content's order, in their colours, each requirement /core's clause — met or not, its
+  // number and tier word, never "(you have N)" — and no note looks achieved, since its major is not today's.
+  const today = endingIfYearEndedNow(s);
+  const mirror = m.mirror;
+  if (!today || mirror.today?.major !== t(`ending.${today.majorId}.name`) || mirror.today.minor !== t(`ending.${today.minorId}.name`)) bad(`black card ${JSON.stringify(mirror.today)}, is ${today?.majorId} · ${today?.minorId}`);
+  const others = c.majors.filter((x) => x.id !== today?.majorId);
+  if (!same(mirror.notes.map((n) => n.majorId), others.map((x) => x.id))) bad(`notes ${mirror.notes.map((n) => n.majorId)}`);
+  for (const note of mirror.notes) {
+    const major = others.find((x) => x.id === note.majorId);
+    if (!major) continue;
+    if (note.colour !== major.note || note.name !== t(`ending.${major.id}.name`) || note.goal !== t(`ending.${major.id}.goal`)) bad(`note ${major.id}: ${note.colour} "${note.name}"`);
+    const clauses = majorRequirements(major, s);
+    if (note.reqs.length !== clauses.length) bad(`note ${major.id}: ${note.reqs.length} requirements, /core has ${clauses.length}`);
+    clauses.forEach((clause, i) => {
+      const r = note.reqs[i];
+      if (!r) return;
+      if (r.met !== clause.met || r.mark !== (clause.met ? '✓' : '✗')) bad(`note ${major.id}: requirement ${i} ${r.mark} against ${clause.met}`);
+      if (r.text.includes('(you have')) bad(`note ${major.id}: "${r.text}" counts the player's value`);
+      if (clause.tierKey && !r.text.includes(t(clause.tierKey))) bad(`note ${major.id}: "${r.text}" without the tier ${t(clause.tierKey)}`);
+      if ('range' in clause && clause.state === undefined) {
+        const n = clause.range.min ?? clause.range.max;
+        if (n !== undefined && !r.text.includes(String(n))) bad(`note ${major.id}: "${r.text}" without ${n}`);
+      }
+    });
+    if (note.reqs.length > 0 && note.reqs.every((r) => r.met)) bad(`note ${major.id} looks achieved, but the year would end in ${today?.majorId}`);
+  }
+  // The frenzy's clipping: one of the month's scandal headlines, and only in a frenzy.
+  const scandalTexts = (issue?.pages ?? []).flatMap((p) => p.items).filter((x) => x.kind === 'player' && x.line?.kind === 'scandal').map((x) => pageItemText(c, x));
+  if ((mirror.clipping !== null) !== (m.crisis && scandalTexts.length > 0) || (mirror.clipping !== null && !scandalTexts.includes(mirror.clipping))) bad(`clipping "${mirror.clipping}" (crisis ${m.crisis}, ${scandalTexts.length} scandal stories)`);
 }
 
 /** The month a step belongs to: a month end belongs to the month it ends. */

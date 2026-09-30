@@ -88,6 +88,8 @@ export interface StatBarModel {
 
 export interface NoteReq {
   readonly met: boolean;
+  /** ✓ or ✗. */
+  readonly mark: string;
   readonly icon: 'star' | 'paper' | null;
   readonly text: string;
 }
@@ -103,7 +105,10 @@ export interface MirrorNote {
 export interface MirrorModel {
   readonly kicker: string;
   readonly today: { readonly major: string; readonly minor: string } | null;
+  /** The other three majors, in content's order. */
   readonly notes: readonly MirrorNote[];
+  /** In a frenzy, the red clipping stuck to the glass: the month's newest scandal headline. */
+  readonly clipping: string | null;
 }
 
 export interface ItemModel {
@@ -239,7 +244,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
     lane: laneClass,
     fameTier: fame,
     stats: statBar(s, lane),
-    mirror: mirror(s),
+    mirror: mirror(s, issue),
     papers: issue ? papers(s, issue, history, steps.length) : null,
     notebook: notebook(steps),
     script: laneClass === 'screen' ? script(s, fame) : null,
@@ -296,26 +301,32 @@ const NOTE_ORDER: readonly NoteColour[] = ['yellow', 'green', 'blue', 'pink'];
 
 /** A goals-board clause in the stat bar's words, on a sticky note: never "(you have N)" — README §3. */
 function noteReq(clause: MajorClause): NoteReq {
-  if (clause.state !== undefined) return { met: false, icon: 'star', text: t(`goals.note.${clause.state}`) };
+  const mark = (met: boolean) => t(met ? 'ui.note.met' : 'ui.note.unmet');
+  if (clause.state !== undefined) return { met: false, mark: mark(false), icon: 'star', text: t(`goals.note.${clause.state}`) };
   if ('range' in clause) {
     const { min, max } = clause.range;
-    if (clause.tierKey && min !== undefined && max === undefined) return { met: clause.met, icon: 'star', text: t('goals.note.hypeMin', { tier: t(clause.tierKey), min }) };
-    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, icon: 'paper', text: t('goals.note.scandalsMax', { n: max }) };
-    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, icon: 'paper', text: t('goals.note.scandalsMin', { n: min }) };
+    if (clause.tierKey && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'star', text: t('goals.note.hypeMin', { tier: t(clause.tierKey), min }) };
+    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMax', { n: max }) };
+    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMin', { n: min }) };
   }
-  return { met: clause.met, icon: null, text: clauseText(clause) };
+  return { met: clause.met, mark: mark(clause.met), icon: null, text: clauseText(clause) };
 }
 
-function mirror(s: GameState): MirrorModel {
+function mirror(s: GameState, issue: MonthPress | null): MirrorModel {
   const c = s.content;
   const today = endingIfYearEndedNow(s);
+  // The frenzy's red clipping: the newest of the month's scandals, as the papers print it.
+  const scandals = issue?.frenzy ? issue.pages.flatMap((p) => p.items).filter(isScandalLine) : [];
+  const newest = scandals.reduce<PageItem | null>((a, x) => (a === null || (x.line?.step ?? 0) > (a.line?.step ?? 0) ? x : a), null);
   return {
     kicker: t('ui.goals.today'),
     today: today ? { major: majorName(c, today.majorId), minor: minorName(c, today.minorId) } : null,
     notes: c.majors
       .map((m, i) => ({ m, colour: m.note ?? (NOTE_ORDER[i % NOTE_ORDER.length] as NoteColour) }))
       .filter(({ m }) => m.id !== today?.majorId)
+      .slice(0, 3)
       .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), goal: majorGoal(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
+    clipping: newest ? pageItemText(c, newest) : null,
   };
 }
 

@@ -5,12 +5,14 @@
 
 import type { ReactNode } from 'react';
 import { IconDefs } from './Icons.tsx';
+import { Mirror } from './Mirror.tsx';
 import type { DeskModel } from './model.ts';
 import { StatBar } from './StatBar.tsx';
 import './tokens.css';
 import './fonts.css';
 import './css/scene.css';
 import './css/stats.css';
+import './css/mirror.css';
 
 /** What the player can do on the desk: each is a dispatch or a UI toggle in App, never a rule. */
 export interface DeskActions {
@@ -24,6 +26,7 @@ export function Desk({ model, on, children }: { model: DeskModel; on: DeskAction
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
+      <Mirror mirror={model.mirror} crisis={model.crisis} />
       <div className="floor" />
       <div className="deskscene">
         <div className="desktop" />

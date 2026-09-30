@@ -559,6 +559,8 @@
   "goals.note.scandalsMax": "{n} or fewer scandals",
   "goals.note.scandalsMin": "{n} or more scandals",
   "goals.note.known": "Already known",
+  "ui.note.met": "✓",
+  "ui.note.unmet": "✗",
   "desk.gloss": "GLOSS",
   "desk.clapper.prod": "PROD. ONE YEAR",
   "desk.clapper.scene": "SCENE 14",

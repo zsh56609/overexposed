@@ -6,6 +6,29 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part C: the mirror
+
+- **As README §3 and the mockup set it**: the bulb frame (eight bulbs
+  along the top, five down each side), the glass and its reflections, the
+  black card, and three sticky notes at the mockup's three spots, for the
+  majors other than today's in content's order, in their content colours.
+  Notes and card scale up on hover.
+- **The notes speak the stat bar's language**: ✓ or ✗ (their own keys,
+  `ui.note.met` and `ui.note.unmet`), the icon, and the words — "Known ·
+  80+", "5 or fewer scandals", "Already known" — never "(you have N)".
+- **In a frenzy**: the mockup's pattern of dark, harsh and flickering
+  bulbs, the red glass, and a red clipping on the glass. The README does
+  not say what the clipping reads; the mockup's sample repeats the
+  tabloid's scandal headline, so it reads **the month's newest scandal
+  headline**, as the papers print it — no new prose.
+- The flicker stops under the system's reduced-motion setting, until V2's
+  "Reduce motion" can drive it.
+- `check:preview` holds the mirror to /core at every state: the black
+  card is `endingIfYearEndedNow`; the notes are the other majors, each
+  requirement /core's clause (met, number, tier word); **no note ever
+  looks achieved**; and the clipping is one of the month's scandal
+  headlines, only in a frenzy.
+
 ## 2026-10-01 — Round V1a, Part B: the stat bar
 
 - **As README §1 and the mockup set it**: the geometry (five cells of

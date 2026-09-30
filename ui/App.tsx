@@ -8,7 +8,6 @@ import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import {
   cardFace,
   createInitialState,
-  endingIfYearEndedNow,
   establishedLanes,
   freeRerollAvailable,
   getCard,
@@ -16,7 +15,6 @@ import {
   getManager,
   lastWord,
   majorOf,
-  majorRequirements,
   readLines,
   reduce,
   rerollCost,
@@ -53,7 +51,6 @@ import {
   clauseLine,
   effectsText,
   endingPair,
-  majorGoal,
   majorName,
   minorName,
   minorText,
@@ -63,7 +60,6 @@ import {
   heatText,
   isPlaceholder,
   lineText,
-  majorClauseLine,
   managerName,
   mastheadName,
   money,
@@ -250,9 +246,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         <div className="dock-feed">
           <Feed c={c} steps={snap.steps} />
         </div>
-        <div className="dock-goals">
-          <GoalsBoard s={s} />
-        </div>
         {s.phase === 'play' && (
           <div className="dock-hand">
             <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />
@@ -375,38 +368,6 @@ function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
 // Goals (decision 10): the four major endings in narrative order, aspirations first (decision 22) — each
 // with its name, its goal line and its side of the 2×2 of fame and reputation, live. The marker names the
 // ending the year would resolve to today, major and minor, from /core (docs/design/content-expansion.md §1).
-
-function GoalsBoard({ s }: { s: GameState }) {
-  const c = s.content;
-  const today = endingIfYearEndedNow(s);
-  return (
-    <div className="goals">
-      <h2>{t('ui.goals.title')}</h2>
-      {c.majors.map((m) => {
-        const name = majorName(c, m.id);
-        const goal = majorGoal(c, m.id);
-        const isToday = today !== null && today.majorId === m.id;
-        return (
-          <div key={m.id} className={isToday ? 'goal today' : 'goal'}>
-            {isToday && (
-              <div className="today-mark">
-                {t('ui.goals.today')}: {endingPair(c, today.majorId, today.minorId)}
-              </div>
-            )}
-            <strong className={prose(name)}>{name}</strong> <em className={prose(goal)}>{goal}</em>
-            <div className="clauses">
-              {majorRequirements(m, s).map((clause, i) => (
-                <span key={i} className={clause.met ? 'met' : 'unmet'}>
-                  {majorClauseLine(clause)}
-                </span>
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Previews
