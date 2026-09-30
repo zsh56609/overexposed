@@ -4,8 +4,10 @@
 This folder is the source of truth for the **visual phase**. `docs/ui-plan.md` §14
 records the same decisions in prose; where the two differ, **this README is newer and wins**.
 
-Build nothing from this folder until the visual phase begins (after the content
-feature freeze, see `docs/status.md`). Content rounds may read it for context.
+The visual work runs alongside the content, not after the feature freeze (2026-10-01):
+V1a the desk, static (§1–§7) → V1b the motion on the desk → phase 3 (events) →
+V2 the screens around the desk (§8–§9) → phase 4 → the freeze. The current round is
+in `docs/status.md`.
 
 ## Files
 
@@ -210,5 +212,5 @@ object for manager messages) with the real `/core` queries and `/i18n` keys.
 
 - **Already in the game or in round 2b:** three papers and routing, prominence by fame, the rival, world sagas, managers and perks, scandals scaling with fame, the lead-paper rule, the goals-board fix.
 - **Round 2c (content and information display):** tooltips; card flavour lines; cost only above one; lane-weighted draft; new screen cards; craft icon by lane; month names and calendar; season marks; countdown icon and colours; stat bar order; the card face field; desk scripts; two-bubble manager messages and a quiet-month trigger; tier words on the goals board; scene tags.
-- **Visual phase:** everything else in this README — round 1 the desk (§1–§7), round 2 the screens around it (§8–§9).
+- **Visual phase:** everything else in this README — V1a the desk, static (§1–§7); V1b its motion (§9's "Playing a card" and "Month end"); V2 the screens around it (§8–§9).
 - **Phase 3:** the event presentations in §9 are the target look for events.

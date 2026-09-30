@@ -30,6 +30,12 @@ export const BANDS = {
    * comeback starts from, it sits at 1.20–1.46% — 5–7% of comeback-style runs.
    */
   minorReachMin: 0.01,
+  /**
+   * Reachable by a way of playing (round V1a): every minor ending reaches at least this share of one
+   * player-like persona's runs — an ending has to be something a way of playing reaches, not only a product
+   * of the mix of personas. It gives the pooled floor above its meaning.
+   */
+  minorPersonaMin: 0.03,
   /** A probe ignoring heat must end on the damaged side of the scandal axis in more than this share. */
   probeHeatCollapseMin: 0.8,
   /** A probe ignoring hype must end on the famous side of the hype axis in less than this share. */
@@ -180,6 +186,14 @@ const ratio = (a: number, b: number) => (b === 0 ? null : a / b);
 
 function dist(xs: readonly number[]): Dist {
   return { mean: mean(xs), p10: quantile(xs, 0.1), p50: quantile(xs, 0.5), p90: quantile(xs, 0.9) };
+}
+
+/** Each minor ending's best player-like persona and its share of that persona's runs (round V1a). */
+function minorReach(ids: readonly string[], share: Readonly<Record<string, Readonly<Record<string, number>>>>, players: readonly PersonaId[]): { id: string; persona: string; share: number }[] {
+  return ids.map((id) => {
+    const best = players.map((p) => ({ persona: p as string, share: share[p]?.[id] ?? 0 })).sort((a, b) => b.share - a.share)[0];
+    return { id, persona: best?.persona ?? '-', share: best?.share ?? 0 };
+  });
 }
 
 export function buildReport(batch: BatchResult): Report {
@@ -470,6 +484,16 @@ export function buildReport(batch: BatchResult): Report {
     pass: players.length === 0 ? null : rare.length === 0,
     actual: rare.length === 0 ? `lowest ${[...endingIds].sort((a, b) => (share.players[a] ?? 0) - (share.players[b] ?? 0)).slice(0, 3).map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ')}` : `below: ${rare.map((id) => `${id} ${pct(share.players[id] ?? 0)}`).join(', ')}`,
   });
+  const reach = minorReach(endingIds, share, players);
+  const unplayed = reach.filter((x) => x.share < BANDS.minorPersonaMin);
+  bands.push({
+    target: `every minor ending reached in >= ${pct(BANDS.minorPersonaMin)} of one player-like persona's runs`,
+    pass: players.length === 0 ? null : unplayed.length === 0,
+    actual:
+      unplayed.length === 0
+        ? `lowest ${[...reach].sort((a, b) => a.share - b.share).slice(0, 3).map((x) => `${x.id} ${pct(x.share)} (${x.persona})`).join(', ')}`
+        : `below: ${unplayed.map((x) => `${x.id} ${pct(x.share)} (best: ${x.persona})`).join(', ')}`,
+  });
 
   // Probe assertions. Their majors come from content: ignoring heat must end on the damaged side of the
   // axis on scandals held, ignoring hype must never end on the famous side of the axis on hype.
@@ -655,6 +679,13 @@ export function formatReport(r: Report): string {
   out.push(table(['major', ...P, 'players'], r.majors.ids.map((id) => [id, ...G.map((g) => pc(r.majors.share[g][id] ?? 0))])));
   h('MINOR ENDINGS  (grouped by major)');
   out.push(table(['minor', ...P, 'players'], r.endings.ids.map((id) => [`${r.endings.majorOf[id] ?? '?'} / ${id}`, ...G.map((g) => pc(r.endings.share[g][id] ?? 0))])));
+  h(`MINOR REACH BY A WAY OF PLAYING  (each minor's best player-like persona; band: >= ${pc(BANDS.minorPersonaMin)})`);
+  out.push(
+    table(
+      ['minor', 'best persona', 'its share', 'pooled'],
+      minorReach(r.endings.ids, r.endings.share, P.filter((p) => !isProbe(p))).map((x) => [x.id, x.persona, pc(x.share), pc(r.endings.share.players[x.id] ?? 0)]),
+    ),
+  );
   h('LANE AT YEAR END  (the most-played career lane; ties to the first)');
   out.push(table(['lane', ...P, 'players'], r.lanes.ids.map((id) => [id, ...G.map((g) => pc(r.lanes.share[g][id] ?? 0))])));
 

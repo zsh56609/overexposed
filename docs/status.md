@@ -171,10 +171,11 @@ Also for the author:
 
 ## Next task
 
-**Phase 3: events** — additive GameEvents (design/content-expansion.md).
-Then phase 4 (the year in review, the once-a-run variants, a full retune)
-before the 10/15 freeze. Visual craft (design/visual/README.md, ui-plan
-§14) follows the expansion.
+**Round V1a: the desk, static** (design/visual/README.md §1–§7). The order
+of work (2026-10-01): V1a → V1b (the motion on the desk) → phase 3 (events,
+additive GameEvents) → V2 (the screens around the desk) → phase 4 (the year
+in review, the once-per-run variants, a full retune) → the feature freeze on
+10/15. The visual work runs alongside the content, not after the freeze.
 
 ## Waiting on the author
 
@@ -214,6 +215,7 @@ None beyond the items above.
 
 | Date | Milestone |
 |---|---|
+| 2026-10-01 → | V1a → V1b → phase 3 → V2 → phase 4, in that order |
 | 2026-10-15 | Internal feature freeze: tuning, polish and fixes only after this |
 | ~2026-10-18 | Early build submitted to itch as insurance |
 | 2026-10-26 | Illustration may start (the four ending illustrations; AGENTS.md §6) |

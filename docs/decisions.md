@@ -6,6 +6,86 @@ rules).
 
 ---
 
+## 2026-10-01 — Round 308e7bb answered; round V1a begins
+
+Round V1a builds the desk as the visual reference's README §1–§7 describe
+it, static: every state, hover, tooltips and the simple interactions. Its
+motion is round V1b; the screens around the desk are V2. The author's
+answers:
+
+1. **Confirmed**:
+   - Dex = D2; Mags = M1;
+   - the Label Deal at hype 50, the Award Show at craft 47;
+   - the three screen cards from summer;
+   - the quiet month after one silent month;
+   - Money and Actions as names, and "1 month left";
+   - the four scene-tag readings;
+   - Mags's text "every season" with relief in months 3, 6 and 9.
+2. **The minor floor at 1.0% is accepted, with a second band that gives it
+   meaning**: every minor reaches 3% or more of one player-like persona's
+   runs, under each manager. An ending has to be reachable by a way of
+   playing, not only through the mix of personas. `npm run sim` checks it
+   and prints each minor's best persona.
+   On seeds 20260929, 1 and 424242 it passes under both managers:
+
+   | Minor | Dex: best persona, share | Mags: best persona, share |
+   |---|---|---|
+   | leading_role | dealseeker 33.1–35.6% | dealseeker 30.0–32.9% |
+   | household_name | comeback 18.9–19.9% | comeback or dealseeker 16.9–17.3% |
+   | star | dealseeker 13.1–15.0% | dealseeker 17.1–20.0% |
+   | the_independent | minmaxer 6.7–7.1% | minmaxer 4.4–6.5% |
+   | redemption_arc | comeback 9.5–12.5% | comeback 5.4–6.7% |
+   | tabloid_royalty | comeback 22.5–26.0% | comeback 21.8–24.7% |
+   | meltdown | comeback or dealseeker 17.5–18.3% | comeback 22.6–23.4% |
+   | character_actor | artisan 52.6–54.5% | artisan 44.4–47.4% |
+   | the_one_to_watch | random 11.7–12.3% | random 11.8–14.5% |
+   | craftsman | artisan 44.6–46.1% | artisan 49.8–52.4% |
+   | nobody | random 16.0–19.2% | random 16.7–19.8% |
+   | flash_in_the_pan | random 7.0–7.4% | random 6.6–7.4% |
+   | running_on_empty | random 9.1–9.5% | random 6.1–7.7% |
+   | starting_over | random 9.8–11.0% | random 8.5–9.2% |
+
+3. **Card faces show effects as values, not prose.** A card whose effects
+   are all plain values needs no rules text; a conditional rule keeps its
+   text. The three screen cards keep their rules generated from their
+   effects.
+4. **Draft v8** is saved verbatim (docs/writing/draft-v8.md, committed on
+   its own as 0440182) and imported:
+   - six lines replaced, each keeping its key;
+   - The Daily Flash's giant marrow is a summer story (`act: 2`, so once a
+     run, in summer);
+   - one new B-Side one-off, `paper.bside.world.35`. The B-Side pool is 35
+     for 34.1 showings a run: its variant warning is gone.
+5. **check:clicks alternates the manager** run by run, so any two runs
+   cover both.
+6. **The order of work changed**: V1a → V1b (the motion on the desk) →
+   phase 3 (events) → V2 (the screens around the desk) → phase 4 (the year
+   in review, the once-per-run variants, full retuning) → the feature
+   freeze. The visual work runs alongside the content, not after the
+   freeze. Corrected in:
+   - AGENTS.md §6 and §7;
+   - docs/status.md, the next task and the schedule;
+   - docs/design/content-expansion.md, the status note;
+   - docs/ui-plan.md, §10's layer 3 row and §14;
+   - docs/design/visual/README.md, its opening note and "Where each
+     decision lands".
+7. **The visual reference is v18**: mockups/vanity.html is titled "visual
+   direction v18" and the README's status line runs to v18.
+   - The README is the spec and wins. Shots 01–14 predate v17: they still
+     show the phone's number badge, which v17 removed.
+   - The README's §8 still quotes round 2b's perk texts. The game's are
+     D2 and M1.
+
+**The baseline for V1a** (presentation only), recorded after these
+changes in sim/out/baseline-v1a, not committed: `npm run sim`,
+`sim:awards`, `sim:tiers` and `sim:managers` on seeds 20260929, 1 and
+424242.
+- The results equal round 308e7bb's. Every run record (2 managers × 3
+  seeds × 9,000 runs) and the award, tier and manager reports are
+  identical; the sim report adds only the new band and its table.
+- 14 of 14 bands pass under each manager on each seed.
+- V1a must leave all of it unchanged.
+
 ## 2026-10-01 — Round 2c, Part F: the perks and the base game
 
 - **Where Part F began.** Parts A–E in, round 2b's perks still on:

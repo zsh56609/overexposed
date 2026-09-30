@@ -322,7 +322,7 @@ The ending screen exists to make that zero-friction.
 |---|---|
 | **1 — Function** | A complete run playable in the browser. Every screen exists. Preview works. Ugly is fine. Built 2026-09-29. |
 | **2 — Meaning and art** | The meaning layer first — goals board, feed headlines and headline fields, ending names, season openers, deck viewer. Visual craft alongside it, never ahead: type, palette, halftone, card layout, front-page setting, season transitions, per AGENTS.md §6 — not illustration, which is layer 4. Decisions in §13; the approved visual direction in §14. |
-| 3 — Motion | Card flight, number roll-up, crystallisation hit-stop and shake, winter crowding. |
+| 3 — Motion | Card flight, number roll-up, crystallisation hit-stop and shake, winter crowding — the desk's in round V1b. |
 | 4 — Illustration | The four ending illustrations (public-domain collage). Not before 2026-10-26. |
 | — Onboarding | After layer 2. Contextual hints, not a tutorial level. |
 
@@ -648,9 +648,11 @@ wherever it and this section differ.** This section keeps the decisions in
 prose; it does not repeat the README.
 
 The visual direction the author approved through mockups (2026-09-30,
-rounds 2a and 2b). Recorded here so it survives until the visual phase;
-**none of it is built yet.** The phase designs for the one 1280×720 stage
-(decision 17) and keeps everything inside it.
+rounds 2a and 2b). The visual work runs alongside the content, not after
+the freeze (2026-10-01): V1a builds the desk, static (README §1–§7); V1b
+its motion; phase 3 (events) follows; then V2, the screens around the
+desk; then phase 4 and the freeze. The phase designs for the one 1280×720
+stage (decision 17) and keeps everything inside it.
 
 - **The scene**: a dressing-room vanity with a lightbulb mirror, drawn in
   true CSS perspective. The mirror is the private self — the goals as

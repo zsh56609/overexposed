@@ -219,7 +219,7 @@ Illustration is concentrated at emotional beats:
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
 
-**Do not start illustration before 2026-10-26** — the four ending illustrations. Layer 2 visual craft (type, palette, layout, texture) proceeds once the meaning layer is in; the loop is already tuned.
+**Do not start illustration before 2026-10-26** — the four ending illustrations. The visual work (type, palette, layout, texture, motion) runs alongside the content, not after the freeze — the order of work is in §7.
 
 ---
 
@@ -237,7 +237,7 @@ Illustration is concentrated at emotional beats:
 | 11/3–11/4 | Buffer, itch page, submission materials |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
-Progress runs ahead of this table: UI layer 1 was built on 2026-09-29. The current task is in [`docs/status.md`](docs/status.md).
+Progress runs ahead of this table: UI layer 1 was built on 2026-09-29. **The order of work (2026-10-01):** V1a (the desk, static) → V1b (the motion on the desk) → phase 3 (events) → V2 (the screens around the desk) → phase 4 (the year in review, the once-per-run variants, a full retune) → the feature freeze on 10/15. The current task is in [`docs/status.md`](docs/status.md).
 
 ### Scope control
 

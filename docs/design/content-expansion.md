@@ -2,7 +2,10 @@
 
 > **Status: approved by the author, 2026-09-30.** This is the reference for
 > the content expansion phase, which runs until the internal feature freeze on
-> 2026-10-15. Visual craft follows the freeze.
+> 2026-10-15. The visual work runs alongside it, not after the freeze
+> (2026-10-01): V1a (the desk, static) → V1b (the motion on the desk) →
+> phase 3 (events) → V2 (the screens around the desk) → phase 4 (the year in
+> review, the once-per-run variants, a full retune) → the freeze.
 >
 > Player-facing prose is not in this document. Names below define structure;
 > the prose for each phase is drafted and imported with that phase.

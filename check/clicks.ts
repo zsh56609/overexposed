@@ -7,6 +7,7 @@
 // every card and END TURN — the hovered one included — must be the element a click at its centre, and
 // near each corner, would reach. A hover that opens no preview fails too, so the check is never vacuous.
 // At every draft (round 2c): at most one extra card — Dex's — labelled with his line, the label inside its card.
+// The managers alternate run by run (round V1a): any number of runs from two covers both.
 //
 // Runs the Vite dev server in-process and needs Chrome or Edge (CHROME_PATH overrides the search).
 // Usage: node check/clicks.ts [--runs=4] [--size=1280x720]
@@ -69,8 +70,9 @@ const DRIVE = (runs: number) => `(async () => {
     while (!document.querySelector('.ending') && guard++ < 600) {
       stats.states++;
       if (document.querySelector('.manager-choice')) {
+        // The managers alternate run by run (round V1a), so every check covers each of them.
         const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
-        take[rand(take.length)].click();
+        take[run % take.length].click();
       } else if (document.querySelector('.draft')) {
         // Dex knows someone (round 2c, F1): at most one extra card, labelled with the manager's line, inside its card.
         stats.drafts++;
