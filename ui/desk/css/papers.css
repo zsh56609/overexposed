@@ -9,19 +9,23 @@
   background-color: var(--newsprint);
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .12  0 0 0 0 .10  0 0 0 0 .07  0 0 0 .32 0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), radial-gradient(ellipse at 50% 42%, rgba(255, 252, 242, .55) 0%, rgba(0, 0, 0, 0) 58%, rgba(125, 100, 62, .18) 100%);
   box-shadow: 0 16px 28px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(60, 48, 30, .12);
-  transition: left .5s, top .5s, transform .5s, filter .5s; outline: none;
+  left: 0; top: 0; transition: transform .5s; will-change: transform; outline: none;
 }
+/* A paper behind stands in shadow: a dark veil (the mockup's brightness .84 and .9), faded on the compositor. */
+.desk .pp::before { content: ""; position: absolute; inset: 0; z-index: 5; background: #000; opacity: var(--shade, 0); transition: opacity .5s; pointer-events: none; }
 .desk .pp::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(180deg, transparent 49.4%, rgba(0, 0, 0, .08) 49.9%, rgba(255, 255, 255, .45) 50.25%, transparent 50.9%),
               linear-gradient(135deg, transparent 93%, rgba(0, 0, 0, .10) 96%, rgba(255, 255, 255, .2) 100%);
 }
 .desk .pp > * { position: relative; }
-.desk .pp.pos0 { left: 0; top: 56px; transform: rotate(-.8deg); z-index: 3; }
-.desk .pp.pos1 { left: -8px; top: 0; transform: rotate(-2deg); z-index: 1; filter: brightness(.84); cursor: pointer; }
-.desk .pp.pos2 { left: 12px; top: 28px; transform: rotate(1.6deg); z-index: 2; filter: brightness(.9); cursor: pointer; }
-.desk .pp.pos1:hover, .desk .pp.pos1:focus-visible { transform: rotate(-2deg) translateY(-5px); filter: brightness(.97); }
-.desk .pp.pos2:hover, .desk .pp.pos2:focus-visible { transform: rotate(1.6deg) translateY(-5px); filter: brightness(.99); }
+/* Each paper's place is a transform (the mockup's left/top offsets, then its tilt), so switching papers moves
+   them on the compositor without laying the desk out again. */
+.desk .pp.pos0 { transform: translate(0, 56px) rotate(-.8deg); z-index: 3; }
+.desk .pp.pos1 { transform: translate(-8px, 0) rotate(-2deg); z-index: 1; --shade: .16; cursor: pointer; }
+.desk .pp.pos2 { transform: translate(12px, 28px) rotate(1.6deg); z-index: 2; --shade: .1; cursor: pointer; }
+.desk .pp.pos1:hover, .desk .pp.pos1:focus-visible { transform: translate(-8px, 0) rotate(-2deg) translateY(-5px); --shade: .03; }
+.desk .pp.pos2:hover, .desk .pp.pos2:focus-visible { transform: translate(12px, 28px) rotate(1.6deg) translateY(-5px); --shade: .01; }
 
 /* The masthead: two ears and the name; the dateline under it — date, issue number, tagline. */
 .desk .mhrow { display: flex; align-items: center; gap: 8px; }

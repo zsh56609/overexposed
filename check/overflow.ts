@@ -1,0 +1,279 @@
+// npm run check:overflow — every desk text at its longest (round V1a; docs/handoff/v1a.md).
+//
+// Every line group's variants are made to read as its longest variant, and every press subject as the longest
+// noun; then seeded runs are played through the real UI in headless Chrome at each size — 1280x720, 800x450 and
+// a phone held landscape — and at every state the desk is audited: each fixed box holds its text (stat cells,
+// mastheads, datelines, the box office, card names, the notes' requirement lines, the phone's clock, END TURN),
+// each page holds its stories, the notes stay on the glass and apart, the notebook and the script hold their
+// words, the bubbles stay below the stat bar, a card's text stays in the strip its neighbour leaves showing and
+// above the stage's edge, and tooltips, previews and notes stay on the stage — with every card's preview, every
+// stat tooltip, each paper pulled forward and a bubble's reaction row open along the way. Transitions are
+// switched off: the check measures where things settle.
+//
+// Runs the Vite dev server in-process and needs Chrome or Edge (CHROME_PATH overrides the search).
+// Usage: node check/overflow.ts [--runs=4] [--sizes=1280x720,800x450,844x390m]   (m: mobile emulation)
+
+import { spawn } from 'node:child_process';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createServer } from 'vite';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
+const RUNS = Number(arg('runs', '4'));
+const SIZES = arg('sizes', '1280x720,800x450,844x390m')
+  .split(',')
+  .map((s) => ({ mobile: s.endsWith('m'), size: s.replace(/m$/, '').split('x').map(Number) as [number, number] }));
+
+const CHROMES = [
+  process.env.CHROME_PATH,
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+];
+const chrome = CHROMES.find((p): p is string => !!p && existsSync(p));
+if (!chrome) {
+  console.error('overflow check: no Chrome or Edge found; set CHROME_PATH');
+  process.exit(1);
+}
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Runs in the page: every line group's variants set to its longest (the strings module the app itself imported). */
+const PATCH = `(async () => {
+  const urls = performance.getEntriesByType('resource').map((e) => new URL(e.name)).map((u) => u.pathname + u.search);
+  const m = await import(urls.find((u) => u.startsWith('/i18n/en.json')));
+  const s = m.default;
+  // The desk scripts are fixed scenes, not variants: kept as written, each tried in the script page by the audit.
+  const content = await import(urls.find((u) => u.startsWith('/content/scripts.json')));
+  window.__scenes = content.default.scripts.map((sc) => ({ heading: s[sc.headingKey], lines: sc.lines.map((l) => ({ kind: l.kind, text: s[l.key] })) }));
+  const groups = new Map();
+  for (const [k, v] of Object.entries(s)) {
+    if (typeof v !== 'string' || k.startsWith('script.')) continue;
+    const g = k.startsWith('press.subject.') ? 'press.subject.*' : k.replace(/\\.\\d+(?=\\.|$)/g, '.#');
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(k);
+  }
+  let patched = 0;
+  for (const keys of groups.values()) {
+    if (keys.length < 2) continue;
+    const longest = keys.map((k) => s[k]).reduce((a, b) => (b.length > a.length ? b : a));
+    for (const k of keys) if (s[k] !== longest) { s[k] = longest; patched++; }
+  }
+  return patched + ' strings set to their group\\'s longest';
+})()`;
+
+/** Runs in the page: the desk audit, in stage pixels. */
+const AUDIT = `window.__deskAudit = (where) => {
+  const out = [];
+  const add = (m) => out.push(where + ': ' + m);
+  const desk = document.querySelector('.desk');
+  if (!desk) return out;
+  const stage = desk.getBoundingClientRect();
+  const k = stage.width / 1280; // the stage's scale: every measure below is in stage pixels
+  const S = (r) => ({ l: (r.left - stage.left) / k, t: (r.top - stage.top) / k, r: (r.right - stage.left) / k, b: (r.bottom - stage.top) / k });
+  const name = (el) => el.tagName.toLowerCase() + '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.');
+  const holds = (el, what) => { if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1) add(what + ' ' + name(el) + ' holds ' + el.scrollWidth + 'x' + el.scrollHeight + ' in ' + el.clientWidth + 'x' + el.clientHeight + ' "' + el.textContent.slice(0, 50) + '"'); };
+  const within = (el, box, what, pad = 0.5) => { const a = S(el.getBoundingClientRect()), b = box; if (a.l < b.l - pad || a.t < b.t - pad || a.r > b.r + pad || a.b > b.b + pad) add(what + ' ' + name(el) + ' at ' + [a.l, a.t, a.r, a.b].map(Math.round) + ' outside ' + [b.l, b.t, b.r, b.b].map(Math.round) + ' "' + el.textContent.slice(0, 40) + '"'); };
+  const STAGE = { l: 0, t: 0, r: 1280, b: 720 };
+  // The stat bar: every cell's content on one line in its cell; the date clear of the deck button.
+  for (const c of desk.querySelectorAll('.stats .cell')) holds(c, 'stat cell');
+  const when = desk.querySelector('.stats .when'), deckb = desk.querySelector('.stats .deckbtn');
+  if (when && deckb && S(when.getBoundingClientRect()).l < S(deckb.getBoundingClientRect()).r + 8) add('the date runs into the deck button');
+  if (deckb) holds(deckb, 'deck button');
+  const tip = desk.querySelector('.tip.on'); if (tip) { within(tip, STAGE, 'tooltip'); holds(tip, 'tooltip'); }
+  // The papers: each page holds its stories; mastheads, datelines and the box office on their lines.
+  for (const p of desk.querySelectorAll('.pp')) {
+    holds(p, 'paper');
+    for (const x of p.querySelectorAll('.mh, .dl, .bo div, .kk')) holds(x, 'paper line');
+    const rw = p.querySelector('.rw'); if (rw) { const pr = S(p.getBoundingClientRect()), rr = S(rw.getBoundingClientRect()); if (p.classList.contains('pos0') && rr.b > pr.b - 4) add('the front paper ' + p.dataset.paper + ' is cut off at the bottom: row ends ' + Math.round(rr.b) + ', page ' + Math.round(pr.b)); }
+    for (const e of p.querySelectorAll('.ear')) { const er = e.getBoundingClientRect(), mr = p.querySelector('.mhrow').getBoundingClientRect(); if (er.height > mr.height + 1) add('ear taller than its masthead row "' + e.textContent + '"'); }
+  }
+  // The mirror: the black card and the notes inside the glass, the notes' requirement lines on one line.
+  const glass = desk.querySelector('.glass');
+  if (glass) {
+    const g = S(glass.getBoundingClientRect());
+    for (const n of desk.querySelectorAll('.mirror .sticky, .mirror .today')) within(n, { l: g.l - 30, t: g.t - 30, r: g.r + 30, b: g.b }, 'mirror note');
+    for (const r of desk.querySelectorAll('.mirror .req')) holds(r, 'note requirement');
+    const today = desk.querySelector('.mirror .today'), notes = [...desk.querySelectorAll('.mirror .sticky')];
+    const box = (el) => S(el.getBoundingClientRect());
+    const all = [today, ...notes].filter(Boolean);
+    for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = box(all[i]), b = box(all[j]); const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t); if (ox > 6 && oy > 6) add('mirror notes overlap ' + name(all[i]) + ' / ' + name(all[j]) + ' by ' + Math.round(ox) + 'x' + Math.round(oy)); }
+    const clip = desk.querySelector('.mirror .clipM'); if (clip) within(clip, STAGE, 'clipping');
+  }
+  // The desk: the notebook's page and the script hold their words.
+  const nb = desk.querySelector('.notebook'); if (nb) { const t = nb.querySelector('.nb-txt'); if (t && t.offsetTop + t.offsetHeight > nb.clientHeight + 1) add('notebook page overflows: ' + (t.offsetTop + t.offsetHeight) + ' > ' + nb.clientHeight + ' "' + t.textContent.slice(0, 40) + '"'); }
+  const sc = desk.querySelector('.script');
+  if (sc) {
+    // Every scene of every band in the page, as it is written; then the page as it was.
+    const was = sc.innerHTML;
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    for (const scene of window.__scenes ?? []) {
+      sc.innerHTML = '<b>' + esc(scene.heading) + '</b>' + scene.lines.map((l) => {
+        if (l.kind === 'action') return '<span class="act">' + esc(l.text) + '</span>';
+        const at = l.text.indexOf(': ');
+        const cue = at > 0 ? '<span class="cue">' + esc(l.text.slice(0, at)) + ':</span> ' : '';
+        const text = at > 0 ? l.text.slice(at + 2) : l.text;
+        return '<p>' + cue + (l.kind === 'you' ? '<i>' + esc(text) + '</i>' : '<span>' + esc(text) + '</span>') + '</p>';
+      }).join('');
+      holds(sc, 'script');
+      if (sc.offsetTop + sc.offsetHeight > 236) add('the script "' + scene.heading + '" runs off the desk: ' + (sc.offsetTop + sc.offsetHeight) + 'px');
+    }
+    sc.innerHTML = was;
+  }
+  const clk = desk.querySelector('.lock .clk'); if (clk) holds(clk, 'phone clock');
+  // The bubbles stay below the stat bar and on the stage, the reaction row too.
+  const bub = desk.querySelector('.bubbles'); if (bub && bub.children.length) { const b = S(bub.getBoundingClientRect()); if (b.t < 50) add('bubbles reach the stat bar: top ' + Math.round(b.t)); }
+  for (const x of desk.querySelectorAll('.bub, .rx-bar')) within(x, { l: 0, t: 46, r: 1280, b: 720 }, 'bubble');
+  // The hand: each name in its box; each body's text in the card's visible part and strip.
+  const cards = [...desk.querySelectorAll('.hand .card')];
+  cards.forEach((c, i) => {
+    const nm = c.querySelector('.name'); if (nm) holds(nm, 'card name');
+    const body = c.querySelector('.body');
+    const next = cards[i + 1];
+    const strip = next ? Math.min(c.offsetWidth, next.offsetLeft - c.offsetLeft) : c.offsetWidth;
+    if (body) {
+      const bottom = body.offsetTop + body.offsetHeight;
+      if (bottom > 222) add('card body runs below the stage: ' + bottom + 'px ("' + (c.querySelector('.name')?.textContent ?? '') + '")');
+      if (body.offsetLeft + body.offsetWidth > strip + 2 && next) add('card body wider than its visible strip (' + strip + 'px) in a hand of ' + cards.length);
+    }
+    for (const x of c.querySelectorAll('.cs, .revtag, .pass')) holds(x, 'card header');
+  });
+  const end = desk.querySelector('.endbtn'); if (end) holds(end, 'END TURN');
+  const fl = desk.querySelector('.floating'); if (fl) { within(fl, { l: 0, t: 46, r: 1280, b: 720 }, 'preview'); }
+  const toast = desk.querySelector('.toast.on'); if (toast) within(toast, STAGE, 'toast');
+  if (document.documentElement.scrollWidth > innerWidth + 1 || document.documentElement.scrollHeight > innerHeight + 1) add('the page scrolls');
+  return out;
+};`;
+
+/** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
+const DRIVE = (runs: number) => `(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let rnd = 424242;
+  const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
+  const issues = {};
+  const note = (l) => { for (const m of l) issues[m] = (issues[m] || 0) + 1; };
+  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0 };
+  const over = (el) => { el.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); };
+  const out = (el) => { el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); };
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  document.querySelector('button.big').click();
+  await sleep(40);
+  for (let run = 0; run < ${runs}; run++) {
+    let guard = 0;
+    while (!document.querySelector('.ending') && guard++ < 600) {
+      seen.states++;
+      const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : 'play';
+      if (phase === 'manager') { const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
+      note(__deskAudit(phase));
+      if (phase === 'draft') { const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
+      if (phase === 'gate') { const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
+      const cards = [...document.querySelectorAll('.desk .hand .card')];
+      seen.maxHand = Math.max(seen.maxHand, cards.length);
+      for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await sleep(2); seen.previews++; note(__deskAudit('preview')); out(c); }
+      const end = document.querySelector('.desk .endbtn'); if (end) { over(end); await sleep(2); note(__deskAudit('end preview')); out(end); }
+      for (const cell of document.querySelectorAll('.desk .stats [data-tip]')) { cell.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' })); await sleep(2); seen.tips++; note(__deskAudit('tooltip')); cell.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' })); }
+      if (rand(3) === 0) {
+        for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); seen.fronts++; seen.papers.add(p.dataset.paper); note(__deskAudit('paper ' + p.dataset.paper + ' forward')); }
+        const b = [...document.querySelectorAll('.desk .bub:not(.who)')].at(-1); if (b) { b.click(); await sleep(4); seen.bubbles++; note(__deskAudit('reaction row')); document.body.click(); await sleep(2); }
+      }
+      const playable = cards.filter((c) => c.getAttribute('aria-disabled') !== 'true');
+      if (playable.length && rand(6)) playable[rand(playable.length)].click();
+      else document.querySelector('.desk .endbtn').click();
+      await sleep(6);
+    }
+    document.querySelector('button.play-again')?.click();
+    await sleep(30);
+  }
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+})()`;
+
+const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
+await server.listen();
+const url = server.resolvedUrls?.local[0];
+let failed = false;
+try {
+  if (!url) throw new Error('the dev server did not start');
+  for (const { size, mobile } of SIZES) {
+    const [width, height] = size;
+    const profile = mkdtempSync(join(tmpdir(), 'overexposed-overflow-'));
+    const proc = spawn(chrome, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, `--window-size=${width},${height}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
+    try {
+      let port = 0;
+      for (let i = 0; i < 80 && !port; i++) {
+        await sleep(250);
+        try {
+          port = Number(readFileSync(join(profile, 'DevToolsActivePort'), 'utf8').split('\n')[0]);
+        } catch {
+          // not written yet
+        }
+      }
+      if (!port) throw new Error('Chrome did not open a DevTools port');
+      const pages = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) as { type: string; webSocketDebuggerUrl: string }[];
+      const page = pages.find((t) => t.type === 'page');
+      if (!page) throw new Error('no page target');
+      const ws = new WebSocket(page.webSocketDebuggerUrl);
+      await new Promise((r) => ws.addEventListener('open', r));
+      let id = 0;
+      type Reply = { result?: { result?: { value?: unknown }; exceptionDetails?: { exception?: { description?: string } } } };
+      const pending = new Map<number, (m: Reply) => void>();
+      ws.addEventListener('message', (e) => {
+        const m = JSON.parse(String(e.data));
+        if (m.id && pending.has(m.id)) {
+          pending.get(m.id)?.(m);
+          pending.delete(m.id);
+        }
+      });
+      const send = (method: string, params: object = {}) =>
+        new Promise<Reply>((res) => {
+          const i = ++id;
+          pending.set(i, res);
+          ws.send(JSON.stringify({ id: i, method, params }));
+        });
+      const evaluate = async (expression: string) => {
+        const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: 1_200_000 });
+        if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? 'the page script failed');
+        return r.result?.result?.value;
+      };
+      await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile });
+      if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+      await send('Page.navigate', { url: `${url}?seed=20260929` });
+      await sleep(3000);
+      const t0 = performance.now();
+      await evaluate(PATCH);
+      await evaluate(AUDIT);
+      const out = (await evaluate(DRIVE(RUNS))) as { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; cards: string[]; faces: string[]; issues: [string, number][] };
+      ws.close();
+      const tag = `${width}x${height}${mobile ? ' (phone)' : ''}`;
+      console.log(
+        `overflow check at ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
+          `hands of up to ${out.maxHand}; ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+      );
+      for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
+      if (out.issues.length > 0) failed = true;
+    } finally {
+      proc.kill();
+      await sleep(500);
+      try {
+        rmSync(profile, { recursive: true, force: true });
+      } catch {
+        // Chrome may still hold a file for a moment; the temp dir is the OS's to clean
+      }
+    }
+  }
+  console.log(failed ? 'FAIL: some desk text does not fit' : 'PASS: every desk text fits, at its longest, at every size');
+} catch (err) {
+  failed = true;
+  console.error(`overflow check: ${err instanceof Error ? err.message : String(err)}`);
+} finally {
+  await server.close();
+}
+process.exit(failed ? 1 : 0);

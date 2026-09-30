@@ -6,6 +6,39 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a: acceptance
+
+- **The sim is untouched**: `sim`, `sim:awards`, `sim:tiers` and
+  `sim:managers` on seeds 20260929, 1 and 424242 are identical to the
+  Part 0 baseline, every run record and every report line.
+- **Every desk text at its longest**: a new check, `npm run
+  check:overflow`, makes every line group read as its longest variant (and
+  every press subject the longest noun), plays seeded runs through the real
+  UI at 1280×720, 800×450 and a phone held landscape, and audits the desk at
+  every state and every hover. It found three things, now fixed:
+  - **The script page grows with its scene**: one real scene (the
+    interview room) ran 9px past the mockup's 126px box and lost its punch
+    line. The page is at least 126px, as long as its scene; the check tries
+    all nine scenes as written.
+  - **Card text keeps to the strip a fanned card shows**: from six cards the
+    next card covered the end of the text. Values and flavour narrow to the
+    strip; names keep the mockup's width until the hand is crowded (eight
+    cards and more), where they drop a size and may take three lines.
+  - A script line group is not a set of variants: the check keeps scenes as
+    written instead of making every line the longest.
+- **The papers stand by transform**, not left and top, and a back paper's
+  shade is a veil, not a brightness filter: the filter's transition dropped
+  a third of the frames in Firefox and the left/top one laid the desk out
+  again every frame (954 layouts in a dozen switches, now 73). Same look.
+- **Money everywhere**: the ending's run summary still said "capital"; it
+  says "money", as round 2c named it.
+- **Browsers**: Chromium and Firefox 142 (driven headless over WebDriver
+  BiDi, no dependency) pass the same audits and the desk's interactions.
+  WebKit is untested: it needs Playwright's WebKit build, a download and a
+  dev dependency, which the author has not approved.
+- **The reference comparison** is in `docs/handoff/v1a-compare/`: the
+  game in the state nearest each of shots 01–14, beside the shot.
+
 ## 2026-10-01 — Round V1a, Part F: the hand
 
 - **As README §6 and the mockup set it**: the fan centred at x=540, 150px

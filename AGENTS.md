@@ -307,6 +307,7 @@ npm run validate       # content schema + i18n key check
 npm run typecheck
 npm run check:preview  # every UI preview against the real reducer outcome, then check:clicks
 npm run check:clicks   # no click on a card or END TURN is swallowed (headless Chrome)
+npm run check:overflow # every desk text at its longest variant, at three sizes (headless Chrome)
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
 npm run sim:managers   # the two managers side by side, and the message triggers

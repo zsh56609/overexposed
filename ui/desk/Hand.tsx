@@ -29,8 +29,10 @@ const CENTRE = 540;
 const MAX_SPAN = 960;
 const MAX_LIFT = 18;
 const HOVER_LIFT = 13;
+/** The spacing between cards: the strip of each card the next one leaves showing. */
+export const fanSpacing = (n: number): number => Math.min(n > 5 ? 128 : 150, n > 1 ? (MAX_SPAN - CARD_W) / (n - 1) : 150);
 export function fan(n: number): { left: number; rot: number; lift: number }[] {
-  const sp = Math.min(n > 5 ? 128 : 150, n > 1 ? (MAX_SPAN - CARD_W) / (n - 1) : 150);
+  const sp = fanSpacing(n);
   const x0 = CENTRE - (CARD_W + (n - 1) * sp) / 2;
   return Array.from({ length: n }, (_, i) => {
     const t = n === 1 ? 0 : (i / (n - 1)) * 2 - 1;
@@ -184,7 +186,8 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
   }, [focus, end]);
   return (
     <>
-      <div className="hand" data-hook="hand">
+      {/* The strip each card shows: the text keeps inside it when draws swell the hand. */}
+      <div className={`hand${fanSpacing(cards.length) < 120 ? ' tight' : ''}`} data-hook="hand" style={{ ['--strip' as string]: `${fanSpacing(cards.length)}px` }}>
         {cards.map((card, i) => {
           const at = places[i] ?? { left: 0, rot: 0, lift: 0 };
           return <Card key={card.uid} card={card} pos={{ ...at, z: 10 + i }} words={words} season={season} onPlay={play} focus={focus} toast={toast} />;

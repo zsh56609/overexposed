@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V1a reference comparison</title>
+<style>
+  :root { --bg: #15120E; --fg: #EDE6D6; --muted: #9c8e7b; --line: rgba(237, 230, 214, .15); --accent: #ffcf85; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  header { padding: 24px 16px 8px; max-width: 1400px; margin: 0 auto; }
+  h1 { font: 700 26px/1.2 Georgia, serif; margin: 0 0 6px; }
+  header p { color: var(--muted); margin: 4px 0; max-width: 900px; }
+  section { max-width: 1400px; margin: 0 auto; padding: 18px 16px; border-top: 1px solid var(--line); }
+  h2 { font: 700 18px/1.3 Georgia, serif; margin: 0 0 4px; }
+  h2 small { font: 600 11px/1 system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-left: 8px; }
+  .note { color: var(--muted); margin: 0 0 10px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  figure { margin: 0; }
+  figure img { width: 100%; height: auto; display: block; border: 1px solid var(--line); }
+  figcaption { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 800px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Round V1a — the desk against the visual reference</h1>
+  <p>Left: the approved mockup's shot (<code>docs/design/visual/shots</code>, v16 and earlier). Right: the game, production build, 1280×720, in the state nearest the shot — lane, fame, calm or frenzy, season — found by playing the sim's personas and replayed through the real UI.</p>
+  <p>Everywhere: the mockup's text and numbers are samples, the game's are real; shots 01–11 predate v17, so they still show the phone's number badge the README has since removed; the film titles in the Marquee's box office are the mockup's own sample list, shown as <code>TODO(prose)</code> until the author approves them; the stat bar carries a Deck button after the actions. Shots 12–14 are screens of round V2, still plain in the game.</p>
+</header>
+
+<section>
+  <h2>01 · music · unknown · calm · spring</h2>
+  <p class="note">Game: music lane, month 3 (May 2027), hype "Noticed" — play rarely establishes the music lane while still Unknown.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/01-music-unknown-calm-spring.jpg" alt="Reference 01"><figcaption>Reference</figcaption></figure><figure><img src="01.jpg" alt="Game 01"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>02 · music · rising · calm · summer</h2>
+  <p class="note">Game: music lane, Rising, June 2027.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/02-music-rising-calm-summer.jpg" alt="Reference 02"><figcaption>Reference</figcaption></figure><figure><img src="02.jpg" alt="Game 02"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>03 · music · famous · calm · summer</h2>
+  <p class="note">Game: music lane, Famous — in winter (January 2028): no persona reached Famous by summer.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/03-music-famous-calm-summer.jpg" alt="Reference 03"><figcaption>Reference</figcaption></figure><figure><img src="03.jpg" alt="Game 03"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>04 · screen · famous · calm · autumn</h2>
+  <p class="note">Game: screen lane, Famous, October 2027 — the Marquee's box office with the player's film on top.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/04-screen-famous-calm-autumn.jpg" alt="Reference 04"><figcaption>Reference</figcaption></figure><figure><img src="04.jpg" alt="Game 04"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>05 · celebrity · rising · calm · winter</h2>
+  <p class="note">Game: celebrity lane, Rising, December 2027.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/05-celebrity-rising-calm-winter.jpg" alt="Reference 05"><figcaption>Reference</figcaption></figure><figure><img src="05.jpg" alt="Game 05"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>07 · music · unknown · frenzy · summer</h2>
+  <p class="note">Game: music lane, Unknown, July 2027, two scandals due at the month's end.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/07-music-unknown-frenzy-summer.jpg" alt="Reference 07"><figcaption>Reference</figcaption></figure><figure><img src="07.jpg" alt="Game 07"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>08 · the tabloid pulled forward</h2>
+  <p class="note">Game: the same state, The Daily Flash clicked forward — the scandal a two-line brief behind world news (README §7).</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/08-music-unknown-frenzy-tabloid-pulled-forward.jpg" alt="Reference 08"><figcaption>Reference</figcaption></figure><figure><img src="08.jpg" alt="Game 08"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>09 · music · famous · frenzy · winter</h2>
+  <p class="note">Game: music lane, Famous, February 2028. /core's lead-paper rule keeps the B-Side in front when the player also leads it that month; the reference puts the tabloid on the desk — a question for the author (docs/decisions.md, Part D).</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/09-music-famous-frenzy-winter.jpg" alt="Reference 09"><figcaption>Reference</figcaption></figure><figure><img src="09.jpg" alt="Game 09"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>10 · craft's tooltip on the screen lane</h2>
+  <p class="note">Game: screen lane, Rising, October 2027, the pointer on craft.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/10-tooltip-craft-screen.jpg" alt="Reference 10"><figcaption>Reference</figcaption></figure><figure><img src="10.jpg" alt="Game 10"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>11 · tapback reactions</h2>
+  <p class="note">Game: the same month — a heart on the first bubble, the row open on the last.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/11-tapback-reactions.jpg" alt="Reference 11"><figcaption>Reference</figcaption></figure><figure><img src="11.jpg" alt="Game 11"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>12 · title <small>round V2</small></h2>
+  <p class="note">Still the plain title screen; the reference is screens.html.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/12-title.jpg" alt="Reference 12"><figcaption>Reference</figcaption></figure><figure><img src="12.jpg" alt="Game 12"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>13 · manager choice <small>round V2</small></h2>
+  <p class="note">Still the plain manager choice.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/13-manager-choice.jpg" alt="Reference 13"><figcaption>Reference</figcaption></figure><figure><img src="13.jpg" alt="Game 13"><figcaption>Game</figcaption></figure></div>
+</section>
+<section>
+  <h2>14 · awards night <small>round V2</small></h2>
+  <p class="note">Still the plain ending screen, here after the year of 09.</p>
+  <div class="pair"><figure><img src="../../design/visual/shots/14-awards-night.jpg" alt="Reference 14"><figcaption>Reference</figcaption></figure><figure><img src="14.jpg" alt="Game 14"><figcaption>Game</figcaption></figure></div>
+</section>
+</body>
+</html>

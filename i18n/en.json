@@ -978,7 +978,7 @@
   "ui.ending.title": "One year later.",
   "ui.ending.summary": "Run summary",
   "ui.ending.peakHype": "Peak hype {n}",
-  "ui.ending.final": "Final: hype {hype} · craft {craft} · capital {capital} · heat {heat}",
+  "ui.ending.final": "Final: hype {hype} · craft {craft} · money {capital} · heat {heat}",
   "ui.ending.scandals": "Scandals held {n}",
   "ui.ending.flags": "Milestones: {flags}",
   "ui.ending.noFlags": "Milestones: none",

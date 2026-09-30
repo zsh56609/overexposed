@@ -3,10 +3,11 @@
 
 .desk .onDesk { position: absolute; }
 
-/* Music: two different sheets. Screen: a script and a clapperboard lying flat. Celebrity: a magazine. */
+/* Music: two different sheets. Screen: a script and a clapperboard lying flat — the page as long as its scene
+   (the mockup's 126px holds all but one). Celebrity: a magazine. */
 .desk .sheetm { position: absolute; box-shadow: 0 14px 18px rgba(0, 0, 0, .45); line-height: 0; }
 .desk .script {
-  position: absolute; width: 150px; height: 126px; background: #fbfaf5; box-shadow: 0 14px 18px rgba(0, 0, 0, .45);
+  position: absolute; width: 150px; min-height: 126px; background: #fbfaf5; box-shadow: 0 14px 18px rgba(0, 0, 0, .45);
   font-family: 'Courier New', monospace; font-size: 9.4px; padding: 9px 11px; line-height: 1.42; color: #2a2a2a; overflow: hidden;
 }
 .desk .script b { display: block; font-size: 9.8px; margin-bottom: 3px; }

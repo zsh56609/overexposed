@@ -19,18 +19,24 @@
 
 /* Fixed anchors, so every card's name and values sit at the same height: name 18px, values 70px, flavour 108px.
    A card's body flows from the values down: rules longer than the values' two lines push the flavour lower. */
-.desk .card .name { position: absolute; left: 14px; top: 18px; width: 116px; height: 44px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; line-height: 1.05; overflow: hidden; }
-.desk .card .body { position: absolute; left: 14px; top: 70px; width: 118px; display: flex; flex-direction: column; }
+.desk .hand { --strip: 150px; }
+.desk .card .name { position: absolute; left: 14px; top: 18px; width: min(116px, calc(var(--strip) - 12px)); height: 44px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; line-height: 1.05; overflow: hidden; }
+.desk .card .body { position: absolute; left: 14px; top: 70px; width: min(118px, calc(var(--strip) - 16px)); display: flex; flex-direction: column; }
 .desk .card .fx { display: flex; flex-wrap: wrap; gap: 5px 10px; align-items: center; font-weight: 800; font-size: 14px; min-height: 38px; align-content: flex-start; }
 .desk .card .fx span { display: flex; align-items: center; gap: 3px; }
 .desk .card .fx svg { width: 15px; height: 15px; flex: none; }
 .desk .card .fx.text { display: block; font-size: 10.5px; font-weight: 600; line-height: 1.3; }
 .desk .card .fx .needs { flex-basis: 100%; font-size: 9.5px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
 .desk .card .fx.text .needs { display: block; margin-top: 3px; }
-.desk .card .fl { width: 114px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
-.desk .card .rl { margin-top: 6px; width: 118px; font-size: 9.5px; font-weight: 600; line-height: 1.3; opacity: .9; }
+.desk .card .fl { width: min(114px, 100%); font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
+.desk .card .rl { margin-top: 6px; width: 100%; font-size: 9.5px; font-weight: 600; line-height: 1.3; opacity: .9; }
 .desk .card .cost2 { position: absolute; right: 12px; top: 14px; display: flex; gap: 4px; }
 .desk .card .cost2 i { width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 6px 1px rgba(255, 214, 130, .6); }
+
+/* A crowded hand (eight cards and more): names a size smaller, up to three lines, so they keep to the strip. */
+.desk .hand.tight .card .name { font-size: 16px; height: 52px; }
+.desk .hand.tight .f-script .name, .desk .hand.tight .f-callsheet .name { font-size: 14px; }
+.desk .hand.tight .f-notebook .name { font-size: 14.5px; }
 
 /* Values: icon and number in the resource's colour; money green when earned, red when spent; draws in ink. */
 .desk .card .r-hype { color: var(--val-hype); }
@@ -92,12 +98,12 @@
 .desk .f-notebook::after { content: ""; position: absolute; left: 30px; top: 0; bottom: 0; width: 1px; background: rgba(210, 60, 60, .5); }
 .desk .f-notebook .holes { position: absolute; left: 7px; top: 14px; bottom: 14px; width: 12px; background: radial-gradient(circle, #0b0907 3.3px, transparent 3.8px) 0 0 / 12px 22px repeat-y; }
 .desk .f-notebook .name, .desk .f-notebook .body { left: 38px; }
-.desk .f-notebook .name { width: 92px; font-size: 17px; }
-.desk .f-notebook .body, .desk .f-notebook .fl { width: 92px; }
+.desk .f-notebook .name { width: min(92px, calc(var(--strip) - 36px)); font-size: 17px; }
+.desk .f-notebook .body { width: min(92px, calc(var(--strip) - 40px)); }
 /* Scandal: red, a dashed white border, the ✕, its in-hand line as flavour. */
 .desk .f-scandal { background: var(--red); color: #FFF3EF; border: 2.5px dashed #FFF3EF; }
 .desk .f-scandal .x { position: absolute; right: 13px; top: 9px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.2; }
-.desk .f-scandal .name { width: 120px; }
+.desk .f-scandal .name { width: min(120px, calc(var(--strip) - 8px)); }
 .desk .f-scandal .fx { font-size: 11px; font-weight: 600; opacity: .85; }
 
 /* END TURN: "no scandal" or "N scandals will print"; red in a frenzy. */
