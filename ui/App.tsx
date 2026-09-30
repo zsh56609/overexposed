@@ -25,7 +25,7 @@ import {
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { feedLines, type FeedLine } from './feed.ts';
-import { t } from './i18n.ts';
+import { t, tp } from './i18n.ts';
 import { legalOf, previewDraftCard, previewEndTurn, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
 import {
@@ -384,7 +384,7 @@ function GoalsBoard({ s }: { s: GameState }) {
 function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outcome; skipScandals?: boolean }) {
   const lines: string[] = [];
   for (const k of RESOURCE_KEYS) if (o.deltas[k] !== 0) lines.push(t('ui.effect.resource', { delta: signed(o.deltas[k]), resource: resourceName(k) }));
-  if (o.drawn) lines.push(t('ui.preview.drawn', { n: o.drawn }));
+  if (o.drawn) lines.push(tp('ui.preview.drawn', o.drawn, { n: o.drawn }));
   for (const a of o.added) {
     if (skipScandals && getCard(c, a.cardId)?.kind === 'scandal') continue; // listed with their causes above
     lines.push(t('ui.preview.added', { card: cardName(c, a.cardId), zone: zoneName(a.to) }));
@@ -596,7 +596,7 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
   return (
     <div className="draft">
       <div className="row">
-        <h2 className="grow">{t('ui.draft.title', { n: s.draft.picksLeft })}</h2>
+        <h2 className="grow">{tp('ui.draft.title', s.draft.picksLeft, { n: s.draft.picksLeft })}</h2>
         <button disabled={!legal.extraPick} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
           {t('ui.draft.extraPick', { cost: cfg.extraPickCost })}
         </button>

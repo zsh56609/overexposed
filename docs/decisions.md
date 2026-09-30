@@ -6,6 +6,46 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 1fddbd6 answered; the preview swallowed clicks
+
+The content expansion design (docs/design/content-expansion.md) is
+approved; this round is its phase 1. The author's answers to round
+1fddbd6:
+
+1. **The three headlines with career-stage words stay** (Press Junket
+   "RISING SINGER", Indie Label "NEWCOMER", Public Feud "NEWCOMER"). They
+   are exactly the headlines phase 2's press `{subject}` slot is for,
+   which makes the subject follow fame and lane; rewriting them now would
+   be done twice. The mismatch is accepted until phase 2.
+2. **Stat bar small numbers at 800×450 and on touch: accepted until
+   visual craft**, which rebuilds the stat bar. For that phase: touch has
+   no hover, so a long-press on a stat must show its full value.
+3. **"A story is breaking" persisting for months is intended.** It is the
+   residue restored in round 3: a story does not die on its own; the
+   player has to cool down. Phase 2 gives the manager a line for a player
+   stuck in it.
+4. **The final gate's awards label is "On the night:"**, not "Awards:" —
+   it refers to awards night and echoes the Award Show gate's "not to
+   embarrass them on the night".
+5. **Tier rarity is right**: top tiers reached in about a quarter to a
+   third of runs read as an achievement. The ending thresholds change in
+   phase 1, so the boundaries are realigned there.
+6. **AGENTS.md carries only rules, the frozen summary and pointers.**
+   Detailed specifications live in docs/; the draft heuristics and the
+   band table move out first, to make room for the ending structure.
+
+**Bug, found by the author's automated playthrough:** the floating
+preview intercepted pointer events — a click aimed at a card or END TURN
+beneath it was swallowed. The preview is display-only and now takes no
+pointer events. This was very likely the real cause of the "preview
+lingers on a card" issue seen before only under automated input.
+`npm run check:clicks` (part of `npm run check:preview`) plays seeded runs
+in headless Chrome and, with the preview open over each card position and
+over END TURN, hit-tests every card and END TURN at its centre and near
+each corner; without the fix it reports END TURN blocked by the preview.
+Also: counted phrases pluralise properly ("1 slot", "2 slots"), wherever
+the interface used "(s)" or a fixed plural.
+
 ## 2026-09-30 — Numbers recede (decision 25)
 
 Ambient state is words; decisions are numbers. The stat bar tells the

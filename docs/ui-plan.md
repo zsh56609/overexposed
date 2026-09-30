@@ -103,7 +103,9 @@ and the button that opens the deck viewer (§8).
 
 Hovering (desktop) or long-pressing (touch) a card shows its outcome
 before it is played, in a floating panel attached to the hovered card
-(decision 6):
+(decision 6). The panel is display-only: it takes no pointer events, so a
+click aimed at a card or END TURN beneath it always lands
+(`npm run check:clicks`).
 
 - first, the headline the card would print — the exact variant the feed
   will use, in the card's register (decision 21): the story at the moment
@@ -497,6 +499,9 @@ it.
       threshold (Known at Headliner's 60 hype, Accomplished at The
       Musician's Musician's 55 craft), so a word never runs ahead of a
       goal the player can see.
+    - For visual craft, which rebuilds the stat bar: touch has no hover,
+      so a long-press on a stat must show its full value. Until then the
+      small numbers at 800×450 and on touch are accepted.
     (2026-09-30)
 
 ### Still open

@@ -14,7 +14,7 @@ import {
   type Register,
   type ResourceKey,
 } from '../core/index.ts';
-import { t } from './i18n.ts';
+import { t, tp } from './i18n.ts';
 import { playHeadlineKey } from './preview.ts';
 
 const signedFormat = new Intl.NumberFormat('en', { signDisplay: 'exceptZero' });
@@ -126,7 +126,7 @@ export function blockerText(b: PlayBlocker): string {
     case 'unplayable':
       return t('ui.reason.unplayable');
     case 'slots':
-      return t('ui.reason.slots', { cost: b.cost, slots: b.slots });
+      return tp('ui.reason.slots', b.cost, { cost: b.cost, slots: b.slots });
     case 'requires':
       return t('ui.reason.requires', { clauses: b.clauses.map(clauseText).join('; ') });
   }
@@ -143,9 +143,9 @@ export function effectText(c: ContentIndex, e: Effect, self?: string): string {
       if (e.cardId === self) return t('ui.effect.copySelf', { count: e.count ?? 1, zone: zoneName(e.to) });
       return t('ui.effect.addCard', { count: e.count ?? 1, card: cardName(c, e.cardId), zone: zoneName(e.to) });
     case 'exhaustTag':
-      return t('ui.effect.exhaustTag', { count: e.count ?? 1, tag: tagName(e.tag) });
+      return tp('ui.effect.exhaustTag', e.count ?? 1, { count: e.count ?? 1, tag: tagName(e.tag) });
     case 'slots':
-      return t('ui.effect.slots', { delta: signed(e.value) });
+      return tp('ui.effect.slots', e.value, { delta: signed(e.value) });
     case 'setFlag':
       return t('ui.effect.setFlag', { flag: flagName(e.flag) });
     case 'conditional': {

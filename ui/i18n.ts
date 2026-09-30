@@ -21,3 +21,13 @@ export function t(key: string, vars: Readonly<Record<string, string | number>> =
   }
   return s.replace(/\{(\w+)\}/g, (slot, name: string) => (Object.hasOwn(vars, name) ? String(vars[name]) : slot));
 }
+
+const plural = new Intl.PluralRules('en');
+
+/**
+ * `t` for a phrase that counts something: `<key>.one` or `<key>.other`, as English plural rules pick for
+ * `n` (1 and −1 are one) — "1 slot", "2 slots", never "slot(s)".
+ */
+export function tp(key: string, n: number, vars: Readonly<Record<string, string | number>> = {}): string {
+  return t(`${key}.${plural.select(n)}`, vars);
+}

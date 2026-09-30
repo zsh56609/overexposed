@@ -13,7 +13,8 @@
     "sim:awards": "node sim/awards.ts",
     "sim:tiers": "node sim/tiers.ts",
     "validate": "node validate/run.ts",
-    "check:preview": "node check/preview.ts",
+    "check:preview": "node check/preview.ts && node check/clicks.ts",
+    "check:clicks": "node check/clicks.ts",
     "typecheck": "tsc -b"
   },
   "dependencies": {

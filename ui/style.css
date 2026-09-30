@@ -98,8 +98,9 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .today-mark { font-weight: bold; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; }
 
 .preview { display: flex; flex-direction: column; gap: 0.2em; border: 1px solid var(--ink); padding: 0.3em 0.5em; background: #fff; }
-/* The floating preview: attached above the hovered card or END TURN (Floating in App.tsx sets its box). */
-.floating { position: absolute; z-index: 4; }
+/* The floating preview: attached above the hovered card or END TURN (Floating in App.tsx sets its box).
+   Display only: it never takes a click or a hover meant for what lies beneath it (npm run check:clicks). */
+.floating { position: absolute; z-index: 4; pointer-events: none; }
 .floating .preview { box-shadow: 3px 3px 0 var(--ink); }
 .preview-headline { font-size: 1.05em; }
 .scandal-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.25em; }

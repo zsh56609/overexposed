@@ -5,7 +5,7 @@
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
 import { getCard, lineMoved, monthsLeft, RESOURCE_KEYS, type GameEvent, type Register, type ResourceKey } from '../core/index.ts';
-import { t } from './i18n.ts';
+import { t, tp } from './i18n.ts';
 import { addedBy } from './preview.ts';
 import type { PlayedStep } from './queue.ts';
 import {
@@ -162,10 +162,10 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
           open().draws.push(cardName(c, e.cardId));
           break;
         case 'shuffle':
-          open().details.push(t('ui.event.shuffle', { count: e.count }));
+          open().details.push(tp('ui.event.shuffle', e.count, { count: e.count }));
           break;
         case 'slots':
-          open().details.push(t('ui.feed.slots', { delta: signed(e.delta) }));
+          open().details.push(tp('ui.feed.slots', e.delta, { delta: signed(e.delta) }));
           break;
         case 'flag':
           open().details.push(t('ui.feed.flag', { flag: flagName(e.flag) }));
