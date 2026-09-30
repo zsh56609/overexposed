@@ -8,6 +8,7 @@
 
 import {
   ADD_CARD_ZONES,
+  CARD_FACES,
   CARD_KINDS,
   CONDITION_RANGE_KEYS,
   EFFECT_FIELDS,
@@ -25,6 +26,7 @@ import {
   COUNTDOWN_LEVELS,
   PROMINENCES,
   REGISTERS,
+  SCENE_IDS,
   SCRIPT_LINE_KINDS,
   RESOURCE_KEYS,
   scandalGroup,
@@ -90,7 +92,7 @@ const ID = /^[a-z][a-z0-9_]*$/;
 const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
-  'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'headlineKeys', 'register', 'inHandKeys',
+  'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'face', 'headlineKeys', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
@@ -109,7 +111,7 @@ const CONTENT_BUDGET = { action: 25, opportunity: 8, scandal: 6, gate: 8, major:
 const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
-  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands',
+  'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls'];
 
@@ -406,6 +408,16 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
     v.lanes = raw.lanes.filter(isStr);
   }
   checkTiers(v, raw.tiers);
+  // Card faces (round 2c): a face for every lane, neutral and the scandals — a card's own face overrides it.
+  if (raw.cardFaces !== undefined) {
+    const faces = raw.cardFaces;
+    const owners = [...v.lanes, NEUTRAL_LANE, 'scandal'];
+    if (!isObj(faces)) v.error('schema', 'rules.cardFaces', `must map ${owners.join(', ')} to a face`);
+    else {
+      v.fields(faces, owners, 'rules.cardFaces');
+      for (const o of owners) if (!(CARD_FACES as readonly unknown[]).includes(faces[o])) v.error('schema', `rules.cardFaces.${o}`, `must be one of ${CARD_FACES.join(', ')}, got ${q(faces[o])}`);
+    }
+  }
   // Fame bands (round 2c): low, mid, high — what the quiet trigger and the desk scripts read.
   if (raw.fameBands !== undefined) {
     const hype = isObj(raw.tiers) && isObj(raw.tiers.hype) && Array.isArray(raw.tiers.hype.nameKeys) ? raw.tiers.hype.nameKeys.length : 1;
@@ -1143,6 +1155,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   checkReferences(v, rules, cards);
   checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)));
   checkManagers(v, raw.managers, rules, raw.endings);
+  checkFaces(v, rules, cards);
   checkScripts(v, raw.scripts, rules);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
@@ -1163,7 +1176,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 // ---------------------------------------------------------------------------
 // The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
 
-const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'rival'];
+const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'scenes', 'rival'];
 const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom', 'filler'];
 
 function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>): void {
@@ -1279,6 +1292,35 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
           v.int(f.laneBelow, `${at}.filler.laneBelow`, [1, Math.max(slots.length, 1)]);
           if (papers.every((p) => !Array.isArray(p.fillerKeys))) v.warn('structure', `${at}.filler`, 'no paper has fillerKeys: filler never prints');
         }
+      }
+    }
+  }
+
+  // The lead story's photograph (round 2c): a scene per paper and story kind, and overrides.
+  const scenes = raw.scenes;
+  if (scenes !== undefined) {
+    const at = `${file} scenes`;
+    const scene = (x: unknown, where: string) => {
+      if (!(SCENE_IDS as readonly unknown[]).includes(x)) v.error('schema', where, `must be one of ${SCENE_IDS.join(', ')}, got ${q(x)}`);
+    };
+    if (!isObj(scenes)) v.error('schema', at, 'must be { player, scandal, rival, world, overrides }');
+    else {
+      v.fields(scenes, ['player', 'scandal', 'rival', 'world', 'overrides'], at);
+      for (const kind of ['player', 'world'] as const) {
+        const map = scenes[kind];
+        if (!isObj(map)) v.error('schema', `${at}.${kind}`, 'must give every paper a scene');
+        else for (const id of paperIds) scene(map[id], `${at}.${kind}.${String(id)}`);
+      }
+      scene(scenes.scandal, `${at}.scandal`);
+      scene(scenes.rival, `${at}.rival`);
+      if (scenes.overrides !== undefined) {
+        if (!isObj(scenes.overrides)) v.error('schema', `${at}.overrides`, 'must map a line group id or an i18n key to a scene');
+        else
+          for (const [k, x] of Object.entries(scenes.overrides)) {
+            scene(x, `${at}.overrides.${k}`);
+            // A line group id (card:<id>, scandal:<id>, world:<paper>, filler:<paper>, spillover:<paper>), else an i18n key.
+            if (!/^(card|scandal|world|filler|spillover):/.test(k)) v.key(k, `${at}.overrides.${k}`);
+          }
       }
     }
   }
@@ -1442,6 +1484,17 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
   else for (const h of msg.hard) if (!known.includes(h) && !needed.includes(h as string)) v.error('references', `${at}.hard`, `${q(h)} is no trigger and no trigger line key`);
   v.int(msg.quietAfter, `${at}.quietAfter`, [1, v.totalTurns]);
   if (v.fameBands.length === 0) v.warn('structure', `${at}`, 'no rules.fameBands: the quiet trigger never fires');
+}
+
+/** Every card has a known face (round 2c): its own, or its lane's default in rules.cardFaces. */
+function checkFaces(v: Ctx, rules: Obj | null, cards: readonly Obj[]): void {
+  const faces = rules && isObj(rules.cardFaces) ? rules.cardFaces : {};
+  for (const c of cards) {
+    const where = `card ${String(c.id)}.face`;
+    if (c.face !== undefined && !(CARD_FACES as readonly unknown[]).includes(c.face)) v.error('schema', where, `must be one of ${CARD_FACES.join(', ')}, got ${q(c.face)}`);
+    const face = c.face ?? faces[c.kind === 'scandal' ? 'scandal' : isStr(c.lane) ? c.lane : NEUTRAL_LANE];
+    if (!(CARD_FACES as readonly unknown[]).includes(face)) v.error('structure', where, 'has no face: set one, or a default for its lane in rules.cardFaces');
+  }
 }
 
 // ---------------------------------------------------------------------------

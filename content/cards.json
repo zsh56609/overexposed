@@ -2,6 +2,7 @@
   {
     "id": "vocal_coaching",
     "lane": "music",
+    "face": "score",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.vocal_coaching.name",
@@ -145,6 +146,7 @@
   {
     "id": "studio_session",
     "lane": "music",
+    "face": "score",
     "kind": "action",
     "cost": 2,
     "nameKey": "card.studio_session.name",
@@ -187,6 +189,7 @@
   {
     "id": "ghostwriter",
     "lane": "music",
+    "face": "score",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.ghostwriter.name",
@@ -307,6 +310,7 @@
   {
     "id": "sellout_ad",
     "lane": "celebrity",
+    "face": "gold",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.sellout_ad.name",
@@ -342,6 +346,7 @@
   {
     "id": "demo_tape",
     "lane": "music",
+    "face": "score",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.demo_tape.name",
@@ -359,6 +364,7 @@
   {
     "id": "fan_meetup",
     "lane": "celebrity",
+    "face": "pass",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.fan_meetup.name",
@@ -385,6 +391,7 @@
   {
     "id": "late_night_show",
     "lane": "screen",
+    "face": "callsheet",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.late_night_show.name",
@@ -427,6 +434,7 @@
   {
     "id": "brand_deal",
     "lane": "celebrity",
+    "face": "gold",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.brand_deal.name",
@@ -444,6 +452,7 @@
   {
     "id": "film_cameo",
     "lane": "screen",
+    "face": "callsheet",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.film_cameo.name",
@@ -463,6 +472,7 @@
   {
     "id": "mentorship",
     "lane": "music",
+    "face": "score",
     "kind": "opportunity",
     "cost": 1,
     "nameKey": "card.mentorship.name",
@@ -608,6 +618,7 @@
   {
     "id": "screen_test",
     "lane": "screen",
+    "face": "headshot",
     "kind": "action",
     "cost": 1,
     "nameKey": "card.screen_test.name",
@@ -643,6 +654,7 @@
   {
     "id": "guest_spot",
     "lane": "screen",
+    "face": "callsheet",
     "kind": "action",
     "cost": 1,
     "actMin": 2,
@@ -680,6 +692,7 @@
   {
     "id": "streaming_role",
     "lane": "screen",
+    "face": "callsheet",
     "kind": "opportunity",
     "cost": 1,
     "actMin": 2,

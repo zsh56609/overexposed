@@ -12,6 +12,14 @@ export type CardKind = (typeof CARD_KINDS)[number];
 export const ADD_CARD_ZONES = ['deck', 'discard', 'hand'] as const;
 export type AddCardZone = (typeof ADD_CARD_ZONES)[number];
 
+/** A card's face in the visual phase (round 2c; docs/design/visual/README.md §6): the paper tells the lane. */
+export const CARD_FACES = ['flyer', 'score', 'script', 'revision', 'callsheet', 'headshot', 'gloss', 'gold', 'pass', 'notebook', 'scandal'] as const;
+export type CardFace = (typeof CARD_FACES)[number];
+
+/** The newspaper photographs' scenes (round 2c; the visual phase draws each in code). Only a lead story has one. */
+export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy'] as const;
+export type SceneId = (typeof SCENE_IDS)[number];
+
 /** The feed's three voices (docs/ui-plan.md §13, decision 15): which typography a card's headline gets. */
 export const REGISTERS = ['loud', 'quiet', 'money'] as const;
 export type Register = (typeof REGISTERS)[number];
@@ -105,6 +113,8 @@ export interface CardDef {
   readonly textKey?: string;
   /** Non-scandals: the card's flavour line, italic on its face (round 2c). A scandal's is its in-hand line. */
   readonly flavorKey?: string;
+  /** Its face in the visual phase (round 2c): overrides the lane's default in rules.cardFaces. */
+  readonly face?: CardFace;
   /** Default true. Scandals are false: they only take up room in the hand. */
   readonly playable?: boolean;
   readonly tags?: readonly string[];
@@ -352,6 +362,17 @@ export interface PressDef {
   /** The subjects column read while no lane is established. */
   readonly earlyLane: string;
   readonly page?: PageRules;
+  /**
+   * The lead story's photograph (round 2c): a scene by paper and story kind, and overrides by line group id
+   * or i18n key (the rival's winter nominations take the trophy).
+   */
+  readonly scenes?: {
+    readonly player: Readonly<Record<string, SceneId>>;
+    readonly scandal: SceneId;
+    readonly rival: SceneId;
+    readonly world: Readonly<Record<string, SceneId>>;
+    readonly overrides?: Readonly<Record<string, SceneId>>;
+  };
   /** The rival (design §3.3): the jam's light rival, introduced through the press. */
   readonly rival?: { readonly arcs: readonly RivalArcDef[] };
 }
@@ -520,6 +541,8 @@ export interface Rules {
    * quiet-month trigger and the desk scripts read them (core/tiers.ts fameBand).
    */
   readonly fameBands?: readonly FameBand[];
+  /** Each lane's card face, and the scandals' (round 2c): a card's `face` overrides it. */
+  readonly cardFaces?: Readonly<Record<string, CardFace>>;
   /** The year's calendar (round 2c): the month and year the first month falls in. */
   readonly calendar?: { readonly startMonth: number; readonly startYear: number };
   /** The stat bar's tooltip lines for the stats without tiers (round 2c): money, the countdown, actions. */
@@ -648,6 +671,14 @@ export function getGate(index: ContentIndex, id: string): GateDef | undefined {
 }
 
 export const getMajor = (index: ContentIndex, id: string): MajorDef | undefined => index.majors.find((m) => m.id === id);
+
+/** A card's face (round 2c): its own, or its lane's default — a scandal's, the scandals'. */
+export function cardFace(index: ContentIndex, id: string): CardFace | null {
+  const card = getCard(index, id);
+  if (!card) return null;
+  const faces = index.rules.cardFaces;
+  return card.face ?? faces?.[card.kind === 'scandal' ? 'scandal' : (card.lane ?? NEUTRAL_LANE)] ?? null;
+}
 export const getManager = (index: ContentIndex, id: string | null): ManagerDef | undefined =>
   id === null ? undefined : index.managers?.managers.find((m) => m.id === id);
 export const getMinor = (index: ContentIndex, id: string): MinorDef | undefined => index.minors.find((m) => m.id === id);

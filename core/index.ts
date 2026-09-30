@@ -32,6 +32,7 @@ export {
   rivalArc,
   rivalBeatTurn,
   sagaBeatTurn,
+  sceneOf,
   type FrontPage,
   type MonthPress,
   type PageItem,

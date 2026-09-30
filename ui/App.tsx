@@ -6,6 +6,7 @@
 
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
 import {
+  cardFace,
   createInitialState,
   endingIfYearEndedNow,
   establishedLanes,
@@ -43,8 +44,10 @@ import {
   blockerText,
   calendarLabel,
   cardName,
+  cardFlavor,
   cardRuleLines,
   cardText,
+  costLabel,
   clauseLine,
   dateLine,
   effectsText,
@@ -670,10 +673,12 @@ function Hand({
           const scandal = def?.kind === 'scandal';
           const playable = legal.play.has(card.uid);
           const text = scandal ? lineText(c, inHand.get(card.uid), card.cardId) : cardText(c, card.cardId);
+          const flavor = scandal ? null : cardFlavor(c, card.cardId);
+          const cost = scandal ? null : costLabel(c, card.cardId);
           return (
             <button
               key={card.uid}
-              className={`card${scandal ? ' scandal' : ''}${playable ? '' : ' off'}`}
+              className={`card face-${cardFace(c, card.cardId) ?? 'none'}${scandal ? ' scandal' : ''}${playable ? '' : ' off'}`}
               aria-disabled={!playable}
               onPointerEnter={(e) => {
                 if (e.pointerType === 'mouse') setFocus({ kind: 'card', uid: card.uid, anchor: anchorOf(e.currentTarget) });
@@ -706,9 +711,10 @@ function Hand({
             >
               <span className="card-head">
                 <strong>{cardName(c, card.cardId)}</strong>
-                <span className="muted">{scandal ? t('ui.hand.dead') : t('ui.hand.cost', { n: def?.cost ?? 0 })}</span>
+                {(scandal || cost) && <span className="muted">{scandal ? t('ui.hand.dead') : cost}</span>}
               </span>
               <span className={prose(text, scandal ? 'in-hand' : '')}>{text}</span>
+              {flavor && <span className={prose(flavor, 'flavor')}>{flavor}</span>}
               {scandal &&
                 cardRuleLines(c, card.cardId).map((line, i) => (
                   <span key={i} className="muted rules">
@@ -751,12 +757,13 @@ function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Ac
         {s.draft.offer.map((id) => {
           const clauses = previewDraftCard(s, id);
           return (
-            <div key={id} className="card offer">
+            <div key={id} className={`card offer face-${cardFace(c, id) ?? 'none'}`}>
               <span className="card-head">
                 <strong>{cardName(c, id)}</strong>
-                <span className="muted">{t('ui.hand.cost', { n: getCard(c, id)?.cost ?? 0 })}</span>
+                {costLabel(c, id) && <span className="muted">{costLabel(c, id)}</span>}
               </span>
               <span>{cardText(c, id)}</span>
+              {cardFlavor(c, id) && <span className={prose(cardFlavor(c, id) ?? '', 'flavor')}>{cardFlavor(c, id)}</span>}
               <div className="req">
                 <span className="muted">{t('ui.draft.requires')}</span>
                 {clauses.length ? (

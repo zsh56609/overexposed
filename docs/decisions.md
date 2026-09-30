@@ -6,6 +6,37 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2c, Part D: cards
+
+- **Flavour lines and cost.**
+  - Every card shows its flavour line in italics under its rules; a
+    scandal's flavour line is its in-hand line, as before.
+  - The cost shows only above one action, reading "2 actions": the stat
+    bar calls them actions now.
+- **Card faces are content.**
+  - `rules.cardFaces` gives each lane's default: music flyer, screen
+    script, celebrity gloss, neutral notebook, scandals scandal.
+  - A card's own `face` overrides it, for the author's list: score,
+    revision, call sheet, headshot, gold, pass.
+  - /core's `cardFace` resolves a card's face. Validate requires every
+    card to resolve to one of the eleven faces.
+  - The three new screen cards take their faces with Part E.
+- **Scene tags are content** (`press.scenes`). Only a lead story gets one,
+  from /core's `sceneOf` in `frontPages`. Four readings, where the brief
+  named no default:
+  - A world or saga lead in Marquee is `filmset`. The brief named B-Side
+    (crowd) and The Daily Flash (street) only, and Marquee is the film
+    trade paper.
+  - Fame filler takes the player's default for its paper: it is about the
+    player.
+  - A spillover is `paparazzi` like a scandal. It never leads today: its
+    cap is a brief.
+  - "Her winter nominations" is the breakthrough arc's winter beat,
+    "JUNO VALE SWEEPS THE NOMINATIONS" — the one beat about nominations —
+    so its key overrides to `trophy`.
+- `check:preview` asserts every lead has its scene, and no other story
+  one.
+
 ## 2026-09-30 — Round 2c, Part C: the managers
 
 - **Two bubbles, always.**

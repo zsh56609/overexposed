@@ -11,6 +11,7 @@
   "laneStartingDeck": false,
   "laneEstablished": { "minPlays": 2, "lead": 2 },
   "calendar": { "startMonth": 3, "startYear": 2027 },
+  "cardFaces": { "music": "flyer", "screen": "script", "celebrity": "gloss", "neutral": "notebook", "scandal": "scandal" },
   "fameBands": [{ "id": "low", "from": 0 }, { "id": "mid", "from": 2 }, { "id": "high", "from": 3 }],
   "statTips": { "capital": "tip.money", "toGo": "tip.next.togo", "toNext": "tip.next.tonext", "slots": "tip.actions" },
   "heatThreshold": [7, 6, 6, 5],

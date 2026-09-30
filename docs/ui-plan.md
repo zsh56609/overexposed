@@ -613,6 +613,11 @@ it.
     bubble. On the ending screen, after the rival's closing line and
     before "Play again", the manager has the last word: two bubbles for
     the year's major, labelled with their name. (2026-09-30)
+33. Cards (round 2c, Part D). Every card shows its flavour line in italics
+    under its rules — a scandal's is its in-hand line. The cost shows only
+    above one action ("2 actions"). The card's face and a lead story's
+    photograph scene are content for the visual phase: in this build a
+    face is only a class on the card. (2026-09-30)
 
 ### Still open
 

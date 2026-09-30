@@ -2,7 +2,7 @@
 // and what the papers call the player when it prints. Papers print the public acts; the notebook keeps the
 // private work. Read-only; ids, keys and numbers only — /ui renders the words.
 
-import { getCard, type ContentIndex, type PaperDef, type Prominence, type RivalArcDef } from './content.ts';
+import { getCard, type ContentIndex, type PaperDef, type Prominence, type RivalArcDef, type SceneId } from './content.ts';
 import { establishedLanes } from './lanes.ts';
 import { readLines, type HistoryStep, type PrintedLine } from './lines.ts';
 import { deriveSeed } from './rng.ts';
@@ -110,6 +110,8 @@ export interface PageItem {
   readonly subjectKey: string | null;
   /** For the player's line: the printed line itself. */
   readonly line: PressLine | null;
+  /** The lead story's photograph (round 2c): its scene. Only a lead has one. */
+  readonly scene?: SceneId;
 }
 
 export interface FrontPage {
@@ -333,7 +335,8 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       });
       for (const key of stories) printed.set(key, (printed.get(key) ?? 0) + 1);
       lastWorld.set(paper.id, new Set(stories));
-      return { paper: paper.id, items: slots.filter((x): x is PageItem => x !== null), overwhelmed };
+      const items = slots.filter((x): x is PageItem => x !== null).map((item) => (item.slot === 'lead' ? { ...item, scene: sceneOf(c, paper.id, item) } : item));
+      return { paper: paper.id, items, overwhelmed };
     });
 
     months.push({
@@ -352,6 +355,33 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
     });
   });
   return months;
+}
+
+/**
+ * The lead story's photograph (round 2c): an override for its i18n key or its line group, else the default
+ * for its kind and paper — the player's story (and the fame filler about them) by paper; a scandal, the
+ * paparazzi; the rival, hers; a world story or a saga's beat by paper.
+ */
+export function sceneOf(c: ContentIndex, paper: string, item: Omit<PageItem, 'slot'>): SceneId | undefined {
+  const scenes = c.press?.scenes;
+  if (!scenes) return undefined;
+  const group =
+    item.kind === 'player' && item.line
+      ? item.line.kind === 'scandal'
+        ? `scandal:${item.line.cardId}`
+        : `card:${item.line.cardId}`
+      : item.kind === 'filler' || item.kind === 'spillover'
+        ? `${item.kind}:${paper}`
+        : item.kind === 'world'
+          ? `world:${paper}`
+          : null;
+  const own = (item.key !== null ? scenes.overrides?.[item.key] : undefined) ?? (group !== null ? scenes.overrides?.[group] : undefined);
+  if (own) return own;
+  if (item.kind === 'player' && item.line?.kind === 'scandal') return scenes.scandal;
+  if (item.kind === 'spillover') return scenes.scandal;
+  if (item.kind === 'rival') return scenes.rival;
+  if (item.kind === 'world' || item.kind === 'saga') return scenes.world[paper];
+  return scenes.player[paper];
 }
 
 /** The paper of the established lane — the early lane's before one is established. */

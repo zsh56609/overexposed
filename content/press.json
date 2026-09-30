@@ -143,6 +143,13 @@
     "celebrity": ["press.subject.newcomer", "press.subject.newcomer", "press.subject.singer", "press.subject.celebrity", "press.subject.celebrity"]
   },
   "earlyLane": "music",
+  "scenes": {
+    "player": { "flash": "carpet", "bside": "singer", "marquee": "filmset" },
+    "scandal": "paparazzi",
+    "rival": "rival",
+    "world": { "flash": "street", "bside": "crowd", "marquee": "filmset" },
+    "overrides": { "rival.breakthrough.4": "trophy" }
+  },
   "page": {
     "slots": ["lead", "secondary", "secondary", "brief"],
     "worldMin": [2, 2, 1, 1, 1],

@@ -47,6 +47,16 @@ export const signedAmount = (key: string, n: number): string => (key === 'capita
 export const cardName = (c: ContentIndex, id: string): string => t(getCard(c, id)?.nameKey ?? `card.${id}.name`);
 /** A card's text: its rules, or for a scandal the line shown while it sits in hand. */
 export const cardText = (c: ContentIndex, id: string): string => t(getCard(c, id)?.textKey ?? `card.${id}.text`);
+/** A card's flavour line (round 2c), italic on its face; none for a card without one. */
+export const cardFlavor = (c: ContentIndex, id: string): string | null => {
+  const key = getCard(c, id)?.flavorKey;
+  return key ? t(key) : null;
+};
+/** A card's cost, shown only above one action (round 2c): "2 actions". */
+export const costLabel = (c: ContentIndex, id: string): string | null => {
+  const cost = getCard(c, id)?.cost ?? 1;
+  return cost > 1 ? t('ui.hand.cost', { n: cost }) : null;
+};
 export const gateName = (c: ContentIndex, id: string): string => t(getGate(c, id)?.nameKey ?? `gate.${id}.name`);
 export const seasonName = (c: ContentIndex, act: number): string => t(c.rules.actNameKeys[act - 1] ?? `act.${act}.name`);
 export const resourceName = (k: ResourceKey): string => t(`ui.resource.${k}`);

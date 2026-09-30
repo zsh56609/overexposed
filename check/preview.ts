@@ -72,7 +72,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -307,6 +307,25 @@ function checkPages(history: readonly PlayedStep[], seed: number): void {
     counts.pages += month.pages.length;
     // Every page is full, and the lead paper holds the player's most prominent story (or is the default).
     for (const fp of month.pages) if (fp.items.length !== (history[0]?.after.content.press?.page?.slots.length ?? 0)) report('page', seed, month.turn, `${fp.paper}: ${fp.items.length} stories`);
+    // The lead story's photograph (round 2c, D4): only a lead has a scene — by kind and paper, or its override.
+    for (const fp of month.pages) {
+      for (const item of fp.items) {
+        if ((item.slot === 'lead') !== (item.scene !== undefined)) report('scene', seed, month.turn, `${fp.paper} ${item.slot}: scene ${item.scene}`);
+        if (item.slot !== 'lead') continue;
+        counts.scenes++;
+        const expected =
+          item.key === 'rival.breakthrough.4'
+            ? 'trophy'
+            : item.kind === 'rival'
+              ? 'rival'
+              : item.kind === 'player' && item.line?.kind === 'scandal'
+                ? 'paparazzi'
+                : item.kind === 'world' || item.kind === 'saga'
+                  ? { flash: 'street', bside: 'crowd', marquee: 'filmset' }[fp.paper]
+                  : { flash: 'carpet', bside: 'singer', marquee: 'filmset' }[fp.paper];
+        if (item.scene !== expected) report('scene', seed, month.turn, `${fp.paper} lead ${item.kind} ${item.key}: ${item.scene}, expected ${expected}`);
+      }
+    }
   }
 }
 
@@ -487,7 +506,7 @@ console.log(
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
-    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages) recomposed, ` +
+    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
     `${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,

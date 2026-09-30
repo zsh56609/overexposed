@@ -789,7 +789,7 @@
   "ui.feed.slots.other": "{delta} slots this month",
   "ui.feed.noHeadline": "[{card}]",
   "ui.hand.title": "Hand",
-  "ui.hand.cost": "Cost {n}",
+  "ui.hand.cost": "{n} actions",
   "ui.hand.dead": "SCANDAL — dead card",
   "ui.hand.hint": "Hover a card or End turn (long-press a card on touch) to preview; click to play.",
   "ui.hand.endTurnNone": "End turn · no scandal",

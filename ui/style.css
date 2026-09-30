@@ -171,6 +171,8 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 .card.scandal { background: #fbe1dd; border: 2px dashed var(--red); opacity: 1; }
 .card.scandal .card-head strong, .in-hand { font-style: italic; }
 .card .rules { font-size: 0.8em; }
+/* A card's flavour line (round 2c, D1): italic, the last line of its face. */
+.card .flavor { font-style: italic; color: var(--muted); font-size: 0.85em; }
 .end { font-size: 1.1em; padding: 0.2em 1.2em; }
 .end.printing { border: 2px solid var(--red); color: var(--red); font-weight: bold; }
 .take { margin-top: auto; }

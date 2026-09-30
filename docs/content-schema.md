@@ -31,6 +31,12 @@ checks in round 2c (2026-09-30).
 `lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (display only: the press subject, the lead paper, the managers) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 `flavorKey` (round 2c): a non-scandal's flavour line, italic on its face; a
 scandal's flavour line is its in-hand line.
+`face` (round 2c, for the visual phase): the card's face — `flyer`, `score`,
+`script`, `revision`, `callsheet`, `headshot`, `gloss`, `gold`, `pass`,
+`notebook` or `scandal`. Without one, its lane's default in
+`rules.cardFaces` (music flyer, screen script, celebrity gloss, neutral
+notebook; scandals scandal). /core's `cardFace` resolves it; validate
+requires every card to have a known face.
 `onDraw` and `onEndOfTurn` are optional effect arrays of the same shape.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
@@ -134,6 +140,12 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   has fewer stories there than this — `fillLaneFrom`, the tier from which
   filler fills the lane's paper, and `scandalPaperFrom`, the tier from
   which the scandal paper gets one filler line whatever the lane.
+- `scenes` (round 2c, for the visual phase's photographs; only a lead story
+  has one): `player` and `world`, a scene per paper; `scandal` and `rival`;
+  `overrides` by line group id (`card:<id>`, `scandal:<id>`, `world:<paper>`,
+  `filler:<paper>`, `spillover:<paper>`) or by i18n key. The scenes:
+  `singer`, `rival`, `crowd`, `paparazzi`, `carpet`, `filmset`, `street`,
+  `trophy`. /core's `sceneOf` gives each lead its scene in `frontPages`.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), `endingKey`.
 
