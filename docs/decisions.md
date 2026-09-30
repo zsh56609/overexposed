@@ -6,6 +6,38 @@ rules).
 
 ---
 
+## 2026-09-30 — Round b59f9d6 answered; round 2b begins
+
+Round 2b is the two managers, the corrections the numbers and the
+author's screenshots revealed, and the world's content. Round 2c follows
+(card faces, lane depth, tooltips, the calendar). The author's answers:
+
+1. **The Redemption Arc at 1.46%: accepted.** It needs a genuine
+   comeback, so it is a rare achievement ending. The minor reachability
+   floor is **1.4%**: the gap to 1.5% is within seed noise (the third seed
+   gives 1.84%), and "reachable" means "not effectively impossible".
+2. **Round 2a's Part E decisions** 1, 2, 3, 5, 6 and 7 are confirmed: a
+   Money line is a business brief; at equal prominence a scandal, then a
+   LOUD act, then Money, the spillover claiming its brief first; the
+   rival's beat is the first world story; a lead-paper tie while early
+   goes to B-Side; world stories are marked by type alone; the rival's
+   majors. Decision 4 — the Flash overwhelmed in any scandal month — is
+   **replaced**: a scandal's prominence follows fame (Part A).
+3. The Daily Flash leading ~80% of months meant the lead paper no longer
+   signalled anything: fixed in Part A.
+4. The fame meter's flat middle (one or two public stories a month):
+   fixed by fame filler (Part D).
+5. The five Flash headlines with SINGER hard-coded: rewritten with the
+   subject slot (Part B).
+6. No marker word for world news: grey text is enough until visual craft
+   lays out the page.
+7. The established lane falling back to "early": hysteresis (Part A).
+8. The goals board showed The Hard Way's "✓ Scandals 6+" while the player
+   was Known — it read as achieved (Part A).
+9. "Play again" sat above the ending the player had not read yet (Part A).
+10. **The two managers are not narrative only**: each gets one small perk,
+    so the opening choice is a real one (Part C).
+
 ## 2026-09-30 — Phase 2a, Part E: the front page, the world, the rival
 
 Built as the author specified (design §3.3, §3.4): /core's `frontPages`

@@ -425,7 +425,7 @@ New or changed:
 | Band | Target |
 |---|---|
 | Major concentration | Per player-like persona, no major above 70% |
-| Minor reachability | Every minor reached in at least 1.5% of player-like runs: "reachable", not "common". The Hard Way's minors and The Independent are meant to be rare; in a collection, rare endings are the achievements, and the axes are not bent to inflate them |
+| Minor reachability | Every minor reached in at least 1.4% of player-like runs: "reachable" — not effectively impossible — not "common". The Hard Way's minors and The Independent are meant to be rare; in a collection, rare endings are the achievements, and the axes are not bent to inflate them |
 | Lane reachability | Each lane reachable by a persona that pursues it — add lane-seeking personas |
 | Event balance | No event choice dominant; every choice taken in a meaningful share of runs |
 | Run length | Estimated story beats per run within the under-20-minute target |

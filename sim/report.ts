@@ -23,10 +23,12 @@ export const BANDS = {
    */
   personaMajorExempt: ['artisan'] as readonly PersonaId[],
   /**
-   * Player-like, pooled: every minor ending reached in at least this share of runs — "reachable", not
-   * "common". Rare minors are the collection's achievements; the axes are not bent to inflate them.
+   * Player-like, pooled: every minor ending reached in at least this share of runs — "reachable", meaning
+   * not effectively impossible, not "common". Rare minors are the collection's achievements; the axes are
+   * not bent to inflate them. 1.4% (round b59f9d6): The Redemption Arc needs a genuine comeback and sits at
+   * 1.46–1.84%, within seed noise of 1.5%.
    */
-  minorReachMin: 0.015,
+  minorReachMin: 0.014,
   /** A probe ignoring heat must end on the damaged side of the scandal axis in more than this share. */
   probeHeatCollapseMin: 0.8,
   /** A probe ignoring hype must end on the famous side of the hype axis in less than this share. */
