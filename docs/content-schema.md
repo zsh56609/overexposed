@@ -92,7 +92,9 @@ Two levels ([`design/content-expansion.md`](design/content-expansion.md) §1).
   board does not list as a requirement (the tier word and the goal line
   carry them).
 - `majors`, in goals-board order: `id`, `on` (a side per axis),
-  `nameKey`, `goalKey`. Every corner of the axes has exactly one major.
+  `nameKey`, `goalKey`, optional `note` (round V1a) — the colour of its
+  sticky note on the mirror: `yellow`, `green`, `blue` or `pink`. Every
+  corner of the axes has exactly one major.
 - `minors`, in resolution order within their major: `id`, `major`,
   `nameKey`, `textKeys` (the text's variants, one per run), optional
   `goalKey`, and either `conditions` or `fallback: true` — exactly one
@@ -118,7 +120,13 @@ content budget, capped at 8.
 Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
 §3.1; the voices in [`writing/voice.md`](writing/voice.md)).
 
-- `papers`: `id`, `mastheadKey`.
+- `papers`: `id`, `mastheadKey`, optional `issue` (round V1a) —
+  `{ base, step }`, the issue number the desk prints for month *m*:
+  base + *m* × step. A paper on the desk also has the conventional keys
+  `paper.<id>.ear.left`, `ear.right`, `tagline`, `issue` (the label, with
+  `{n}`), `kicker.player` and `kicker.world`, and optionally `sub`; an
+  ear that reads `{weather}` needs `paper.<id>.weather.<season>` for
+  every season in `rules.seasons`.
 - `route`: `loud` maps each card lane to a paper; `money` and `scandal`
   name one. A quiet line prints in no paper: the player's notebook.
 - `subjects`: per lane, one i18n key per hype tier, lowest first — the
@@ -151,10 +159,23 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   `trophy`. /core's `sceneOf` gives each lead its scene in `frontPages`.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), `endingKey`.
+- `boxOffice` (round V1a, README §2): the weekend box office one paper
+  prints — `paper`; `titleKeys`, the films, a ring in an order the seed
+  chooses, one opening at the top each month while the rest slide down;
+  `rows`; `grosses`, each row's takings in tenths of a million, top
+  first, plus a seeded `0…jitter−1` a month; `player` — `titleKey`,
+  `gross`, and the fame tier (`fromTier`, 0-based) on the `lane` from
+  which the player's own film tops the table. /core's `boxOffice` gives a
+  month's rows. The paper needs `paper.<id>.boxoffice.title`, `new` and
+  `gross` (with `{m}`).
 
 /core's `pressLines` gives each printed line its variant, paper and
 subject, fixed at the moment it prints; `frontPages` composes every
-month's front pages from the run's history.
+month's front pages from the run's history, and `issueNow` (round V1a)
+the issue on the desk before the first month ends. The desk's shared
+words are `paper.kicker.brief`, `paper.kicker.scandal`,
+`paper.kicker.justIn`, `paper.caption.<player|scandal|rival|world>`,
+`paper.dek` and `paper.dek.scandal`.
 
 ## The managers — `content/managers.json`
 
@@ -217,7 +238,7 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
   tier — `calm`, `amber`, `red` or `crossed`. /core's `countdownLevel`
   reads it.
 
-## The stat bar and the calendar — `rules.statTips`, `rules.calendar`
+## The stat bar and the calendar — `rules.statTips`, `rules.calendar`, `rules.seasons`
 
 - `statTips`: the tooltip lines of the stats without tiers — `capital`
   (money), `toGo` and `toNext` (the countdown before and after a line is
@@ -225,6 +246,9 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
 - `calendar`: `startMonth` (1–12) and `startYear`, the date of the first
   month of play. /core's `calendarDate` gives each month its calendar
   month and year, its place in its season, and the months left.
+- `seasons` (round V1a): one season id per act, in order — `spring`,
+  `summer`, `autumn` or `winter` — the light on the desk and the weather
+  in a paper's ear. The names players read stay in `actNameKeys`.
 
 ## Desk scripts — `content/scripts.json`
 
@@ -259,6 +283,7 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - `rules.tiers`: a word per tier, boundaries in order
 - variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)
 - tier words: one word of at most 10 characters
+- the desk (round V1a): `rules.seasons` one per act, a major's `note` colour, a paper's `issue`, the box office (its paper, rows, takings, the player's lane), and every desk key a paper or the box office needs — the film titles not yet written are a warning
 - player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
 
 Load failures are loud in dev, graceful in the shipped build.

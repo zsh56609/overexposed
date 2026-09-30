@@ -112,6 +112,11 @@ export interface PageItem {
   readonly line: PressLine | null;
   /** The lead story's photograph (round 2c): its scene. Only a lead has one. */
   readonly scene?: SceneId;
+  /**
+   * The lead's photograph (round V1a): how many earlier months led this paper with the same scene — the
+   * counter the drawing's shuffle bag follows, so the same picture never leads a paper two times running.
+   */
+  readonly photo?: number;
 }
 
 export interface FrontPage {
@@ -205,10 +210,25 @@ interface Candidate {
 
 /** Every month's front pages so far: one per month the history has ended. */
 export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
+  return composeYear(history, false).months;
+}
+
+/**
+ * The issue on the desk now (round V1a): while a month is being played — or drafted, or before month 1 —
+ * its front pages as they stand, with what has printed so far this month and nothing of the month's end;
+ * between a season's last month and its gate, and once the year has ended, the month just printed. The
+ * world's stories, beats and filler are the month's own, from the same counters as frontPages, so the
+ * issue a month ends on differs from this only by what prints at its end.
+ */
+export function issueNow(history: readonly HistoryStep[]): MonthPress | null {
+  return composeYear(history, true).current;
+}
+
+function composeYear(history: readonly HistoryStep[], inProgress: boolean): { months: MonthPress[]; current: MonthPress | null } {
   const first = history[0]?.after;
   const press = first?.content.press;
   const page = press?.page;
-  if (!first || !press || !page) return [];
+  if (!first || !press || !page) return { months: [], current: null };
   const c = first.content;
   const seed = first.seed;
   const arc = rivalArc(c, seed);
@@ -222,15 +242,14 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
   const lastWorld = new Map<string, ReadonlySet<string>>(press.papers.map((p) => [p.id, new Set()]));
   const spilled = new Map<string, number>();
   const filled = new Map<string, number>();
+  const photos = new Map<string, number>();
   const filler = page.filler;
   const months: MonthPress[] = [];
 
-  history.forEach((step, index) => {
-    const end = step.events.find((e) => e.type === 'turnEnd');
-    if (end?.type !== 'turnEnd') return;
-    const tier = fameTier(c, end.resources.hype);
-    const lane = lanes[index] ?? null;
-    const mine = byMonth.get(end.turn) ?? [];
+  // One month's pages: the month, its season, the fame and the lane it ends on, the step that ends it.
+  const compose = (turn: number, act: number, hype: number, lane: string | null, index: number): MonthPress => {
+    const tier = fameTier(c, hype);
+    const mine = byMonth.get(turn) ?? [];
     const scandals = mine.filter((l) => l.kind === 'scandal').length;
     const frenzy = scandals >= page.frenzyAt;
     // Fame amplifies scandal (round 2b): a frenzy spills over only once the player is known.
@@ -242,13 +261,13 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
         ? [press.route.loud[lane] ?? '']
         : mine.flatMap((l) => (l.kind === 'play' && l.paper !== null && getCard(c, l.cardId)?.register === 'loud' ? [l.paper] : [])),
     );
-    const beat = arc && end.turn === rivalBeatTurn(c, seed, end.act) ? (arc.beats[end.act - 1] ?? null) : null;
+    const beat = arc && turn === rivalBeatTurn(c, seed, act) ? (arc.beats[act - 1] ?? null) : null;
     let rivalPrinted = false;
     // The world's own timeline: each saga's beat for this season, in the month the seed chose.
     const sagas = press.papers.flatMap((paper) =>
       (paper.sagas ?? []).flatMap((saga) => {
-        const key = saga.beats[end.act - 1];
-        return key !== undefined && end.turn === sagaBeatTurn(c, seed, paper.id, saga.id, end.act) ? [{ paper: paper.id, key, printed: false }] : [];
+        const key = saga.beats[act - 1];
+        return key !== undefined && turn === sagaBeatTurn(c, seed, paper.id, saga.id, act) ? [{ paper: paper.id, key, printed: false }] : [];
       }),
     );
     // Fame filler goes to the established lane's paper, and once famous also to the scandal paper.
@@ -327,7 +346,7 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
         if (saga) saga.printed = true;
       }
       const printed = printedWorld.get(paper.id) as Map<string, number>;
-      const stories = worldStories(seed, paper, end.act, printed, lastWorld.get(paper.id) as ReadonlySet<string>, open.length - world.length);
+      const stories = worldStories(seed, paper, act, printed, lastWorld.get(paper.id) as ReadonlySet<string>, open.length - world.length);
       for (const key of stories) world.push({ kind: 'world', key, subjectKey: null, line: null });
       open.forEach((i, k) => {
         const item = world[k];
@@ -335,13 +354,23 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       });
       for (const key of stories) printed.set(key, (printed.get(key) ?? 0) + 1);
       lastWorld.set(paper.id, new Set(stories));
-      const items = slots.filter((x): x is PageItem => x !== null).map((item) => (item.slot === 'lead' ? { ...item, scene: sceneOf(c, paper.id, item) } : item));
+      const items = slots
+        .filter((x): x is PageItem => x !== null)
+        .map((item) => {
+          if (item.slot !== 'lead') return item;
+          const scene = sceneOf(c, paper.id, item);
+          if (scene === undefined) return { ...item, scene };
+          const group = `photo:${paper.id}:${scene}`;
+          const n = photos.get(group) ?? 0;
+          photos.set(group, n + 1);
+          return { ...item, scene, photo: n };
+        });
       return { paper: paper.id, items, overwhelmed };
     });
 
-    months.push({
-      turn: end.turn,
-      act: end.act,
+    return {
+      turn,
+      act,
       step: index,
       fameTier: tier,
       lane,
@@ -352,9 +381,49 @@ export function frontPages(history: readonly HistoryStep[]): MonthPress[] {
       lead: leadPaper(c, pages, lane),
       rival: beat ? { paper: beat.paper, key: beat.key, printed: rivalPrinted } : null,
       sagas,
-    });
+    };
+  };
+
+  history.forEach((step, index) => {
+    const end = step.events.find((e) => e.type === 'turnEnd');
+    if (end?.type !== 'turnEnd') return;
+    months.push(compose(end.turn, end.act, end.resources.hype, lanes[index] ?? null, index));
   });
-  return months;
+  let current: MonthPress | null = null;
+  if (inProgress) {
+    const now = history.at(-1)?.after ?? first;
+    current = now.phase === 'gate' || now.phase === 'ended' ? (months.at(-1) ?? null) : compose(now.turn, now.act, now.resources.hype, lanes.at(-1) ?? null, history.length - 1);
+  }
+  return { months, current };
+}
+
+/** A row of the weekend box office (round V1a): the film, its takings in tenths of a million, new this month, the player's. */
+export interface BoxOfficeRow {
+  readonly titleKey: string;
+  readonly gross: number;
+  readonly fresh: boolean;
+  readonly player: boolean;
+}
+
+/**
+ * The weekend box office for a month (round V1a; README §2). The films make a ring in a seeded order; each
+ * month the next one opens at the top and the rest slide down a row — a film is new the month it opens.
+ * Takings are content's per row plus a seeded jitter. Once the player is famous on the box office's lane
+ * (the screen), their film tops it. Read-only and seeded, never the game RNG.
+ */
+export function boxOffice(c: ContentIndex, seed: number, turn: number, tier: number, lane: string | null): BoxOfficeRow[] {
+  const bo = c.press?.boxOffice;
+  if (!bo || bo.titleKeys.length === 0) return [];
+  const ring = [...bo.titleKeys].sort((a, b) => deriveSeed(seed, hashId(`boxoffice:${a}`)) - deriveSeed(seed, hashId(`boxoffice:${b}`)) || a.localeCompare(b));
+  const n = ring.length;
+  const rows: BoxOfficeRow[] = Array.from({ length: Math.min(bo.rows, n) }, (_, i) => ({
+    titleKey: ring[(((turn - 1 - i) % n) + n) % n] as string,
+    gross: (bo.grosses[i] ?? bo.grosses.at(-1) ?? 0) + (bo.jitter > 0 ? deriveSeed(seed, hashId(`boxoffice:${turn}:${i}`)) % bo.jitter : 0),
+    fresh: i === 0,
+    player: false,
+  }));
+  if (tier >= bo.player.fromTier && lane === bo.player.lane) return [{ titleKey: bo.player.titleKey, gross: bo.player.gross, fresh: false, player: true }, ...rows.slice(0, rows.length - 1)];
+  return rows;
 }
 
 /**

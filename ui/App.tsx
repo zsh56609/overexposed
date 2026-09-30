@@ -10,7 +10,6 @@ import {
   createInitialState,
   endingIfYearEndedNow,
   establishedLanes,
-  explainCondition,
   freeRerollAvailable,
   getCard,
   getGate,
@@ -33,9 +32,12 @@ import {
   type MonthPress,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
+import { Desk } from './desk/Desk.tsx';
+import { deskModel } from './desk/model.ts';
+import licenceUrl from './fonts/OFL.txt?url';
 import { feedLines, type FeedLine } from './feed.ts';
 import { t, tp } from './i18n.ts';
-import { legalOf, previewDraftCard, previewEndTurn, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
+import { legalOf, previewDraftCard, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
 import { statCells } from './stats.ts';
 import {
@@ -50,7 +52,6 @@ import {
   cardText,
   costLabel,
   clauseLine,
-  dateLine,
   effectsText,
   endingPair,
   majorGoal,
@@ -70,7 +71,6 @@ import {
   openingText,
   pageItemText,
   resourceName,
-  seasonLabel,
   seasonName,
   signedAmount,
   zoneName,
@@ -119,9 +119,11 @@ function Title({ onStart, error }: { onStart: (seed: number) => void; error: str
   const urlSeed = seedFromUrl();
   // The run to come is chosen now, so the opening premise is that run's variant (decision 15, revised).
   const [seed] = useState(() => urlSeed ?? freshSeed());
+  const [credits, setCredits] = useState(false);
   const opening = openingText(content, seed);
+  if (credits) return <Credits onClose={() => setCredits(false)} />;
   return (
-    <div className="title">
+    <div className="plain full title">
       <h1>{t('ui.title.name')}</h1>
       <div className={prose(opening, 'opening')}>
         {opening.split('\n\n').map((para, i) => (
@@ -133,6 +135,31 @@ function Title({ onStart, error }: { onStart: (seed: number) => void; error: str
       </button>
       {urlSeed !== null && <p className="muted">{t('ui.title.seed', { seed: urlSeed })}</p>}
       {error && <p className="error">{error}</p>}
+      <button className="credits-open" onClick={() => setCredits(true)}>
+        {t('ui.title.credits')}
+      </button>
+    </div>
+  );
+}
+
+/**
+ * The credits (round V1a): every third-party asset the game ships, as the jam requires — the two font
+ * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts).
+ */
+function Credits({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="plain full credits">
+      <h1>{t('ui.credits.title')}</h1>
+      <h2>{t('ui.credits.fonts')}</h2>
+      <p>{t('credits.font.playfair')}</p>
+      <p>{t('credits.font.franklin')}</p>
+      <p>
+        {t('ui.credits.licence')}{' '}
+        <a href={licenceUrl} target="_blank" rel="noreferrer">
+          {t('ui.credits.read')}
+        </a>
+      </p>
+      <button onClick={onClose}>{t('ui.credits.close')}</button>
     </div>
   );
 }
@@ -195,6 +222,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // Every line printed so far, the counter the next ones follow from (decision 15, revised), and the
   // established lane, which has hysteresis and so is read from history.
   const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).at(-1) ?? null }), [snap.steps]);
+  // The desk: every word and number it shows, from /core (round V1a; ui/desk/model.ts).
+  const model = useMemo(() => deskModel({ state: s, steps: snap.steps, lines }), [s, snap.steps, lines]);
 
   const act = (action: Action) => {
     if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
@@ -207,83 +236,70 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     }
   };
 
-  if (s.phase === 'ended') return <Ending s={s} steps={snap.steps} onRestart={onRestart} />;
-  if (s.phase === 'manager') return <ManagerChoice s={s} legal={legal} act={act} error={error} />;
+  if (s.phase === 'ended') return <div className="plain full"><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
+  if (s.phase === 'manager') return <div className="plain full"><ManagerChoice s={s} legal={legal} act={act} error={error} /></div>;
 
-  const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter, lines.lane) : null;
+  const endPreview = model.endPreview;
   const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
-    <div className="app">
-      <Masthead s={s} onDeck={() => setDeckOpen(true)} />
-      <StatStrip s={s} lane={lines.lane} />
+    <Desk model={model}>
+      {/* V1a scaffolding: the plain play area over the new scene, until the desk's parts replace it. */}
+      <div className="plain dock">
+        <div className="dock-stats">
+          <StatStrip s={s} lane={lines.lane} />
+          <button className="deck-open" onClick={() => setDeckOpen(true)}>
+            {t('ui.deck.open')}
+          </button>
+        </div>
+        <div className="dock-feed">
+          <Feed c={c} steps={snap.steps} />
+        </div>
+        <div className="dock-goals">
+          <GoalsBoard s={s} />
+        </div>
+        {s.phase === 'play' && (
+          <div className="dock-hand">
+            <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />
+          </div>
+        )}
+        {card && focus?.kind === 'card' && (
+          <Floating anchor={focus.anchor}>
+            <PlayPreviewView c={c} p={card} />
+          </Floating>
+        )}
+        {focus?.kind === 'end' && endPreview && (
+          <Floating anchor={focus.anchor}>
+            <EndTurnPreviewView c={c} p={endPreview} />
+          </Floating>
+        )}
+      </div>
       {error && (
-        <p className="error overlay">
+        <p className="plain error-layer">
           {t('ui.error.title')}: {error}
         </p>
       )}
-      {/* The goals stay in view through every decision (decision 6): the preview floats in the play area. */}
-      <div className="body">
-        <div className="main">
-          <div className={s.phase === 'gate' ? 'middle wide' : 'middle'}>
-            <Feed c={c} steps={snap.steps} />
-            {s.phase !== 'gate' && (
-              <aside className="side">
-                <Side s={s} />
-              </aside>
-            )}
-          </div>
-          <section className="bottom">
-            {s.phase === 'play' && <Hand s={s} inHand={lines.inHand} legal={legal} act={act} setFocus={setFocus} endPreview={endPreview} />}
+      {/* The screens around the desk (round V2) in their plain versions, over the dimmed scene. */}
+      {(s.phase === 'draft' || s.phase === 'gate') && (
+        <div className="ov">
+          <div className="scrim" />
+          <div className="plain panel">
             {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
             {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
-          </section>
-          {card && focus?.kind === 'card' && (
-            <Floating anchor={focus.anchor}>
-              <PlayPreviewView c={c} p={card} />
-            </Floating>
-          )}
-          {focus?.kind === 'end' && endPreview && (
-            <Floating anchor={focus.anchor}>
-              <EndTurnPreviewView c={c} p={endPreview} />
-            </Floating>
-          )}
+          </div>
         </div>
-        <aside className="goals-rail">
-          <GoalsBoard s={s} />
-        </aside>
-      </div>
-      {deckOpen && <DeckViewer s={s} onClose={() => setDeckOpen(false)} />}
-    </div>
+      )}
+      {deckOpen && (
+        <div className="plain deck-layer">
+          <DeckViewer s={s} onClose={() => setDeckOpen(false)} />
+        </div>
+      )}
+    </Desk>
   );
 }
 
 // ---------------------------------------------------------------------------
 // Frame: masthead, stat strip, feed, side panel
-
-function Masthead({ s, onDeck }: { s: GameState; onDeck: () => void }) {
-  const c = s.content;
-  const date = calendarLabel(c, s.turn);
-  return (
-    <header className="masthead">
-      <span className="name">{t('ui.masthead.name')}</span>
-      <span className="seed muted">{t('ui.side.seed', { seed: s.seed })}</span>
-      <span className="counts">
-        {t('ui.side.deck', { n: s.deck.length })} · {t('ui.side.discard', { n: s.discard.length })} · {t('ui.side.scandals', { n: scandalCount(s) })}
-      </span>
-      <button className="deck-open" onClick={onDeck}>
-        {t('ui.deck.open')}
-      </button>
-      {/* The date (round 2c, A3): the month and year, then the season and the month's place in it. */}
-      <span className="when">
-        <HoverTip header={date} line={dateLine(c, s.turn)} align="right" className="date">
-          <strong>{date}</strong>
-        </HoverTip>{' '}
-        <span className="season muted">{seasonLabel(c, s.turn)}</span>
-      </span>
-    </header>
-  );
-}
 
 /**
  * A tooltip (round 2c, A2): shown on hover, or on a long-press on touch until the next tap; a header, then
@@ -434,28 +450,6 @@ function FrontPageView({ c, month }: { c: ContentIndex; month: MonthPress }) {
         })}
       </ol>
     </li>
-  );
-}
-
-/** This season's gates, live. Not shown at a gate: the gate panel shows them in full there. */
-function Side({ s }: { s: GameState }) {
-  const c = s.content;
-  return (
-    <div className="side-box">
-      <h2>{t('ui.side.thisSeason')}</h2>
-      {(c.gatesByAct[String(s.act)] ?? []).map((g) => (
-        <div key={g.id} className="mini-gate">
-          <strong>{gateName(c, g.id)}</strong>
-          <ul>
-            {explainCondition(g.requires, s).map((clause, i) => (
-              <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                {clauseLine(clause)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
   );
 }
 

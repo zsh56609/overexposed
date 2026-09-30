@@ -20,6 +20,14 @@ export type CardFace = (typeof CARD_FACES)[number];
 export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy'] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
+/** The seasons the scene can light (round V1a; docs/design/visual/README.md): one per act, in content. */
+export const SEASON_IDS = ['spring', 'summer', 'autumn', 'winter'] as const;
+export type SeasonId = (typeof SEASON_IDS)[number];
+
+/** The mirror's sticky notes (round V1a; README §3): each major's colour. */
+export const NOTE_COLOURS = ['yellow', 'green', 'blue', 'pink'] as const;
+export type NoteColour = (typeof NOTE_COLOURS)[number];
+
 /** The feed's three voices (docs/ui-plan.md §13, decision 15): which typography a card's headline gets. */
 export const REGISTERS = ['loud', 'quiet', 'money'] as const;
 export type Register = (typeof REGISTERS)[number];
@@ -220,6 +228,8 @@ export interface MajorDef {
   readonly nameKey: string;
   /** Its goals-board line. */
   readonly goalKey: string;
+  /** Its sticky note's colour on the mirror (round V1a). */
+  readonly note?: NoteColour;
 }
 
 export interface MinorDef {
@@ -287,6 +297,22 @@ export interface PaperDef {
   readonly spilloverKeys?: readonly string[];
   /** Its fame filler: what it prints about a famous player who did nothing newsworthy (a line group, with the subject). */
   readonly fillerKeys?: readonly string[];
+  /** Its issue number on the desk (round V1a): base + month × step. */
+  readonly issue?: { readonly base: number; readonly step: number };
+}
+
+/**
+ * A paper's weekend box office (round V1a; README §2): a ring of film titles, one entering at the top each
+ * month and sliding down; the player's film tops it once they are famous on its lane.
+ */
+export interface BoxOfficeDef {
+  readonly paper: string;
+  readonly titleKeys: readonly string[];
+  readonly rows: number;
+  /** Each row's takings in tenths of a million, top first; each month adds a seeded 0…jitter−1. */
+  readonly grosses: readonly number[];
+  readonly jitter: number;
+  readonly player: { readonly titleKey: string; readonly gross: number; readonly fromTier: number; readonly lane: string };
 }
 
 /** How prominent a story is on a front page, most first. */
@@ -375,6 +401,7 @@ export interface PressDef {
   };
   /** The rival (design §3.3): the jam's light rival, introduced through the press. */
   readonly rival?: { readonly arcs: readonly RivalArcDef[] };
+  readonly boxOffice?: BoxOfficeDef;
 }
 
 // ---------------------------------------------------------------------------
@@ -506,6 +533,8 @@ export interface Rules {
   readonly turnsPerAct: number;
   /** i18n key naming each act, in order (the seasons). One per act. */
   readonly actNameKeys: readonly string[];
+  /** The season each act is (round V1a): the scene's light and the stat bar's marks. One per act. */
+  readonly seasons?: readonly SeasonId[];
   /** Each act's season opener variants (decision 15), one list per act; one variant per run. */
   readonly actOpenerKeys?: readonly (readonly string[])[];
   /** The opening premise's variants, shown on the title screen; one per run. */
@@ -636,6 +665,8 @@ export interface ContentIndex {
   readonly awards: readonly AwardDef[];
   readonly press: PressDef | null;
   readonly managers: ManagersDef | null;
+  /** The desk scripts (round 2c), for the desk (round V1a). */
+  readonly scripts: DeskScriptsDef | null;
   /** Scandal card ids in content order: the pool heat crystallises from. */
   readonly scandalIds: readonly string[];
   /** Tags every scandal carries (e.g. the marker removal cards target). They say nothing about the kind of trouble. */
@@ -664,6 +695,7 @@ export function indexContent(content: Content): ContentIndex {
     awards: content.awards ?? [],
     press: content.press ?? null,
     managers: content.managers ?? null,
+    scripts: content.scripts ?? null,
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
   };

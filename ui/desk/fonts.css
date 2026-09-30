@@ -1,0 +1,25 @@
+/* The game's two families, self-hosted (round V1a; README: the game loads no web fonts). Each file is the
+   whole variable font in a WOFF2 wrapper that leaves its data unchanged (tools/woff2.ts), under the SIL Open
+   Font License 1.1 (ui/fonts/OFL.txt; the in-game credits). */
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../fonts/PlayfairDisplay.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../fonts/PlayfairDisplay-Italic.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Libre Franklin';
+  src: url('../fonts/LibreFranklin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}

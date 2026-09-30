@@ -21,6 +21,9 @@ export { bagIndex, bagKey, hashId, onceIndex, onceItem, onceKey } from './varian
 export {
   fameTier,
   frontPages,
+  issueNow,
+  boxOffice,
+  type BoxOfficeRow,
   lanePaper,
   paperOf,
   playerShare,

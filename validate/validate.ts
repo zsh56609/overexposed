@@ -27,6 +27,8 @@ import {
   PROMINENCES,
   REGISTERS,
   SCENE_IDS,
+  SEASON_IDS,
+  NOTE_COLOURS,
   SCRIPT_LINE_KINDS,
   RESOURCE_KEYS,
   scandalGroup,
@@ -98,7 +100,7 @@ const CARD_FIELDS = [
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
 const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
-const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey'];
+const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note'];
 const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKeys', 'goalKey'];
 const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
 /** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
@@ -112,6 +114,7 @@ const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
+  'seasons',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls', 'laneCards'];
 
@@ -152,6 +155,8 @@ class Ctx {
   lanes: readonly string[] = [];
   /** rules.fameBands' ids, once checked (round 2c). */
   fameBands: readonly string[] = [];
+  /** rules.seasons, once checked (round V1a). */
+  seasons: readonly string[] = [];
 
   error(check: CheckId, where: string, message: string): void {
     this.issues.push({ level: 'error', check, where, message });
@@ -313,6 +318,15 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
       v.error('ranges', 'rules.actNameKeys', `has ${raw.actNameKeys.length} entries for ${v.acts} acts`);
     }
     raw.actNameKeys.forEach((k, i) => v.key(k, `rules.actNameKeys[${i}]`));
+  }
+  // The season each act is (round V1a): one per act, each one the scene can light.
+  if (raw.seasons !== undefined) {
+    if (!Array.isArray(raw.seasons) || raw.seasons.length !== v.acts) v.error('schema', 'rules.seasons', `must be a list of one season per act (${v.acts})`);
+    else
+      raw.seasons.forEach((s, i) => {
+        if (!(SEASON_IDS as readonly unknown[]).includes(s)) v.error('schema', `rules.seasons[${i}]`, `must be one of ${SEASON_IDS.join(', ')}, got ${q(s)}`);
+      });
+    v.seasons = Array.isArray(raw.seasons) ? raw.seasons.filter(isStr) : [];
   }
   if (raw.actOpenerKeys !== undefined) {
     if (!Array.isArray(raw.actOpenerKeys)) v.error('schema', 'rules.actOpenerKeys', 'must be an array: one list of opener variants per act');
@@ -738,6 +752,8 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
     v.fields(m, MAJOR_FIELDS, where);
     v.key(m.nameKey, `${where}.nameKey`);
     v.key(m.goalKey, `${where}.goalKey`);
+    // Its sticky note on the mirror (round V1a).
+    if (m.note !== undefined && !(NOTE_COLOURS as readonly unknown[]).includes(m.note)) v.error('schema', `${where}.note`, `must be one of ${NOTE_COLOURS.join(', ')}, got ${q(m.note)}`);
     if (!isObj(m.on)) return v.error('schema', `${where}.on`, 'must name its side of every axis, like { "fame": "known" }');
     v.fields(m.on, [...axisSides.keys()], `${where}.on`);
     for (const [axis, sides] of axisSides) {
@@ -966,6 +982,7 @@ function checkProse(
   gates: readonly Obj[],
   endings: { readonly majors: readonly Obj[]; readonly minors: readonly Obj[] },
   awards: readonly Obj[],
+  press: unknown,
 ): void {
   const written = (key: unknown) =>
     isStr(key) && typeof i18n[key] === 'string' && i18n[key] !== '' && !String(i18n[key]).startsWith(PROSE_PLACEHOLDER);
@@ -998,6 +1015,10 @@ function checkProse(
     if (!anyWritten(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
   }
   if (!anyWritten(rules?.openingKeys)) v.warn('prose', 'rules.openingKeys', 'no opening premise');
+  // The box office's film titles (round V1a): the mockup's are samples, not prose.
+  const films: unknown[] = isObj(press) && isObj(press.boxOffice) && Array.isArray(press.boxOffice.titleKeys) ? press.boxOffice.titleKeys : [];
+  const unwrittenFilms = films.filter((k) => !written(k)).length;
+  if (unwrittenFilms > 0) v.warn('prose', 'press.boxOffice.titleKeys', `${unwrittenFilms} of ${films.length} film titles not written`);
   for (const a of awards) {
     const missing = (['nameKey', 'citationKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
     if (missing.length > 0) v.warn('prose', `award ${String(a.id)}`, `no ${missing.join(', ')}`);
@@ -1155,7 +1176,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
   const awards = checkAwards(v, raw.awards, endingIds);
   checkReferences(v, rules, cards);
-  checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)));
+  checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)), isObj(i18n) ? i18n : {});
   checkManagers(v, raw.managers, rules, raw.endings);
   checkFaces(v, rules, cards);
   checkScripts(v, raw.scripts, rules);
@@ -1164,7 +1185,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   checkBudget(v, cards, gates, endings);
   const i18nKeys = i18n === undefined ? 0 : checkI18n(v, i18n);
   if (isObj(i18n)) {
-    checkProse(v, i18n, rules, cards, gates, endings, awards);
+    checkProse(v, i18n, rules, cards, gates, endings, awards, raw.press);
     checkVariants(v, raw, i18n, appearances);
     checkTierWords(v, rules, i18n);
   }
@@ -1178,17 +1199,31 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 // ---------------------------------------------------------------------------
 // The press (content/press.json, phase 2a): three papers, where each line prints, what they call the player.
 
-const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'scenes', 'rival'];
+const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'scenes', 'rival', 'boxOffice'];
 const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom', 'filler'];
 
-function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>): void {
+function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>, i18n: Obj): void {
   const file = 'content/press.json';
   if (raw === undefined) return v.error('schema', file, 'is missing: the papers every line prints in');
   if (!isObj(raw)) return v.error('schema', file, 'must be an object: { papers, route, subjects, earlyLane }');
   v.fields(raw, PRESS_FIELDS, file);
   const papers = checkList(v, raw.papers, `${file} papers`, 'paper', (p, where) => {
-    v.fields(p, ['id', 'mastheadKey', 'world', 'sagas', 'spilloverKeys', 'fillerKeys'], where);
+    v.fields(p, ['id', 'mastheadKey', 'world', 'sagas', 'spilloverKeys', 'fillerKeys', 'issue'], where);
     v.key(p.mastheadKey, `${where}.mastheadKey`);
+    // On the desk (round V1a): the issue number, and the masthead's words by convention — its ears, its
+    // tagline, its issue label, its kickers; a {weather} ear reads the paper's weather for each season.
+    if (p.issue !== undefined) {
+      if (!isObj(p.issue)) v.error('schema', `${where}.issue`, 'must be { base, step }');
+      else {
+        v.fields(p.issue, ['base', 'step'], `${where}.issue`);
+        v.int(p.issue.base, `${where}.issue.base`, [0, 999999]);
+        v.int(p.issue.step, `${where}.issue.step`, [0, 9999]);
+      }
+    }
+    if (isStr(p.id)) {
+      for (const part of ['ear.left', 'ear.right', 'tagline', 'issue', 'kicker.player', 'kicker.world']) v.key(`paper.${p.id}.${part}`, `${where} (desk: ${part})`);
+      if (String(i18n[`paper.${p.id}.ear.left`] ?? '').includes('{weather}')) for (const s of v.seasons) v.key(`paper.${p.id}.weather.${s}`, `${where} (desk: weather, ${s})`);
+    }
     // Its world news: a pool of stories, each for any season or only its own.
     if (p.world !== undefined) {
       if (!Array.isArray(p.world) || p.world.length === 0) v.error('schema', `${where}.world`, 'must be a non-empty list of { key, act? }');
@@ -1326,6 +1361,35 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
       }
     }
   }
+
+  // The weekend box office (round V1a): a ring of film titles on one paper, and the player's film.
+  const bo = raw.boxOffice;
+  if (bo !== undefined) {
+    const at = `${file} boxOffice`;
+    if (!isObj(bo)) v.error('schema', at, 'must be { paper, titleKeys, rows, grosses, jitter, player }');
+    else {
+      v.fields(bo, ['paper', 'titleKeys', 'rows', 'grosses', 'jitter', 'player'], at);
+      paper(bo.paper, `${at}.paper`);
+      v.keys(bo.titleKeys, `${at}.titleKeys`);
+      const titles = Array.isArray(bo.titleKeys) ? bo.titleKeys.length : 0;
+      v.int(bo.rows, `${at}.rows`, [1, Math.max(1, titles)]);
+      if (!Array.isArray(bo.grosses) || bo.grosses.length < (isInt(bo.rows) ? bo.rows : 1)) v.error('schema', `${at}.grosses`, 'must give every row its takings');
+      else bo.grosses.forEach((g, i) => v.int(g, `${at}.grosses[${i}]`, [0, 9999]));
+      v.int(bo.jitter, `${at}.jitter`, [0, 99]);
+      const pl = bo.player;
+      if (!isObj(pl)) v.error('schema', `${at}.player`, 'must be { titleKey, gross, fromTier, lane }');
+      else {
+        v.fields(pl, ['titleKey', 'gross', 'fromTier', 'lane'], `${at}.player`);
+        v.key(pl.titleKey, `${at}.player.titleKey`);
+        v.int(pl.gross, `${at}.player.gross`, [0, 9999]);
+        v.int(pl.fromTier, `${at}.player.fromTier`, [0, 20]);
+        if (!v.lanes.includes(pl.lane as string)) v.error('references', `${at}.player.lane`, `no lane ${q(pl.lane)}`);
+      }
+      for (const part of ['title', 'new', 'gross']) v.key(`paper.${String(bo.paper)}.boxoffice.${part}`, `${at} (desk: ${part})`);
+    }
+  }
+  // The desk's shared words (round V1a): the kickers every paper uses, the captions.
+  for (const k of ['paper.kicker.brief', 'paper.kicker.scandal', 'paper.kicker.justIn', 'paper.caption.player', 'paper.caption.scandal', 'paper.caption.rival', 'paper.caption.world', 'paper.dek', 'paper.dek.scandal']) v.key(k, `${file} (desk)`);
 
   // The rival: one arc per run, a beat per season in a named paper, a closing line, the major she ends in.
   const rival = raw.rival;

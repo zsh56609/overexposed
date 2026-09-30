@@ -1,0 +1,43 @@
+/* The scene (round V1a; README "The scene"): a dressing-room vanity seen from the chair. Its layers, back to
+   front, as the mockup stacks them (z-index in brackets):
+     wall and light pool · papers [5] and the mirror [5] with their shadows [4] · the floor [9] ·
+     the desk plane [10] and its front edge [11] · upright props [20] · crumpled paper [21] ·
+     this month's pile [26, empty until V1b] · the manager's bubbles [30] · the season's dim [32] ·
+     the hand [35] · the stat bar [60] · END TURN [70] · tooltips [90] · the plain screens on top [150].
+   Every selector is scoped under .desk: the plain screens keep their own styles (ui/style.css, .plain). */
+
+.desk {
+  position: absolute; inset: 0; width: 1280px; height: 720px; overflow: clip;
+  font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 16px; line-height: normal; color: var(--ink);
+  background: radial-gradient(ellipse at 58% 26%, var(--wall) 0%, var(--wall2) 62%, #0c0907 100%);
+}
+.desk *, .desk *::before, .desk *::after { box-sizing: border-box; margin: 0; padding: 0; }
+.desk button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; }
+
+.desk .wallpaper { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 235, 200, .028) 0 2px, transparent 2px 40px); }
+.desk .lightpool { position: absolute; left: 540px; top: 0; width: 780px; height: 560px; background: radial-gradient(ellipse at 50% 40%, var(--light), transparent 62%); opacity: .26; mix-blend-mode: screen; transition: background .7s; }
+.desk .dim { position: absolute; inset: 0; background: #0a1020; opacity: var(--dim); pointer-events: none; transition: opacity .7s; z-index: 32; }
+
+/* The desk in true perspective (README: perspective 1100px, origin 640px 140px; tilted 64° about its front edge). */
+.desk .deskscene { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; perspective: 1100px; perspective-origin: 640px 140px; pointer-events: none; z-index: 10; }
+.desk .desktop { position: absolute; left: 70px; top: 316px; width: 1140px; height: 240px; transform-origin: 50% 100%; transform: rotateX(64deg); background: linear-gradient(180deg, #5a3f2b 0%, #4a3322 45%, #3b2819 100%); }
+.desk .desktop::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0, 0, 0, .07) 0 2px, transparent 2px 23px), repeating-linear-gradient(90deg, rgba(255, 220, 170, .04) 0 1px, transparent 1px 61px); }
+.desk .desktop::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 70px; background: linear-gradient(180deg, rgba(0, 0, 0, .55), transparent); }
+.desk .deskfront { position: absolute; left: 70px; top: 556px; width: 1140px; height: 30px; z-index: 11; background: linear-gradient(180deg, #2e1f14, #1e140c); box-shadow: 0 14px 26px rgba(0, 0, 0, .6), inset 0 2px 0 rgba(255, 220, 170, .14); }
+.desk .floor { position: absolute; left: 0; right: 0; top: 586px; bottom: 0; background: linear-gradient(180deg, #0e0a07, #070504); z-index: 9; }
+
+/* This month's pile (V1b fills it; README §9 "Playing a card"): cards that lie on the desk share the desk's own
+   perspective — the same vanishing point and the same hinge (its front edge, 640,556) — so they converge
+   with the phone and the desk. The layer sits under the hand. */
+.desk .scene3d { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; perspective: 1100px; perspective-origin: 640px 140px; pointer-events: none; }
+.desk .scene3d.pile { z-index: 26; }
+.desk .plane { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 640px 556px; pointer-events: none; }
+
+/* The screens around the desk (V2) keep their plain versions until then, over the dimmed scene; the stat bar
+   stays in view above them (README §9). */
+.desk .ov { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; z-index: 150; }
+.desk .ov .scrim { position: absolute; inset: 0; background: rgba(8, 6, 4, .74); backdrop-filter: blur(2.5px); }
+
+/* A short note in the middle of the desk: a scandal card can't be played; no actions left (README §9). */
+.desk .toast { position: absolute; left: 50%; top: 430px; transform: translateX(-50%); z-index: 130; background: var(--ink); color: var(--cream); border: 1px solid rgba(255, 220, 170, .25); padding: 8px 14px; font-size: 12px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+.desk .toast.on { opacity: 1; }

@@ -3,6 +3,7 @@
     {
       "id": "flash",
       "mastheadKey": "paper.flash.masthead",
+      "issue": { "base": 20400, "step": 31 },
       "world": [
         { "key": "paper.flash.world.1" },
         { "key": "paper.flash.world.2" },
@@ -39,6 +40,7 @@
     {
       "id": "bside",
       "mastheadKey": "paper.bside.masthead",
+      "issue": { "base": 200, "step": 1 },
       "world": [
         { "key": "paper.bside.world.1" },
         { "key": "paper.bside.world.2" },
@@ -86,6 +88,7 @@
     {
       "id": "marquee",
       "mastheadKey": "paper.marquee.masthead",
+      "issue": { "base": 1100, "step": 6 },
       "world": [
         { "key": "paper.marquee.world.1" },
         { "key": "paper.marquee.world.2" },
@@ -166,6 +169,17 @@
     "overwhelmScandalFrom": 4,
     "overwhelmLaneFrom": 4,
     "filler": { "laneFrom": 3, "laneBelow": 2, "fillLaneFrom": 4, "scandalPaperFrom": 4 }
+  },
+  "boxOffice": {
+    "paper": "marquee",
+    "titleKeys": [
+      "paper.marquee.film.1", "paper.marquee.film.2", "paper.marquee.film.3", "paper.marquee.film.4", "paper.marquee.film.5",
+      "paper.marquee.film.6", "paper.marquee.film.7", "paper.marquee.film.8", "paper.marquee.film.9", "paper.marquee.film.10"
+    ],
+    "rows": 4,
+    "grosses": [46, 35, 25, 15],
+    "jitter": 5,
+    "player": { "titleKey": "paper.marquee.film.player", "gross": 63, "fromTier": 4, "lane": "screen" }
   },
   "rival": {
     "arcs": [

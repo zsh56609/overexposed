@@ -6,6 +6,60 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a, Part A: the desk's foundations
+
+- **The stage** stays the one 1280×720 stage, scaled to fit, and now
+  clips: nothing of the scene draws outside it. The new styles live under
+  `.desk`, the old ones under `.plain`, so the two never collide while
+  both are on screen.
+- **Fonts**: Playfair Display (regular and italic) and Libre Franklin,
+  the variable fonts, self-hosted as WOFF2 in `ui/fonts/`. No dependency
+  and no download at run time: `tools/woff2.ts` wraps each original TTF
+  in WOFF2 without transforming its tables, and checks that every table
+  comes back byte for byte. The font data is unchanged and not subset,
+  so under the OFL-FAQ the fonts keep their names although Playfair has
+  a Reserved Font Name. The notices and the licence ship beside them
+  (`ui/fonts/OFL.txt`) and are credited in-game (a Credits screen from
+  the title) and in `CREDITS.md` for the itch page.
+- **Tokens**: the README's colours, the season lights, the value
+  colours and the paper stocks are CSS variables (`ui/desk/tokens.css`),
+  never literals in the components.
+- **One adapter** (`ui/desk/model.ts`) turns state and history into
+  every word and number the desk shows, from /core queries and content;
+  the components render its fields and compute nothing. It is pure, so
+  check:preview can hold the desk to /core.
+- **The issue on the desk** is the current month's, as it stands: in the
+  play phase, the front pages as they would print if the month ended now
+  (the stories printed so far plus the scandals its end would add, from
+  the reducer run the END TURN preview already makes — those are marked
+  `coming` for V1b); while drafting, the month so far (/core's new
+  `issueNow`); at a gate and at the year's end, the month just printed.
+  The crisis look follows that issue's frenzy.
+- **The box office is /core's** (`boxOffice`, seeded, never the game
+  RNG), its films and takings content (`press.boxOffice`). It takes the
+  Marquee's right column unless the lead is the rival's, a scandal, or
+  the player's own story before they are famous — those carry a
+  photograph, as the mockup sets it.
+- **The photographs' shuffle bag is counted by /core**: each lead carries
+  `photo`, how many earlier months led its paper with the same scene, and
+  the desk picks the drawing with `bagIndex` on it — never the same
+  picture on a paper two times running, and no comparison in /ui. The
+  street is one bag whatever the season; the season only changes how it
+  is drawn.
+- **Content, not code**: the sticky notes' colours (`majors[].note`), the
+  season of each act (`rules.seasons`), each paper's issue number
+  (`papers[].issue`). Validate checks all three and every desk key.
+- **The desk's words** — the papers' ears, taglines, issue labels and
+  kickers, the captions, the props' labels, the card faces' header
+  lines — are the mockup's, keyed in `en.json`. The ten film titles are
+  the mockup's sample list and stay `TODO(prose)` until the author
+  approves them; the player's film, *One Year*, is the README's.
+- **Scaffolding**: until Parts B–F replace them, the plain stat strip,
+  feed, goals board and hand sit over the new scene where the desk's
+  parts will go, so the game stays playable end to end; the draft, the
+  gates, the deck and the ending keep their plain screens (V2) over the
+  dimmed scene.
+
 ## 2026-10-01 — Round 308e7bb answered; round V1a begins
 
 Round V1a builds the desk as the visual reference's README §1–§7 describe

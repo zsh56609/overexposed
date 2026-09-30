@@ -8,25 +8,29 @@
       "id": "breakthrough",
       "on": { "fame": "known", "reputation": "clean" },
       "nameKey": "ending.breakthrough.name",
-      "goalKey": "ending.breakthrough.goal"
+      "goalKey": "ending.breakthrough.goal",
+      "note": "yellow"
     },
     {
       "id": "long_game",
       "on": { "fame": "unknown", "reputation": "clean" },
       "nameKey": "ending.long_game.name",
-      "goalKey": "ending.long_game.goal"
+      "goalKey": "ending.long_game.goal",
+      "note": "green"
     },
     {
       "id": "overexposed",
       "on": { "fame": "known", "reputation": "damaged" },
       "nameKey": "ending.overexposed.name",
-      "goalKey": "ending.overexposed.goal"
+      "goalKey": "ending.overexposed.goal",
+      "note": "blue"
     },
     {
       "id": "hard_way",
       "on": { "fame": "unknown", "reputation": "damaged" },
       "nameKey": "ending.hard_way.name",
-      "goalKey": "ending.hard_way.goal"
+      "goalKey": "ending.hard_way.goal",
+      "note": "pink"
     }
   ],
   "minors": [

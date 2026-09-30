@@ -2,6 +2,7 @@
   "acts": 4,
   "turnsPerAct": 3,
   "actNameKeys": ["act.spring.name", "act.summer.name", "act.autumn.name", "act.winter.name"],
+  "seasons": ["spring", "summer", "autumn", "winter"],
   "actOpenerKeys": [["act.spring.opener.1"], ["act.summer.opener.1"], ["act.autumn.opener.1"], ["act.winter.opener.1"]],
   "openingKeys": ["story.opening.1"],
   "handSize": 5,

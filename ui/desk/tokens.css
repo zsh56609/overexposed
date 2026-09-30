@@ -1,0 +1,66 @@
+/* The desk's tokens (round V1a; docs/design/visual/README.md). Every colour the scene uses is named here,
+   exactly as the README and the approved mockup (v18) give it; the component styles read these names. */
+
+.desk {
+  /* The palette (AGENTS.md §6): newsprint cream, ink, tabloid red. */
+  --cream: #EDE6D6;
+  --ink: #15120E;
+  --red: #D92B1F;
+
+  /* The stat bar's icons: these colours never change (README §1). */
+  --icon-hype: #ffd84a;
+  --icon-craft: #8fc7ff;
+  --icon-heat: #ff7a4a;
+  --icon-money: #b9e38a;
+  --icon-scandal: #e0584a;
+
+  /* A card's values: icon and number in the resource's colour (README §6); money green earned, red spent. */
+  --val-hype: #8a6a00;
+  --val-craft: #1b4f8a;
+  --val-heat: #c2410c;
+  --val-gain: #1d7a33;
+  --val-cost: #b3261e;
+  /* …lighter on the dark faces (headshot, all-access pass)… */
+  --val-dark-hype: #ffd84a;
+  --val-dark-craft: #9fd0ff;
+  --val-dark-heat: #ff9a6b;
+  --val-dark-gain: #8fe08a;
+  --val-dark-cost: #ff8a7a;
+  /* …paler on pink gloss… */
+  --val-gloss-hype: #fff0a0;
+  --val-gloss-heat: #ffd3bd;
+  --val-gloss-gain: #d4f8cb;
+  --val-gloss-cost: #ffd0cb;
+  /* …deeper on gold foil. */
+  --val-gold-hype: #5a4100;
+  --val-gold-craft: #123c6e;
+  --val-gold-heat: #8a2a06;
+  --val-gold-gain: #15501e;
+  --val-gold-cost: #7d1710;
+
+  /* The seasons' marks (README §1). */
+  --season-spring: #8fd98a;
+  --season-summer: #ffd84a;
+  --season-autumn: #ff8a3d;
+  --season-winter: #d4e9ff;
+
+  /* The papers (README §2): newsprint and its ink; each paper's colour; the margin rules. */
+  --newsprint: #ece6d9;
+  --newsprint-ink: #1a1714;
+  --paper-flash: #c4261b;
+  --paper-bside: #2c6863;
+  --paper-marquee: #1a1714;
+  --mark-you: #D92B1F;
+  --mark-rival: #6a4fb3;
+
+  /* The scene's light, by season (README: season changes the light — colour temperature and --dim). */
+  --light: #ffd98a;
+  --glass: rgba(255, 215, 150, .20);
+  --wall: #3a2c20;
+  --wall2: #1d150f;
+  --dim: 0;
+}
+.desk.spring { --light: #eef3b8; --glass: rgba(175, 215, 190, .24); --wall: #353024; --wall2: #1c1813; --sc: var(--season-spring); }
+.desk.summer { --light: #ffd98a; --glass: rgba(255, 215, 150, .20); --wall: #3c2d20; --wall2: #1e1610; --sc: var(--season-summer); }
+.desk.autumn { --light: #ff9d4d; --glass: rgba(255, 150, 85, .24); --wall: #3d2618; --wall2: #1f130c; --sc: var(--season-autumn); }
+.desk.winter { --light: #a9c6ec; --glass: rgba(150, 180, 225, .28); --wall: #232730; --wall2: #101217; --dim: .22; --sc: var(--season-winter); }
