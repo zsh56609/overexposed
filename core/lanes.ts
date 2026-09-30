@@ -1,7 +1,8 @@
 // Career lanes (docs/design/content-expansion.md §2): music, screen, celebrity. The player never picks one;
 // it is read from the cards they played — the résumé is what you did, not what you held. Neutral cards
-// (draws, relief, money, removal) never count, and neither, by default, does the starting deck every run
-// shares (rules.laneStartingDeck): the lane is the career built from it. Read-only; ids and numbers only.
+// (utility: draws, heat relief, scandal removal) never count, and neither, by default, does the starting
+// deck every run shares (rules.laneStartingDeck): the lane is the career built from it. Read-only; ids
+// and numbers only.
 
 import { getCard, type ContentIndex } from './content.ts';
 

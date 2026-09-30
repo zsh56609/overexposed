@@ -147,7 +147,7 @@ Still open:
   only fast-forwards) before any animation lands.
 - Code comments still cite "CLAUDE.md §N" in 11 places. They resolve,
   because CLAUDE.md imports AGENTS.md.
-- AGENTS.md is at 26,268 bytes (limit ~28 KiB).
+- AGENTS.md is at 26,325 bytes (limit ~28 KiB).
 - Tooling: the Vite dev server on Windows sometimes misses the last of
   several writes to one file within a second and then serves a stale
   module. After a scripted multi-edit, touch the file (or restart the
@@ -178,8 +178,8 @@ follows the expansion.
   relief plus scandal removal, which the design's own rule calls neutral;
   borderline: Late Night Show (screen, though it is a music performance on
   TV), Street Team and Press Junket (celebrity, though promotion and
-  interviews come with any career), Brand Deal and Sellout Ad (celebrity,
-  though they are money).
+  interviews come with any career), Brand Deal and Sellout Ad (celebrity:
+  money cards, where Side Gig is neutral).
 - **"Household name"**: the tier word and the minor ending share a name.
 - **Three headlines still name a career stage** (Press Junket "RISING
   SINGER", Indie Label "NEWCOMER", Public Feud "NEWCOMER"): kept for phase
