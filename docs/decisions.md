@@ -6,6 +6,28 @@ rules).
 
 ---
 
+## 2026-09-30 — Round 2b, Part B: draft v6
+
+Draft v6 is saved verbatim (docs/writing/draft-v6.md) and committed on its
+own before any import. Its pieces land with the parts that build their
+structure: the subject-slot rewrites and the variants for the most
+repeated groups here; the managers, their perks and the choice screen in
+Part C; the sagas, the new world stories and the fame filler in Part D.
+
+The five Flash headlines that hard-coded SINGER now carry the subject
+slot (Street Team's and Old Rumor's reworded as well as re-slotted), and
+nine groups gain variants. Read against voice.md — every variant correct
+in every branch and at every fame tier — two are borderline, for the
+author:
+- **Copycat Story, "STILL THE ONLY STORY IN TOWN"**: while the player is
+  Unknown or Noticed a scandal prints as a brief (fame amplifies scandal),
+  so "the only story in town" overstates it there. "NOW EVERY OUTLET HAS
+  THE STORY" had the same tension.
+- **Cover Single, "A cover that knows exactly what it's borrowing, and
+  why."**: praise of the cover's intelligence, printed also in the weak
+  branch (craft under 15); the other variant hedges ("the jury's still
+  out").
+
 ## 2026-09-30 — Round 2b, Part A: corrections
 
 - **Fame amplifies scandal** — a design principle. A scandal's
