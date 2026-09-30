@@ -6,7 +6,7 @@
 import { memo, useEffect, useRef, useState, type FocusEvent, type PointerEvent } from 'react';
 import type { SeasonId } from '../../core/index.ts';
 import { isPlaceholder } from '../text.ts';
-import { Icon, SeasonMark } from './Icons.tsx';
+import { Icon, keyboardFocus, SeasonMark } from './Icons.tsx';
 import type { StatBarModel, StatCellModel } from './model.ts';
 
 type TipId = StatCellModel['id'] | 'actions' | 'when';
@@ -53,7 +53,7 @@ export const StatBar = memo(function StatBar({ stats, season, onDeck }: { stats:
     onPointerCancel: () => window.clearTimeout(press.current),
     // Keyboard focus only: a tap also focuses the cell, and on touch the tooltip is a long-press.
     onFocus: (e: FocusEvent<HTMLElement>) => {
-      if (e.currentTarget.matches(':focus-visible')) show(id, e.currentTarget);
+      if (keyboardFocus(e.currentTarget)) show(id, e.currentTarget);
     },
     onBlur: () => setTip(null),
   });

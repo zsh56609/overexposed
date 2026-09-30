@@ -9,7 +9,7 @@ import { memo, useCallback, useRef, type KeyboardEvent, type PointerEvent, type 
 import type { SeasonId } from '../../core/index.ts';
 import { isPlaceholder } from '../text.ts';
 import { photoUrl } from './halftone.ts';
-import { Icon } from './Icons.tsx';
+import { Icon, keyboardFocus } from './Icons.tsx';
 import type { EndTurnModel, HandCardModel, HandWords } from './model.ts';
 
 /** Where a preview attaches: an element's box on the stage (App's Floating reads it). */
@@ -135,7 +135,7 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
       onPointerUp={() => window.clearTimeout(press.current)}
       onPointerCancel={() => window.clearTimeout(press.current)}
       onFocus={(e) => {
-        if (e.currentTarget.matches(':focus-visible')) focus({ kind: 'card', uid: card.uid, anchor });
+        if (keyboardFocus(e.currentTarget)) focus({ kind: 'card', uid: card.uid, anchor });
       }}
       onBlur={() => focus(null)}
       onClick={onClick}
@@ -204,7 +204,7 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
           if (e.pointerType === 'mouse') focus(null);
         }}
         onFocus={(e) => {
-          if (e.currentTarget.matches(':focus-visible')) focus({ kind: 'end', anchor: END_ANCHOR });
+          if (keyboardFocus(e.currentTarget)) focus({ kind: 'end', anchor: END_ANCHOR });
         }}
         onBlur={() => focus(null)}
         onClick={onEnd}

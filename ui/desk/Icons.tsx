@@ -63,6 +63,18 @@ export function IconDefs() {
   );
 }
 
+/**
+ * Whether an element has keyboard focus (`:focus-visible`), false where the browser does not know the
+ * selector (older Safari throws on it). A tap also focuses; only the keyboard opens a tooltip or a preview.
+ */
+export function keyboardFocus(el: Element): boolean {
+  try {
+    return el.matches(':focus-visible');
+  } catch {
+    return false;
+  }
+}
+
 /** One icon by reference; `className` sets its size and colour. */
 export function Icon({ id, className }: { id: IconId; className?: string }) {
   return (
