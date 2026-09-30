@@ -310,7 +310,7 @@ The ending screen exists to make that zero-friction.
 | Layer | Scope |
 |---|---|
 | **1 — Function** | A complete run playable in the browser. Every screen exists. Preview works. Ugly is fine. Built 2026-09-29. |
-| **2 — Meaning and art** | The meaning layer first — goals board, feed headlines and headline fields, ending names, season openers, deck viewer. Visual craft alongside it, never ahead: type, palette, halftone, card layout, front-page setting, season transitions, per AGENTS.md §6 — not illustration, which is layer 4. Decisions in §13. |
+| **2 — Meaning and art** | The meaning layer first — goals board, feed headlines and headline fields, ending names, season openers, deck viewer. Visual craft alongside it, never ahead: type, palette, halftone, card layout, front-page setting, season transitions, per AGENTS.md §6 — not illustration, which is layer 4. Decisions in §13; the approved visual direction in §14. |
 | 3 — Motion | Card flight, number roll-up, crystallisation hit-stop and shake, winter crowding. |
 | 4 — Illustration | The four ending illustrations (public-domain collage). Not before 2026-10-26. |
 | — Onboarding | After layer 2. Contextual hints, not a tutorial level. |
@@ -564,3 +564,46 @@ it.
 
 - First-run mechanic exposure (docs/decisions.md, 2026-09-29): a manual
   test for the author's next playtest.
+
+---
+
+## 14. Visual phase
+
+The visual direction the author approved through mockups (2026-09-30,
+round 2a). Recorded here so it survives until the visual phase; **none of
+it is built yet.** The phase designs for the one 1280×720 stage
+(decision 17) and keeps everything inside it.
+
+- **The scene**: a dressing-room vanity with a lightbulb mirror, drawn in
+  true CSS perspective. The mirror is the private self — the goals as
+  sticky notes on the glass; the papers are the public self.
+- **The papers are traditional newsprint, not magazines**: grain, a fold,
+  yellowed edges, ears beside the masthead, a dateline, columns of body
+  text, black-and-white halftone photographs with captions. They differ
+  within the newspaper idiom: a red-top tabloid (The Daily Flash); a music
+  weekly with one spot colour (B-Side); a trade paper, dense, with a
+  box-office table (Marquee). A glossy magazine was considered and
+  rejected for the jam: it would bring a second visual language, and a
+  cover structure the fame meter does not fit. It stays a possible fourth
+  outlet for the full version.
+- **The desk**: three papers stand at the back of the desk — the month's
+  lead paper in front, the other two behind with their mastheads
+  showing; clicking one pulls it forward (the feed's paper switch today,
+  decision 27).
+- **The notebook**: private work — the quiet register — is a notebook
+  lying on the desk.
+- **Props by lane**, standing on the desk: a metronome (music), a
+  clapperboard (screen), a makeup-brush cup (celebrity), a plain coffee
+  mug while no lane is established (/core's `establishedLane`). The
+  metronome swings slowly when calm and faster in a frenzy, close to the
+  mirror bulbs' flicker. No mask: the white half mask is another work's
+  signature image.
+- **A frenzy**: the desk fills with red clippings and crumpled paper —
+  faceted, a different shape each ball.
+- **Stat bar**: six cells of one equal width, narrower than now (tier words
+  are single words of at most 10 characters, so they fit). Action slots
+  are three small glowing bulbs, the same bulbs as the mirror; a used
+  slot goes dark.
+- **The hand**: a fanned hand held close to the camera, overlapping
+  slightly, lifting gently on hover; every card's name and values on
+  fixed lines.
