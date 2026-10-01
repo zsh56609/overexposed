@@ -17,3 +17,26 @@ season changes from any to summer.
 World news, B-Side, new one-off (season any):
 The city's oldest jazz club turns fifty. Its drummer has played every
 night of it.
+
+
+Provenance: Drafted with AI assistance and accepted by the author.
+Addendum (round V1b): two tooltips, the box-office films, and the label
+of a story going to press.
+
+Tooltips
+| Key | Replaced | New |
+|---|---|---|
+| tooltip:actions | What you can still do this month. Each card you play uses one. | What you can still do this month. Most cards use one; a few use two. |
+| tooltip:next scandal (N TO NEXT) | A scandal is already coming this month. This is how close you are to a second. | A scandal is already coming this month. This is how close you are to another. |
+
+Mags's perk text stays: at the end of the fourth season the year ends,
+so relief there would change nothing.
+
+Films on the Marquee's weekend box office (the player's own film stays
+One Year):
+Glass Harbour · Paper Kings · Midsummer Static · The Tin Lantern ·
+Northbound Nine · Velvet Curfew · Salt & Ember · Low Tide Hotel ·
+Borrowed Crowns · The Understudy's Daughter
+
+The label on a story that will print at the end of the month:
+Going to press
