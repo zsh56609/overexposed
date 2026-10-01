@@ -306,15 +306,19 @@ npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
 npm run check:preview  # every UI preview against the real reducer outcome, then check:clicks
-npm run check:clicks   # no click on a card or END TURN is swallowed (headless Chrome)
-npm run check:overflow # every desk text at its longest variant, at three sizes (headless Chrome)
+npm run check:clicks   # every legal action's control on the stage and hit at its centre; no click swallowed
+npm run check:overflow # every text at its longest, desk and plain screens (:full replays check/desk-states.json)
+npm run check:interactions  # the desk's tooltips, bubbles, papers and hand by real input
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
 npm run sim:managers   # the two managers side by side, and the message triggers
 npm run sim:variants   # appearances per line group → sim/appearances.json, and the variant gap list
 npm run sim:press      # front pages: lead papers, the fame meter, the rival, world-pool repeats
+npm run sim:baseline -- --out=sim/out/<name>; npm run sim:compare -- <a> <b>  # numbers unmoved?
+npm run tune:thresholds | tune:endings | tune:lanes | tune:try  # a content number, measured before it is set
+npm run desk:states | desk:shots | desk:compare | desk:perf | desk:photos | desk:sheet  # the desk's tools
 ```
 
-Every `sim` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn).
+Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chrome and Firefox at three sizes. Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

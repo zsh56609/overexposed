@@ -6,6 +6,75 @@ rules).
 
 ---
 
+## 2026-10-01 — Round V1a: the draft the author could not play, and the handoff
+
+- **The blocker** (the author's play of the V1a build): after the
+  manager's choice the draft showed its title, Extra pick and Reroll, and
+  no cards. The plain screens — the draft and the gates, the deck, the
+  error line — were drawn inside `.desk`, so the desk's rules reached
+  them: the hand's `.desk .card` (absolute, 490px down) put every offer
+  below the stage, and the desk's resets (`.desk *`, `.desk button`)
+  stripped the panel's buttons. **The plain screens now stand beside the
+  desk**, in the stage, over a scrim of their own (`.screen-over`), and
+  **the hand's rules are scoped to the hand** (`.desk .hand .card`,
+  `.desk .hand .f-…`). Every plain screen checked: the title and its
+  credits, the manager choice, the draft with three and four offers, after
+  an extra pick and after a reroll, the deck, a season door, the last door,
+  the ending. No other screen had collided.
+- **Why no check caught it**: the checks took the draft's cards with
+  `element.click()`, which reaches a button wherever it lies; the click
+  check hit-tested only the hand and END TURN; the overflow audit measured
+  only the desk; the reference screenshots were all months on the desk.
+- **The assertion that would have caught it** (`check:clicks`): in every
+  state, every control for a legal action — New run and Credits, the
+  manager choice, each offer's Take, Extra pick and Reroll, each door,
+  every playable card, END TURN, the deck's buttons, Play again — lies
+  inside the stage and is the element `elementFromPoint` finds at its
+  centre (a fanned card at the centre of the strip it shows, in its own
+  tilted frame). At 1280×720, 800×450 and a phone held landscape, in
+  Chromium and Firefox: 6,503 controls in 1,359 states over the six
+  runs, 0 blocked. On the old build it fails at once:
+  "Take" lies outside the stage, nothing is hit at its centre.
+  `check:overflow` audits the plain screens too — nothing off the stage,
+  nothing cut off by a box that hides its overflow — and fails on the old
+  build as well (`div.card.offer` off the stage). Both run in Chromium and
+  Firefox.
+- **The stat bar's keyboard focus** is read from the pointer (no press in
+  the last 600 ms) instead of `:focus-visible`, which headless Firefox
+  never sets: its window never has focus. The same in a browser; the
+  keyboard test is skipped where the window has no focus.
+- **The overflow audit puts React's nodes back** after trying each scene
+  in the script page: rebuilding the page from its HTML left React holding
+  nodes no longer in it, and a later month's script crashed the app under
+  the audit (never in play).
+- **A Firefox that cannot start its tab is started again.** Three times a
+  check waited forever on Firefox. Firefox's own log says why: on this
+  Windows machine its sandbox sometimes fails to start a tab's process
+  ("Failed to launch tab subprocess"), about one fresh browser in ten to
+  twenty-five, and that tab never loads anything. The driver now starts
+  such a browser again (its first tab must answer within 8 s; three
+  tries), keeps the page in its first tab's process (Fission off in the
+  throwaway profile, so loading the game starts no new process), ends the
+  whole process tree on close (killing Firefox's launcher alone had left
+  browsers running), and gives up on a silent browser — two minutes for a
+  command, twenty for a page script — failing the check and naming the
+  command. Forty launches in a row: none stalled, three started again.
+- **Every tool in the repo**, each with an npm script, for the agent that
+  continues on another machine: the browser driver (Chrome over CDP,
+  Firefox over WebDriver BiDi, no dependency); the state finder and the
+  replay steps (`desk:states` → `check/desk-states.json`: the reference
+  states, the biggest hand, a hand for every card, and now every minor
+  ending); the longer overflow audit (`check:overflow:full`); the
+  interaction check; the screenshots, the reference comparison, the
+  performance run, the photographs, a contact sheet of shots; the sim's
+  baseline and its comparison; and the tuning instruments of earlier
+  rounds, ported to today's /core — `tune:thresholds`, `tune:endings`,
+  `tune:lanes`, `tune:try`. `tune:try` plays a content patch in memory
+  (the old experiment runner wrote it into `content/` and restored it).
+  What each replaced, and the scratch scripts left out — one-off importers
+  whose drafts and results are in the repo, file-editing scripts, probes
+  whose answers are recorded here: `docs/handoff/v1a.md`, "Tools".
+
 ## 2026-10-01 — Round V1a: acceptance
 
 - **The sim is untouched**: `sim`, `sim:awards`, `sim:tiers` and
