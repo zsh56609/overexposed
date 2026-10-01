@@ -63,16 +63,17 @@ export function IconDefs() {
   );
 }
 
+/** When a pointer last went down anywhere on the page: a focus that follows it within a moment is the pointer's. */
+let lastPointerDown = Number.NEGATIVE_INFINITY;
+if (typeof document !== 'undefined') document.addEventListener('pointerdown', () => (lastPointerDown = performance.now()), true);
+
 /**
- * Whether an element has keyboard focus (`:focus-visible`), false where the browser does not know the
- * selector (older Safari throws on it). A tap also focuses; only the keyboard opens a tooltip or a preview.
+ * Whether an element's focus came from the keyboard (Tab), not from a pointer: a tap or a click also focuses a
+ * cell or a card, and on touch a tooltip is a long-press. Read from the last pointer press rather than
+ * `:focus-visible`, which older Safari does not know and a window in the background never shows.
  */
-export function keyboardFocus(el: Element): boolean {
-  try {
-    return el.matches(':focus-visible');
-  } catch {
-    return false;
-  }
+export function keyboardFocus(_el: Element): boolean {
+  return performance.now() - lastPointerDown > 600;
 }
 
 /** One icon by reference; `className` sets its size and colour. */

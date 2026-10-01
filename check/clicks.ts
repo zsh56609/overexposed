@@ -1,62 +1,48 @@
-// npm run check:clicks — nothing may swallow a click aimed at a card or END TURN.
+// npm run check:clicks — every control for a legal action can be seen and reached, and nothing swallows a click.
 //
-// The author's automated playthrough found the floating preview intercepting clicks meant for the cards and
-// END TURN beneath it. The preview is display-only (pointer-events: none); this check keeps it that way.
-// In the style of the stage overflow audits: seeded runs played through the real UI in headless Chrome,
-// and at every play state, with the floating preview open over each card position and over END TURN,
-// every card and END TURN — the hovered one included — must be the element a click would reach: END TURN
-// at its centre and near each corner; a card of the fanned hand (round V1a) across the strip of it the
-// next card leaves showing — near its top, its middle and its lower edge, in the card's own tilted frame —
-// so nothing on the desk (the papers, the mirror, the bubbles, the phone, the props) and nothing floating
-// ever covers a card or END TURN. A hover that opens no preview fails too, so the check is never vacuous.
+// Two assertions, over seeded runs played through the real UI, at three sizes (1280x720, 800x450, a phone held
+// landscape) and in two browsers (headless Chrome and Firefox, check/browser.ts):
+//
+// 1. Reachable controls (round V1a, after the author found the draft's offers pushed off its panel): in every
+//    state — the title and its credits, the manager choice, every draft (three offers and Dex's four, after an
+//    extra pick, after a reroll), the season doors, the hand, the deck viewer, the ending — every control for a
+//    legal action lies inside the stage and is the element actually hit at its centre (elementFromPoint). A
+//    fanned card is hit at the centre of the strip of it the next card leaves showing, in its own tilted frame.
+//    A state with no control for any action fails too.
+// 2. Nothing swallows a click (round 2c and V1a): at every play state, with the floating preview open over
+//    each card and over END TURN, every card and END TURN — the hovered one included — is the element a click
+//    reaches: END TURN at its centre and near each corner, a card across its visible strip, near its top, its
+//    middle and its lower edge. A hover that opens no preview fails too, so the check is never vacuous.
 // At every draft (round 2c): at most one extra card — Dex's — labelled with his line, the label inside its card.
-// The managers alternate run by run (round V1a): any number of runs from two covers both.
+// The managers alternate run by run, so any two runs cover both. Transitions are switched off: the check
+// measures where things settle.
 //
-// Runs the Vite dev server in-process and needs Chrome or Edge (CHROME_PATH overrides the search).
-// Usage: node check/clicks.ts [--runs=4] [--size=1280x720]
+// Runs the Vite dev server in-process. Usage:
+//   node check/clicks.ts [--runs=4] [--sizes=1280x720,800x450,844x390m] [--browsers=chrome,firefox]
 
-import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
 const RUNS = Number(arg('runs', '4'));
-const [WIDTH, HEIGHT] = arg('size', '1280x720').split('x').map(Number) as [number, number];
+const SIZES = sizesFromArgs(process.argv);
+const BROWSERS = browsersFromArgs(process.argv);
 
-const CHROMES = [
-  process.env.CHROME_PATH,
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-  '/usr/bin/chromium-browser',
-];
-const chrome = CHROMES.find((p): p is string => !!p && existsSync(p));
-if (!chrome) {
-  console.error('click-through check: no Chrome or Edge found; set CHROME_PATH');
-  process.exit(1);
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/** Runs in the page: plays RUNS seeded runs by DOM and hit-tests every target under every preview. */
+/** Runs in the page: plays RUNS seeded runs by DOM, asserting reachable controls and unswallowed clicks. */
 const DRIVE = (runs: number) => `(async () => {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let rnd = 20260929;
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const blocked = {};
   const note = (m) => { blocked[m] = (blocked[m] || 0) + 1; };
-  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0 };
+  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0 };
   const POINTS = [[0.5, 0.5], [0.12, 0.12], [0.88, 0.12], [0.12, 0.88], [0.88, 0.88]];
   const name = (el, cards, end) => (el === end ? 'END TURN' : 'card ' + (cards.indexOf(el) + 1) + ' of ' + cards.length);
-  const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
+  const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
+  const label = (el) => (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 30);
   const hitBy = (target) => {
     const r = target.getBoundingClientRect();
     for (const [fx, fy] of POINTS) {
@@ -68,31 +54,89 @@ const DRIVE = (runs: number) => `(async () => {
   };
   // A fanned card is tilted and the next one overlaps it: probe points placed inside the card itself, across
   // the strip the next card leaves showing, are carried by the card's own transform.
+  const stripOf = (card, cards) => { const next = cards[cards.indexOf(card) + 1]; return next ? Math.min(card.offsetWidth, next.offsetLeft - card.offsetLeft) : card.offsetWidth; };
+  const probe = (card, x, y) => {
+    const p = document.createElement('i');
+    p.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:1px;height:1px;pointer-events:none';
+    card.appendChild(p);
+    const r = p.getBoundingClientRect();
+    p.remove();
+    return [r.left + 0.5, r.top + 0.5];
+  };
   const hitCard = (card, cards) => {
-    const next = cards[cards.indexOf(card) + 1];
-    const strip = next ? Math.min(card.offsetWidth, next.offsetLeft - card.offsetLeft) : card.offsetWidth;
+    const strip = stripOf(card, cards);
     for (const [x, y] of [[10, 22], [strip - 12, 22], [strip / 2, 110], [10, 200], [strip - 12, 200]]) {
       stats.points++;
-      const probe = document.createElement('i');
-      probe.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:1px;height:1px;pointer-events:none';
-      card.appendChild(probe);
-      const r = probe.getBoundingClientRect();
-      probe.remove();
-      const top = document.elementFromPoint(r.left + 0.5, r.top + 0.5);
+      const [px, py] = probe(card, x, y);
+      const top = document.elementFromPoint(px, py);
       if (!top || !(top === card || card.contains(top))) return top;
     }
     return null;
+  };
+  // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
+  const screenOf = () => document.querySelector('.deck-viewer') ? 'deck' : document.querySelector('.plain.credits') ? 'credits' : document.querySelector('.plain.title') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  const CONTROLS = {
+    title: ['button.big', '.credits-open'],
+    credits: ['.plain.credits button'],
+    manager: ['.manager-choice .choose'],
+    draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn'],
+    doors: ['.gates .take', '.desk .deckbtn'],
+    hand: ['.desk .endbtn', '.desk .deckbtn'],
+    deck: ['.deck-viewer .row button'],
+    ending: ['button.play-again'],
+  };
+  const reachable = () => {
+    const screen = screenOf();
+    const stage = document.querySelector('.stage').getBoundingClientRect();
+    const inStage = (x, y) => x >= stage.left - 0.5 && x <= stage.right + 0.5 && y >= stage.top - 0.5 && y <= stage.bottom + 0.5;
+    const els = (CONTROLS[screen] ?? []).flatMap((sel) => [...document.querySelectorAll(sel)]).filter((el) => !el.disabled);
+    const cards = screen === 'hand' ? [...document.querySelectorAll('.desk .hand .card')] : [];
+    const playable = cards.filter((c) => c.getAttribute('aria-disabled') === 'false');
+    if (screen === 'unknown') note('a state with no screen the check knows');
+    if (els.length + playable.length === 0) note(screen + ': no control for any action');
+    stats.byScreen[screen] = (stats.byScreen[screen] || 0) + 1;
+    for (const el of els) {
+      stats.controls++;
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      if (r.width < 1 || r.height < 1) { note(screen + ': "' + label(el) + '" has no size'); continue; }
+      if (r.left < stage.left - 0.5 || r.top < stage.top - 0.5 || r.right > stage.right + 0.5 || r.bottom > stage.bottom + 0.5) note(screen + ': "' + label(el) + '" lies outside the stage');
+      const top = document.elementFromPoint(x, y);
+      if (!top || !(top === el || el.contains(top))) note(screen + ': "' + label(el) + '" is covered at its centre by ' + describe(top));
+    }
+    for (const card of playable) {
+      stats.controls++;
+      const [x, y] = probe(card, stripOf(card, cards) / 2, 110);
+      if (!inStage(x, y)) note('hand: card ' + (cards.indexOf(card) + 1) + ' of ' + cards.length + ' lies outside the stage');
+      const top = document.elementFromPoint(x, y);
+      if (!top || !(top === card || card.contains(top))) note('hand: card ' + (cards.indexOf(card) + 1) + ' of ' + cards.length + ' is covered at its centre by ' + describe(top));
+    }
+  };
+  const openDeck = async () => {
+    const b = document.querySelector('.desk .deckbtn');
+    if (!b) return;
+    b.click(); await sleep(4);
+    stats.deckViews++;
+    reachable();
+    document.querySelector('.deck-viewer .row button')?.click(); await sleep(4);
+    if (document.querySelector('.deck-viewer')) note('the deck viewer does not close');
   };
   // Transitions are presentation: the check measures where things settle, not where they are mid-glide.
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; }';
   document.head.appendChild(still);
+  // The title and its credits.
+  reachable();
+  document.querySelector('.credits-open')?.click(); await sleep(10);
+  reachable();
+  document.querySelector('.plain.credits button')?.click(); await sleep(10);
   document.querySelector('button.big').click();
   await sleep(40);
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
-    while (!document.querySelector('.ending') && guard++ < 600) {
+    while (!document.querySelector('.ending') && guard++ < 800) {
       stats.states++;
+      reachable();
       if (document.querySelector('.manager-choice')) {
         // The managers alternate run by run (round V1a), so every check covers each of them.
         const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
@@ -104,22 +148,28 @@ const DRIVE = (runs: number) => `(async () => {
         if (extras.length > 0) stats.extraDrafts++;
         if (extras.length > 1) note('a draft shows ' + extras.length + ' extra cards');
         for (const x of extras) {
-          const label = x.querySelector('.extra-label');
-          const text = (label && label.textContent) || '';
+          const lab = x.querySelector('.extra-label');
+          const text = (lab && lab.textContent) || '';
           if (!text || text.startsWith('manager.') || text.startsWith('TODO')) note('an extra card labelled "' + text + '"');
-          const a = label && label.getBoundingClientRect();
+          const a = lab && lab.getBoundingClientRect();
           const b = x.getBoundingClientRect();
           if (a && (a.left < b.left - 0.5 || a.right > b.right + 0.5 || a.top < b.top - 0.5 || a.bottom > b.bottom + 0.5)) note('an extra card label outside its card');
         }
         if (document.querySelectorAll('.draft .card.offer').length > 4) note('a draft shows more than four cards');
-        const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled);
-        take[rand(take.length)].click();
+        // Now and then an extra pick or a reroll when there is one to take, and a look at the deck.
+        const [extra, reroll] = [...document.querySelectorAll('.draft > .row > button')];
+        const roll = rand(8);
+        if (roll === 0) await openDeck();
+        if (roll <= 2 && extra && !extra.disabled) { extra.click(); stats.extraPicks++; }
+        else if (roll <= 4 && reroll && !reroll.disabled) { reroll.click(); stats.rerolls++; }
+        else { const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); }
       } else if (document.querySelector('.gates')) {
         const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled);
         take[rand(take.length)].click();
       } else {
-        const cards = [...document.querySelectorAll('.hand .card')];
-        const end = document.querySelector('button.end');
+        // Assertion 2: under every preview, every card and END TURN still takes the click.
+        const cards = [...document.querySelectorAll('.desk .hand .card')];
+        const end = document.querySelector('.desk .endbtn');
         const targets = [...cards, end];
         for (const source of targets) {
           source.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
@@ -134,12 +184,15 @@ const DRIVE = (runs: number) => `(async () => {
           source.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' }));
           await sleep(1);
         }
+        if (rand(12) === 0) await openDeck();
         const playable = cards.filter((c) => c.getAttribute('aria-disabled') !== 'true');
         if (playable.length && rand(6)) playable[rand(playable.length)].click();
         else end.click();
       }
       await sleep(3);
     }
+    stats.states++;
+    reachable();
     stats.runs++;
     document.querySelector('button.play-again')?.click();
     await sleep(20);
@@ -147,69 +200,41 @@ const DRIVE = (runs: number) => `(async () => {
   return { ...stats, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
 })()`;
 
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; blocked: [string, number][] };
+
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false } });
 await server.listen();
 const url = server.resolvedUrls?.local[0];
-const profile = mkdtempSync(join(tmpdir(), 'overexposed-clicks-'));
-const proc = spawn(chrome, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, `--window-size=${WIDTH},${HEIGHT}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
-let failed = true;
+let failed = false;
 try {
   if (!url) throw new Error('the dev server did not start');
-  let port = 0;
-  for (let i = 0; i < 80 && !port; i++) {
-    await sleep(250);
-    try {
-      port = Number(readFileSync(join(profile, 'DevToolsActivePort'), 'utf8').split('\n')[0]);
-    } catch {
-      // not written yet
+  for (const browser of BROWSERS) {
+    for (const size of SIZES) {
+      const tag = `${browser} ${size.width}x${size.height}${size.mobile ? ' (phone)' : ''}`;
+      const page = await launch(browser, size);
+      try {
+        await page.navigate(`${url}?seed=20260929`, 3000);
+        const t0 = performance.now();
+        const out = await page.evaluate<Out>(DRIVE(RUNS));
+        const screens = Object.entries(out.byScreen)
+          .map(([k, n]) => `${k} ${n}`)
+          .join(', ');
+        console.log(
+          `click-through check, ${tag}: ${out.runs} runs, ${out.states} states — ${out.controls} controls reached (${screens}; ${out.extraPicks} extra picks, ${out.rerolls} rerolls, ${out.deckViews} deck views), ` +
+            `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+        );
+        for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
+        if (out.blocked.length > 0 || out.runs < RUNS) failed = true;
+      } finally {
+        await page.close();
+      }
     }
   }
-  if (!port) throw new Error('Chrome did not open a DevTools port');
-  const pages = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) as { type: string; webSocketDebuggerUrl: string }[];
-  const page = pages.find((t) => t.type === 'page');
-  if (!page) throw new Error('no page target');
-  const ws = new WebSocket(page.webSocketDebuggerUrl);
-  await new Promise((r) => ws.addEventListener('open', r));
-  let id = 0;
-  const pending = new Map<number, (m: { result?: { result?: { value?: unknown }; exceptionDetails?: { exception?: { description?: string } } } }) => void>();
-  ws.addEventListener('message', (e) => {
-    const m = JSON.parse(String(e.data));
-    if (m.id && pending.has(m.id)) {
-      pending.get(m.id)?.(m);
-      pending.delete(m.id);
-    }
-  });
-  const send = (method: string, params: object = {}) =>
-    new Promise<{ result?: { result?: { value?: unknown }; exceptionDetails?: { exception?: { description?: string } } } }>((res) => {
-      const i = ++id;
-      pending.set(i, res);
-      ws.send(JSON.stringify({ id: i, method, params }));
-    });
-  await send('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
-  await send('Page.navigate', { url: `${url}?seed=20260929` });
-  await sleep(3000);
-  const t0 = performance.now();
-  const r = await send('Runtime.evaluate', { expression: DRIVE(RUNS), awaitPromise: true, returnByValue: true, timeout: 600_000 });
-  if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? 'the page script failed');
-  const out = r.result?.result?.value as { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; blocked: [string, number][] };
-  ws.close();
-  console.log(
-    `click-through check: ${out.runs} runs at ${WIDTH}x${HEIGHT}, ${out.states} states — ${out.hovers} previews opened, ` +
-      `${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
-  );
-  for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
-  failed = out.blocked.length > 0 || out.runs < RUNS;
-  console.log(failed ? `FAIL: ${out.blocked.length} kind(s) of blocked click` : 'PASS: every click reaches its card or END TURN');
+  console.log(failed ? 'FAIL: a control could not be reached, or a click was swallowed' : 'PASS: every control for a legal action is on the stage and takes its click, in every browser and size');
 } catch (err) {
+  failed = true;
   console.error(`click-through check: ${err instanceof Error ? err.message : String(err)}`);
 } finally {
-  proc.kill();
   await server.close();
-  await sleep(500);
-  try {
-    rmSync(profile, { recursive: true, force: true });
-  } catch {
-    // Chrome may still hold a file for a moment; the temp dir is the OS's to clean
-  }
 }
 process.exit(failed ? 1 : 0);

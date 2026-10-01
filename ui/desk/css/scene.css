@@ -3,8 +3,9 @@
      wall and light pool · papers [5] and the mirror [5] with their shadows [4] · the floor [9] ·
      the desk plane [10] and its front edge [11] · upright props [20] · crumpled paper [21] ·
      this month's pile [26, empty until V1b] · the manager's bubbles [30] · the season's dim [32] ·
-     the hand [35] · the stat bar [60] · END TURN [70] · tooltips [90] · the plain screens on top [150].
-   Every selector is scoped under .desk: the plain screens keep their own styles (ui/style.css, .plain). */
+     the hand [35] · the stat bar [60] · END TURN [70] · previews [90] · tooltips [200]; the plain screens of round
+   V2 stand beside the desk, not inside it, at [150] (ui/style.css).
+   Every selector is scoped under .desk, and nothing but the desk's own parts is rendered inside it. */
 
 .desk {
   position: absolute; inset: 0; width: 1280px; height: 720px; overflow: hidden; overflow: clip;
@@ -34,10 +35,6 @@
 .desk .scene3d.pile { z-index: 26; }
 .desk .plane { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 640px 556px; pointer-events: none; }
 
-/* The screens around the desk (V2) keep their plain versions until then, over the dimmed scene; the stat bar
-   stays in view above them (README §9). */
-.desk .ov { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; z-index: 150; }
-.desk .ov .scrim { position: absolute; inset: 0; background: rgba(8, 6, 4, .74); -webkit-backdrop-filter: blur(2.5px); backdrop-filter: blur(2.5px); }
 
 /* A short note in the middle of the desk: a scandal card can't be played; no actions left (README §9). */
 .desk .toast { position: absolute; left: 50%; top: 430px; transform: translateX(-50%); z-index: 130; background: var(--ink); color: var(--cream); border: 1px solid rgba(255, 220, 170, .25); padding: 8px 14px; font-size: 12px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }

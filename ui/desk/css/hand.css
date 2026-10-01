@@ -1,37 +1,38 @@
-/* The hand (round V1a; README §6), as the mockup (v18) sets it: the fan near the camera, the hover, the fixed
+/* The hand (round V1a; README §6), as the mockup (v18) sets it — every card rule under .hand, so no other
+   screen's .card takes the fan's place: the fan near the camera, the hover, the fixed
    anchors, the value colours and the faces — each face a class f-<face> from content (round 2c). END TURN at the
    bottom right; the floating previews; the note a card that can't be played shows. */
 
 .desk .hand { position: absolute; inset: 0; z-index: 35; pointer-events: none; }
-.desk .card {
+.desk .hand .card {
   position: absolute; top: 490px; width: 186px; height: 252px; pointer-events: auto; cursor: pointer; outline: none;
   --rot: 0deg; --lift: 0px; transform-origin: 50% 120%;
   transform: translateY(calc(var(--lift) * -1)) rotate(var(--rot));
   transition: transform .42s cubic-bezier(.22, .61, .36, 1), box-shadow .42s;
   box-shadow: 0 14px 26px rgba(0, 0, 0, .55); color: var(--ink);
 }
-.desk .card:hover, .desk .card:focus-visible {
+.desk .hand .card:hover, .desk .hand .card:focus-visible {
   transform: translateY(calc(var(--lift) * -1 - 13px)) rotate(calc(var(--rot) * .6)) scale(1.012);
   z-index: 80 !important; box-shadow: 0 18px 30px rgba(0, 0, 0, .56); transition-delay: 70ms;
 }
-.desk .card.nope { animation: desk-nope .4s; }
+.desk .hand .card.nope { animation: desk-nope .4s; }
 @keyframes desk-nope { 0%, 100% { margin-left: 0; } 25% { margin-left: -6px; } 75% { margin-left: 6px; } }
 
 /* Fixed anchors, so every card's name and values sit at the same height: name 18px, values 70px, flavour 108px.
    A card's body flows from the values down: rules longer than the values' two lines push the flavour lower. */
 .desk .hand { --strip: 150px; }
-.desk .card .name { position: absolute; left: 14px; top: 18px; width: min(116px, calc(var(--strip) - 12px)); height: 44px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; line-height: 1.05; overflow: hidden; }
-.desk .card .body { position: absolute; left: 14px; top: 70px; width: min(118px, calc(var(--strip) - 16px)); display: flex; flex-direction: column; }
-.desk .card .fx { display: flex; flex-wrap: wrap; gap: 5px 10px; align-items: center; font-weight: 800; font-size: 14px; min-height: 38px; align-content: flex-start; }
-.desk .card .fx span { display: flex; align-items: center; gap: 3px; }
-.desk .card .fx svg { width: 15px; height: 15px; flex: none; }
-.desk .card .fx.text { display: block; font-size: 10.5px; font-weight: 600; line-height: 1.3; }
-.desk .card .fx .needs { flex-basis: 100%; font-size: 9.5px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
-.desk .card .fx.text .needs { display: block; margin-top: 3px; }
-.desk .card .fl { width: min(114px, 100%); font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
-.desk .card .rl { margin-top: 6px; width: 100%; font-size: 9.5px; font-weight: 600; line-height: 1.3; opacity: .9; }
-.desk .card .cost2 { position: absolute; right: 12px; top: 14px; display: flex; gap: 4px; }
-.desk .card .cost2 i { width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 6px 1px rgba(255, 214, 130, .6); }
+.desk .hand .card .name { position: absolute; left: 14px; top: 18px; width: min(116px, calc(var(--strip) - 12px)); height: 44px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; line-height: 1.05; overflow: hidden; }
+.desk .hand .card .body { position: absolute; left: 14px; top: 70px; width: min(118px, calc(var(--strip) - 16px)); display: flex; flex-direction: column; }
+.desk .hand .card .fx { display: flex; flex-wrap: wrap; gap: 5px 10px; align-items: center; font-weight: 800; font-size: 14px; min-height: 38px; align-content: flex-start; }
+.desk .hand .card .fx span { display: flex; align-items: center; gap: 3px; }
+.desk .hand .card .fx svg { width: 15px; height: 15px; flex: none; }
+.desk .hand .card .fx.text { display: block; font-size: 10.5px; font-weight: 600; line-height: 1.3; }
+.desk .hand .card .fx .needs { flex-basis: 100%; font-size: 9.5px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
+.desk .hand .card .fx.text .needs { display: block; margin-top: 3px; }
+.desk .hand .card .fl { width: min(114px, 100%); font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
+.desk .hand .card .rl { margin-top: 6px; width: 100%; font-size: 9.5px; font-weight: 600; line-height: 1.3; opacity: .9; }
+.desk .hand .card .cost2 { position: absolute; right: 12px; top: 14px; display: flex; gap: 4px; }
+.desk .hand .card .cost2 i { width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 6px 1px rgba(255, 214, 130, .6); }
 
 /* A crowded hand (eight cards and more): names a size smaller, up to three lines, so they keep to the strip. */
 .desk .hand.tight .card .name { font-size: 16px; height: 52px; }
@@ -39,72 +40,72 @@
 .desk .hand.tight .f-notebook .name { font-size: 14.5px; }
 
 /* Values: icon and number in the resource's colour; money green when earned, red when spent; draws in ink. */
-.desk .card .r-hype { color: var(--val-hype); }
-.desk .card .r-craft { color: var(--val-craft); }
-.desk .card .r-heat { color: var(--val-heat); }
-.desk .card .r-gain { color: var(--val-gain); }
-.desk .card .r-cost { color: var(--val-cost); }
-.desk .card .r-draw, .desk .card .r-text { color: inherit; }
-.desk .card .fx .r-flag { flex-basis: 100%; font-size: 10.5px; font-weight: 700; font-style: italic; opacity: .8; }
+.desk .hand .card .r-hype { color: var(--val-hype); }
+.desk .hand .card .r-craft { color: var(--val-craft); }
+.desk .hand .card .r-heat { color: var(--val-heat); }
+.desk .hand .card .r-gain { color: var(--val-gain); }
+.desk .hand .card .r-cost { color: var(--val-cost); }
+.desk .hand .card .r-draw, .desk .hand .card .r-text { color: inherit; }
+.desk .hand .card .fx .r-flag { flex-basis: 100%; font-size: 10.5px; font-weight: 700; font-style: italic; opacity: .8; }
 /* …lighter on the dark faces, paler on pink gloss, deeper on gold foil. */
-.desk .f-headshot .r-hype, .desk .f-pass .r-hype { color: var(--val-dark-hype); }
-.desk .f-headshot .r-craft, .desk .f-pass .r-craft { color: var(--val-dark-craft); }
-.desk .f-headshot .r-heat, .desk .f-pass .r-heat { color: var(--val-dark-heat); }
-.desk .f-headshot .r-gain, .desk .f-pass .r-gain { color: var(--val-dark-gain); }
-.desk .f-headshot .r-cost, .desk .f-pass .r-cost { color: var(--val-dark-cost); }
-.desk .f-gloss .r-hype { color: var(--val-gloss-hype); }
-.desk .f-gloss .r-heat { color: var(--val-gloss-heat); }
-.desk .f-gloss .r-gain { color: var(--val-gloss-gain); }
-.desk .f-gloss .r-cost { color: var(--val-gloss-cost); }
-.desk .f-gold .r-hype { color: var(--val-gold-hype); }
-.desk .f-gold .r-craft { color: var(--val-gold-craft); }
-.desk .f-gold .r-heat { color: var(--val-gold-heat); }
-.desk .f-gold .r-gain { color: var(--val-gold-gain); }
-.desk .f-gold .r-cost { color: var(--val-gold-cost); }
+.desk .hand .f-headshot .r-hype, .desk .hand .f-pass .r-hype { color: var(--val-dark-hype); }
+.desk .hand .f-headshot .r-craft, .desk .hand .f-pass .r-craft { color: var(--val-dark-craft); }
+.desk .hand .f-headshot .r-heat, .desk .hand .f-pass .r-heat { color: var(--val-dark-heat); }
+.desk .hand .f-headshot .r-gain, .desk .hand .f-pass .r-gain { color: var(--val-dark-gain); }
+.desk .hand .f-headshot .r-cost, .desk .hand .f-pass .r-cost { color: var(--val-dark-cost); }
+.desk .hand .f-gloss .r-hype { color: var(--val-gloss-hype); }
+.desk .hand .f-gloss .r-heat { color: var(--val-gloss-heat); }
+.desk .hand .f-gloss .r-gain { color: var(--val-gloss-gain); }
+.desk .hand .f-gloss .r-cost { color: var(--val-gloss-cost); }
+.desk .hand .f-gold .r-hype { color: var(--val-gold-hype); }
+.desk .hand .f-gold .r-craft { color: var(--val-gold-craft); }
+.desk .hand .f-gold .r-heat { color: var(--val-gold-heat); }
+.desk .hand .f-gold .r-gain { color: var(--val-gold-gain); }
+.desk .hand .f-gold .r-cost { color: var(--val-gold-cost); }
 
 /* Music: a gig flyer (yellow, a dashed top), a practice page of score paper. */
-.desk .f-flyer { background: #F2CE5C; }
-.desk .f-flyer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px); opacity: .8; }
-.desk .f-score { background: #f7f2e2; }
-.desk .f-score::before {
+.desk .hand .f-flyer { background: #F2CE5C; }
+.desk .hand .f-flyer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 12px); opacity: .8; }
+.desk .hand .f-score { background: #f7f2e2; }
+.desk .hand .f-score::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .42;
   background: repeating-linear-gradient(180deg, transparent 0 34px, #2a241c 34px 35px, transparent 35px 40px, #2a241c 40px 41px, transparent 41px 46px, #2a241c 46px 47px, transparent 47px 52px, #2a241c 52px 53px, transparent 53px 58px, #2a241c 58px 59px, transparent 59px 84px);
 }
 /* Screen: the script page (white, black spine, Courier name), revision pages in blue, the call sheet, the 8×10. */
-.desk .f-script { background: #FBFAF6; }
-.desk .f-script::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #2a2a2a; }
-.desk .f-script .name { font-family: 'Courier New', monospace; font-weight: 700; font-size: 16.5px; letter-spacing: -.02em; }
-.desk .f-revision { background: #dce7f3; }
-.desk .card .revtag { position: absolute; left: 14px; top: 6px; font-family: 'Courier New', monospace; font-size: 7px; font-weight: 700; letter-spacing: .06em; opacity: .62; }
-.desk .f-callsheet { background: #e3edd9; }
-.desk .f-callsheet::before { content: ""; position: absolute; inset: 13px 0 0; pointer-events: none; background: repeating-linear-gradient(180deg, transparent 0 17px, rgba(40, 62, 30, .17) 17px 18px); }
-.desk .f-callsheet .cs { position: absolute; left: 0; right: 0; top: 0; height: 13px; background: #1f2a1a; color: #e3edd9; font-size: 6.4px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 3.4px 0 0 12px; white-space: nowrap; overflow: hidden; }
-.desk .f-callsheet .name { font-family: 'Libre Franklin', system-ui, sans-serif; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: .01em; }
-.desk .f-headshot { background: #161616 center / cover no-repeat; color: #f6f3ec; }
-.desk .f-headshot::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .1) 62%); }
-.desk .f-headshot::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 7px #f1eee6; background: linear-gradient(118deg, transparent 44%, rgba(255, 255, 255, .12) 52%, transparent 60%); }
+.desk .hand .f-script { background: #FBFAF6; }
+.desk .hand .f-script::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #2a2a2a; }
+.desk .hand .f-script .name { font-family: 'Courier New', monospace; font-weight: 700; font-size: 16.5px; letter-spacing: -.02em; }
+.desk .hand .f-revision { background: #dce7f3; }
+.desk .hand .card .revtag { position: absolute; left: 14px; top: 6px; font-family: 'Courier New', monospace; font-size: 7px; font-weight: 700; letter-spacing: .06em; opacity: .62; }
+.desk .hand .f-callsheet { background: #e3edd9; }
+.desk .hand .f-callsheet::before { content: ""; position: absolute; inset: 13px 0 0; pointer-events: none; background: repeating-linear-gradient(180deg, transparent 0 17px, rgba(40, 62, 30, .17) 17px 18px); }
+.desk .hand .f-callsheet .cs { position: absolute; left: 0; right: 0; top: 0; height: 13px; background: #1f2a1a; color: #e3edd9; font-size: 6.4px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; padding: 3.4px 0 0 12px; white-space: nowrap; overflow: hidden; }
+.desk .hand .f-callsheet .name { font-family: 'Libre Franklin', system-ui, sans-serif; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: .01em; }
+.desk .hand .f-headshot { background: #161616 center / cover no-repeat; color: #f6f3ec; }
+.desk .hand .f-headshot::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(0, 0, 0, .62), rgba(0, 0, 0, .1) 62%); }
+.desk .hand .f-headshot::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 7px #f1eee6; background: linear-gradient(118deg, transparent 44%, rgba(255, 255, 255, .12) 52%, transparent 60%); }
 /* Celebrity: pink gloss, gold foil, the all-access pass. */
-.desk .f-gloss { background: linear-gradient(135deg, #ec4f95, #b92a6c); color: #fff; }
-.desk .f-gloss::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, .26) 50%, transparent 60%); pointer-events: none; }
-.desk .f-gold { background: linear-gradient(125deg, #8f6118 0%, #e6c664 20%, #b3862c 40%, #f6e59c 57%, #c29434 76%, #86591a 100%); color: #241703; }
-.desk .f-gold::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, .5) 48%, transparent 60%); mix-blend-mode: soft-light; }
-.desk .f-pass { background: linear-gradient(160deg, #1c1c1c, #050505); color: #ecd07c; box-shadow: inset 0 0 0 1px #6b5423, 0 14px 26px rgba(0, 0, 0, .55); }
-.desk .f-pass::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 42%, rgba(255, 255, 255, .13) 50%, transparent 58%); }
-.desk .f-pass .hole { position: absolute; left: 80px; top: 8px; width: 26px; height: 6px; border-radius: 3px; background: #303030; box-shadow: inset 0 1px 2px #000; }
-.desk .f-pass .pass { position: absolute; left: 14px; top: 190px; font-size: 7.5px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; opacity: .8; }
+.desk .hand .f-gloss { background: linear-gradient(135deg, #ec4f95, #b92a6c); color: #fff; }
+.desk .hand .f-gloss::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 40%, rgba(255, 255, 255, .26) 50%, transparent 60%); pointer-events: none; }
+.desk .hand .f-gold { background: linear-gradient(125deg, #8f6118 0%, #e6c664 20%, #b3862c 40%, #f6e59c 57%, #c29434 76%, #86591a 100%); color: #241703; }
+.desk .hand .f-gold::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, .5) 48%, transparent 60%); mix-blend-mode: soft-light; }
+.desk .hand .f-pass { background: linear-gradient(160deg, #1c1c1c, #050505); color: #ecd07c; box-shadow: inset 0 0 0 1px #6b5423, 0 14px 26px rgba(0, 0, 0, .55); }
+.desk .hand .f-pass::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 42%, rgba(255, 255, 255, .13) 50%, transparent 58%); }
+.desk .hand .f-pass .hole { position: absolute; left: 80px; top: 8px; width: 26px; height: 6px; border-radius: 3px; background: #303030; box-shadow: inset 0 1px 2px #000; }
+.desk .hand .f-pass .pass { position: absolute; left: 14px; top: 190px; font-size: 7.5px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; opacity: .8; }
 /* Neutral: a spiral notebook page; the content clears the spiral and the margin line. */
-.desk .f-notebook { background: #fbf9f1; }
-.desk .f-notebook::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 21px, rgba(80, 120, 190, .26) 21px 22px); pointer-events: none; }
-.desk .f-notebook::after { content: ""; position: absolute; left: 30px; top: 0; bottom: 0; width: 1px; background: rgba(210, 60, 60, .5); }
-.desk .f-notebook .holes { position: absolute; left: 7px; top: 14px; bottom: 14px; width: 12px; background: radial-gradient(circle, #0b0907 3.3px, transparent 3.8px) 0 0 / 12px 22px repeat-y; }
-.desk .f-notebook .name, .desk .f-notebook .body { left: 38px; }
-.desk .f-notebook .name { width: min(92px, calc(var(--strip) - 36px)); font-size: 17px; }
-.desk .f-notebook .body { width: min(92px, calc(var(--strip) - 40px)); }
+.desk .hand .f-notebook { background: #fbf9f1; }
+.desk .hand .f-notebook::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(180deg, transparent 0 21px, rgba(80, 120, 190, .26) 21px 22px); pointer-events: none; }
+.desk .hand .f-notebook::after { content: ""; position: absolute; left: 30px; top: 0; bottom: 0; width: 1px; background: rgba(210, 60, 60, .5); }
+.desk .hand .f-notebook .holes { position: absolute; left: 7px; top: 14px; bottom: 14px; width: 12px; background: radial-gradient(circle, #0b0907 3.3px, transparent 3.8px) 0 0 / 12px 22px repeat-y; }
+.desk .hand .f-notebook .name, .desk .hand .f-notebook .body { left: 38px; }
+.desk .hand .f-notebook .name { width: min(92px, calc(var(--strip) - 36px)); font-size: 17px; }
+.desk .hand .f-notebook .body { width: min(92px, calc(var(--strip) - 40px)); }
 /* Scandal: red, a dashed white border, the ✕, its in-hand line as flavour. */
-.desk .f-scandal { background: var(--red); color: #FFF3EF; border: 2.5px dashed #FFF3EF; }
-.desk .f-scandal .x { position: absolute; right: 13px; top: 9px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.2; }
-.desk .f-scandal .name { width: min(120px, calc(var(--strip) - 8px)); }
-.desk .f-scandal .fx { font-size: 11px; font-weight: 600; opacity: .85; }
+.desk .hand .f-scandal { background: var(--red); color: #FFF3EF; border: 2.5px dashed #FFF3EF; }
+.desk .hand .f-scandal .x { position: absolute; right: 13px; top: 9px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.2; }
+.desk .hand .f-scandal .name { width: min(120px, calc(var(--strip) - 8px)); }
+.desk .hand .f-scandal .fx { font-size: 11px; font-weight: 600; opacity: .85; }
 
 /* END TURN: "no scandal" or "N scandals will print"; red in a frenzy. */
 .desk .endbtn {
@@ -137,5 +138,5 @@
 .desk .floating .scandal-list .cause { display: block; font-size: 11px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .desk .card.nope { animation: none; }
+  .desk .hand .card.nope { animation: none; }
 }

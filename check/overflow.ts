@@ -1,49 +1,34 @@
-// npm run check:overflow — every desk text at its longest (round V1a; docs/handoff/v1a.md).
+// npm run check:overflow — every text at its longest, on the desk and on the plain screens (round V1a).
 //
 // Every line group's variants are made to read as its longest variant, and every press subject as the longest
-// noun; then seeded runs are played through the real UI in headless Chrome at each size — 1280x720, 800x450 and
-// a phone held landscape — and at every state the desk is audited: each fixed box holds its text (stat cells,
-// mastheads, datelines, the box office, card names, the notes' requirement lines, the phone's clock, END TURN),
-// each page holds its stories, the notes stay on the glass and apart, the notebook and the script hold their
-// words, the bubbles stay below the stat bar, a card's text stays in the strip its neighbour leaves showing and
-// above the stage's edge, and tooltips, previews and notes stay on the stage — with every card's preview, every
-// stat tooltip, each paper pulled forward and a bubble's reaction row open along the way. Transitions are
-// switched off: the check measures where things settle.
+// noun; then seeded runs are played through the real UI at each size — 1280x720, 800x450 and a phone held
+// landscape — in headless Chrome and Firefox (check/browser.ts), and at every state:
+// - the desk is audited: each fixed box holds its text (stat cells, mastheads, datelines, the box office, card
+//   names, the notes' requirement lines, the phone's clock, END TURN), each page holds its stories, the notes stay
+//   on the glass and apart, the notebook holds its words and the script page holds every scene as written, the
+//   bubbles stay below the stat bar, a card's text stays in the strip its neighbour leaves showing and above the
+//   stage's edge, and tooltips, previews and notes stay on the stage — with every card's preview, every stat
+//   tooltip, each paper pulled forward and a bubble's reaction row open along the way;
+// - the plain screens of round V2 are audited (after the author found the draft's offers pushed off its panel):
+//   the title, its credits, the manager choice, every draft (after extra picks and rerolls too), the deck viewer,
+//   the season doors, the ending — nothing in them leaves the stage, and nothing is cut off by a box that hides
+//   its overflow.
+// With --replays, every state recorded in check/desk-states.json (the reference states, the biggest hand, a hand
+// for every card, every minor ending's screen) is replayed and audited too. Transitions are switched off: the
+// check measures where things settle.
 //
-// Runs the Vite dev server in-process and needs Chrome or Edge (CHROME_PATH overrides the search).
-// Usage: node check/overflow.ts [--runs=4] [--sizes=1280x720,800x450,844x390m]   (m: mobile emulation)
+// Runs the Vite dev server in-process. Usage:
+//   node check/overflow.ts [--runs=4] [--replays] [--sizes=1280x720,800x450,844x390m] [--browsers=chrome,firefox]
 
-import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
+import { loadStates, PLAY_STEPS, ROOT } from './desk-replay.ts';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
 const RUNS = Number(arg('runs', '4'));
-const SIZES = arg('sizes', '1280x720,800x450,844x390m')
-  .split(',')
-  .map((s) => ({ mobile: s.endsWith('m'), size: s.replace(/m$/, '').split('x').map(Number) as [number, number] }));
-
-const CHROMES = [
-  process.env.CHROME_PATH,
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-  '/usr/bin/chromium-browser',
-];
-const chrome = CHROMES.find((p): p is string => !!p && existsSync(p));
-if (!chrome) {
-  console.error('overflow check: no Chrome or Edge found; set CHROME_PATH');
-  process.exit(1);
-}
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const REPLAYS = process.argv.includes('--replays');
+const SIZES = sizesFromArgs(process.argv);
+const BROWSERS = browsersFromArgs(process.argv);
 
 /** Runs in the page: every line group's variants set to its longest (the strings module the app itself imported). */
 const PATCH = `(async () => {
@@ -111,8 +96,9 @@ const AUDIT = `window.__deskAudit = (where) => {
   const nb = desk.querySelector('.notebook'); if (nb) { const t = nb.querySelector('.nb-txt'); if (t && t.offsetTop + t.offsetHeight > nb.clientHeight + 1) add('notebook page overflows: ' + (t.offsetTop + t.offsetHeight) + ' > ' + nb.clientHeight + ' "' + t.textContent.slice(0, 40) + '"'); }
   const sc = desk.querySelector('.script');
   if (sc) {
-    // Every scene of every band in the page, as it is written; then the page as it was.
-    const was = sc.innerHTML;
+    // Every scene of every band in the page, as it is written; then the page as it was — React's own nodes put back,
+    // since a page rebuilt from its HTML would leave React holding nodes that are no longer in it.
+    const was = [...sc.childNodes];
     const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
     for (const scene of window.__scenes ?? []) {
       sc.innerHTML = '<b>' + esc(scene.heading) + '</b>' + scene.lines.map((l) => {
@@ -125,7 +111,7 @@ const AUDIT = `window.__deskAudit = (where) => {
       holds(sc, 'script');
       if (sc.offsetTop + sc.offsetHeight > 236) add('the script "' + scene.heading + '" runs off the desk: ' + (sc.offsetTop + sc.offsetHeight) + 'px');
     }
-    sc.innerHTML = was;
+    sc.replaceChildren(...was);
   }
   const clk = desk.querySelector('.lock .clk'); if (clk) holds(clk, 'phone clock');
   // The bubbles stay below the stat bar and on the stage, the reaction row too.
@@ -152,6 +138,32 @@ const AUDIT = `window.__deskAudit = (where) => {
   return out;
 };`;
 
+/** Runs in the page: the plain screens' audit — nothing off the stage, nothing cut off by a box hiding its overflow. */
+const PLAIN = `window.__plainAudit = (where) => {
+  const out = [];
+  const add = (m) => out.push(where + ': ' + m);
+  const stage = document.querySelector('.stage').getBoundingClientRect();
+  const name = (el) => el.tagName.toLowerCase() + '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.');
+  const text = (el) => ' "' + (el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 40) + '"';
+  const clips = (el) => { const cs = getComputedStyle(el); return ['hidden', 'clip'].includes(cs.overflowX) || ['hidden', 'clip'].includes(cs.overflowY); };
+  for (const root of document.querySelectorAll('.stage .plain')) {
+    for (const el of [root, ...root.querySelectorAll('*')]) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden') continue;
+      if (r.left < stage.left - 1 || r.top < stage.top - 1 || r.right > stage.right + 1 || r.bottom > stage.bottom + 1) { add('off the stage: ' + name(el) + text(el)); continue; }
+      for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        if (!clips(a)) continue;
+        if (a.classList.contains('stage') || a.classList.contains('frame')) break;
+        const ar = a.getBoundingClientRect();
+        if (r.left < ar.left - 1 || r.top < ar.top - 1 || r.right > ar.right + 1 || r.bottom > ar.bottom + 1) { add('cut off by ' + name(a) + ': ' + name(el) + text(el)); break; }
+      }
+    }
+  }
+  return out;
+};`;
+
 /** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
 const DRIVE = (runs: number) => `(async () => {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -159,23 +171,43 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const issues = {};
   const note = (l) => { for (const m of l) issues[m] = (issues[m] || 0) + 1; };
-  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0 };
+  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0 };
+  const plain = (where) => { seen.screens[where] = (seen.screens[where] || 0) + 1; note(__plainAudit(where)); };
   const over = (el) => { el.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); };
   const out = (el) => { el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); };
+  const deck = async () => {
+    const b = document.querySelector('.desk .deckbtn'); if (!b) return;
+    b.click(); await sleep(4); seen.deckViews++; plain('deck');
+    document.querySelector('.deck-viewer .row button')?.click(); await sleep(4);
+  };
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
   document.head.appendChild(still);
+  plain('title');
+  document.querySelector('.credits-open')?.click(); await sleep(10);
+  plain('credits');
+  document.querySelector('.plain.credits button')?.click(); await sleep(10);
   document.querySelector('button.big').click();
   await sleep(40);
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
-    while (!document.querySelector('.ending') && guard++ < 600) {
+    while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
       const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : 'play';
-      if (phase === 'manager') { const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
+      if (phase === 'manager') { plain('manager'); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));
-      if (phase === 'draft') { const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
-      if (phase === 'gate') { const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
+      if (phase === 'draft') {
+        plain('draft');
+        const [extra, reroll] = [...document.querySelectorAll('.draft > .row > button')];
+        const roll = rand(8);
+        if (roll === 0) await deck();
+        if (roll <= 2 && extra && !extra.disabled) { extra.click(); seen.extraPicks++; }
+        else if (roll <= 4 && reroll && !reroll.disabled) { reroll.click(); seen.rerolls++; }
+        else { const take = [...document.querySelectorAll('.draft .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); }
+        await sleep(6);
+        continue;
+      }
+      if (phase === 'gate') { plain('doors'); const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
       const cards = [...document.querySelectorAll('.desk .hand .card')];
       seen.maxHand = Math.max(seen.maxHand, cards.length);
       for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await sleep(2); seen.previews++; note(__deskAudit('preview')); out(c); }
@@ -185,91 +217,94 @@ const DRIVE = (runs: number) => `(async () => {
         for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); seen.fronts++; seen.papers.add(p.dataset.paper); note(__deskAudit('paper ' + p.dataset.paper + ' forward')); }
         const b = [...document.querySelectorAll('.desk .bub:not(.who)')].at(-1); if (b) { b.click(); await sleep(4); seen.bubbles++; note(__deskAudit('reaction row')); document.body.click(); await sleep(2); }
       }
+      if (rand(12) === 0) await deck();
       const playable = cards.filter((c) => c.getAttribute('aria-disabled') !== 'true');
       if (playable.length && rand(6)) playable[rand(playable.length)].click();
-      else document.querySelector('.desk .endbtn').click();
+      else {
+        const btn = document.querySelector('.desk .endbtn');
+        if (!btn) throw new Error('a month on the desk without END TURN: the app is gone (see the dev server log for a React error)');
+        btn.click();
+      }
       await sleep(6);
     }
+    plain('ending');
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
+
+/** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
+const REPLAY_AUDIT = `(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  await sleep(30);
+  const issues = [...__deskAudit('state'), ...__plainAudit('state')];
+  for (const c of document.querySelectorAll('.desk .hand .card')) { c.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); await sleep(3); issues.push(...__deskAudit('preview')); c.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); }
+  for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); issues.push(...__deskAudit('paper ' + p.dataset.paper)); }
+  return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
+})()`;
+
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
 const url = server.resolvedUrls?.local[0];
+const states = REPLAYS ? loadStates() : {};
 let failed = false;
 try {
   if (!url) throw new Error('the dev server did not start');
-  for (const { size, mobile } of SIZES) {
-    const [width, height] = size;
-    const profile = mkdtempSync(join(tmpdir(), 'overexposed-overflow-'));
-    const proc = spawn(chrome, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, `--window-size=${width},${height}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', 'about:blank'], { stdio: 'ignore' });
-    try {
-      let port = 0;
-      for (let i = 0; i < 80 && !port; i++) {
-        await sleep(250);
-        try {
-          port = Number(readFileSync(join(profile, 'DevToolsActivePort'), 'utf8').split('\n')[0]);
-        } catch {
-          // not written yet
-        }
-      }
-      if (!port) throw new Error('Chrome did not open a DevTools port');
-      const pages = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()) as { type: string; webSocketDebuggerUrl: string }[];
-      const page = pages.find((t) => t.type === 'page');
-      if (!page) throw new Error('no page target');
-      const ws = new WebSocket(page.webSocketDebuggerUrl);
-      await new Promise((r) => ws.addEventListener('open', r));
-      let id = 0;
-      type Reply = { result?: { result?: { value?: unknown }; exceptionDetails?: { exception?: { description?: string } } } };
-      const pending = new Map<number, (m: Reply) => void>();
-      ws.addEventListener('message', (e) => {
-        const m = JSON.parse(String(e.data));
-        if (m.id && pending.has(m.id)) {
-          pending.get(m.id)?.(m);
-          pending.delete(m.id);
-        }
-      });
-      const send = (method: string, params: object = {}) =>
-        new Promise<Reply>((res) => {
-          const i = ++id;
-          pending.set(i, res);
-          ws.send(JSON.stringify({ id: i, method, params }));
-        });
-      const evaluate = async (expression: string) => {
-        const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: 1_200_000 });
-        if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? 'the page script failed');
-        return r.result?.result?.value;
-      };
-      await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile });
-      if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
-      await send('Page.navigate', { url: `${url}?seed=20260929` });
-      await sleep(3000);
-      const t0 = performance.now();
-      await evaluate(PATCH);
-      await evaluate(AUDIT);
-      const out = (await evaluate(DRIVE(RUNS))) as { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; cards: string[]; faces: string[]; issues: [string, number][] };
-      ws.close();
-      const tag = `${width}x${height}${mobile ? ' (phone)' : ''}`;
-      console.log(
-        `overflow check at ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
-          `hands of up to ${out.maxHand}; ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
-      );
-      for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
-      if (out.issues.length > 0) failed = true;
-    } finally {
-      proc.kill();
-      await sleep(500);
+  for (const browser of BROWSERS) {
+    for (const size of SIZES) {
+      const tag = `${browser} ${size.width}x${size.height}${size.mobile ? ' (phone)' : ''}`;
+      const page = await launch(browser, size);
       try {
-        rmSync(profile, { recursive: true, force: true });
-      } catch {
-        // Chrome may still hold a file for a moment; the temp dir is the OS's to clean
+        await page.navigate(`${url}?seed=20260929`, 3000);
+        const t0 = performance.now();
+        await page.evaluate(PATCH);
+        await page.evaluate(AUDIT);
+        await page.evaluate(PLAIN);
+        const out = await page.evaluate<Out>(DRIVE(RUNS));
+        const screens = Object.entries(out.screens)
+          .map(([k, n]) => `${k} ${n}`)
+          .join(', ');
+        console.log(
+          `overflow check, ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
+            `hands of up to ${out.maxHand}; plain screens ${screens} (${out.extraPicks} extra picks, ${out.rerolls} rerolls); ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+        );
+        for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
+        if (out.issues.length > 0) failed = true;
+        if (REPLAYS) {
+          let n = 0;
+          let broke = 0;
+          const held = new Set<string>();
+          for (const [key, state] of Object.entries(states)) {
+            await page.navigate(`${url}?seed=${state.seed}`, 2500);
+            await page.evaluate(PATCH);
+            await page.evaluate(AUDIT);
+            await page.evaluate(PLAIN);
+            const r = await page.evaluate<string>(PLAY_STEPS(state.steps));
+            if (r !== 'ok') {
+              broke++;
+              console.log(`REPLAY ${key}: ${r} — run npm run desk:states after a content change`);
+              continue;
+            }
+            const x = await page.evaluate<{ hand: number; cards: string[]; issues: string[] }>(REPLAY_AUDIT);
+            for (const id of x.cards) held.add(id);
+            n += x.issues.length;
+            for (const m of [...new Set(x.issues)].slice(0, 4)) console.log(`OVERFLOW ${key}  ${m}`);
+          }
+          console.log(`overflow check, ${tag}: ${Object.keys(states).length} recorded states replayed, ${held.size} cards in their hands — ${n} issues${broke ? `, ${broke} did not replay` : ''}`);
+          if (n > 0 || broke > 0) failed = true;
+        }
+      } finally {
+        await page.close();
       }
     }
   }
-  console.log(failed ? 'FAIL: some desk text does not fit' : 'PASS: every desk text fits, at its longest, at every size');
+  console.log(failed ? 'FAIL: some text does not fit, or a screen is cut off' : 'PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size');
 } catch (err) {
   failed = true;
   console.error(`overflow check: ${err instanceof Error ? err.message : String(err)}`);

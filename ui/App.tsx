@@ -240,27 +240,30 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
-    <Desk model={model} on={on}>
-      {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
-      {s.phase === 'play' && card && focus?.kind === 'card' && (
-        <Floating anchor={focus.anchor}>
-          <PlayPreviewView c={c} p={card} />
-        </Floating>
-      )}
-      {s.phase === 'play' && focus?.kind === 'end' && endPreview && (
-        <Floating anchor={focus.anchor}>
-          <EndTurnPreviewView c={c} p={endPreview} />
-        </Floating>
-      )}
+    <>
+      <Desk model={model} on={on}>
+        {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
+        {s.phase === 'play' && card && focus?.kind === 'card' && (
+          <Floating anchor={focus.anchor}>
+            <PlayPreviewView c={c} p={card} />
+          </Floating>
+        )}
+        {s.phase === 'play' && focus?.kind === 'end' && endPreview && (
+          <Floating anchor={focus.anchor}>
+            <EndTurnPreviewView c={c} p={endPreview} />
+          </Floating>
+        )}
+      </Desk>
+      {/* The screens around the desk (round V2) in their plain versions, over the dimmed scene — beside the
+          desk, never inside it, so none of the desk's styles reach them. */}
       {error && (
         <p className="plain error-layer">
           {t('ui.error.title')}: {error}
         </p>
       )}
-      {/* The screens around the desk (round V2) in their plain versions, over the dimmed scene. */}
       {(s.phase === 'draft' || s.phase === 'gate') && (
-        <div className="ov">
-          <div className="scrim" />
+        <div className="screen-over">
+          <div className="screen-scrim" />
           <div className="plain panel">
             {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
             {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
@@ -272,7 +275,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           <DeckViewer s={s} onClose={() => setDeckOpen(false)} />
         </div>
       )}
-    </Desk>
+    </>
   );
 }
 
