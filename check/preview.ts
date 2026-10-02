@@ -641,6 +641,11 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
       if (it.text !== pageItemText(c, x) || it.kind !== x.kind || it.red !== scandal || it.brief !== (x.slot === 'brief') || it.mark !== (mine ? 'you' : x.kind === 'rival' ? 'rival' : null)) bad(`${fp.paper} story ${i}: ${JSON.stringify(it)} against ${x.kind} ${x.slot} ${x.key}`);
       if (it.coming !== (x.line !== null && x.line.step >= history.length) || (it.coming && s.phase !== 'play')) bad(`${fp.paper} story ${i}: coming ${it.coming} in the ${s.phase} phase`);
       if (!it.kicker || it.kicker.startsWith('⟦')) bad(`${fp.paper} story ${i}: kicker "${it.kicker}"`);
+      if (it.coming && it.kicker !== t('paper.kicker.coming')) bad('pending scandal lacks Going to press');
+      const released = fp.paper === c.press?.route.loud.music && x.kind === 'player' && x.line?.kind === 'play' && getCard(c, x.line.cardId)?.release;
+      const reviewTier = x.line ? statTiers(withEnd[x.line.step]?.after ?? s).craft : null;
+      const expectedStars = released && reviewTier ? t(`paper.review.${reviewTier.index}`) : null;
+      if (it.stars !== expectedStars) bad(`${fp.paper}: stars on a non-release, or wrong release-time craft tier`);
     });
     const lead = fp.items[0];
     const photographed = lead !== undefined && (lead.kind === 'rival' || (lead.kind === 'player' && lead.line?.kind === 'scandal') || ((lead.kind === 'player' || lead.kind === 'filler' || lead.kind === 'spillover') && issue.fameTier < (bo?.player.fromTier ?? Infinity)));

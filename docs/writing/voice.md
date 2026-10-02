@@ -86,7 +86,7 @@ That is the thesis: the mass press never sees the practice.
   different runs read differently. `npm run sim:variants` lists the gaps.
 - **Rating: ESRB Teen.** Scandals are breakups, feuds, bad reviews, old photos, rumours — nothing sexual, no drugs, no violence.
 
-## Length budget (keeps a run under 20 minutes)
+## Length budget (keeps a run within 10–15 minutes)
 
 | Item | Maximum |
 |---|---|

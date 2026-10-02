@@ -190,7 +190,7 @@ holds at least one card of that lane when the pool has one
 possible. Three screen cards deepen the screen lane from summer on: Table
 Read (quiet), Self-Tape (LOUD, Marquee) and Voice-Over (Money).
 
-**The established lane** (phase 2a) is for display only. A single play
+**The established lane** drives presentation and, since round 2c, the lane-weighted draft. A single play
 should not change what the press calls the player, so a lane establishes
 itself once it has at least two plays and leads the next lane by two
 (`rules.laneEstablished`); before that the career is "early". Chosen with
@@ -201,20 +201,15 @@ when another lane takes the lead and meets the establishing threshold; a
 lane that stops leading without another establishing itself falls back to
 early. Hysteresis needs the path, so it is read from the run's history
 (`establishedLanes`), and stays deterministic. It drives the press subject
-and the lead paper now, the managers' lines, and the vanity's lane props
-later; ending resolution keeps `currentLane`.
+and the lead paper, the managers' lines, the vanity's lane props and the draft; ending resolution keeps `currentLane`.
 
-**Content gap.** Screen has only two cards today (Film Cameo, Late Night Show).
-Two minor endings — Leading Role and The Character Actor — require the screen
-lane, so they would be unreachable. Five screen cards are therefore added in
-phase 1, not later: the endings depend on them.
+**Screen content.** Phase 1 added five screen cards to Film Cameo and Late Night Show; round 2c added Table Read, Self-Tape and Voice-Over. The lane now has ten cards.
 
 ---
 
 ## 3. Voices
 
-The game currently has one voice, the press, and it speaks only after the
-player acts. A career story needs three.
+The three voices below are implemented through rounds 2a–2c: the press, two managers and the rival’s press arc. Phase 3 adds their event choices.
 
 | Voice | Register | Role |
 |---|---|---|
@@ -514,10 +509,11 @@ New or changed:
 | Band | Target |
 |---|---|
 | Major concentration | Per player-like persona, no major above 70% |
-| Minor reachability | Every minor reached in at least 1.4% of player-like runs: "reachable" — not effectively impossible — not "common". The Hard Way's minors and The Independent are meant to be rare; in a collection, rare endings are the achievements, and the axes are not bent to inflate them |
+| Minor reachability | Every minor reached in at least 1.0% of player-like runs: "reachable" — not effectively impossible — not "common". The Hard Way's minors and The Independent are meant to be rare; in a collection, rare endings are the achievements, and the axes are not bent to inflate them |
+| Minor persona reach | Every minor reaches 3% of at least one player-like persona, under each manager |
 | Lane reachability | Each lane reachable by a persona that pursues it — add lane-seeking personas |
 | Event balance | No event choice dominant; every choice taken in a meaningful share of runs |
-| Run length | Estimated story beats per run within the under-20-minute target |
+| Run length | Estimated story beats per run within the 10–15-minute target |
 
 Kept: probe assertions, scandal median, gate met%, card play rate, skill
 divergence, zero soft-locks, zero crashes. The artisan persona leans hard
@@ -528,6 +524,8 @@ only, and variety belongs at the minor level.
 ---
 
 ## 9. Scope
+
+Visual rounds run alongside this scope: V1a → V1b → phase 3 → V2 → phase 4 → the 10/15 freeze. Submit an early build in the week of 10/5.
 
 | Jam — before the 10/15 freeze | Full version |
 |---|---|
@@ -542,6 +540,8 @@ only, and variety belongs at the minor level.
 ---
 
 ## 10. Build phases to the freeze
+
+Phases 1 and 2 are complete. Execution order: V1a (static desk, done) → V1b (desk motion) → phase 3 (events) → V2 (surrounding screens) → phase 4 (year in review, once-per-run variants and retune) → freeze.
 
 | Phase | Contents | Prose drafted with it |
 |---|---|---|

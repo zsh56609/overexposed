@@ -27,3 +27,7 @@ item by item, when they are added (from 2026-10-26).
 ## Sound
 
 None yet.
+
+## Development-only browser checks
+
+Playwright 1.63.0 — Microsoft and contributors, Apache-2.0; https://github.com/microsoft/playwright (added 2026-10-02). Used only to drive the downloaded WebKit test browser. Neither Playwright nor its browsers ship in the game bundle. WebKit's component licences are included with its installed distribution.

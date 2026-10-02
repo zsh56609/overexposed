@@ -8,12 +8,13 @@
 // Firefox gets the phone's viewport only. A browser that stops answering fails the check after a while, naming
 // the command, instead of hanging it.
 
+import { webkit } from 'playwright';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-export type BrowserName = 'chrome' | 'firefox';
+export type BrowserName = 'chrome' | 'firefox' | 'webkit';
 
 export interface Page {
   readonly name: BrowserName;
@@ -34,6 +35,12 @@ export interface Page {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+async function screenshotFile(path: string, bytes: Uint8Array): Promise<void> {
+  for (let attempt = 0; ; attempt++) {
+    try { writeFileSync(path, bytes); return; }
+    catch (err) { if (attempt >= 5) throw err; await sleep(200); }
+  }
+}
 
 /** How long a command may go unanswered: a page script may run a whole audit, anything else a moment. */
 const ANSWER_MS = 120_000;
@@ -69,6 +76,7 @@ const FIREFOXES = [
 
 /** The browser's executable, or null when it is not installed. */
 export function find(name: BrowserName): string | null {
+  if (name === 'webkit') return existsSync(webkit.executablePath()) ? webkit.executablePath() : null;
   return (name === 'chrome' ? CHROMES : FIREFOXES).find((p): p is string => !!p && existsSync(p)) ?? null;
 }
 
@@ -76,10 +84,10 @@ export function find(name: BrowserName): string | null {
  * The browsers a check runs in, from `--browsers=chrome,firefox` (default `fallback`): each one installed,
  * a missing one skipped with a note. Exits when none is.
  */
-export function browsersFromArgs(argv: readonly string[], fallback = 'chrome,firefox'): BrowserName[] {
+export function browsersFromArgs(argv: readonly string[], fallback = 'chrome,firefox,webkit'): BrowserName[] {
   const asked = (argv.find((a) => a.startsWith('--browsers='))?.split('=')[1] ?? fallback).split(',').filter(Boolean) as BrowserName[];
   const have = asked.filter((b) => {
-    if (b !== 'chrome' && b !== 'firefox') throw new Error(`unknown browser ${b}`);
+    if (b !== 'chrome' && b !== 'firefox' && b !== 'webkit') throw new Error(`unknown browser ${b}`);
     if (find(b)) return true;
     console.log(`(${b} is not installed here: skipped; ${b === 'chrome' ? 'CHROME_PATH' : 'FIREFOX_PATH'} points to one)`);
     return false;
@@ -100,7 +108,31 @@ export function sizesFromArgs(argv: readonly string[], fallback = '1280x720,800x
 }
 
 export async function launch(name: BrowserName, size: { width: number; height: number; mobile?: boolean }): Promise<Page> {
-  return name === 'chrome' ? launchChrome(size) : launchFirefox(size);
+  return name === 'webkit' ? launchWebKit(size) : name === 'chrome' ? launchChrome(size) : launchFirefox(size);
+}
+
+/** Only WebKit comes from Playwright; the installed Chrome and Firefox keep their existing drivers. */
+async function launchWebKit(size: { width: number; height: number; mobile?: boolean }): Promise<Page> {
+  const browser = await webkit.launch({ headless: true });
+  const context = await browser.newContext({ viewport: size, hasTouch: true, isMobile: size.mobile ?? false });
+  const page = await context.newPage();
+  page.setDefaultTimeout(ANSWER_MS);
+  return {
+    name: 'webkit',
+    async evaluate<T>(expression: string): Promise<T> { return within(page.evaluate(expression) as Promise<T>, SCRIPT_MS, 'WebKit script'); },
+    async navigate(url, settle = 2500) { await page.goto(url); await sleep(settle); },
+    async screenshot(path) { await page.screenshot({ path }); },
+    async move(x, y) { await page.mouse.move(x, y); },
+    async click(x, y) { await page.mouse.click(x, y); },
+    async press(x, y, ms) {
+      // Playwright exposes trusted taps, but no held WebKit touch. Never substitute synthetic input silently.
+      if (ms > 100) throw new Error('WebKit driver: trusted long-press unsupported by Playwright Touchscreen');
+      await page.touchscreen.tap(x, y);
+    },
+    async key(name) { await page.keyboard.press(name); },
+    async throttle(rate) { if (rate !== 1) throw new Error('WebKit CPU throttling unavailable'); },
+    async close() { await browser.close(); },
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -159,7 +191,7 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
     },
     async screenshot(path) {
       const r = await send('Page.captureScreenshot', { format: path.endsWith('.jpg') ? 'jpeg' : 'png', ...(path.endsWith('.jpg') ? { quality: 88 } : {}) });
-      writeFileSync(path, Buffer.from(String(r.result?.data ?? ''), 'base64'));
+      await screenshotFile(path, Buffer.from(String(r.result?.data ?? ''), 'base64'));
     },
     async move(x, y) {
       await mouse('mouseMoved', x, y);
@@ -185,6 +217,8 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
     },
     async close() {
       try {
+        // Edge may relaunch itself: its launcher PID is not the browser PID.
+        await within(send('Browser.close'), 3000, 'closing Chrome').catch(() => {});
         ws.close();
       } catch {
         // already closed

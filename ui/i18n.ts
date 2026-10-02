@@ -19,11 +19,11 @@ export function t(key: string, vars: Readonly<Record<string, string | number>> =
     }
     return `⟦${key}⟧`;
   }
-  return s.replace(/\{(\w+)\}/g, (slot, name: string) => (Object.hasOwn(vars, name) ? String(vars[name]) : slot));
+  return s.replace(/\{(\w+)\}/g, (slot, name: string) => (Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : slot));
 }
 
 /** Whether content has written a key at all: for the desk's optional words (a masthead's subtitle). */
-export const has = (key: string): boolean => Object.hasOwn(strings, key);
+export const has = (key: string): boolean => Object.prototype.hasOwnProperty.call(strings, key);
 
 const plural = new Intl.PluralRules('en');
 

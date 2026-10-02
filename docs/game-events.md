@@ -1,6 +1,6 @@
 # GameEvents (frozen)
 
-The per-event spec, moved out of [AGENTS.md](../AGENTS.md) §2 to keep that file under ~28 KiB. It is frozen with the rest of AGENTS.md §2 ("FROZEN for UI"): the UI is built on these events and fields. Defined in `core/state.ts`.
+The per-event spec, moved out of [AGENTS.md](../AGENTS.md) §2 to keep that file under 24 KiB. It is frozen with the rest of AGENTS.md §2 ("FROZEN for UI"): the UI is built on these events and fields. Defined in `core/state.ts`.
 
 Every action returns the new state with `events`: what happened, in order, ids and numbers only. The UI animates from these and never diffs states.
 

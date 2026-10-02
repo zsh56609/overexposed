@@ -78,8 +78,8 @@ const Paper = memo(function Paper({ page, pos, forward, label }: { page: PageMod
       </div>
       <div className="ld">
         {lead ? (
-          <div className={itemClass(lead, 'lead')} data-kind={lead.kind} data-coming={lead.coming ? '1' : undefined}>
-            <div className="kk">{lead.kicker}</div>
+          <div className={itemClass(lead, 'lead')} data-story={lead.story} data-kind={lead.kind} data-coming={lead.coming ? '1' : undefined}>
+            <div className="kk">{lead.kicker}{lead.stars && <span className="review"> {lead.stars}</span>}</div>
             <div className={ph(lead.text, 'hd')}>{lead.text}</div>
             {lead.dek && <div className="dk">{lead.dek}</div>}
             <div className="txt">
@@ -94,8 +94,8 @@ const Paper = memo(function Paper({ page, pos, forward, label }: { page: PageMod
       </div>
       <div className="rw">
         {page.row.map((x, i) => (
-          <div key={i} className={itemClass(x, 'it')} data-kind={x.kind} data-coming={x.coming ? '1' : undefined}>
-            <div className="kk">{x.kicker}</div>
+          <div key={i} className={itemClass(x, 'it')} data-story={x.story} data-kind={x.kind} data-coming={x.coming ? '1' : undefined}>
+            <div className="kk">{x.kicker}{x.stars && <span className="review"> {x.stars}</span>}</div>
             <div className={ph(x.text, 'h')}>{x.text}</div>
             <div className="t2" />
           </div>

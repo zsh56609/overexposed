@@ -240,6 +240,7 @@
   },
   {
     "id": "collab_single",
+    "release": true,
     "lane": "music",
     "kind": "action",
     "cost": 1,
@@ -410,6 +411,7 @@
   },
   {
     "id": "cover_single",
+    "release": true,
     "lane": "music",
     "kind": "action",
     "cost": 1,
@@ -672,6 +674,7 @@
   },
   {
     "id": "soundtrack_single",
+    "release": true,
     "lane": "screen",
     "kind": "action",
     "cost": 1,

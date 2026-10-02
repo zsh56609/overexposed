@@ -156,7 +156,7 @@ Follow the display rule frozen in AGENTS.md ("Displayed heat"). Integers
 only, and it counts no scandals (decision 1):
 
 - normally **"N TO GO"** — points of heat until the next line
-- once heat is over a line: **"LINE CROSSED · N TO THE NEXT"**
+- once heat is over a line: **"N TO NEXT"**
 - the scandal count lives in exactly one place, the END TURN preview
   (§4, decision 2)
 - never show the effective threshold; a player must never see a
@@ -177,12 +177,10 @@ only, and it counts no scandals (decision 1):
   monthsLeft). No
   separate warning panel (decision 18). The season transition also
   states how far the line moved this season (decision 13).
-- before the numbers, a pressure tier word (decision 25): Quiet,
-  Whispers, People are talking, They're circling from the points still
-  to go; A story is breaking once one line is crossed, Out of control at
-  two or more. /core reads it off heatOutlook — the distance to the line,
+- before the numbers, a short pressure tier word (decision 25, revised): Quiet,
+  Whispers, Buzz, Circling, Breaking, Frenzy. /core reads it off heatOutlook — the distance to the line,
   never the threshold — and it states pressure only, never a scandal
-  count. It and "LINE CROSSED" always agree (check:preview).
+  count. It and "N TO NEXT" always agree (check:preview).
 
 Crossing the line and crystallisation are two separate moments
 (decision 3):
@@ -280,7 +278,7 @@ docs/decisions.md). The ending decides the headline.
   the final state and the run's event history
 - run summary (peak hype, scandals held, milestone flags such as signed,
   ...)
-- **the endings collection** — "Endings found: 3 of 13", grouped by
+- **the endings collection** — "Endings found: 3 of 14", grouped by
   major, found minors named, the rest "Undiscovered". Kept in this
   browser only (localStorage `overexposed.endingsFound`, every access in
   try/catch): with storage empty or unavailable it shows this run's
@@ -643,7 +641,7 @@ it.
 ## 14. Visual phase
 
 **[`design/visual/README.md`](design/visual/README.md) is the newer, fuller
-visual spec** — mockups v12, the cover, reference shots — **and wins
+visual spec** — mockups v18, the cover, reference shots — **and wins
 wherever it and this section differ.** This section keeps the decisions in
 prose; it does not repeat the README.
 
@@ -701,8 +699,8 @@ stage (decision 17) and keeps everything inside it.
   each month opens, the manager's messages rise from it as bubbles, one
   at a time, with an optional sound. A two-bubble message rises as two.
   In the unstyled build they are the feed's labelled lines (decision 29).
-- **Stat bar**: six cells of one equal width, narrower than now (tier words
-  are single words of at most 10 characters, so they fit). Action slots
+- **Stat bar**: five 114px cells from x=16 to x=586; the actions cell is
+  fixed at x=586–694, centred on x=640. Tier words have at most 10 characters. Action slots
   are three small glowing bulbs, the same bulbs as the mirror; a used
   slot goes dark.
 - **The hand**: a fanned hand held close to the camera, overlapping

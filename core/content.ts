@@ -105,13 +105,15 @@ export const EFFECT_FIELDS: { readonly [K in EffectOp]: readonly string[] } = {
 export const EFFECT_OPS = Object.keys(EFFECT_FIELDS) as readonly EffectOp[];
 
 export function isEffectOp(op: unknown): op is EffectOp {
-  return typeof op === 'string' && Object.hasOwn(EFFECT_FIELDS, op);
+  return typeof op === 'string' && Object.prototype.hasOwnProperty.call(EFFECT_FIELDS, op);
 }
 
 // ---------------------------------------------------------------------------
 // Content pieces
 
 export interface CardDef {
+  /** A public release, eligible for the music paper's craft review (V1b). */
+  readonly release?: boolean;
   readonly id: string;
   readonly kind: CardKind;
   /** Slots spent to play it. */
@@ -702,11 +704,11 @@ export function indexContent(content: Content): ContentIndex {
 }
 
 export function getCard(index: ContentIndex, id: string): CardDef | undefined {
-  return Object.hasOwn(index.cards, id) ? index.cards[id] : undefined;
+  return Object.prototype.hasOwnProperty.call(index.cards, id) ? index.cards[id] : undefined;
 }
 
 export function getGate(index: ContentIndex, id: string): GateDef | undefined {
-  return Object.hasOwn(index.gates, id) ? index.gates[id] : undefined;
+  return Object.prototype.hasOwnProperty.call(index.gates, id) ? index.gates[id] : undefined;
 }
 
 export const getMajor = (index: ContentIndex, id: string): MajorDef | undefined => index.majors.find((m) => m.id === id);

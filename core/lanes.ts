@@ -17,7 +17,7 @@ export function lanePlays(s: LaneSubject): Readonly<Record<string, number>> {
   const plays: Record<string, number> = Object.fromEntries(lanes.map((lane) => [lane, 0]));
   for (const [cardId, n] of Object.entries(s.careerPlays)) {
     const lane = getCard(s.content, cardId)?.lane;
-    if (lane !== undefined && Object.hasOwn(plays, lane)) plays[lane] = (plays[lane] ?? 0) + n;
+    if (lane !== undefined && Object.prototype.hasOwnProperty.call(plays, lane)) plays[lane] = (plays[lane] ?? 0) + n;
   }
   return plays;
 }

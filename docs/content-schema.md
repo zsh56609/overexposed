@@ -28,9 +28,11 @@ checks in round 2c (2026-09-30).
 
 `kind`: `action` | `opportunity` | `scandal`. Opportunities are draft-only (never in the starting deck) and one-shot: played, they are exhausted instead of discarded, so spending one is a decision.
 `actMin`: earliest act this card may be offered in a draft (for scandals: may crystallise). Omit for act 1.
-`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (display only: the press subject, the lead paper, the managers) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
+`lane`: one of `rules.lanes` (`music`, `screen`, `celebrity`) or `neutral`: utility — draws, heat relief, scandal removal — plus Side Gig, as the author assigned. Every non-scandal card has one; scandals have none. The career lane is read, never chosen: /core's `currentLane` and `laneShares` count the cards played (`careerPlays`), neutral never counts, starting-deck cards only if `rules.laneStartingDeck`; a tie goes to the first lane, music. `establishedLanes` (the press subject, lead paper, managers and lane-weighted draft) reads the established lane from history — it has hysteresis: a lane establishes itself once `rules.laneEstablished` holds and stays while it still leads; "early" before ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §2).
 `flavorKey` (round 2c): a non-scandal's flavour line, italic on its face; a
 scandal's flavour line is its in-hand line.
+`release` (optional boolean, V1b): a public release eligible for B-Side review stars; presentation only, no rule effect. Reviews use the craft tier immediately after the release.
+
 `face` (round 2c, for the visual phase): the card's face — `flyer`, `score`,
 `script`, `revision`, `callsheet`, `headshot`, `gloss`, `gold`, `pass`,
 `notebook` or `scandal`. Without one, its lane's default in

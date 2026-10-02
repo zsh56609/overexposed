@@ -1553,3 +1553,15 @@ never meets the core mechanic. Jam raters usually play once; a cautious
 first run may never show a scandal. To verify by hand. If confirmed, fix
 in content, not the frozen formula: give every hype source some heat, so
 no route to the craftsman hype floor is heat-free.
+
+## Round V1b — author rulings and implementation (2026-10-03)
+
+The author approved round-visual-1b.md in full, including Playwright's WebKit as a development dependency, main commits/pushes and the report. Part 0's prose addendum was recorded verbatim in draft-v8 in its own commit before import.
+
+- Visual README §7 wins the newspaper tie: a scandal lead (Known and above) wins a tie against the lane's lead. Lesser fame still keeps the lane paper. This is a read-only press query; the four simulation reports must stay identical.
+- The desk's hypothetical month-end scandal carries the approved Going to press label. Cooling that prevents its publication removes it; copied scandals may still print independently.
+- Public release cards are Cover Single, Collab Single and Soundtrack Single (`release: true`). B-Side alone shows their craft stars, using the tier immediately after the release, so later practice cannot rewrite a review. Soundtrack Single normally routes to Marquee and consequently has no B-Side stars there. Studio work, demos, ghostwriting and signing a contract are not a public release.
+- Every URL-seeded restart is base seed + zero-based run index; ordinary runs still obtain a new crypto seed. Static audits explicitly turn off the queue's motion; D7 is tested separately with real pointer input and motion on.
+- Preserve v18's card timing: lift 200 ms, carry starts 290 ms, print at 740 ms, settle at 930 ms. Each play's GameEvents identify its card and resources. Capture-phase click/Enter/Space consumes a busy input as skip only. No extra reducer action follows that input.
+- Use the prompt's allowed split after Part C. Part D (month end, scandal flip, season, dealing and arrivals) and full Part E acceptance remain before phase 3. A–C must still finish their browser, frame and performance acceptance; an implementation is not a completed round until that evidence exists.
+- Keep browser limitations explicit: Firefox BiDi has no CPU throttling here; Playwright's WebKit Touchscreen exposes taps but no trusted held touch. Do not label synthetic input as a trusted long-press or normal-speed Firefox as 4×.

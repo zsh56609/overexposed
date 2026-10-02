@@ -16,7 +16,7 @@
     "sim:press": "node sim/press.ts",
     "sim:managers": "node sim/managers.ts",
     "validate": "node validate/run.ts",
-    "check:preview": "node check/preview.ts && node check/clicks.ts",
+    "check:preview": "node check/preview.ts && node check/press-contract.ts && node check/clicks.ts",
     "check:clicks": "node check/clicks.ts",
     "check:overflow": "node check/overflow.ts",
     "check:overflow:full": "node check/overflow.ts --runs=10 --replays",
@@ -44,6 +44,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "playwright": "^1.63.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.1"
   }

@@ -215,7 +215,7 @@ export function addSlots(d: Draft, delta: number): void {
 }
 
 function setFlag(d: Draft, flag: string): void {
-  if (Object.hasOwn(d.flags, flag)) return;
+  if (Object.prototype.hasOwnProperty.call(d.flags, flag)) return;
   d.flags[flag] = true;
   d.events.push({ type: 'flag', flag, source: d.source });
 }

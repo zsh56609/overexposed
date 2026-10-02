@@ -1,6 +1,6 @@
 # Overexposed — visual design reference
 
-**Status:** approved by the author through mockup rounds v1–v15 (2026-09-29 → 09-30). v13 added the screens around the desk (§9); v14 refined their motion; v15 replaced the card-play animation and added the scandal flip; v16 put the pile in the desk's own plane and simplified stat changes; v17 made the notebook a real one and took the number off the phone; v18 gave the phone the player's own time and tied reactions to messages, not words.
+**Status:** approved by the author through mockup rounds v1–v18 (2026-09-29 → 09-30). v13 added the screens around the desk (§9); v14 refined their motion; v15 replaced the card-play animation and added the scandal flip; v16 put the pile in the desk's own plane and simplified stat changes; v17 made the notebook a real one and took the number off the phone; v18 gave the phone the player's own time and tied reactions to messages, not words.
 This folder is the source of truth for the **visual phase**. `docs/ui-plan.md` §14
 records the same decisions in prose; where the two differ, **this README is newer and wins**.
 
@@ -58,7 +58,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - **Season marks:** only the current season, as **three of its icons** (spring sprout `#8fd98a`, summer sun `#ffd84a`, autumn leaf `#ff8a3d`, winter snowflake `#d4e9ff`). Months passed: filled at 55%; this month: full colour with a glow; months to come: dim.
 - **Date:** month name + year. The year starts in **March 2027**; January and February are **2028** (awards season). All three papers always show the same date.
 - **Optical alignment:** icons and text are aligned by their ink, not their boxes. The offsets in `vanity.html` (search `translateY` near `.cell`) were measured: text +0.75px, numbers +1px, flame +1.25px, craft/money icons +0.25px, clapperboard −0.5px, date −1px, season marks +0.85px, pill contents +0.75px.
-- **Tooltips** on every cell (hover; long-press on touch): a header with the stat, tier and value, then one short line in the game's voice. Craft lines differ for singing and acting. Copy: the `TIP` object in `vanity.html` (draft; imported by round 2c).
+- **Tooltips** on every cell (hover, keyboard focus and long-press on touch; never a short tap; above choice overlays): a header with the stat, tier and value, then one short line in the game's voice. Craft lines differ for singing and acting. Copy: the `TIP` object in `vanity.html` (draft; imported by round 2c).
 
 ### 2. The papers (back left)
 
@@ -67,11 +67,12 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - **Mark my stories** (a setting, on by default): the player's stories carry a red rule in the left margin; the rival's carry a purple one.
 - **Photographs:** only the lead story has one. Halftone, drawn in code (see Porting). Eight scenes: singer at a microphone · the rival with a guitar · festival crowd · paparazzi (red duotone, only when a scandal leads) · red carpet · film set · street in each season (sun, rain, wind, snow) · award under a spotlight. Rule learned: a silhouette needs light behind it, and a picture is recognised by one iconic object.
 - **Photo selection:** every line group carries a scene tag (defined in round 2c); each scene has several variants generated from the same drawing code with different seeds; choose with the shuffle bag; never the same picture on the same paper two months running.
+- **B-Side reviews:** stars only for the player’s own releases, using the craft tier at release: Raw ★, Learning ★★, Solid ★★★, Seasoned ★★★½, Skilled ★★★★, Masterful ★★★★★. Coming scandal stories carry “Going to press” and disappear if cooling prevents them.
 - **Marquee's box office** changes every month; when the player is Famous on the screen lane, their film, *One Year*, tops it.
 
 ### 3. The mirror (back right)
 
-- Bulb frame. In a frenzy some bulbs flicker or go dark and a red clipping is stuck to the glass.
+- Bulb frame. In a frenzy some bulbs flicker or go dark and a red clipping of the month’s latest scandal headline is stuck to the glass.
 - **Black card** (taped, slight tilt): "If the year ended today" · major · minor.
 - **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows its goal line and its requirements **in the stat bar's language**: `✓/✗` + icon + tier word + number — "★ Known · 80+", "📰 5 or fewer scandals", "📰 6 or more scandals". The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
 - Notes and the black card scale up slightly on hover (×1.05, ×1.04).
@@ -79,22 +80,23 @@ bottom. Season changes the light (colour temperature and `--dim`).
 ### 4. The desk
 
 - **Notebook** (centre): quiet, private work. It never reaches the press. A spiral-bound pad — metal coil along the top, stacked page edges and a card back beneath, a pencil beside it. When quiet work lands **the page stays**: the old line fades and the new one is written word by word, left to right.
-- **Lane props:** music — a **metronome** (standing) and two **different** sheets of music; screen — a **script** and a **clapperboard lying flat** between the notebook and the phone, its arm open (draw the arm inside the SVG's viewBox — it was clipped once); celebrity — a brush cup; no lane yet — a plain mug.
+- **Lane props:** music — a **metronome** (standing) and two **different** sheets of music; screen — a **script** and a **clapperboard lying flat** between the notebook and the phone, its arm open (draw the arm inside the SVG's viewBox — it was clipped once); celebrity — a magazine and brush cup; no lane yet — a plain mug.
 - **Metronome:** swings by default (full period 2.4s calm, 1.3s in a frenzy). Click to stop: it finishes the current stroke, then eases to the centre and stops. Click again: it starts from the centre with a growing swing. Engine: `metroFrame` in `vanity.html`.
 - **The script's content improves with fame** — three tiers (unknown: bad soap, cheap horror, an advert; rising: competent TV; famous: prestige scenes in homage to classic scene types, all lines original). The player's lines are highlighted like an actor's copy. Copy: `SCRIPTS` in `vanity.html` (draft; imported by round 2c).
 - **Frenzy:** red clippings on the desk; two faceted crumpled paper balls, different sizes, staggered, centre-left between the lane props and the clippings. Each ball is a different random shape (`crumple()`); its contact shadow is small and tucked under the ball so it never looks as if it floats.
 
 ### 5. The phone and the manager
 
-- The phone lies flat on the desk at the right, under the chat bubbles. **No number badge**: its lock screen shows the notifications, and the count is the number of bars. Calm: a dark blue screen and a couple of blue notifications (the manager). Frenzy: the screen glows red, notifications pile up — red press alerts among the blue — and it buzzes every few seconds. Each manager message that arrives adds a notification, lights the screen and buzzes the phone. The lock screen shows **the player's own local time**, formatted the way their phone would (24-hour regions 15:52, 12-hour regions 3:52, no AM/PM), refreshed every few seconds — the browser knows the time zone; no permission, no network. Messages rise above it in screen space, labelled with the manager's name.
+- The phone lies flat on the desk at the right, under the chat bubbles. **No number badge**: its lock screen shows the notifications, and the count is the number of bars. Calm: a dark blue screen and a couple of blue notifications (the manager). Frenzy: the screen glows red, notifications pile up — red press alerts among the blue — and it buzzes every few seconds. Each manager message that arrives adds a notification, lights the screen and buzzes the phone. The lock screen shows **the player's own local time**, formatted the way their phone would (24-hour regions 15:52, 12-hour regions 3:52, no AM/PM), refreshed every few seconds — the browser knows the time zone; no permission, no network. Messages rise above it in screen space, labelled with the manager's first name.
 - **Each message is two bubbles: a longer one, then a short one.**
-- **A reaction belongs to one message** — its month and its place in that month — never to its words. A line that recurs later is a new message and starts with no reaction. (Lines come from the shuffle bags, so a repeat only happens once a pool is used up; 2c adds variants to the busiest groups.)
+- **A reaction belongs to one bubble of one message** — its month, message position and bubble position — never to its words. A line that recurs later is a new message and starts with no reaction. (Lines come from the shuffle bags, so a repeat only happens once a pool is used up; 2c adds variants to the busiest groups.)
 - Bubbles scale up slightly on hover. **Tapback reactions:** clicking a bubble opens a row of three below it — calm ❤️ 😂 👍, frenzy 💔 😭 👍 (the thumbs-up never turns down). Choosing one leaves it as a badge on the bubble's corner; choosing it again removes it; choosing another replaces it. UI state only — no rule reads it. The bubble with the open row is raised above its neighbours.
 
 ### 6. The hand
 
-- Fanned, overlapping, near the camera. **Hover:** lift 13px, straighten to 60% of its tilt, scale 1.012, 0.42s ease-out, 70ms delay. The hand re-renders only when its cards change.
+- Fanned, overlapping, near the camera. Above five cards the spacing contracts; eight or more remain on stage and clear of END TURN. **Hover:** lift 13px, straighten to 60% of its tilt, scale 1.012, 0.42s ease-out, 70ms delay. The hand re-renders only when its cards change.
 - **Card anatomy — fixed anchors on every face:** name at 18px, values at 70px, italic flavour line at 108px (Playfair italic). Text stays inside the visible strip of a fanned card (~118px). **No cost circle and no paper label**; a card costing more than one action shows that many small bulbs, top right.
+- **Card-face extras:** requirement line, labelled flag effects, true minus sign, action and money wording; a screen career uses the clapperboard for craft.
 - **Values:** icon + number in the resource's colour — hype `#8a6a00`, craft `#1b4f8a`, heat `#c2410c`, money **green `#1d7a33` when earned, red `#b3261e` when spent**; drawing cards is a **card icon + "Draw N"** in plain ink. Dark faces (headshot, VIP pass), pink gloss and gold foil use lighter or deeper shades of the same colours (tables in `vanity.html`, search `.r-hype`).
 - **Card faces — the paper tells the lane** (each card needs a face field; round 2c):
   - music: gig flyer (yellow, dashed top) · score paper (cream, staff lines)
@@ -110,16 +112,17 @@ The press composition is `/core`'s job, but the look depends on it: an unknown p
 scandal month keeps **their lane's paper in front**; the tabloid behind carries the scandal
 as a two-line brief and its lead is usually world news or the rival. Once the player is
 Known the scandal leads the tabloid (with the paparazzi photo) and the tabloid takes the
-desk; Famous overwhelms the page. See `shots/08-…tabloid-pulled-forward.jpg` and `shots/09-…frenzy….jpg`.
+desk even when tied with the lane paper; Famous overwhelms the page. See `shots/08-…tabloid-pulled-forward.jpg` and `shots/09-…frenzy….jpg`.
 
 ### 8. Other screens (`screens.html`)
 
-- **Title**, **manager choice** (two business cards; each shows its **perk** — Dex "Knows everyone: your first reroll each season is free", Mags "Calms things down: you lose 1 heat at the end of every month"), **awards night** (curtains, spotlight, plaques revealed in sequence, rival's closing line). "Play again" sits at the bottom, after the reveal.
+- **Title**, **manager choice** (two business cards; each shows its **perk** — Dex D2 (one extra card in each draft offer and the first reroll each season free), Mags M1 (season-end relief; see content/managers.json and draft-v7)), **awards night** (curtains, spotlight, plaques revealed in sequence, rival's closing line). "Play again" sits at the bottom, after the reveal.
 
 ### 9. The screens around the desk
 
 Every screen happens *in the dressing room*: the scene dims behind it and the stat
 bar stays visible, so the player always sees what they have while they choose.
+The action bulbs remain visible during choices. The Deck & discard button stays in the stat bar until V2 places it. Photographs are drawn and cached on first need.
 Header pattern: amber small-caps kicker (usually the date), a Playfair title, an
 italic line.
 

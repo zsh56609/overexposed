@@ -94,6 +94,7 @@ const ID = /^[a-z][a-z0-9_]*$/;
 const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
+  'release',
   'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'face', 'headlineKeys', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
@@ -620,6 +621,7 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
       if (c.textKey !== undefined) v.key(c.textKey, `${where}.textKey`);
       if (c.flavorKey !== undefined) v.key(c.flavorKey, `${where}.flavorKey`);
     }
+    if (c.release !== undefined && typeof c.release !== 'boolean') v.error('schema', `${where}.release`, 'must be a boolean');
     if (c.playable !== undefined && typeof c.playable !== 'boolean') v.error('schema', `${where}.playable`, 'must be a boolean');
     if (c.tags !== undefined && (!Array.isArray(c.tags) || !c.tags.every(isStr))) {
       v.error('schema', `${where}.tags`, 'must be an array of strings');

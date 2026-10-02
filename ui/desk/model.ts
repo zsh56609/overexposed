@@ -116,6 +116,8 @@ export interface MirrorModel {
 }
 
 export interface ItemModel {
+  readonly story: string;
+  readonly stars: string | null;
   readonly kind: PageItem['kind'];
   readonly kicker: string;
   readonly text: string;
@@ -265,7 +267,7 @@ export function deskIssue(s: GameState, steps: readonly PlayedStep[]): { readonl
   if (s.phase !== 'play') return { issue: issueNow(steps), history: steps };
   const after = reduce(s, { type: 'END_TURN' });
   const history = [...steps, { id: -1, action: { type: 'END_TURN' as const }, before: s, after, events: after.events }];
-  return { issue: frontPages(history).at(-1) ?? null, history };
+  return { issue: frontPages(history).slice(-1)[0] ?? null, history };
 }
 
 export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
@@ -413,16 +415,22 @@ function item(s: GameState, paper: string, x: PageItem, isLead: boolean, history
   const scandal = isScandalLine(x);
   const mine = x.kind === 'player' || x.kind === 'filler' || x.kind === 'spillover';
   const brief = x.slot === 'brief';
-  const kicker = brief || x.kind === 'spillover' ? t('paper.kicker.brief') : scandal ? t('paper.kicker.scandal') : mine || x.kind === 'rival' ? t(`paper.${paper}.kicker.player`) : t(`paper.${paper}.kicker.world`);
+  const coming = x.line !== null && x.line.step >= realSteps;
+  const review = paper === c.press?.route.loud.music && x.kind === 'player' && x.line?.kind === 'play' && getCard(c, x.line.cardId)?.release;
+  // A review remembers the craft at the release, rather than changing with later practice.
+  const craft = x.line ? statTiers(history[x.line.step]?.after ?? s).craft : null;
+  const kicker = coming ? t('paper.kicker.coming') : brief || x.kind === 'spillover' ? t('paper.kicker.brief') : scandal ? t('paper.kicker.scandal') : mine || x.kind === 'rival' ? t(`paper.${paper}.kicker.player`) : t(`paper.${paper}.kicker.world`);
   return {
     kind: x.kind,
+    story: x.line ? `${x.line.step}:${x.line.event}` : `${x.kind}:${pageItemText(c, x)}`,
+    stars: review && craft ? t(`paper.review.${craft.index}`) : null,
     kicker,
     text: pageItemText(c, x),
     dek: isLead ? dek(s, x, history) : null,
     mark: mine ? 'you' : x.kind === 'rival' ? 'rival' : null,
     red: scandal,
     brief,
-    coming: x.line !== null && x.line.step >= realSteps,
+    coming,
   };
 }
 
@@ -477,7 +485,7 @@ function right(s: GameState, fp: FrontPage, lead: PageItem | null, issue: MonthP
 /** The notebook's page: the player's latest quiet line — private work, never in the press. */
 function notebook(steps: readonly PlayedStep[]): string | null {
   const quiet = pressLines(steps).filter((l) => l.paper === null && l.kind === 'play');
-  const last = quiet.at(-1);
+  const last = quiet.slice(-1)[0];
   const first = steps[0]?.after;
   return last && first ? lineText(first.content, last, last.cardId, last.subjectKey) : null;
 }

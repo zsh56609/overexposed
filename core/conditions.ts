@@ -111,7 +111,7 @@ export function inRange(value: number, range: Range): boolean {
 }
 
 function flagsHold(flags: Readonly<Record<string, true>>, test: FlagTest): boolean {
-  const has = (f: string) => Object.hasOwn(flags, f);
+  const has = (f: string) => Object.prototype.hasOwnProperty.call(flags, f);
   if (test.all && !test.all.every(has)) return false;
   if (test.any && !test.any.some(has)) return false;
   if (test.not && test.not.some(has)) return false;

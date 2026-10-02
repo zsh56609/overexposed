@@ -206,7 +206,7 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 
 ## 6. Art direction
 
-**Tabloid / editorial. No illustration on card faces — typography only.** Presentation is scored on clarity as well as art; card text density is high.
+**Tabloid / editorial. Card faces use the visual README §6 templates, including the code-drawn halftone headshot.** Presentation is scored on clarity as well as art; card text density is high.
 
 Illustration is concentrated at emotional beats:
 - **4 endings — required.** These are what players screenshot and what drives "one more run".
@@ -219,7 +219,7 @@ Illustration is concentrated at emotional beats:
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
 
-**Do not start illustration before 2026-10-26** — the four ending illustrations. The visual work (type, palette, layout, texture, motion) runs alongside the content, not after the freeze — the order of work is in §7.
+**Code-drawn scene art belongs to the visual rounds. Hand-painted illustration, if any, waits until 2026-10-26.** The visual work (type, palette, layout, texture, motion) runs alongside the content, not after the freeze — the order of work is in §7.
 
 ---
 
@@ -232,7 +232,7 @@ Illustration is concentrated at emotional beats:
 | 10/10–10/15 | React UI |
 | **10/15** | **Internal feature freeze — tuning and polish only after this** |
 | 10/16–10/25 | Early build to jam Discord; iterate on feedback |
-| **~10/18** | **Submit an early build to itch as insurance** (see §10) |
+| **Week of 10/5** | **Submit an early build to itch as insurance** (see §10) |
 | 10/26–11/2 | Illustration + motion polish |
 | 11/3–11/4 | Buffer, itch page, submission materials |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
@@ -276,7 +276,7 @@ The repo is public and its history is evidence. The jam requires a signed attest
 
 There is **no official repo** — itch.io does not host code. Build on itch as a project page, then submit that project from the jam page. Put the GitHub link in the project description.
 
-**Submit an early build around 10/18 and keep replacing it.** itch allows unlimited build updates until submissions close, so an early submission is insurance against anything going wrong on 11/4.
+**Submit an early build in the week of 10/5 and keep replacing it.** itch allows unlimited build updates until submissions close, so an early submission is insurance against anything going wrong on 11/4.
 
 **Submission must include:**
 - [ ] Playable browser build (browser builds get the most plays and ratings)

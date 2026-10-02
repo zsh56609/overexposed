@@ -391,8 +391,8 @@ function composeYear(history: readonly HistoryStep[], inProgress: boolean): { mo
   });
   let current: MonthPress | null = null;
   if (inProgress) {
-    const now = history.at(-1)?.after ?? first;
-    current = now.phase === 'gate' || now.phase === 'ended' ? (months.at(-1) ?? null) : compose(now.turn, now.act, now.resources.hype, lanes.at(-1) ?? null, history.length - 1);
+    const now = history.slice(-1)[0]?.after ?? first;
+    current = now.phase === 'gate' || now.phase === 'ended' ? (months.slice(-1)[0] ?? null) : compose(now.turn, now.act, now.resources.hype, lanes.slice(-1)[0] ?? null, history.length - 1);
   }
   return { months, current };
 }
@@ -418,7 +418,7 @@ export function boxOffice(c: ContentIndex, seed: number, turn: number, tier: num
   const n = ring.length;
   const rows: BoxOfficeRow[] = Array.from({ length: Math.min(bo.rows, n) }, (_, i) => ({
     titleKey: ring[(((turn - 1 - i) % n) + n) % n] as string,
-    gross: (bo.grosses[i] ?? bo.grosses.at(-1) ?? 0) + (bo.jitter > 0 ? deriveSeed(seed, hashId(`boxoffice:${turn}:${i}`)) % bo.jitter : 0),
+    gross: (bo.grosses[i] ?? bo.grosses.slice(-1)[0] ?? 0) + (bo.jitter > 0 ? deriveSeed(seed, hashId(`boxoffice:${turn}:${i}`)) % bo.jitter : 0),
     fresh: i === 0,
     player: false,
   }));
@@ -480,6 +480,9 @@ function leadPaper(c: ContentIndex, pages: readonly FrontPage[], lane: string | 
   const preferred = lanePaper(c, lane) ?? pages[0]?.paper ?? '';
   if (best === Infinity) return preferred;
   const tied = ranks.filter((r) => r.rank === best).map((r) => r.paper);
+  // A scandal earns a lead only from Known up. Once it does, it wins a tie too (V1b).
+  const scandalLead = pages.find((p) => tied.includes(p.paper) && p.items.some((x) => x.slot === 'lead' && x.line?.kind === 'scandal'));
+  if (scandalLead) return scandalLead.paper;
   return tied.includes(preferred) ? preferred : (tied[0] ?? preferred);
 }
 
