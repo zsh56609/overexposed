@@ -9,7 +9,7 @@ import { fan } from './Hand.tsx';
 const SLOTS = [[896, 458, -8], [918, 450, 5], [938, 442, -3], [956, 436, 7], [972, 430, -5]] as const;
 const planeAt = (x: number, y: number, rot: number, scale: number) => `translate(${x - 93}px,${y - 126}px) rotateZ(${rot}deg) scale(${scale})`;
 
-export function Motion({ snap }: { snap: Snapshot }) {
+export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => void }) {
   const host = useRef<HTMLDivElement>(null);
   const flight = useRef<{ id: number; plane: HTMLElement; face: HTMLElement; original: HTMLElement; x: number; y: number; rot: number; animations: Animation[] } | null>(null);
   const tails = useRef<((restore?: boolean) => void)[]>([]);
@@ -96,6 +96,7 @@ export function Motion({ snap }: { snap: Snapshot }) {
     if (beat !== 'land' || lastLand.current === step.id) return;
     lastLand.current = step.id;
     const animate = (el: Element, frames: Keyframe[], ms: number) => {
+      hold(mode === 'reduced' ? Math.min(ms, 150) : ms);
       const a = el.animate(frames, { duration: mode === 'reduced' ? Math.min(ms, 150) : ms }); tails.current.push(() => a.cancel());
     };
     // History gives the composed story's exact identity; never replace an arbitrary row.
@@ -130,6 +131,7 @@ export function Motion({ snap }: { snap: Snapshot }) {
           tails.current.push(() => a.cancel()); delay += duration + 40;
         }
         note.style.visibility = 'hidden'; note.parentElement?.appendChild(overlay);
+        hold(mode === 'full' ? delay : 150);
         const done = () => { overlay.remove(); note.style.visibility = ''; };
         const timer = window.setTimeout(done, mode === 'full' ? delay : 150);
         tails.current.push(() => { clearTimeout(timer); done(); });
@@ -166,6 +168,6 @@ export function Motion({ snap }: { snap: Snapshot }) {
       const pill = root.querySelector('[data-hook="countdown"]');
       if (pill && pill.textContent !== previousCountdown.current) animate(pill, mode === 'full' ? [{ transform: 'scale(1)' }, { transform: 'scale(1.1)', offset: .4 }, { transform: 'scale(1)' }] : [{ opacity: .4 }, { opacity: 1 }], 320);
     }
-  }, [snap]);
+  }, [snap, hold]);
   return <div ref={host} className="motion-host" aria-hidden="true"><div className="scene3d motion-pile" /><div className="scene3d motion-flight" /></div>;
 }

@@ -12,6 +12,8 @@ export class EventQueue {
   private nextId = 1;
   private snapshot: Snapshot;
   private timers: ReturnType<typeof setTimeout>[] = [];
+  private tailTimer: ReturnType<typeof setTimeout> | undefined;
+  private tailUntil = 0;
   private readonly mode: () => MotionMode;
   constructor(first: Step, mode: () => MotionMode = () => 'off') {
     this.mode = mode;
@@ -29,8 +31,18 @@ export class EventQueue {
     if (!step.events.some(e => e.type === 'play') || mode === 'off') { this.apply(step, null); this.play(); return; }
     this.snapshot = { ...this.snapshot, busy: true, active: { step, beat: 'lift', mode } }; this.emit();
     this.timers.push(setTimeout(() => this.apply(step, { step, beat: 'land', mode }), mode === 'reduced' ? 0 : CARD_TIMING.land));
-    this.timers.push(setTimeout(() => { this.clearTimers(); this.snapshot = { ...this.snapshot, busy: false, active: null }; this.emit(); this.play(); }, mode === 'reduced' ? 150 : CARD_TIMING.settle));
+    this.timers.push(setTimeout(() => { this.timers = []; this.snapshot = { ...this.snapshot, busy: this.tailTimer !== undefined, active: null }; this.emit(); this.play(); }, mode === 'reduced' ? 150 : CARD_TIMING.settle));
   }
+  /** Presentation tails (printing, handwriting, deltas) still consume a skip click after the card lands. */
+  readonly hold = (ms: number): void => {
+    this.tailUntil = Math.max(this.tailUntil, Date.now() + ms);
+    clearTimeout(this.tailTimer);
+    this.tailTimer = setTimeout(() => {
+      this.tailTimer = undefined; this.tailUntil = 0;
+      if (!this.snapshot.active) { this.snapshot = { ...this.snapshot, busy: false }; this.emit(); this.play(); }
+    }, Math.max(0, this.tailUntil - Date.now()));
+    if (!this.busy) { this.snapshot = { ...this.snapshot, busy: true }; this.emit(); }
+  };
   skip(): void {
     this.clearTimers(); const active = this.snapshot.active;
     this.snapshot = { ...this.snapshot, skipped: this.snapshot.skipped + 1 };
@@ -39,7 +51,7 @@ export class EventQueue {
     for (const next of this.pending.splice(0)) this.apply({ id: this.nextId++, action: next.action, before: this.snapshot.state, after: next.state, events: next.events }, null);
   }
   dispose(): void { this.clearTimers(); this.listeners.clear(); }
-  private clearTimers(): void { for (const timer of this.timers) clearTimeout(timer); this.timers = []; }
+  private clearTimers(): void { for (const timer of this.timers) clearTimeout(timer); this.timers = []; clearTimeout(this.tailTimer); this.tailTimer = undefined; this.tailUntil = 0; }
   private apply(step: PlayedStep, active: ActiveStep | null): void { this.snapshot = { ...this.snapshot, state: step.after, steps: [...this.snapshot.steps, step], busy: active !== null, active }; this.emit(); }
   private emit(): void { for (const fn of this.listeners) fn(); }
   readonly subscribe = (fn: () => void): (() => void) => { this.listeners.add(fn); return () => this.listeners.delete(fn); };

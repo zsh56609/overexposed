@@ -25,4 +25,5 @@ const disposed=new EventQueue(first,()=> 'full');disposed.enqueue(next);disposed
 await sleep(980);assert.equal(disposed.getSnapshot().state,state);
 const reduced=new EventQueue(first,()=> 'reduced');reduced.enqueue(next);await sleep(180);
 assert.equal(reduced.getSnapshot().state,after);assert.equal(reduced.busy,false);reduced.dispose();
+const tail=new EventQueue(first,()=> 'full');tail.enqueue(next);tail.hold(1400);await sleep(980);assert.equal(tail.getSnapshot().active,null);assert.equal(tail.busy,true);tail.skip();assert.equal(tail.busy,false);assert.equal(tail.getSnapshot().steps.length,2);tail.dispose();
 console.log('queue: skip before/after landing, queued actions, stale timers, disposal and reduced timing — PASS');

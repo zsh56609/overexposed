@@ -250,7 +250,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   return (
     <>
-      <Desk model={model} on={on} snap={snap}>
+      <Desk model={model} on={on} snap={snap} hold={queue.hold}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         {s.phase === 'play' && card && focus?.kind === 'card' && (
           <Floating anchor={focus.anchor}>

@@ -23,11 +23,11 @@ try {
           document.documentElement.dataset.motion='full';
           const target=document.querySelector(${JSON.stringify(selector)}); if(!target || target.getAttribute('aria-disabled')==='true') throw Error('not playable');
           const frames=[]; let on=true,last=performance.now(); const tick=t=>{frames.push(t-last);last=t;if(on)requestAnimationFrame(tick)};requestAnimationFrame(tick);
-          const before=Number(document.querySelector('.desk').dataset.step),start=performance.now();target.click();
-          while(Number(document.querySelector('.desk')?.dataset.step??before)===before||document.querySelector('.desk')?.dataset.busy==='1') { if(performance.now()-start>10000)throw Error('motion timed out');await new Promise(r=>setTimeout(r,5)); }
+          const before=Number(document.querySelector('.desk').dataset.step),start=performance.now();target.click();let flightMs=null;
+          while(Number(document.querySelector('.desk')?.dataset.step??before)===before||document.querySelector('.desk')?.dataset.busy==='1') { if(performance.now()-start>10000)throw Error('motion timed out');if(performance.now()-start>50 && target.matches('.card') && !document.querySelector('.motion-flight .plane')) flightMs??=Math.round(performance.now()-start);await new Promise(r=>setTimeout(r,5)); }
           const settled=performance.now()-start; await new Promise(r=>setTimeout(r,1500));on=false;
           const f=frames.slice(1).sort((a,b)=>a-b),q=p=>Number(f[Math.min(f.length-1,Math.floor(f.length*p))].toFixed(2));
-          return {settledMs:Math.round(settled),frames:f.length,p50:q(.5),p95:q(.95),max:q(1),over33:f.filter(x=>x>33.4).length,flight:document.querySelectorAll('.motion-flight .plane').length,pile:document.querySelectorAll('.motion-pile .plane').length};
+          return {flightMs,settledMs:Math.round(settled),frames:f.length,p50:q(.5),p95:q(.95),max:q(1),over33:f.filter(x=>x>33.4).length,flight:document.querySelectorAll('.motion-flight .plane').length,pile:document.querySelectorAll('.motion-pile .plane').length};
         })()`);
         rows.push({browser,rate,label,...result as object}); console.log(JSON.stringify(rows.slice(-1)[0]));
       }

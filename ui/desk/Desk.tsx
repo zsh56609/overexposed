@@ -49,7 +49,7 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
   return [toast, show];
 }
 
-export function Desk({ model, on, children, snap }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot }) {
+export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; hold: (ms: number) => void }) {
   const [toast, showToast] = useToast();
   return (
     <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
@@ -67,7 +67,7 @@ export function Desk({ model, on, children, snap }: { model: DeskModel; on: Desk
       <div className="deskfront" />
       <Uprights lane={model.lane} crisis={model.crisis} labels={model.labels} balls={model.balls} />
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
-      <Motion snap={snap} />
+      <Motion snap={snap} hold={hold} />
       <Bubbles messages={model.messages} />
       <div className="dim" />
       {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} />}
