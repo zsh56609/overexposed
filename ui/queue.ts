@@ -1,91 +1,47 @@
-// The event feed as a queue (docs/ui-plan.md §7).
-//
-// Every action goes reducer → Step (new state + its events) → this queue. The UI reads the settled
-// state and the played steps from here, never from the reducer directly. Layer 1 has no animation, so
-// play() drains a step the moment it arrives. Layer 3 replaces play() with a timed player — one event at
-// a time, skippable, a click fast-forwards via skip() — and nothing upstream changes.
-
+// GameEvents determine the timeline. Presentation never changes the reducer result.
 import type { Action, GameEvent, GameState } from '../core/index.ts';
-
-/** One reducer step: the action, the events it produced, the state it ended on. */
-export interface Step {
-  readonly action: Action | null;
-  readonly state: GameState;
-  readonly events: readonly GameEvent[];
-}
-
-/** A step as played. The feed groups its events per action (docs/ui-plan.md §13, decision 5). */
-export interface PlayedStep {
-  readonly id: number;
-  readonly action: Action | null;
-  /** The state the action applied to; null for the run's opening step. */
-  readonly before: GameState | null;
-  readonly after: GameState;
-  readonly events: readonly GameEvent[];
-}
-
-export interface Snapshot {
-  /** The state the player sees and acts on: every played step applied. */
-  readonly state: GameState;
-  /** Every played step, oldest first. */
-  readonly steps: readonly PlayedStep[];
-  /** True while events are still waiting to play (never in layer 1). */
-  readonly busy: boolean;
-}
-
+export interface Step { readonly action: Action | null; readonly state: GameState; readonly events: readonly GameEvent[] }
+export interface PlayedStep { readonly id: number; readonly action: Action | null; readonly before: GameState | null; readonly after: GameState; readonly events: readonly GameEvent[] }
+export type MotionMode = 'full' | 'reduced' | 'off';
+export interface ActiveStep { readonly step: PlayedStep; readonly beat: 'lift' | 'land'; readonly mode: MotionMode }
+export interface Snapshot { readonly state: GameState; readonly steps: readonly PlayedStep[]; readonly busy: boolean; readonly active: ActiveStep | null; readonly skipped: number }
+export const CARD_TIMING = { lift: 200, carry: 290, land: 740, settle: 930 } as const;
 export class EventQueue {
   private readonly pending: Step[] = [];
   private readonly listeners = new Set<() => void>();
-  private steps: PlayedStep[] = [];
   private nextId = 1;
   private snapshot: Snapshot;
-
-  constructor(first: Step) {
-    this.snapshot = { state: first.state, steps: [], busy: false };
-    this.enqueue(first);
+  private timers: ReturnType<typeof setTimeout>[] = [];
+  private readonly mode: () => MotionMode;
+  constructor(first: Step, mode: () => MotionMode = () => 'off') {
+    this.mode = mode;
+    this.snapshot = { state: first.state, steps: [], busy: false, active: null, skipped: 0 }; this.enqueue(first);
   }
-
-  /** The newest state, including steps not played yet: the one the next action applies to. */
-  get latest(): GameState {
-    return this.pending.at(-1)?.state ?? this.snapshot.state;
-  }
-
-  get busy(): boolean {
-    return this.pending.length > 0;
-  }
-
-  enqueue(step: Step): void {
-    this.pending.push(step);
-    this.play();
-  }
-
-  /** Layer 1: play everything pending at once. */
+  get latest(): GameState { return this.pending.slice(-1)[0]?.state ?? this.snapshot.active?.step.after ?? this.snapshot.state; }
+  get busy(): boolean { return this.snapshot.busy; }
+  enqueue(step: Step): void { this.pending.push(step); this.play(); }
   play(): void {
-    this.drain();
+    if (this.busy) return;
+    const next = this.pending.shift(); if (!next) return;
+    const step: PlayedStep = { id: this.nextId++, action: next.action, before: this.snapshot.steps.length ? this.snapshot.state : null, after: next.state, events: next.events };
+    const mode = this.mode();
+    // Part D supplies month-end beats next round. Other steps currently settle immediately.
+    if (!step.events.some(e => e.type === 'play') || mode === 'off') { this.apply(step, null); this.play(); return; }
+    this.snapshot = { ...this.snapshot, busy: true, active: { step, beat: 'lift', mode } }; this.emit();
+    this.timers.push(setTimeout(() => this.apply(step, { step, beat: 'land', mode }), mode === 'reduced' ? 0 : CARD_TIMING.land));
+    this.timers.push(setTimeout(() => { this.clearTimers(); this.snapshot = { ...this.snapshot, busy: false, active: null }; this.emit(); this.play(); }, mode === 'reduced' ? 150 : CARD_TIMING.settle));
   }
-
-  /** Fast-forward: play everything pending now. Layer 3 calls this on click. */
   skip(): void {
-    this.drain();
+    this.clearTimers(); const active = this.snapshot.active;
+    this.snapshot = { ...this.snapshot, skipped: this.snapshot.skipped + 1 };
+    if (active?.beat === 'lift') this.apply(active.step, null);
+    else { this.snapshot = { ...this.snapshot, busy: false, active: null }; this.emit(); }
+    for (const next of this.pending.splice(0)) this.apply({ id: this.nextId++, action: next.action, before: this.snapshot.state, after: next.state, events: next.events }, null);
   }
-
-  private drain(): void {
-    if (this.pending.length === 0) return;
-    let state = this.snapshot.state;
-    const steps = [...this.steps];
-    for (const step of this.pending.splice(0)) {
-      steps.push({ id: this.nextId++, action: step.action, before: steps.length === 0 ? null : state, after: step.state, events: step.events });
-      state = step.state;
-    }
-    this.steps = steps;
-    this.snapshot = { state, steps, busy: false };
-    for (const fn of this.listeners) fn();
-  }
-
-  readonly subscribe = (fn: () => void): (() => void) => {
-    this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
-  };
-
+  dispose(): void { this.clearTimers(); this.listeners.clear(); }
+  private clearTimers(): void { for (const timer of this.timers) clearTimeout(timer); this.timers = []; }
+  private apply(step: PlayedStep, active: ActiveStep | null): void { this.snapshot = { ...this.snapshot, state: step.after, steps: [...this.snapshot.steps, step], busy: active !== null, active }; this.emit(); }
+  private emit(): void { for (const fn of this.listeners) fn(); }
+  readonly subscribe = (fn: () => void): (() => void) => { this.listeners.add(fn); return () => this.listeners.delete(fn); };
   readonly getSnapshot = (): Snapshot => this.snapshot;
 }

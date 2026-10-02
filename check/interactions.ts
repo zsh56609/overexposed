@@ -14,7 +14,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createServer } from 'vite';
-import { browsersFromArgs, launch, type Page } from './browser.ts';
+import { browsersFromArgs, sizesFromArgs, launch, type Page } from './browser.ts';
 import { cardPoint, centre, loadStates, reach, ROOT } from './desk-replay.ts';
 
 const BROWSERS = browsersFromArgs(process.argv);
@@ -22,6 +22,7 @@ const en = JSON.parse(readFileSync(join(ROOT, 'i18n', 'en.json'), 'utf8')) as Re
 const states = loadStates();
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+const neutral = (page: Page) => page.evaluate<[number, number]>(`(() => { const r = document.querySelector('.desk').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height * 300 / 720]; })()`);
 type Result = [what: string, ok: boolean | 'skipped'];
 
 async function tooltips(page: Page, url: string): Promise<Result[]> {
@@ -35,7 +36,7 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
   await page.move(...heat);
   await sleep(300);
   out.push(['a tooltip opens on hover', await on()]);
-  await page.move(640, 300);
+  await page.move(...await neutral(page));
   await sleep(300);
   out.push(['it closes when the pointer leaves', !(await on())]);
   const money = (await centre(page, '.desk [data-tip="money"]')) as [number, number];
@@ -43,7 +44,7 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
     await page.press(...money, 700);
     await sleep(200);
     out.push(['it opens on a long-press', await on()]);
-    await page.press(640, 300, 40);
+    await page.press(...await neutral(page), 40);
     await sleep(300);
     out.push(['a tap elsewhere closes it', !(await on())]);
     await page.press(...money, 60);
@@ -97,7 +98,7 @@ async function bubblesAndMetronome(page: Page, url: string): Promise<Result[]> {
     out.push(['the same again removes it', (await badges()) === '']);
     await page.click(...bubble);
     await sleep(250);
-    await page.click(640, 300);
+    await page.click(...await neutral(page));
     await sleep(300);
     out.push(['a click elsewhere closes the row', !(await page.evaluate<boolean>(`!!document.querySelector('.desk .rx-bar')`))]);
   }
@@ -135,7 +136,7 @@ async function papers(page: Page, url: string): Promise<Result[]> {
   })()`);
   const back = await page.evaluate<[number, number, string]>(`(() => { const p = [...document.querySelectorAll('.desk .pp')].find((x) => !x.classList.contains('pos0')); const r = p.getBoundingClientRect(); return [r.x + r.width / 2, r.y + 12, p.dataset.paper]; })()`);
   await page.click(back[0], back[1]);
-  await page.move(640, 300);
+  await page.move(...await neutral(page));
   await sleep(900);
   const front = await page.evaluate<string>(`document.querySelector('.desk .news').dataset.front`);
   const touched = await page.evaluate<string[]>(`(() => { window.__mo.disconnect(); return [...window.__touched]; })()`);
@@ -160,7 +161,7 @@ async function hand(page: Page, url: string): Promise<Result[]> {
     const shaking = await page.evaluate<boolean>(`document.querySelectorAll('.desk .hand .card')[${si}].classList.contains('nope')`);
     out.push(["a scandal shakes and says it can't be played", shaking && (await look()).toast === en['ui.toast.scandal']]);
   }
-  await page.move(640, 300);
+  await page.move(...await neutral(page));
   await sleep(300);
   // The rest on a hand with nothing but cards to play.
   const music = states.s02;
@@ -173,7 +174,7 @@ async function hand(page: Page, url: string): Promise<Result[]> {
   out.push(["a card's preview opens on hover", (await look()).preview]);
   const before = await look();
   await page.click(...((await cardPoint(page, pi)) as [number, number]));
-  await page.move(640, 300);
+  await page.move(...await neutral(page));
   await sleep(400);
   const after = await look();
   out.push(['a click plays it: one card fewer, a bulb darker', after.cards === before.cards - 1 && after.used > before.used]);
@@ -181,7 +182,7 @@ async function hand(page: Page, url: string): Promise<Result[]> {
     const idx = await page.evaluate<number>(`[...document.querySelectorAll('.desk .hand .card')].findIndex((c) => c.getAttribute('aria-disabled') === 'false')`);
     if (idx < 0) break;
     await page.click(...((await cardPoint(page, idx)) as [number, number]));
-    await page.move(640, 300);
+    await page.move(...await neutral(page));
     await sleep(250);
   }
   const other = await page.evaluate<number>(`[...document.querySelectorAll('.desk .hand .card')].findIndex((c) => !c.classList.contains('f-scandal'))`);
@@ -217,17 +218,19 @@ const url = server.resolvedUrls?.local[0] as string;
 let failed = false;
 try {
   for (const browser of BROWSERS) {
-    const page = await launch(browser, { width: 1280, height: 720 });
+    for (const size of sizesFromArgs(process.argv)) {
+    const page = await launch(browser, size);
     try {
       const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url))];
       const passed = results.filter(([, ok]) => ok === true).length;
       const skipped = results.filter(([, ok]) => ok === 'skipped').length;
-      console.log(`interactions, ${browser}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);
+      console.log(`interactions, ${browser} ${size.width}x${size.height}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);
       for (const [what, ok] of results) if (ok !== true) console.log(`  ${ok === 'skipped' ? 'skipped' : 'FAIL'}  ${what}`);
       if (results.some(([, ok]) => ok === false)) failed = true;
     } finally {
       await page.close();
     }
+  }
   }
   console.log(failed ? 'FAIL: an interaction does not behave' : 'PASS: every interaction behaves, in every browser');
 } catch (err) {

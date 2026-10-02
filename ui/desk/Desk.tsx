@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Bubbles, DeskPlane, Uprights } from './DeskItems.tsx';
+import type { Snapshot } from '../queue.ts';
 import { Hand, type HandFocus } from './Hand.tsx';
 import { IconDefs } from './Icons.tsx';
 import { Mirror } from './Mirror.tsx';
@@ -46,10 +47,10 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
   return [toast, show];
 }
 
-export function Desk({ model, on, children }: { model: DeskModel; on: DeskActions; children?: ReactNode }) {
+export function Desk({ model, on, children, snap }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot }) {
   const [toast, showToast] = useToast();
   return (
-    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />

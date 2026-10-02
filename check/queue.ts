@@ -1,0 +1,28 @@
+// Real reducer steps: skip must neither lose, duplicate nor later replay an action.
+import assert from 'node:assert/strict';
+import { createInitialState, legalActions, reduce, type Content } from '../core/index.ts';
+import { loadRawContent } from '../validate/load.ts';
+import { EventQueue } from '../ui/queue.ts';
+const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
+let state=createInitialState(1,loadRawContent() as Content,{strict:true});
+while(state.phase!=='play') state=reduce(state,legalActions(state)[0]!);
+const action=legalActions(state).find(a=>a.type==='PLAY_CARD')!;
+const after=reduce(state,action);
+const first={action:null,state,events:[]};
+const next={action,state:after,events:after.events};
+const q=new EventQueue(first,()=> 'full');
+q.enqueue(next); assert.equal(q.busy,true);assert.equal(q.latest,after);assert.equal(q.getSnapshot().state,state);
+q.skip();assert.equal(q.busy,false);assert.equal(q.getSnapshot().state,after);assert.equal(q.getSnapshot().steps.length,2);
+await sleep(980);assert.equal(q.getSnapshot().steps.length,2);q.dispose();
+const landed=new EventQueue(first,()=> 'full');landed.enqueue(next);
+await sleep(780);assert.equal(landed.getSnapshot().active?.beat,'land');assert.equal(landed.getSnapshot().steps.length,2);
+landed.skip();await sleep(180);assert.equal(landed.getSnapshot().steps.length,2);landed.dispose();
+const queued=new EventQueue(first,()=> 'full');queued.enqueue(next);
+const endAction={type:'END_TURN'} as const;const end=reduce(after,endAction);
+queued.enqueue({action:endAction,state:end,events:end.events});queued.skip();
+assert.equal(queued.getSnapshot().state,end);assert.equal(queued.getSnapshot().steps.length,3);queued.dispose();
+const disposed=new EventQueue(first,()=> 'full');disposed.enqueue(next);disposed.dispose();
+await sleep(980);assert.equal(disposed.getSnapshot().state,state);
+const reduced=new EventQueue(first,()=> 'reduced');reduced.enqueue(next);await sleep(180);
+assert.equal(reduced.getSnapshot().state,after);assert.equal(reduced.busy,false);reduced.dispose();
+console.log('queue: skip before/after landing, queued actions, stale timers, disposal and reduced timing — PASS');

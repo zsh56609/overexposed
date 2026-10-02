@@ -32,6 +32,7 @@ export function loadStates(): Record<string, DeskState> {
 
 /** Runs in the page: clicks through the steps from the title; 'ok', or where it broke. */
 export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
+  document.documentElement.dataset.motion = 'off';
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   document.querySelector('button.big')?.click();
   await sleep(40);

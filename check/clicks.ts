@@ -24,6 +24,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
 import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
+import { checkD7 } from './motion.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
@@ -33,6 +34,7 @@ const BROWSERS = browsersFromArgs(process.argv);
 
 /** Runs in the page: plays RUNS seeded runs by DOM, asserting reachable controls and unswallowed clicks. */
 const DRIVE = (runs: number) => `(async () => {
+  document.documentElement.dataset.motion = 'off';
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let rnd = 20260929;
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
@@ -173,7 +175,7 @@ const DRIVE = (runs: number) => `(async () => {
         const targets = [...cards, end];
         for (const source of targets) {
           source.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
-          await sleep(3);
+          for (let wait = 0; wait < 30 && !document.querySelector('.floating'); wait++) await sleep(10);
           stats.hovers++;
           if (!document.querySelector('.floating')) note('no preview opened over ' + name(source, cards, end));
           for (const target of targets) {
@@ -213,6 +215,7 @@ try {
       const tag = `${browser} ${size.width}x${size.height}${size.mobile ? ' (phone)' : ''}`;
       const page = await launch(browser, size);
       try {
+        await checkD7(page, url);
         await page.navigate(`${url}?seed=20260929`, 3000);
         const t0 = performance.now();
         const out = await page.evaluate<Out>(DRIVE(RUNS));

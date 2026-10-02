@@ -28,6 +28,7 @@ import {
   type GameState,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
+import { motionMode } from './motion.ts';
 import { Desk } from './desk/Desk.tsx';
 import { deskModel } from './desk/model.ts';
 import licenceUrl from './fonts/OFL.txt?url';
@@ -96,13 +97,13 @@ export function App() {
     try {
       const state = createInitialState(seed, content, { strict: STRICT });
       setError(null);
-      setRun((prev) => ({ id: (prev?.id ?? 0) + 1, seed, queue: new EventQueue({ action: null, state, events: state.events }) }));
+      setRun((prev) => ({ id: (prev?.id ?? 0) + 1, seed, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) }));
     } catch (err) {
       setError(t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed, action: 'start' }));
     }
   }, []);
   if (!run) return <Title onStart={start} error={error} />;
-  return <Run key={run.id} run={run} onRestart={() => start(freshSeed())} />;
+  return <Run key={run.id} run={run} onRestart={() => start(seedFromUrl() === null ? freshSeed() : ((seedFromUrl()! + run.id) >>> 0))} />;
 }
 
 function Title({ onStart, error }: { onStart: (seed: number) => void; error: string | null }) {
@@ -201,17 +202,25 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [focus, setFocus] = useState<Focus>(null);
   const [deckOpen, setDeckOpen] = useState(false);
+  useEffect(() => {
+    const skip = (event: MouseEvent | KeyboardEvent) => {
+      if (!queue.busy || (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ')) return;
+      event.preventDefault(); event.stopImmediatePropagation(); queue.skip(); setFocus(null);
+    };
+    document.addEventListener('click', skip, true); document.addEventListener('keydown', skip, true);
+    return () => { document.removeEventListener('click', skip, true); document.removeEventListener('keydown', skip, true); queue.dispose(); };
+  }, [queue]);
   const s = snap.state;
   const c = s.content;
   const legal = useMemo(() => legalOf(s), [s]);
   // Every line printed so far, the counter the next ones follow from (decision 15, revised), and the
   // established lane, which has hysteresis and so is read from history.
-  const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).at(-1) ?? null }), [snap.steps]);
+  const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).slice(-1)[0] ?? null }), [snap.steps]);
   // The desk: every word and number it shows, from /core (round V1a; ui/desk/model.ts).
   const model = useMemo(() => deskModel({ state: s, steps: snap.steps, lines }), [s, snap.steps, lines]);
   const act = useCallback(
     (action: Action) => {
-      if (queue.busy) queue.skip(); // a click fast-forwards whatever is still playing (layer 3)
+      if (queue.busy) { queue.skip(); return; } // D7: skip consumes this action.
       try {
         const next = reduce(queue.latest, action);
         queue.enqueue({ action, state: next, events: next.events });
@@ -241,7 +250,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   return (
     <>
-      <Desk model={model} on={on}>
+      <Desk model={model} on={on} snap={snap}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         {s.phase === 'play' && card && focus?.kind === 'card' && (
           <Floating anchor={focus.anchor}>

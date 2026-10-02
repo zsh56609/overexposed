@@ -166,6 +166,7 @@ const PLAIN = `window.__plainAudit = (where) => {
 
 /** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
 const DRIVE = (runs: number) => `(async () => {
+  document.documentElement.dataset.motion = 'off';
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   let rnd = 424242;
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
