@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Bubbles, DeskPlane, Uprights } from './DeskItems.tsx';
+import { Motion } from './Motion.tsx';
 import type { Snapshot } from '../queue.ts';
 import { Hand, type HandFocus } from './Hand.tsx';
 import { IconDefs } from './Icons.tsx';
@@ -20,6 +21,7 @@ import './css/mirror.css';
 import './css/papers.css';
 import './css/desk-items.css';
 import './css/hand.css';
+import './css/motion.css';
 
 /** "Mark my stories" (README §2): a House rules setting, on by default; round V2 gives it its switch. */
 const MARK_MY_STORIES = true;
@@ -65,7 +67,7 @@ export function Desk({ model, on, children, snap }: { model: DeskModel; on: Desk
       <div className="deskfront" />
       <Uprights lane={model.lane} crisis={model.crisis} labels={model.labels} balls={model.balls} />
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
-      <div className="scene3d pile" data-hook="pile" />
+      <Motion snap={snap} />
       <Bubbles messages={model.messages} />
       <div className="dim" />
       {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} />}

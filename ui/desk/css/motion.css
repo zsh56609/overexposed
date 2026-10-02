@@ -1,0 +1,23 @@
+.desk .motion-host { pointer-events: none; }
+.desk .motion-pile { z-index: 26; }
+.desk .motion-flight { z-index: 85; }
+.desk .motion-face .card { pointer-events: none; cursor: default; }
+.desk .hand .card { transition: left .3s ease-out, transform .42s cubic-bezier(.22,.61,.36,1), box-shadow .42s; }
+.desk .motion-writing { position: absolute; visibility: visible; font: inherit; }
+.desk .notebook { position: absolute; }
+.desk .motion-writing span { display: inline-block; white-space: pre; }
+.desk .motion-writing .motion-old-line { position: absolute; inset: 0; white-space: normal; }
+.desk .motion-delta { position: absolute; top: 1px; transform: translateX(-50%); z-index: 61; font-size: 9px; font-weight: 800; pointer-events: none; }
+.desk .hype { --motion-tint: #ffd84a; }
+.desk .craft { --motion-tint: #8fc7ff; }
+.desk .heat { --motion-tint: #ff7a4a; }
+.desk .money { --motion-tint: #b9e38a; }
+.desk .delta-hype { color: #ffd84a; }
+.desk .delta-craft { color: #8fc7ff; }
+.desk .delta-heat { color: #ff7a4a; }
+.desk .delta-money { color: #b9e38a; }
+.desk .slotbulbs i { transition: background .2s, box-shadow .2s, opacity .2s; }
+.desk .review { white-space: nowrap; letter-spacing: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .desk .hand .card { transition-duration: .15s; }
+}
