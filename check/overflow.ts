@@ -168,6 +168,7 @@ const PLAIN = `window.__plainAudit = (where) => {
 const DRIVE = (runs: number) => `(async () => {
   document.documentElement.dataset.motion = 'off';
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const shown = async (selector, yes = true) => { for (let i=0;i<40;i++) { if (!!document.querySelector(selector) === yes) return; await sleep(10); } throw new Error('audit target did not ' + (yes ? 'open: ' : 'close: ') + selector); };
   let rnd = 424242;
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const issues = {};
@@ -211,9 +212,9 @@ const DRIVE = (runs: number) => `(async () => {
       if (phase === 'gate') { plain('doors'); const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
       const cards = [...document.querySelectorAll('.desk .hand .card')];
       seen.maxHand = Math.max(seen.maxHand, cards.length);
-      for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await sleep(2); seen.previews++; note(__deskAudit('preview')); out(c); }
-      const end = document.querySelector('.desk .endbtn'); if (end) { over(end); await sleep(2); note(__deskAudit('end preview')); out(end); }
-      for (const cell of document.querySelectorAll('.desk .stats [data-tip]')) { cell.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' })); await sleep(2); seen.tips++; note(__deskAudit('tooltip')); cell.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' })); }
+      for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await shown('.floating'); seen.previews++; note(__deskAudit('preview')); out(c); await shown('.floating', false); }
+      const end = document.querySelector('.desk .endbtn'); if (end) { over(end); await shown('.floating'); note(__deskAudit('end preview')); out(end); await shown('.floating', false); }
+      for (const cell of document.querySelectorAll('.desk .stats [data-tip]')) { over(cell); await shown('.tip.on'); seen.tips++; note(__deskAudit('tooltip')); out(cell); await shown('.tip.on', false); }
       if (rand(3) === 0) {
         for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); seen.fronts++; seen.papers.add(p.dataset.paper); note(__deskAudit('paper ' + p.dataset.paper + ' forward')); }
         const b = [...document.querySelectorAll('.desk .bub:not(.who)')].at(-1); if (b) { b.click(); await sleep(4); seen.bubbles++; note(__deskAudit('reaction row')); document.body.click(); await sleep(2); }
@@ -237,13 +238,14 @@ const DRIVE = (runs: number) => `(async () => {
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
 const REPLAY_AUDIT = `(async () => {
+  const shown = async (selector, yes = true) => { for (let i=0;i<40;i++) { if (!!document.querySelector(selector) === yes) return; await sleep(10); } throw new Error('audit target did not ' + (yes ? 'open: ' : 'close: ') + selector); };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
   document.head.appendChild(still);
   await sleep(30);
   const issues = [...__deskAudit('state'), ...__plainAudit('state')];
-  for (const c of document.querySelectorAll('.desk .hand .card')) { c.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); await sleep(3); issues.push(...__deskAudit('preview')); c.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); }
+  for (const c of document.querySelectorAll('.desk .hand .card')) { c.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); await shown('.floating'); issues.push(...__deskAudit('preview')); c.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); await shown('.floating', false); }
   for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); issues.push(...__deskAudit('paper ' + p.dataset.paper)); }
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
