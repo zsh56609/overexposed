@@ -33,7 +33,11 @@
     "tune:endings": "node sim/tune/endings.ts",
     "tune:lanes": "node sim/tune/lanes.ts",
     "tune:try": "node sim/tune/try.ts",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "check:queue": "node check/queue.ts",
+    "desk:reference": "node tools/reference-shots.ts",
+    "desk:motion-shots": "node tools/motion-shots.ts",
+    "desk:motion-perf": "node tools/motion-perf.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

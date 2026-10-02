@@ -1,6 +1,7 @@
 // Presentation only. Event ids select objects, resource events supply every delta and roll endpoint.
 import { useLayoutEffect, useRef } from 'react';
 import { pressLines } from '../../core/index.ts';
+import { signedAmount } from '../text.ts';
 import type { Snapshot } from '../queue.ts';
 import { motionMode } from '../motion.ts';
 import { fan } from './Hand.tsx';
@@ -133,6 +134,37 @@ export function Motion({ snap }: { snap: Snapshot }) {
         const timer = window.setTimeout(done, mode === 'full' ? delay : 150);
         tails.current.push(() => { clearTimeout(timer); done(); });
       }
+    }
+    // Aggregate same-resource events without inferring anything from before/after states.
+    const resources = new Map<string, { target: 'hype' | 'craft' | 'heat' | 'capital'; delta: number; value: number }>();
+    for (const e of step.events) if (e.type === 'resource') resources.set(e.target, { target: e.target, delta: (resources.get(e.target)?.delta ?? 0) + e.delta, value: e.value });
+    for (const e of resources.values()) {
+      if (!e.delta) continue;
+      const id = e.target === 'capital' ? 'money' : e.target;
+      const value = root.querySelector<HTMLElement>(`[data-hook="${id === 'money' ? 'value' : 'number'}-${id}"]`);
+      if (!value) continue;
+      const final = value.textContent;
+      const start = performance.now(); let frame = 0;
+      const roll = () => {
+        const t = Math.min(1, (performance.now() - start) / (mode === 'full' ? 560 : 150));
+        const n = Math.round(e.value - e.delta * (1 - t) ** 3);
+        value.textContent = id === 'money' ? `£${(n * 1000).toLocaleString('en-GB')}` : String(n);
+        if (t < 1) frame = requestAnimationFrame(roll); else value.textContent = final;
+      };
+      frame = requestAnimationFrame(roll);
+      tails.current.push((restore = true) => { cancelAnimationFrame(frame); if (restore) value.textContent = final; });
+      const delta = document.createElement('span'); delta.className = `motion-delta delta-${id}`; delta.textContent = signedAmount(e.target, e.delta);
+      const valueBox = value.getBoundingClientRect(), deskBox = root.getBoundingClientRect();
+      delta.style.left = `${(valueBox.left + valueBox.width / 2 - deskBox.left) * 1280 / deskBox.width}px`;
+      host.current.appendChild(delta);
+      animate(delta, [{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 0 }], 1350);
+      const timer = window.setTimeout(() => delta.remove(), mode === 'full' ? 1350 : 150);
+      tails.current.push(() => { clearTimeout(timer); delta.remove(); });
+      animate(value, [{ color: 'var(--motion-tint)' }, { color: 'inherit' }], 820);
+    }
+    if (step.events.some(e => e.type === 'resource' && e.target === 'heat')) {
+      const pill = root.querySelector('[data-hook="countdown"]');
+      if (pill && pill.textContent !== previousCountdown.current) animate(pill, mode === 'full' ? [{ transform: 'scale(1)' }, { transform: 'scale(1.1)', offset: .4 }, { transform: 'scale(1)' }] : [{ opacity: .4 }, { opacity: 1 }], 320);
     }
   }, [snap]);
   return <div ref={host} className="motion-host" aria-hidden="true"><div className="scene3d motion-pile" /><div className="scene3d motion-flight" /></div>;
