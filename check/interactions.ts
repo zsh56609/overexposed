@@ -110,10 +110,20 @@ async function bubblesAndMetronome(page: Page, url: string): Promise<Result[]> {
     await sleep(300);
     out.push(['the metronome swings', a1 !== (await angle())]);
     await page.click(...metro);
-    await sleep(2800);
-    const s1 = await angle();
+    // The reference caps each frame's elapsed time at 50ms. A low-frame-rate WebKit window can
+    // therefore take longer than 2.8s in wall time to finish its stroke and settle. Observe the
+    // stable centre before restarting; keep a deadline so a lost click still fails the check.
+    const stopStarted = performance.now();
+    let s1 = await angle();
+    let zeroSamples = 0;
+    while (performance.now() - stopStarted < 7000 && zeroSamples < 3) {
+      await sleep(100);
+      s1 = await angle();
+      zeroSamples = /rotate\(0(\.0+)?deg\)/.test(s1) ? zeroSamples + 1 : 0;
+    }
+    console.log(`  metronome ${page.name}: stable centre ${zeroSamples >= 3 ? 'after' : 'not reached within'} ${Math.round(performance.now() - stopStarted)}ms`);
     await sleep(300);
-    out.push(['a click settles it at the centre', s1 === (await angle()) && /rotate\(0(\.0+)?deg\)/.test(s1)]);
+    out.push(['a click settles it at the centre', zeroSamples >= 3 && s1 === (await angle())]);
     await page.click(...metro);
     await sleep(700);
     const r1 = await angle();
