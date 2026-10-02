@@ -1,0 +1,14 @@
+
+> overexposed@0.0.0 check:interactions
+> node check/interactions.ts --browsers=webkit
+
+  metronome webkit: stable centre after 4297ms
+interactions, webkit 1280x720: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+  metronome webkit: stable centre after 2394ms
+interactions, webkit 800x450: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+  metronome webkit: stable centre after 2074ms
+interactions, webkit 844x390: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+PASS: every interaction behaves, in every browser

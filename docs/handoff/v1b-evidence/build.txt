@@ -1,0 +1,22 @@
+
+> overexposed@0.0.0 build
+> npm run typecheck && vite build
+
+
+> overexposed@0.0.0 typecheck
+> tsc -b
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 72 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                      0.41 kB │ gzip:   0.27 kB
+dist/assets/OFL-ByIEFeV4.txt                         4.93 kB │ gzip:   2.19 kB
+dist/assets/LibreFranklin-Dn3QCUQG.woff2            78.49 kB
+dist/assets/PlayfairDisplay-Italic-xDLc0r-w.woff2  110.70 kB
+dist/assets/PlayfairDisplay-BN-k0kRT.woff2         112.06 kB
+dist/assets/index-DEXNNfWZ.css                      49.65 kB │ gzip:  11.20 kB
+dist/assets/index-C1_EMUlE.js                      458.54 kB │ gzip: 140.45 kB
+
+✓ built in 209ms

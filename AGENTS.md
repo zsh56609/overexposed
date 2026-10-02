@@ -319,6 +319,6 @@ npm run tune:thresholds | tune:endings | tune:lanes | tune:try  # a content numb
 npm run desk:states | desk:shots | desk:compare | desk:perf | desk:photos | desk:sheet  # the desk's tools
 ```
 
-Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chrome and Firefox at three sizes. Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).
+Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chromium, Firefox and Playwright WebKit at three sizes. Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

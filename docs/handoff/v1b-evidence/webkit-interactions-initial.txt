@@ -1,0 +1,13 @@
+
+> overexposed@0.0.0 check:interactions
+> node check/interactions.ts --browsers=webkit
+
+interactions, webkit 1280x720: 19 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+  FAIL  a click settles it at the centre
+  FAIL  another click swings it again
+interactions, webkit 800x450: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+interactions, webkit 844x390: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright
+FAIL: an interaction does not behave

@@ -1,0 +1,66 @@
+
+> overexposed@0.0.0 sim:press
+> node sim/press.ts
+
+PRESS  seed=20260929  1000 runs x 9 personas  (116.1s)
+
+MONTHS LED BY EACH PAPER  (the lead paper: the one holding the player's most prominent story)
+  paper            minmaxer         random       crafter*    hypechaser*     dealseeker       comeback        artisan  screenseeker*   celebseeker*
+  flash               44.9%          31.6%           0.4%          54.5%          45.3%          49.7%          14.8%          20.4%          82.8%
+  bside               35.6%          62.2%          67.3%          40.6%          36.0%          43.9%          54.5%          26.2%          16.5%
+  marquee             19.5%           6.2%          32.4%           4.9%          18.7%           6.3%          30.7%          53.3%           0.6%
+  * = probe
+
+LEAD PAPER BY ESTABLISHED LANE  (player-like, pooled; the lane at the month's end)
+                  months     flash     bside   marquee
+  early            27072     29.2%     66.8%      4.0%
+  music            10499     21.3%     73.4%      5.4%
+  screen           11383     23.6%      8.2%     68.3%
+  celebrity        11046     86.4%     10.3%      3.3%
+
+LEAD PAPER BY FAME TIER  (player-like, pooled; the tier at the month's end)
+                  months     flash     bside   marquee
+  tier.hype.1      14421     22.7%     68.6%      8.6%
+  tier.hype.2      12879     23.3%     60.3%     16.4%
+  tier.hype.3      23836     44.7%     36.3%     19.0%
+  tier.hype.4       6461     60.3%     19.4%     20.4%
+  tier.hype.5       2403     63.9%     12.4%     23.7%
+
+A SCANDAL IN THE DAILY FLASH  (player-like; months in which a scandal printed)
+  tier            months   scandal leads the Flash   the Flash on the desk
+  tier.hype.1       1061                      0.0%                    2.7%
+  tier.hype.2       4118                      0.0%                    7.7%
+  tier.hype.3       9614                      0.0%                   49.4%
+  tier.hype.4       2147                    100.0%                   75.2%
+  tier.hype.5        904                    100.0%                   73.1%
+
+THE FAME METER  (player-like runs pooled; by the fame tier at the month's end; share = the player's stories, fame filler included, and without it)
+  tier            months  share of lead page  (real only)  lead overwhelmed  pages overwhelmed  player leads it  filler leads it  filler/month  share of all 3  papers in
+  tier.hype.1      14421               13.3%        13.3%              0.0%               0.0%             0.0%             0.0%          0.00            8.5%       1.02
+  tier.hype.2      12879               14.3%        14.3%              0.0%               0.0%             0.0%             0.0%          0.00            9.4%       1.12
+  tier.hype.3      23836               30.8%        30.8%              0.0%               0.0%             0.6%             0.0%          0.00           16.1%       1.27
+  tier.hype.4       6461               45.9%        35.8%              0.0%               0.0%            69.8%            12.6%          0.72           23.7%       1.86
+  tier.hype.5       2403               77.0%        43.3%             86.4%              39.8%            77.4%             7.9%          2.38           41.8%       2.02
+
+THE ESTABLISHED LANE  (player-like; with hysteresis, round 2b)
+  established by the year's end in 92.6% of runs; after it first settles, 9.6% of later month ends read early again (21.5% of those runs ever do); it changes lane in 4.9%
+  established by month:  1: 0.0%  2: 10.9%  3: 28.9%  4: 44.8%  5: 58.3%  6: 66.5%  7: 73.6%  8: 79.9%  9: 84.2%  10: 87.9%  11: 90.9%  12: 92.6%
+  the lane first established: screen 35.4%, music 33.4%, celebrity 31.2%
+
+THE RIVAL  (player-like runs; her major is fixed by her arc)
+  breakthrough   drawn  26.1%   her major differs from the player's in 65.9%
+  crash          drawn  23.2%   her major differs from the player's in 80.9%
+  crossover      drawn  27.3%   her major differs from the player's in 64.0%
+  fade           drawn  23.4%   her major differs from the player's in 60.3%
+  all arcs: her major differs from the player's in 67.5%; her beats made the page 99.7% of the time
+  world sagas: 24.0 beats due a run; 98.5% of them made the page
+    bside      8.0 beats due a run, 99.9% printed
+    marquee    8.0 beats due a run, 100.0% printed
+    flash      8.0 beats due a run, 95.7% printed
+
+WORLD POOLS  (player-like runs; one-off stories; every paper is readable every month)
+  paper       pool  printed/run  distinct/run  runs with a repeat  repeats/run  most/run  one story, most/run
+  flash         25         24.5          21.4               59.2%          3.1        38                    2
+  bside         35         34.1          32.5               56.3%          1.6        40                    2
+  marquee       37         36.6          34.7               66.2%          1.9        40                    2
+  in the lead paper (what the player reads by default): 25.9 world stories a run, 0.47 of them repeats; 25.8% of runs read a repeat there

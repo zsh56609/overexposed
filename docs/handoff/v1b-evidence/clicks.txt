@@ -1,0 +1,32 @@
+
+> overexposed@0.0.0 check:clicks
+> node check/clicks.ts
+
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, chrome 1280x720: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (21.3s)
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, chrome 800x450: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (21.3s)
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, chrome 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (22.2s)
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, firefox 1280x720: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (26.3s)
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, firefox 800x450: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (26.4s)
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, firefox 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (27.5s)
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, webkit 1280x720: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (30.2s)
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, webkit 800x450: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (30.2s)
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+click-through check, webkit 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (31.3s)
+PASS: every control for a legal action is on the stage and takes its click, in every browser and size

@@ -1,0 +1,11 @@
+
+> overexposed@0.0.0 check:overflow:full
+> node check/overflow.ts --runs=10 --replays --browsers=webkit
+
+overflow check, webkit 1280x720: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (283.1s)
+overflow check, webkit 1280x720: 50 recorded states replayed, 42 cards in their hands — 0 issues
+overflow check, webkit 800x450: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (284.3s)
+overflow check, webkit 800x450: 50 recorded states replayed, 42 cards in their hands — 0 issues
+overflow check, webkit 844x390 (phone): 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (283.7s)
+overflow check, webkit 844x390 (phone): 50 recorded states replayed, 42 cards in their hands — 0 issues
+PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size

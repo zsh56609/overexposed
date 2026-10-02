@@ -1,0 +1,27 @@
+{
+  "commit": "3be87b43cd747964a33a54db425c61b647c30bb3",
+  "referenceCommit": "e839f83",
+  "reference": "Reconstructed from Git; original agent baseline was not handed off",
+  "node": "v24.16.0",
+  "normalization": "sim/compare.ts: JSON runs only; text excludes output path and elapsed times",
+  "files": {
+    "awards-1.txt": "05745979cc121adb2ddc298133cb95cf35c6e130a91ac0be431d6a063628cf8f",
+    "awards-20260929.txt": "d6363de166bf507dd593b2016529dd62a09edf7ac4e42ca7d79928ac329fb49e",
+    "awards-424242.txt": "74dc0643b9e5277a1019533f3342a75951ecfcdb026a807ed48987626a883dc7",
+    "managers-1.txt": "96e1273ff9b7942f9abe68a5c125b165c6222731f79f806f1100d6129ef45cf8",
+    "managers-20260929.txt": "eeec03c337cecad6d1a1bd0dda6c831f231cf66102626008b43a1915df594b43",
+    "managers-424242.txt": "60d9e159d578637a6e81553cddfcb885c59a76f2b46c3cd248b3cf43132e2cd4",
+    "sim-1.guardian.json": "f028140f5dadff4a16f5dcca727927232e05bde0382555f19b0683a6edf23c17",
+    "sim-1.txt": "2d1467a0241f55114291156b66f7d908cb06d2b1506918b9945c3dfe4b0564b2",
+    "sim-1.veteran.json": "0bbc940d41bfdc8d90d0ede58ab28d47d1b0d020518397946e45647892ccca2e",
+    "sim-20260929.guardian.json": "f485efc3eda87fd133037cb535b53fb5d657fe0cccaa3e5c06b743bb41245abd",
+    "sim-20260929.txt": "6897f3e069fd79d79d4d56f319a9a108f17a83385a4319bbe09a4a78e44e0a12",
+    "sim-20260929.veteran.json": "6adc8a277cf27447243da6fec73f21237a8e615bae3b7424904145ce5227a4c1",
+    "sim-424242.guardian.json": "1e36704c04f61fc034188c976108f8400790eb88df420078a33a9012af4e853f",
+    "sim-424242.txt": "3bdd58a580e3bd1d72c1c019677c96bed24e3f1fb9f6138a35e6224e0babdbe4",
+    "sim-424242.veteran.json": "0a81fe66d81274457eb88a6e79e3919acec267921874b1491adebba3ff031e32",
+    "tiers-1.txt": "d5ba8e32fd883b461d3b295169b542a437c2139b2c5ef66a63bb6d29ef4a4045",
+    "tiers-20260929.txt": "4c4dc001293b1ca78243ebdeda44b89847bd09d97416ea09c9213eafbcb03f47",
+    "tiers-424242.txt": "5261a73a54bc6eb01cae83b9be82b5e5ee08e44edf2c4477aa69f4e357d58bce"
+  }
+}

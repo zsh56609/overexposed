@@ -1,0 +1,49 @@
+
+> overexposed@0.0.0 validate
+> node validate/run.ts
+
+validate: 42 cards, 8 gates, 4 major and 14 minor endings, 7 awards, 1016 i18n keys, sources in /core /sim /validate /check /ui
+
+  ok    unknown effect ops
+  ok    references to card / gate / ending / lane / paper ids
+  ok    missing i18n keys
+  ok    player-facing prose not yet written (warnings)      all written
+  ok    variants per line group (warnings)                  27 group(s) short of variants, listed below
+  ok    tier words: one word, at most 10 characters
+  ok    cards unreachable in any act                        42 reachable, earliest act 1..4
+  ok    endings exhaustive: a major per corner, a fallback per major
+  ok    numeric ranges
+  ok    schema shape (fields, types, duplicates)
+  ok    run structure (gates per act, scandal pool, flags)
+  ok    content budget (ceilings)
+  ok    code boundaries (CLAUDE.md §0)
+
+  warn  [variants] opener:1: 1 variant, shown once a run: needs at least 2
+  warn  [variants] opener:2: 1 variant, shown once a run: needs at least 2
+  warn  [variants] opener:3: 1 variant, shown once a run: needs at least 2
+  warn  [variants] opener:4: 1 variant, shown once a run: needs at least 2
+  warn  [variants] opening: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_audition: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_showcase: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_festival: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_session_work: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_label_deal: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_residency: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_arena_tour: 1 variant, shown once a run: needs at least 2
+  warn  [variants] gate:gate_award_show: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:leading_role: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:household_name: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:star: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:the_independent: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:redemption_arc: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:tabloid_royalty: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:meltdown: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:character_actor: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:the_one_to_watch: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:craftsman: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:nobody: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:flash_in_the_pan: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:running_on_empty: 1 variant, shown once a run: needs at least 2
+  warn  [variants] ending:starting_over: 1 variant, shown once a run: needs at least 2
+
+PASS: 0 error(s), 27 warning(s)

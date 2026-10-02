@@ -1,0 +1,123 @@
+target <polygon points="23,14 37,14 47,68 13,68" fill="#241810"></polygon>
+stop 0 {
+  zeroAt: 4152,
+  angles: [
+    'rotate(14.72deg)', 'rotate(16.42deg)',
+    'rotate(16.85deg)', 'rotate(16.9deg)',
+    'rotate(16.09deg)', 'rotate(15.4deg)',
+    'rotate(14.55deg)', 'rotate(12.42deg)',
+    'rotate(12.42deg)', 'rotate(11.21deg)',
+    'rotate(8.61deg)',  'rotate(5.99deg)',
+    'rotate(4.76deg)',  'rotate(2.6deg)',
+    'rotate(1.72deg)',  'rotate(0.48deg)',
+    'rotate(0.14deg)',  'rotate(0deg)',
+    'rotate(0deg)',     'rotate(0deg)'
+  ],
+  clicks: [ { trusted: true, time: 5083 } ],
+  frameP95: 170
+}
+restart [
+  'rotate(0deg)',
+  'rotate(2.45deg)',
+  [ { trusted: true, time: 5083 }, { trusted: true, time: 9244 } ]
+]
+target <polygon points="23,14 37,14 47,68 13,68" fill="#241810"></polygon>
+stop 1 {
+  zeroAt: 6260,
+  angles: [
+    'rotate(16.42deg)',  'rotate(14.72deg)',
+    'rotate(12.02deg)',  'rotate(8.5deg)',
+    'rotate(6.51deg)',   'rotate(4.4deg)',
+    'rotate(0deg)',      'rotate(-2.22deg)',
+    'rotate(-6.51deg)',  'rotate(-8.5deg)',
+    'rotate(-12.02deg)', 'rotate(-13.49deg)',
+    'rotate(-15.71deg)', 'rotate(-16.42deg)',
+    'rotate(-17deg)',    'rotate(-16.9deg)',
+    'rotate(-16.59deg)', 'rotate(-16.09deg)',
+    'rotate(-15.4deg)',  'rotate(-13.55deg)',
+    'rotate(-11.21deg)', 'rotate(-8.61deg)',
+    'rotate(-5.99deg)',  'rotate(-4.76deg)',
+    'rotate(-2.6deg)',   'rotate(-1.01deg)',
+    'rotate(-0.14deg)',  'rotate(0deg)',
+    'rotate(0deg)',      'rotate(0deg)'
+  ],
+  clicks: [ { trusted: true, time: 4823 } ],
+  frameP95: 165
+}
+restart [
+  'rotate(0deg)',
+  'rotate(1.5deg)',
+  [ { trusted: true, time: 4823 }, { trusted: true, time: 11091 } ]
+]
+target <polygon points="23,14 37,14 47,68 13,68" fill="#241810"></polygon>
+stop 2 {
+  zeroAt: 5847,
+  angles: [
+    'rotate(15.71deg)',  'rotate(13.49deg)',
+    'rotate(10.35deg)',  'rotate(8.5deg)',
+    'rotate(4.4deg)',    'rotate(2.22deg)',
+    'rotate(-2.22deg)',  'rotate(-4.4deg)',
+    'rotate(-8.5deg)',   'rotate(-10.35deg)',
+    'rotate(-12.02deg)', 'rotate(-15.71deg)',
+    'rotate(-16.85deg)', 'rotate(-17deg)',
+    'rotate(-16.9deg)',  'rotate(-16.09deg)',
+    'rotate(-14.55deg)', 'rotate(-12.42deg)',
+    'rotate(-9.92deg)',  'rotate(-5.99deg)',
+    'rotate(-4.76deg)',  'rotate(-3.62deg)',
+    'rotate(-1.72deg)',  'rotate(-1.01deg)',
+    'rotate(-0.14deg)',  'rotate(0deg)',
+    'rotate(0deg)',      'rotate(0deg)'
+  ],
+  clicks: [ { trusted: true, time: 5561 } ],
+  frameP95: 182
+}
+restart [
+  'rotate(0deg)',
+  'rotate(2.45deg)',
+  [ { trusted: true, time: 5561 }, { trusted: true, time: 11418 } ]
+]
+target <polygon points="23,14 37,14 47,68 13,68" fill="#241810"></polygon>
+stop 3 {
+  zeroAt: 4153,
+  angles: [
+    'rotate(2.22deg)',   'rotate(-2.22deg)',
+    'rotate(-8.5deg)',   'rotate(-12.02deg)',
+    'rotate(-14.72deg)', 'rotate(-16.85deg)',
+    'rotate(-17deg)',    'rotate(-16.59deg)',
+    'rotate(-15.4deg)',  'rotate(-13.55deg)',
+    'rotate(-11.21deg)', 'rotate(-9.92deg)',
+    'rotate(-7.29deg)',  'rotate(-4.76deg)',
+    'rotate(-2.6deg)',   'rotate(-1.72deg)',
+    'rotate(-0.48deg)',  'rotate(0deg)',
+    'rotate(0deg)',      'rotate(0deg)'
+  ],
+  clicks: [ { trusted: true, time: 5563 } ],
+  frameP95: 135
+}
+restart [
+  'rotate(0deg)',
+  'rotate(2.94deg)',
+  [ { trusted: true, time: 5563 }, { trusted: true, time: 9722 } ]
+]
+target <polygon points="23,14 37,14 47,68 13,68" fill="#241810"></polygon>
+stop 4 {
+  zeroAt: 3723,
+  angles: [
+    'rotate(-10.35deg)', 'rotate(-13.49deg)',
+    'rotate(-15.71deg)', 'rotate(-16.85deg)',
+    'rotate(-17deg)',    'rotate(-16.59deg)',
+    'rotate(-15.4deg)',  'rotate(-13.55deg)',
+    'rotate(-11.21deg)', 'rotate(-8.61deg)',
+    'rotate(-5.99deg)',  'rotate(-3.62deg)',
+    'rotate(-2.6deg)',   'rotate(-1.01deg)',
+    'rotate(-0.14deg)',  'rotate(0deg)',
+    'rotate(0deg)',      'rotate(0deg)'
+  ],
+  clicks: [ { trusted: true, time: 6316 } ],
+  frameP95: 134
+}
+restart [
+  'rotate(0deg)',
+  'rotate(2.94deg)',
+  [ { trusted: true, time: 6316 }, { trusted: true, time: 10043 } ]
+]

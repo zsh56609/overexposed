@@ -1,0 +1,14 @@
+
+> overexposed@0.0.0 check:interactions
+> node check/interactions.ts --browsers=firefox
+
+  metronome firefox: stable centre after 1748ms
+interactions, firefox 1280x720: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+  metronome firefox: stable centre after 1750ms
+interactions, firefox 800x450: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+  metronome firefox: stable centre after 1868ms
+interactions, firefox 844x390: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+PASS: every interaction behaves, in every browser

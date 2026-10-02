@@ -1,0 +1,23 @@
+
+> overexposed@0.0.0 sim:compare
+> node sim/compare.ts sim/out/baseline-v1b-3be87b4 sim/out/baseline-v1b-after
+
+same  awards-1.txt
+same  awards-20260929.txt
+same  awards-424242.txt
+same  managers-1.txt
+same  managers-20260929.txt
+same  managers-424242.txt
+same  sim-1.guardian.json  (9000 runs)
+same  sim-1.txt
+same  sim-1.veteran.json  (9000 runs)
+same  sim-20260929.guardian.json  (9000 runs)
+same  sim-20260929.txt
+same  sim-20260929.veteran.json  (9000 runs)
+same  sim-424242.guardian.json  (9000 runs)
+same  sim-424242.txt
+same  sim-424242.veteran.json  (9000 runs)
+same  tiers-1.txt
+same  tiers-20260929.txt
+same  tiers-424242.txt
+IDENTICAL: 18 files

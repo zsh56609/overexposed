@@ -463,7 +463,7 @@ mechanism is needed.
   three manager check-ins. About nine story beats a run.
 - Different runs draw different events, which is replay value.
 - At ~25 seconds each, a run grows from ~10 to ~14 minutes: inside the
-  under-20 target. Prose adds meaning, not reading time.
+  10–15-minute target. Prose adds meaning, not reading time.
 - Placement: at the start of a month, before the draft and draw.
 
 ---

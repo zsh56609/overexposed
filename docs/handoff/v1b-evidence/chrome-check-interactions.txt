@@ -1,0 +1,11 @@
+
+> overexposed@0.0.0 check:interactions
+> node check/interactions.ts --browsers=chrome
+
+  metronome chrome: stable centre after 1890ms
+interactions, chrome 1280x720: 24 of 24 pass
+  metronome chrome: stable centre after 1841ms
+interactions, chrome 800x450: 24 of 24 pass
+  metronome chrome: stable centre after 1886ms
+interactions, chrome 844x390: 24 of 24 pass
+PASS: every interaction behaves, in every browser
