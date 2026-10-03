@@ -18,8 +18,9 @@ export type BrowserName = 'chrome' | 'firefox' | 'webkit';
 
 export interface Page {
   readonly name: BrowserName;
+  readonly diagnostics: string[];
   /** Runs an expression in the page (promises awaited); its JSON-able value. */
-  evaluate<T = unknown>(expression: string): Promise<T>;
+  evaluate<T = unknown>(expression: string, timeoutMs?: number): Promise<T>;
   navigate(url: string, settle?: number): Promise<void>;
   screenshot(path: string): Promise<void>;
   /** The mouse: moves to, or clicks at, a point in CSS pixels of the viewport. */
@@ -28,7 +29,7 @@ export interface Page {
   /** A touch held down for `ms`, then lifted. */
   press(x: number, y: number, ms: number): Promise<void>;
   /** One key, by its name: 'Tab', 'Enter'. */
-  key(name: 'Tab' | 'Enter'): Promise<void>;
+  key(name: 'Tab' | 'Enter' | 'Space'): Promise<void>;
   /** Chrome only: slows the CPU by `rate` (1 is off). */
   throttle(rate: number): Promise<void>;
   close(): Promise<void>;
@@ -89,8 +90,7 @@ export function browsersFromArgs(argv: readonly string[], fallback = 'chrome,fir
   const have = asked.filter((b) => {
     if (b !== 'chrome' && b !== 'firefox' && b !== 'webkit') throw new Error(`unknown browser ${b}`);
     if (find(b)) return true;
-    console.log(`(${b} is not installed here: skipped; ${b === 'chrome' ? 'CHROME_PATH' : 'FIREFOX_PATH'} points to one)`);
-    return false;
+    throw new Error(`${b} is requested but not installed; set ${b === 'chrome' ? 'CHROME_PATH' : b === 'firefox' ? 'FIREFOX_PATH' : 'PLAYWRIGHT_BROWSERS_PATH'}. Missing browsers are not passes.`);
   });
   if (have.length === 0) {
     console.error('no browser to run in: install Chrome or Firefox, or set CHROME_PATH / FIREFOX_PATH');
@@ -116,10 +116,14 @@ async function launchWebKit(size: { width: number; height: number; mobile?: bool
   const browser = await webkit.launch({ headless: true });
   const context = await browser.newContext({ viewport: size, hasTouch: true, isMobile: size.mobile ?? false });
   const page = await context.newPage();
+  const diagnostics: string[] = [];
+  page.on('pageerror', error => diagnostics.push(`pageerror: ${error.message}`));
+  page.on('console', msg => { if (msg.type()==='error' || msg.type()==='warning') diagnostics.push(`${msg.type()}: ${msg.text()}`); });
   page.setDefaultTimeout(ANSWER_MS);
   return {
     name: 'webkit',
-    async evaluate<T>(expression: string): Promise<T> { return within(page.evaluate(expression) as Promise<T>, SCRIPT_MS, 'WebKit script'); },
+    diagnostics,
+    async evaluate<T>(expression: string, timeoutMs = SCRIPT_MS): Promise<T> { return within(page.evaluate(expression) as Promise<T>, timeoutMs, 'WebKit script'); },
     async navigate(url, settle = 2500) { await page.goto(url); await sleep(settle); },
     async screenshot(path) { await page.screenshot({ path }); },
     async move(x, y) { await page.mouse.move(x, y); },
@@ -161,27 +165,32 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await within(new Promise((r) => ws.addEventListener('open', r)), 30_000, 'the DevTools connection');
   let id = 0;
+  const diagnostics: string[] = [];
   const pending = new Map<number, (m: CdpReply) => void>();
   ws.addEventListener('message', (e) => {
     const m = JSON.parse(String(e.data));
+    if (m.method === 'Runtime.exceptionThrown' || m.method === 'Log.entryAdded' || (m.method === 'Runtime.consoleAPICalled' && ['error','warning'].includes(m.params?.type))) diagnostics.push(JSON.stringify(m));
     if (m.id && pending.has(m.id)) {
       pending.get(m.id)?.(m);
       pending.delete(m.id);
     }
   });
-  const send = (method: string, params: object = {}) => {
+  const send = (method: string, params: object = {}, timeoutMs = method === 'Runtime.evaluate' ? SCRIPT_MS : ANSWER_MS) => {
     const i = ++id;
     const answer = new Promise<CdpReply>((res) => pending.set(i, res));
     ws.send(JSON.stringify({ id: i, method, params }));
-    return within(answer, method === 'Runtime.evaluate' ? SCRIPT_MS : ANSWER_MS, method).finally(() => pending.delete(i));
+    return within(answer, timeoutMs, method).finally(() => pending.delete(i));
   };
+  await send('Runtime.enable'); await send('Log.enable');
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile });
   if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
   const mouse = (type: string, x: number, y: number) => send('Input.dispatchMouseEvent', { type, x, y, button: 'left', clickCount: 1 });
   return {
     name: 'chrome',
-    async evaluate<T>(expression: string) {
-      const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: 1_800_000 });
+    diagnostics,
+    async evaluate<T>(expression: string, timeoutMs = SCRIPT_MS) {
+      const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, timeout: timeoutMs }, timeoutMs);
+      if (r.error) throw new Error(r.error.message ?? 'CDP evaluation failed');
       if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? r.result.exceptionDetails.text ?? 'the page script failed');
       return r.result?.result?.value as T;
     },
@@ -208,9 +217,9 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
       await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     },
     async key(name) {
-      const code = name === 'Tab' ? 9 : 13;
-      await send('Input.dispatchKeyEvent', { type: 'keyDown', key: name, code: name, windowsVirtualKeyCode: code });
-      await send('Input.dispatchKeyEvent', { type: 'keyUp', key: name, code: name, windowsVirtualKeyCode: code });
+      const code = name === 'Tab' ? 9 : name === 'Space' ? 32 : 13;
+      await send('Input.dispatchKeyEvent', { type: 'keyDown', key: name === 'Space' ? ' ' : name, code: name, windowsVirtualKeyCode: code });
+      await send('Input.dispatchKeyEvent', { type: 'keyUp', key: name === 'Space' ? ' ' : name, code: name, windowsVirtualKeyCode: code });
     },
     async throttle(rate) {
       await send('Emulation.setCPUThrottlingRate', { rate });
@@ -314,23 +323,26 @@ async function startFirefox({ width, height }: { width: number; height: number }
     'the WebDriver BiDi connection',
   ).catch(fail);
   let id = 0;
+  const diagnostics: string[] = [];
   const pending = new Map<number, (m: { type: string; result?: Record<string, unknown>; error?: string; message?: string }) => void>();
   socket.addEventListener('message', (e) => {
     const m = JSON.parse(String(e.data));
+    if (m.method === 'log.entryAdded') diagnostics.push(JSON.stringify(m.params));
     if (m.id && pending.has(m.id)) {
       pending.get(m.id)?.(m);
       pending.delete(m.id);
     }
   });
-  const send = (method: string, params: object = {}) => {
+  const send = (method: string, params: object = {}, timeoutMs = method === 'script.evaluate' ? SCRIPT_MS : ANSWER_MS) => {
     const i = ++id;
     const answer = new Promise<Record<string, unknown>>((res, rej) =>
       pending.set(i, (m) => (m.type === 'error' ? rej(new Error(`${method}: ${m.error} ${m.message}`)) : res(m.result ?? {}))),
     );
     socket.send(JSON.stringify({ id: i, method, params }));
-    return within(answer, method === 'script.evaluate' ? SCRIPT_MS : ANSWER_MS, method).finally(() => pending.delete(i));
+    return within(answer, timeoutMs, method).finally(() => pending.delete(i));
   };
   await send('session.new', { capabilities: {} }).catch(fail);
+  await send('session.subscribe', { events: ['log.entryAdded'] }).catch(fail);
   // The window's tab, once Firefox has settled it. BiDi can answer while the first tab does not exist yet, is
   // being replaced, or still loads its start page — and a navigation that raced it was never answered (round
   // V1a's handoff). So the tab is taken once it answers a script, and a navigation left unanswered is tried
@@ -357,8 +369,9 @@ async function startFirefox({ width, height }: { width: number; height: number }
   const at = (x: number, y: number) => ({ type: 'pointerMove', x: Math.round(x), y: Math.round(y), duration: 0 });
   return {
     name: 'firefox',
-    async evaluate<T>(expression: string) {
-      const r = (await send('script.evaluate', { expression, target: { context }, awaitPromise: true, resultOwnership: 'none', serializationOptions: { maxObjectDepth: 30 } })) as { type: string; result?: BidiValue; exceptionDetails?: { text?: string } };
+    diagnostics,
+    async evaluate<T>(expression: string, timeoutMs = SCRIPT_MS) {
+      const r = (await send('script.evaluate', { expression, target: { context }, awaitPromise: true, resultOwnership: 'none', serializationOptions: { maxObjectDepth: 30 } }, timeoutMs)) as { type: string; result?: BidiValue; exceptionDetails?: { text?: string } };
       if (r.type === 'exception') throw new Error(r.exceptionDetails?.text ?? 'the page script failed');
       return fromRemote(r.result) as T;
     },
@@ -389,11 +402,11 @@ async function startFirefox({ width, height }: { width: number; height: number }
       await pointer([at(x, y), { type: 'pointerDown', button: 0 }, { type: 'pause', duration: ms }, { type: 'pointerUp', button: 0 }], 'touch');
     },
     async key(name) {
-      const value = name === 'Tab' ? '\uE004' : '\uE007';
+      const value = name === 'Tab' ? '\uE004' : name === 'Space' ? ' ' : '\uE007';
       await send('input.performActions', { context, actions: [{ type: 'key', id: 'keyboard', actions: [{ type: 'keyDown', value }, { type: 'keyUp', value }] }] });
     },
-    async throttle() {
-      // Firefox's BiDi has no CPU throttling.
+    async throttle(rate) {
+      if (rate !== 1) throw new Error('Firefox BiDi CPU throttling is unavailable');
     },
     async close() {
       try {

@@ -5,7 +5,7 @@
 // when the month has no actions left. Playing is plain until V1b animates it. END TURN at the bottom right.
 // Words and numbers are the adapter's (./model.ts).
 
-import { memo, useCallback, useRef, type KeyboardEvent, type PointerEvent, type MouseEvent } from 'react';
+import { memo, useCallback, useEffect, useRef, type KeyboardEvent, type PointerEvent, type MouseEvent } from 'react';
 import type { SeasonId } from '../../core/index.ts';
 import { isPlaceholder } from '../text.ts';
 import { photoUrl } from './halftone.ts';
@@ -68,6 +68,7 @@ function shake(el: HTMLElement) {
 }
 
 interface HandProps {
+  readonly busy: boolean;
   readonly cards: readonly HandCardModel[];
   readonly words: HandWords;
   readonly endTurn: EndTurnModel;
@@ -78,9 +79,10 @@ interface HandProps {
   readonly toast: (text: string) => void;
 }
 
-const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast }: { card: HandCardModel; pos: { left: number; rot: number; lift: number; z: number }; words: HandWords; season: SeasonId; onPlay: (uid: number) => void; focus: HandProps['focus']; toast: HandProps['toast'] }) {
+const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast, busy }: { card: HandCardModel; pos: { left: number; rot: number; lift: number; z: number }; words: HandWords; season: SeasonId; onPlay: (uid: number) => void; focus: HandProps['focus']; toast: HandProps['toast']; busy: boolean }) {
   const press = useRef<number | undefined>(undefined);
   const longPressed = useRef(false);
+  useEffect(() => { window.clearTimeout(press.current); return () => window.clearTimeout(press.current); }, [busy]);
   const anchor = cardAnchor(pos.left);
   const activate = (el: HTMLElement) => {
     if (card.playable) {
@@ -124,7 +126,7 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
         if (e.pointerType === 'mouse') focus(null);
       }}
       onPointerDown={(e: PointerEvent<HTMLDivElement>) => {
-        if (e.pointerType === 'mouse') return;
+        if (e.pointerType === 'mouse' || busy) return;
         longPressed.current = false;
         window.clearTimeout(press.current);
         press.current = window.setTimeout(() => {
@@ -178,7 +180,7 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
   );
 });
 
-export const Hand = memo(function Hand({ cards, words, endTurn, season, play, end, focus, toast }: HandProps) {
+export const Hand = memo(function Hand({ cards, words, endTurn, season, play, end, focus, toast, busy }: HandProps) {
   const places = fan(cards.length);
   const onEnd = useCallback(() => {
     focus(null);
@@ -190,7 +192,7 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
       <div className={`hand${fanSpacing(cards.length) < 120 ? ' tight' : ''}`} data-hook="hand" style={{ ['--strip' as string]: `${fanSpacing(cards.length)}px` }}>
         {cards.map((card, i) => {
           const at = places[i] ?? { left: 0, rot: 0, lift: 0 };
-          return <Card key={card.uid} card={card} pos={{ ...at, z: 10 + i }} words={words} season={season} onPlay={play} focus={focus} toast={toast} />;
+          return <Card key={card.uid} card={card} pos={{ ...at, z: 10 + i }} words={words} season={season} onPlay={play} focus={focus} toast={toast} busy={busy} />;
         })}
       </div>
       <button

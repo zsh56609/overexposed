@@ -23,6 +23,7 @@
 import { createServer } from 'vite';
 import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
 import { loadStates, PLAY_STEPS, ROOT } from './desk-replay.ts';
+import { auditStep } from './audit-progress.ts';
 
 const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
 const RUNS = Number(arg('runs', '4'));
@@ -33,6 +34,7 @@ const BROWSERS = browsersFromArgs(process.argv);
 /** Runs in the page: every line group's variants set to its longest (the strings module the app itself imported). */
 const PATCH = `(async () => {
   const urls = performance.getEntriesByType('resource').map((e) => new URL(e.name)).map((u) => u.pathname + u.search);
+  if (!urls.some(u=>u.startsWith('/i18n/en.json')) || !urls.some(u=>u.startsWith('/content/scripts.json'))) throw new Error('audit modules not loaded; ready='+document.readyState+' url='+location.href);
   const m = await import(urls.find((u) => u.startsWith('/i18n/en.json')));
   const s = m.default;
   // The desk scripts are fixed scenes, not variants: kept as written, each tried in the script page by the audit.
@@ -196,6 +198,7 @@ const DRIVE = (runs: number) => `(async () => {
     while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
       const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : 'play';
+      window.__auditProgress = { run, guard, phase, states:seen.states, previews:seen.previews, tips:seen.tips };
       if (phase === 'manager') { plain('manager'); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));
       if (phase === 'draft') {
@@ -229,6 +232,7 @@ const DRIVE = (runs: number) => `(async () => {
       }
       await sleep(6);
     }
+    if (!document.querySelector('.ending')) throw new Error('audit reached 800-action guard: '+JSON.stringify(window.__auditProgress));
     plain('ending');
     document.querySelector('button.play-again')?.click();
     await sleep(30);
@@ -266,10 +270,11 @@ try {
       try {
         await page.navigate(`${url}?seed=20260929`, 3000);
         const t0 = performance.now();
-        await page.evaluate(PATCH);
+        console.log(`starting overflow ${tag}`);
+        await auditStep(page, `${tag} longest-text patch`, PATCH);
         await page.evaluate(AUDIT);
         await page.evaluate(PLAIN);
-        const out = await page.evaluate<Out>(DRIVE(RUNS));
+        const out = await auditStep<Out>(page, `${tag} ${RUNS} runs`, DRIVE(RUNS), 600_000);
         const screens = Object.entries(out.screens)
           .map(([k, n]) => `${k} ${n}`)
           .join(', ');
@@ -285,16 +290,17 @@ try {
           const held = new Set<string>();
           for (const [key, state] of Object.entries(states)) {
             await page.navigate(`${url}?seed=${state.seed}`, 2500);
-            await page.evaluate(PATCH);
+            await auditStep(page, `${tag} ${key} longest-text patch`, PATCH);
             await page.evaluate(AUDIT);
             await page.evaluate(PLAIN);
-            const r = await page.evaluate<string>(PLAY_STEPS(state.steps));
+            const r = await auditStep<string>(page, `${tag} replay ${key}`, PLAY_STEPS(state.steps), 60_000);
             if (r !== 'ok') {
               broke++;
               console.log(`REPLAY ${key}: ${r} — run npm run desk:states after a content change`);
               continue;
             }
-            const x = await page.evaluate<{ hand: number; cards: string[]; issues: string[] }>(REPLAY_AUDIT);
+            const x = await auditStep<{ hand: number; cards: string[]; issues: string[] }>(page, `${tag} measure ${key}`, REPLAY_AUDIT);
+            console.log(`replay ${tag} ${key}: ${x.issues.length} issues`);
             for (const id of x.cards) held.add(id);
             n += x.issues.length;
             for (const m of [...new Set(x.issues)].slice(0, 4)) console.log(`OVERFLOW ${key}  ${m}`);

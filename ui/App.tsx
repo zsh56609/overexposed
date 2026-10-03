@@ -202,6 +202,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [focus, setFocus] = useState<Focus>(null);
   const [deckOpen, setDeckOpen] = useState(false);
+  useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
   useEffect(() => {
     const skip = (event: MouseEvent | KeyboardEvent) => {
       if (!queue.busy || (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ')) return;
@@ -237,16 +238,16 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       deck: () => setDeckOpen(true),
       play: (uid: number) => act({ type: 'PLAY_CARD', uid }),
       end: () => act({ type: 'END_TURN' }),
-      focus: setFocus,
+      focus: (next: Focus) => setFocus(queue.busy ? null : next),
     }),
-    [act],
+    [act, queue],
   );
 
   if (s.phase === 'ended') return <div className="plain full"><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
   if (s.phase === 'manager') return <div className="plain full"><ManagerChoice s={s} legal={legal} act={act} error={error} /></div>;
 
   const endPreview = model.endPreview;
-  const card = focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
+  const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
     <>
@@ -257,7 +258,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
             <PlayPreviewView c={c} p={card} />
           </Floating>
         )}
-        {s.phase === 'play' && focus?.kind === 'end' && endPreview && (
+        {!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview && (
           <Floating anchor={focus.anchor}>
             <EndTurnPreviewView c={c} p={endPreview} />
           </Floating>

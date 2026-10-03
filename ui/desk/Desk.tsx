@@ -70,7 +70,7 @@ export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on
       <Motion snap={snap} hold={hold} />
       <Bubbles messages={model.messages} />
       <div className="dim" />
-      {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} />}
+      {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">
         {toast.text}
       </div>

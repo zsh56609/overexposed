@@ -1566,3 +1566,9 @@ The author approved round-visual-1b.md in full, including Playwright's WebKit as
 - Use the prompt's allowed split after Part C. Part D (month end, scandal flip, season, dealing and arrivals) and full Part E acceptance remain before phase 3. A–C must still finish their browser, frame and performance acceptance; an implementation is not a completed round until that evidence exists.
 - Keep browser limitations explicit: Firefox BiDi has no CPU throttling here; Playwright's WebKit Touchscreen exposes taps but no trusted held touch. Do not label synthetic input as a trusted long-press or normal-speed Firefox as 4×.
 - The skip-only hold extends beyond the 930 ms card landing through printing, resource deltas and handwriting. D7 checks both 60 ms and 1100 ms so a click during a visual tail cannot also end the month. Overflow checks wait for the preview/tooltip to actually open and close; a count of dispatched hover events is not evidence of measured visible text.
+
+## V1b completion round — implementation decisions (2026-10-03)
+
+- Start from reviewed `ace1c41`; the checkout was clean and a normal fast-forward pull found no intervening changes. This round completes D/E, not phase 3 or V2. Preserve the four-sim baseline and Part 0 press baseline.
+- Preview requests go through the queue's live busy guard, and existing focus is cleared while busy. This includes visual tails, keyboard focus and touch timers; an unchanged pointer must not open the next card's preview as the fan closes. D7 still consumes the skip input only.
+- The review's 1200s overflow timeout did not reproduce in the first isolated run (41.2s, 213 states, no overflow). A diagnostic rerun took 41.6s with the same counts. Its cause remains unverified. Each audit phase now has a bounded wait, browser errors are retained, and long runs print their last run/action/phase/counters every ten seconds; no-progress failure is bounded at 60s rather than raising the old timeout.
