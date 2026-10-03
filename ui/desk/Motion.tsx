@@ -26,7 +26,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
     f.original.style.visibility = '';
     f.plane.style.transform = 'rotateX(64deg)';
     f.face.style.transform = planeAt(f.x, f.y, f.rot, .55);
-    host.current.querySelector('.motion-pile')?.appendChild(f.plane);
+    f.plane.remove(); // the settled face is reconstructed from history by Pile
     flight.current = null;
   };
   useLayoutEffect(() => () => { finish(); for (const fn of tails.current.splice(0)) fn(); }, []);
@@ -34,7 +34,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
     const root = host.current?.closest('.desk');
     if (!root || !host.current) return;
     if (turn.current !== snap.state.turn) {
-      finish(); host.current.querySelector('.motion-pile')?.replaceChildren(); turn.current = snap.state.turn;
+      finish(); turn.current = snap.state.turn;
     }
     const active = snap.active;
     if (skipped.current !== snap.skipped) {
@@ -43,6 +43,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
       lastLand.current = snap.steps.slice(-1)[0]?.id ?? 0; return;
     }
     if (!active) finish();
+    if(active?.plan) { finish();for(const fn of tails.current.splice(0))fn();lastLand.current=active.step.id;return; }
     const step = active?.step ?? snap.steps.slice(-1)[0];
     const beat = active?.beat ?? 'land';
     const mode = active?.mode ?? motionMode();
@@ -71,7 +72,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
       const angle = rot * Math.PI / 180;
       const cx = parseFloat(original.style.left) + 93 + 176 * Math.sin(angle);
       const cy = 490 - lift + 302 - 176 * Math.cos(angle);
-      const pileCount = host.current.querySelectorAll('.motion-pile .plane').length;
+      const pileCount = root.querySelectorAll('.motion-pile .plane').length;
       const [x, y, rz] = SLOTS[Math.min(pileCount, SLOTS.length - 1)]!;
       original.style.visibility = 'hidden';
       const remaining = [...root.querySelectorAll<HTMLElement>('.hand .card')].filter(c => c !== original);
@@ -97,7 +98,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
     lastLand.current = step.id;
     const animate = (el: Element, frames: Keyframe[], ms: number) => {
       hold(mode === 'reduced' ? Math.min(ms, 150) : ms);
-      const a = el.animate(frames, { duration: mode === 'reduced' ? Math.min(ms, 150) : ms }); tails.current.push(() => a.cancel());
+      const a = el.animate(mode==='reduced'?[{opacity:.4},{opacity:1}]:frames, { duration: mode === 'reduced' ? Math.min(ms, 150) : ms }); tails.current.push(() => a.cancel());
     };
     // History gives the composed story's exact identity; never replace an arbitrary row.
     const line = pressLines(snap.steps).find(l => l.step === snap.steps.length - 1 && l.kind === 'play');
@@ -127,7 +128,7 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
         for (const word of words) {
           const span = document.createElement('span'); span.textContent = word + ' '; overlay.appendChild(span);
           const duration = Math.max(90, word.length * 40);
-          const a = span.animate([{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0)' }], { delay: mode === 'full' ? delay : 0, duration: mode === 'full' ? duration : 150, fill: 'both' });
+          const a = span.animate(mode==='full'?[{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0)' }]:[{opacity:0},{opacity:1}], { delay: mode === 'full' ? delay : 0, duration: mode === 'full' ? duration : 150, fill: 'both' });
           tails.current.push(() => a.cancel()); delay += duration + 40;
         }
         note.style.visibility = 'hidden'; note.parentElement?.appendChild(overlay);
@@ -151,10 +152,10 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
         const t = Math.min(1, (performance.now() - start) / (mode === 'full' ? 560 : 150));
         const n = Math.round(e.value - e.delta * (1 - t) ** 3);
         value.textContent = id === 'money' ? `£${(n * 1000).toLocaleString('en-GB')}` : String(n);
-        if (t < 1) frame = requestAnimationFrame(roll); else value.textContent = final;
+        if (t < 1) frame = requestAnimationFrame(roll); else value.textContent = value.dataset.final??final;
       };
-      frame = requestAnimationFrame(roll);
-      tails.current.push((restore = true) => { cancelAnimationFrame(frame); if (restore) value.textContent = final; });
+      if(mode==='full')frame = requestAnimationFrame(roll);
+      tails.current.push((restore = true) => { cancelAnimationFrame(frame); if (restore) value.textContent = value.dataset.final??final; });
       const delta = document.createElement('span'); delta.className = `motion-delta delta-${id}`; delta.textContent = signedAmount(e.target, e.delta);
       const valueBox = value.getBoundingClientRect(), deskBox = root.getBoundingClientRect();
       delta.style.left = `${(valueBox.left + valueBox.width / 2 - deskBox.left) * 1280 / deskBox.width}px`;
@@ -169,5 +170,5 @@ export function Motion({ snap, hold }: { snap: Snapshot; hold: (ms: number) => v
       if (pill && pill.textContent !== previousCountdown.current) animate(pill, mode === 'full' ? [{ transform: 'scale(1)' }, { transform: 'scale(1.1)', offset: .4 }, { transform: 'scale(1)' }] : [{ opacity: .4 }, { opacity: 1 }], 320);
     }
   }, [snap, hold]);
-  return <div ref={host} className="motion-host" aria-hidden="true"><div className="scene3d motion-pile" /><div className="scene3d motion-flight" /></div>;
+  return <div ref={host} className="motion-host" aria-hidden="true"><div className="scene3d motion-flight" /></div>;
 }

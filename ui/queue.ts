@@ -1,9 +1,10 @@
 // GameEvents determine the timeline. Presentation never changes the reducer result.
 import type { Action, GameEvent, GameState } from '../core/index.ts';
+import { timeline, type BeatKind, type Timeline } from './timeline.ts';
 export interface Step { readonly action: Action | null; readonly state: GameState; readonly events: readonly GameEvent[] }
 export interface PlayedStep { readonly id: number; readonly action: Action | null; readonly before: GameState | null; readonly after: GameState; readonly events: readonly GameEvent[] }
 export type MotionMode = 'full' | 'reduced' | 'off';
-export interface ActiveStep { readonly step: PlayedStep; readonly beat: 'lift' | 'land'; readonly mode: MotionMode }
+export interface ActiveStep { readonly step: PlayedStep; readonly beat: BeatKind; readonly mode: MotionMode; readonly plan?: Timeline; readonly index?: number; readonly published?: boolean }
 export interface Snapshot { readonly state: GameState; readonly steps: readonly PlayedStep[]; readonly busy: boolean; readonly active: ActiveStep | null; readonly skipped: number }
 export const CARD_TIMING = { lift: 200, carry: 290, land: 740, settle: 930 } as const;
 export class EventQueue {
@@ -27,12 +28,28 @@ export class EventQueue {
     const next = this.pending.shift(); if (!next) return;
     const step: PlayedStep = { id: this.nextId++, action: next.action, before: this.snapshot.steps.length ? this.snapshot.state : null, after: next.state, events: next.events };
     const mode = this.mode();
-    // Part D supplies month-end beats next round. Other steps currently settle immediately.
-    if (!step.events.some(e => e.type === 'play') || mode === 'off') { this.apply(step, null); this.play(); return; }
+    if(mode==='off') {this.apply(step,null);this.play();return;}
+    const plan = timeline(step,this.snapshot.steps,mode);
+    if(plan) {
+      let published=false;
+      const advance=(index:number)=> {
+        const beat=plan.beats[index]!;
+        if(beat.kind==='settled') {this.finish();return;}
+        if(beat.kind==='publish') published=true;
+        const active:ActiveStep={step,beat:beat.kind,mode,plan,index,published};
+        if(beat.kind==='publish') this.apply(step,active);
+        else {this.snapshot={...this.snapshot,busy:true,active};this.emit();}
+      };
+      advance(0);
+      plan.beats.forEach((beat,index)=>{if(index>0)this.timers.push(setTimeout(()=>advance(index),beat.at));});
+      return;
+    }
+    if (!step.events.some(e => e.type === 'play')) { this.apply(step, null); this.play(); return; }
     this.snapshot = { ...this.snapshot, busy: true, active: { step, beat: 'lift', mode } }; this.emit();
     this.timers.push(setTimeout(() => this.apply(step, { step, beat: 'land', mode }), mode === 'reduced' ? 0 : CARD_TIMING.land));
-    this.timers.push(setTimeout(() => { this.timers = []; this.snapshot = { ...this.snapshot, busy: this.tailTimer !== undefined, active: null }; this.emit(); this.play(); }, mode === 'reduced' ? 150 : CARD_TIMING.settle));
+    this.timers.push(setTimeout(() => this.finish(), mode === 'reduced' ? 150 : CARD_TIMING.settle));
   }
+  private finish(): void { this.timers=[];this.snapshot={...this.snapshot,busy:this.tailTimer!==undefined,active:null};this.emit();this.play(); }
   /** Presentation tails (printing, handwriting, deltas) still consume a skip click after the card lands. */
   readonly hold = (ms: number): void => {
     this.tailUntil = Math.max(this.tailUntil, Date.now() + ms);
@@ -46,7 +63,7 @@ export class EventQueue {
   skip(): void {
     this.clearTimers(); const active = this.snapshot.active;
     this.snapshot = { ...this.snapshot, skipped: this.snapshot.skipped + 1 };
-    if (active?.beat === 'lift') this.apply(active.step, null);
+    if (active && !this.snapshot.steps.some(step=>step.id===active.step.id)) this.apply(active.step, null);
     else { this.snapshot = { ...this.snapshot, busy: false, active: null }; this.emit(); }
     for (const next of this.pending.splice(0)) this.apply({ id: this.nextId++, action: next.action, before: this.snapshot.state, after: next.state, events: next.events }, null);
   }

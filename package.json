@@ -34,7 +34,7 @@
     "tune:lanes": "node sim/tune/lanes.ts",
     "tune:try": "node sim/tune/try.ts",
     "typecheck": "tsc -b",
-    "check:queue": "node check/queue.ts",
+    "check:queue": "node check/queue.ts && node check/timeline.ts",
     "check:motion": "node check/motion-run.ts",
     "desk:reference": "node tools/reference-shots.ts",
     "desk:motion-shots": "node tools/motion-shots.ts",

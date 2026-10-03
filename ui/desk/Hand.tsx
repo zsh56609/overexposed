@@ -68,6 +68,7 @@ function shake(el: HTMLElement) {
 }
 
 interface HandProps {
+  readonly hiddenCards?: readonly number[];
   readonly busy: boolean;
   readonly cards: readonly HandCardModel[];
   readonly words: HandWords;
@@ -79,7 +80,7 @@ interface HandProps {
   readonly toast: (text: string) => void;
 }
 
-const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast, busy }: { card: HandCardModel; pos: { left: number; rot: number; lift: number; z: number }; words: HandWords; season: SeasonId; onPlay: (uid: number) => void; focus: HandProps['focus']; toast: HandProps['toast']; busy: boolean }) {
+const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast, busy, hidden }: { card: HandCardModel; pos: { left: number; rot: number; lift: number; z: number }; words: HandWords; season: SeasonId; onPlay: (uid: number) => void; focus: HandProps['focus']; toast: HandProps['toast']; busy: boolean; hidden:boolean }) {
   const press = useRef<number | undefined>(undefined);
   const longPressed = useRef(false);
   useEffect(() => { window.clearTimeout(press.current); return () => window.clearTimeout(press.current); }, [busy]);
@@ -118,7 +119,7 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
       aria-label={card.name}
       data-uid={card.uid}
       data-card={card.cardId}
-      style={{ left: pos.left, zIndex: pos.z, ['--rot' as string]: `${pos.rot}deg`, ['--lift' as string]: `${pos.lift}px`, ...headshot }}
+      style={{ visibility:hidden?'hidden':undefined, left: pos.left, zIndex: pos.z, ['--rot' as string]: `${pos.rot}deg`, ['--lift' as string]: `${pos.lift}px`, ...headshot }}
       onPointerEnter={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType === 'mouse') focus({ kind: 'card', uid: card.uid, anchor });
       }}
@@ -143,6 +144,51 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
       onClick={onClick}
       onKeyDown={onKey}
     >
+      <CardInk card={card} words={words} />
+    </div>
+  );
+});
+
+export const Hand = memo(function Hand({ cards, words, endTurn, season, play, end, focus, toast, busy, hiddenCards=[] }: HandProps) {
+  const places = fan(cards.length);
+  const onEnd = useCallback(() => {
+    focus(null);
+    end();
+  }, [focus, end]);
+  return (
+    <>
+      {/* The strip each card shows: the text keeps inside it when draws swell the hand. */}
+      <div className={`hand${fanSpacing(cards.length) < 120 ? ' tight' : ''}`} data-hook="hand" style={{ ['--strip' as string]: `${fanSpacing(cards.length)}px` }}>
+        {cards.map((card, i) => {
+          const at = places[i] ?? { left: 0, rot: 0, lift: 0 };
+          return <Card key={card.uid} card={card} pos={{ ...at, z: 10 + i }} words={words} season={season} onPlay={play} focus={focus} toast={toast} busy={busy} hidden={hiddenCards.includes(card.uid)} />;
+        })}
+      </div>
+      <button
+        className={`endbtn end${endTurn.printing ? ' printing' : ''}`}
+        data-hook="endturn"
+        disabled={!endTurn.legal}
+        onPointerEnter={(e) => {
+          if (e.pointerType === 'mouse') focus({ kind: 'end', anchor: END_ANCHOR });
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType === 'mouse') focus(null);
+        }}
+        onFocus={(e) => {
+          if (keyboardFocus(e.currentTarget)) focus({ kind: 'end', anchor: END_ANCHOR });
+        }}
+        onBlur={() => focus(null)}
+        onClick={onEnd}
+      >
+        <b>{endTurn.title}</b>
+        <span>{endTurn.sub}</span>
+      </button>
+    </>
+  );
+});
+
+/** The exact same printed face for hand, flight, scandal flip and settled pile. */
+export function CardInk({card,words}: {card:HandCardModel;words:HandWords}) { return <>
       {card.face === 'notebook' && <span className="holes" />}
       {card.face === 'callsheet' && <span className="cs">{words.callsheet}</span>}
       {card.face === 'revision' && <span className="revtag">{words.revision}</span>}
@@ -176,44 +222,7 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
         {card.flavour && <div className={ph(card.flavour, 'fl')}>{card.flavour}</div>}
         {card.scandal && card.rules && <div className="rl">{card.rules}</div>}
       </div>
-    </div>
-  );
-});
-
-export const Hand = memo(function Hand({ cards, words, endTurn, season, play, end, focus, toast, busy }: HandProps) {
-  const places = fan(cards.length);
-  const onEnd = useCallback(() => {
-    focus(null);
-    end();
-  }, [focus, end]);
-  return (
-    <>
-      {/* The strip each card shows: the text keeps inside it when draws swell the hand. */}
-      <div className={`hand${fanSpacing(cards.length) < 120 ? ' tight' : ''}`} data-hook="hand" style={{ ['--strip' as string]: `${fanSpacing(cards.length)}px` }}>
-        {cards.map((card, i) => {
-          const at = places[i] ?? { left: 0, rot: 0, lift: 0 };
-          return <Card key={card.uid} card={card} pos={{ ...at, z: 10 + i }} words={words} season={season} onPlay={play} focus={focus} toast={toast} busy={busy} />;
-        })}
-      </div>
-      <button
-        className={`endbtn end${endTurn.printing ? ' printing' : ''}`}
-        data-hook="endturn"
-        disabled={!endTurn.legal}
-        onPointerEnter={(e) => {
-          if (e.pointerType === 'mouse') focus({ kind: 'end', anchor: END_ANCHOR });
-        }}
-        onPointerLeave={(e) => {
-          if (e.pointerType === 'mouse') focus(null);
-        }}
-        onFocus={(e) => {
-          if (keyboardFocus(e.currentTarget)) focus({ kind: 'end', anchor: END_ANCHOR });
-        }}
-        onBlur={() => focus(null)}
-        onClick={onEnd}
-      >
-        <b>{endTurn.title}</b>
-        <span>{endTurn.sub}</span>
-      </button>
-    </>
-  );
-});
+  </>; }
+export function CardPicture({card,words,season}: {card:HandCardModel;words:HandWords;season:SeasonId}) {
+  return <div className={`card ${FACE[card.face]}`} data-card={card.cardId} style={{left:0,top:0,transform:'none',['--strip' as string]:'150px',...(card.face==='headshot'?{backgroundImage:`url(${photoUrl('headshot',season,0)})`}:{})}}><CardInk card={card} words={words}/></div>;
+}

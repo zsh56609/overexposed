@@ -105,6 +105,9 @@ async function bubblesAndMetronome(page: Page, url: string): Promise<Result[]> {
   const metro = await centre(page, '.desk .metro');
   if (!metro) out.push(['metronome: not on this desk', 'skipped']);
   else {
+    // This interaction explicitly exercises ambient motion; replay itself is static.
+    await page.evaluate(`document.documentElement.dataset.motion='full'`);
+    await sleep(100);
     const angle = () => page.evaluate<string>(`document.querySelector('.desk .metro-arm').style.transform`);
     const a1 = await angle();
     await sleep(300);

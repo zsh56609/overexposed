@@ -1,6 +1,14 @@
-# Round V1b handoff — A–C (2026-10-03)
+# Round V1b handoff — D/E completion in progress (2026-10-04)
 
-Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/content/docs, Playwright WebKit, per-part commits/pushes and a committed report. The prompt explicitly permits stopping after C: **D/E remain before phase 3. Do not mark all V1b done.**
+Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/content/docs, Playwright WebKit, per-part commits/pushes and a committed report. The latest completion prompt supersedes the former permission to stop after C: **finish D/E and acceptance before phase 3; do not mark all V1b done yet.** The A–C report stays intact. The older implementation/remaining-work sections below describe the A–C checkpoint; the completion checkpoint immediately below supersedes them where noted.
+
+## Completion checkpoint
+
+- Reviewed source `ace1c41`; clean normal pull found no intervening changes. `e75ea96` fixes busy previews and adds bounded overflow progress/diagnostics. The 1200s failure did not reproduce in isolation; its cause remains unverified.
+- `ui/timeline.ts`, `ui/desk/presentation.ts` and `MonthMotion.tsx` now implement month-end presentation from actual events. `Pile.tsx` reconstructs this month's plays and keys repeated UID plays by event. Shared motion preferences settle the queue and cover ambient effects. No core, content-number or persona change.
+- `npm run check:queue` includes 690 real recorded actions and before/after-beat virtual-clock skips. `npm run check:motion -- --browsers=chrome --sizes=1280x720` adds pointer previews, pile parity and month boundaries. Narrow with `--month-only`, `--pile-only`, `--boundaries-only`; `--big-hand-only` narrows the pile test. Full/reduced/off and early/late skip are compared after identical real inputs; runtime errors fail, known favicon 404 stays explicit.
+- Checkpoint logs are `.npm-cache/v1b-de-*.log`; raw browser diagnostics are `check/out/motion-*-diagnostics.json`. The 300-run preview suite matched all A–C counts. Four sims completed on 20260929/1/424242 under both managers; `node sim/compare.ts sim/out/baseline-v1b-after sim/out/baseline-v1b-de-20261004` reports 18 identical files. Never replace either reference baseline.
+- Still required: resolve the missing PRINTED key, finish all nine browser/viewport correctness and real-input configurations, continuous game/v18 recordings, active-only production frame measurements/diagnosis and final report/ZIP. D/E implementation is not final acceptance. No phase 3 or V2 work has started.
 
 ## Baseline and evidence
 

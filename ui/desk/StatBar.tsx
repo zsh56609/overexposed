@@ -80,11 +80,11 @@ export const StatBar = memo(function StatBar({ stats, season, onDeck }: { stats:
             ) : (
               <>
                 <Icon id={cell.icon} className={cell.icon === 'clap' ? 'clap' : undefined} />
-                <span className="w" data-hook={`value-${cell.id}`}>
+                <span className="w" data-hook={`value-${cell.id}`} data-final={cell.word}>
                   {cell.word}
                 </span>
                 {cell.number !== null && (
-                  <span className="n" data-hook={`number-${cell.id}`}>
+                  <span className="n" data-hook={`number-${cell.id}`} data-final={cell.number}>
                     {cell.number}
                   </span>
                 )}

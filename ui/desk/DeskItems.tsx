@@ -7,10 +7,11 @@
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { isPlaceholder } from '../text.ts';
+import { motionMode, useMotionMode } from '../motion.ts';
 import { crumple, sheetA, sheetB } from './drawings.ts';
 import type { DeskLabels, LaneClass, MessagesModel, PhoneModel, ScriptModel } from './model.ts';
 
-const reduceMotion = (): boolean => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduceMotion = (): boolean => motionMode()!=='full';
 const ph = (text: string, base?: string): string | undefined => (isPlaceholder(text) ? `${base ?? ''} placeholder`.trim() : base);
 
 // ---------------------------------------------------------------------------
@@ -95,6 +96,7 @@ function localClock(): string {
  * seconds. In a frenzy the screen glows red and it buzzes every few seconds.
  */
 const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis: boolean }) {
+  const motion=useMotionMode();
   const [clock, setClock] = useState(localClock);
   const [buzz, setBuzz] = useState(0);
   useEffect(() => {
@@ -102,10 +104,10 @@ const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis
     return () => window.clearInterval(id);
   }, []);
   useEffect(() => {
-    if (!crisis || reduceMotion()) return;
+    if (!crisis || motion!=='full') return;
     const id = window.setInterval(() => setBuzz((n) => n + 1), 5200);
     return () => window.clearInterval(id);
-  }, [crisis]);
+  }, [crisis,motion]);
   // Each buzz restarts the animation: a new key remounts the phone.
   const [buzzing, setBuzzing] = useState(false);
   useEffect(() => {
@@ -177,10 +179,14 @@ export const DeskPlane = memo(function DeskPlane({ lane, crisis, notebook, scrip
  * growing swing. It starts stopped when the system asks for reduced motion.
  */
 function Metronome({ crisis, title }: { crisis: boolean; title: string }) {
+  const motion=useMotionMode();
+  const userStopped=useRef(false);
   const arm = useRef<SVGGElement>(null);
   const engine = useRef({ mode: reduceMotion() ? 'stopped' : 'run', ph: 0, amp: 1, last: null as number | null, to: 0, from: 0, t: 0, dur: 0, period: 2.4 });
   engine.current.period = crisis ? 1.3 : 2.4;
   useEffect(() => {
+    if(motion!=='full'){engine.current.last=null;if(arm.current)arm.current.style.transform='rotate(0deg)';return;}
+    if(engine.current.last===null)engine.current.mode=userStopped.current?'stopped':'run';
     let raf = 0;
     const frame = (ts: number) => {
       const M = engine.current;
@@ -214,15 +220,18 @@ function Metronome({ crisis, title }: { crisis: boolean; title: string }) {
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [motion]);
   const toggle = () => {
+    if(motion!=='full')return;
     const M = engine.current;
     if (M.mode === 'run') {
+      userStopped.current=true;
       const hp = Math.PI / 2;
       M.to = Math.ceil((M.ph - hp) / Math.PI) * Math.PI + hp;
       if (M.to < M.ph) M.to += Math.PI;
       M.mode = 'finish';
     } else if (M.mode === 'stopped') {
+      userStopped.current=false;
       M.mode = 'run';
       M.ph = 0;
       M.amp = 0;
@@ -301,7 +310,7 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
  * choosing it again removes it, another replaces it. A reaction belongs to one bubble of one message — its
  * month and its place — never to its words. UI state only: no rule reads it.
  */
-export const Bubbles = memo(function Bubbles({ messages }: { messages: MessagesModel | null }) {
+export const Bubbles = memo(function Bubbles({ messages, visibleBubbles }: { messages: MessagesModel | null; visibleBubbles?:number }) {
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
   useEffect(() => {
@@ -355,7 +364,7 @@ export const Bubbles = memo(function Bubbles({ messages }: { messages: MessagesM
             </div>
           );
         }),
-      )}
+      ).slice(0,visibleBubbles)}
     </div>
   );
 });

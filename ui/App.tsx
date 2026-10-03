@@ -28,7 +28,7 @@ import {
   type GameState,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
-import { motionMode } from './motion.ts';
+import { motionMode, subscribeMotion } from './motion.ts';
 import { Desk } from './desk/Desk.tsx';
 import { deskModel } from './desk/model.ts';
 import licenceUrl from './fonts/OFL.txt?url';
@@ -203,6 +203,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const [focus, setFocus] = useState<Focus>(null);
   const [deckOpen, setDeckOpen] = useState(false);
   useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
+  useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
     const skip = (event: MouseEvent | KeyboardEvent) => {
       if (!queue.busy || (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ')) return;
@@ -271,7 +272,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           {t('ui.error.title')}: {error}
         </p>
       )}
-      {(s.phase === 'draft' || s.phase === 'gate') && (
+      {(s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan && (
         <div className="screen-over">
           <div className="screen-scrim" />
           <div className="plain panel">

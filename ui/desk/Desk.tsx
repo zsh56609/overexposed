@@ -6,6 +6,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Bubbles, DeskPlane, Uprights } from './DeskItems.tsx';
 import { Motion } from './Motion.tsx';
+import { Pile } from './Pile.tsx';
+import { MonthMotion } from './MonthMotion.tsx';
+import { presentation } from './presentation.ts';
 import type { Snapshot } from '../queue.ts';
 import { Hand, type HandFocus } from './Hand.tsx';
 import { IconDefs } from './Icons.tsx';
@@ -51,8 +54,9 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
 
 export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; hold: (ms: number) => void }) {
   const [toast, showToast] = useToast();
+  const view=presentation(snap,model);
   return (
-    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
@@ -61,20 +65,22 @@ export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on
       <div className="floor" />
       <div className="deskscene">
         <div className="desktop">
-          <DeskPlane lane={model.lane} crisis={model.crisis} notebook={model.notebook} script={model.script} phone={model.phone} labels={model.labels} />
+          <DeskPlane lane={model.lane} crisis={model.crisis} notebook={model.notebook} script={model.script} phone={view.phone} labels={model.labels} />
         </div>
       </div>
       <div className="deskfront" />
       <Uprights lane={model.lane} crisis={model.crisis} labels={model.labels} balls={model.balls} />
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
+      <Pile snap={snap} model={model}/>
       <Motion snap={snap} hold={hold} />
-      <Bubbles messages={model.messages} />
+      {snap.active?.plan&&<MonthMotion key={snap.active.step.id} snap={snap} model={model}/>}
+      <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} />
       <div className="dim" />
-      {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} />}
+      {model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">
         {toast.text}
       </div>
-      <StatBar stats={model.stats} season={model.season} onDeck={on.deck} />
+      <StatBar stats={view.stats} season={model.season} onDeck={on.deck} />
       {children}
     </div>
   );

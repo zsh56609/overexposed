@@ -29,6 +29,7 @@ import {
   type FrontPage,
   type GameEvent,
   type GameState,
+  type CardInstance,
   type MajorClause,
   type MonthPress,
   type NoteColour,
@@ -304,7 +305,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
 // ---------------------------------------------------------------------------
 // The stat bar (README §1)
 
-function statBar(s: GameState, lane: string | null): StatBarModel {
+export function statBar(s: GameState, lane: string | null): StatBarModel {
   const c = s.content;
   const cells = statCells(s, lane);
   const cell = (id: string) => cells.find((x) => x.id === id);
@@ -589,13 +590,14 @@ const HAND_WORDS = (): HandWords => ({
 });
 
 function hand(s: GameState, lines: LinesSoFar): HandCardModel[] {
-  const c = s.content;
   const legal = legalOf(s);
-  return s.hand.map((h) => {
+  return s.hand.map(h=>cardModel(s,h,lines,legal.play.has(h.uid)));
+}
+export function cardModel(s: GameState, h: CardInstance, lines: LinesSoFar, playable = false): HandCardModel {
+    const c = s.content;
     const def = getCard(c, h.cardId);
     const scandal = def?.kind === 'scandal';
     const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, h.cardId, lines.lane);
-    const playable = legal.play.has(h.uid);
     const check = playable ? null : playCheck(s, h.uid);
     return {
       uid: h.uid,
@@ -611,7 +613,6 @@ function hand(s: GameState, lines: LinesSoFar): HandCardModel[] {
       playable,
       why: scandal ? 'scandal' : !check ? null : check.blockers.some((b) => b.code === 'slots') ? 'actions' : 'requires',
     };
-  });
 }
 
 function endTurn(s: GameState, preview: EndTurnPreview | null): EndTurnModel {

@@ -1,6 +1,6 @@
 # Status
 
-As of **2026-10-03**, round V1b **Parts 0 and A–C implemented**, with automated correctness checks passing on this machine and capability skips listed below. Performance limitations remain explicit. The prompt permits a split after C: **Part D and Part E remain; V1b is not yet wholly done, and phase 3 is not the next task.** Read this first; update it at session end.
+As of **2026-10-04**, V1b completion work has added the event-driven month-end presentation and history-derived played pile. **V1b remains incomplete: D/E cross-browser acceptance, continuous visual evidence and production performance diagnosis are still in progress. Phase 3 is not next yet.** The current author instruction supersedes the earlier permission to stop after C. Read this first; update it at session end.
 
 Overexposed is the browser deckbuilder for the Game Gauntlet SIM Jam. One career year is 12 turns, four seasons, March 2027 to February 2028. Fast hype creates heat; heat becomes scandal cards. A run always completes with one of four major and fourteen minor endings. Target play time: 10–15 minutes. English ships; Chinese remains scaffolding.
 
@@ -16,13 +16,15 @@ Overexposed is the browser deckbuilder for the Game Gauntlet SIM Jam. One career
 | V1b A | Timed queue, 740ms print / 930ms card settle; visual tails retain a skip-only hold; busy click/Enter/Space fast-forwards only; stale timers cancelled. URL-seeded restarts use base + run index |
 | V1b B | Card lift/carry/settle in the desk plane, gap closure, persistent played pile, actual composed story prints, back-paper ping, quiet notebook writing |
 | V1b C | Resource GameEvents drive signed figures and number rolls; countdown bump and spent bulbs |
-| Still pending | D: month-end stamp/scandal flip/sweep/date/season/deal/messages. E: complete reduced-motion and final-layout parity, including pile reconstruction for static/off replay |
+| D/E implementation in progress | Month-end event timeline, outgoing snapshot, actual scandal UID/press identity, sweep/date/season/deal/messages; history-derived pile; shared reduced/off switch. Final acceptance remains incomplete; PRINTED has no existing i18n key and currently renders its missing key pending the prose/key ruling |
 
 The frozen run, resources, starting deck and heat formula are unchanged. Minor reachability is 1.0% pooled plus 3% for at least one player-like persona, under each manager. Prose is authored/approved, never invented by implementers.
 
 The visual README wins over older prose: [design/visual/README.md](design/visual/README.md). The rule contract is [../AGENTS.md](../AGENTS.md), meaning-layer scope [ui-plan.md](ui-plan.md), content plan [design/content-expansion.md](design/content-expansion.md). Decisions are in [decisions.md](decisions.md).
 
 ## Verified baseline and checks
+
+Completion-round checkpoint (2026-10-04; working implementation after `e75ea96`): build/typecheck and validate pass (0 errors/27 deferred warnings); the full 300-run preview suite matches every count below (2451.3s on this machine); cooling remains 601/152. Four sims on all three seeds and both managers compare **IDENTICAL: 18 files** against `baseline-v1b-after`, which is unchanged. A virtual-clock test passed 690 recorded reducer actions and **13,976** skips immediately before/after phase beats after adding draft-month message arrivals (earlier checkpoint: 12,706). Chromium 1280×720's first 30 month-end final-state comparisons passed. The large-hand replay exposed repeated plays of the same UID: pile identity now uses the play event, and the six final-state paths match. Real click/Enter/Space skips pass at flip, carry, sweep, season, publication, deal and message arrival. Browser logs also contain an optional favicon 404; preserve it separately from JavaScript errors. These are checkpoint results, not the final nine-configuration acceptance. Local logs: `.npm-cache/v1b-de-*.log`; runtime diagnostics: `check/out/motion-*-diagnostics.json`.
 
 Starting commit: `3be87b43cd747964a33a54db425c61b647c30bb3` (2026-10-01T11:37:22+09:00). The prior agent's original sim outputs were not handed off; old `e839f83` source was reconstructed and compared. Both that comparison and the post-V1b comparison are **IDENTICAL: 18 normalized files**. Three seeds 20260929/1/424242, both managers: four sims pass, 14/14 bands, 0 crash/soft-lock. Full provenance and differences: [reports/2026-10-03-v1b.md](reports/2026-10-03-v1b.md).
 
