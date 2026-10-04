@@ -1022,5 +1022,6 @@
   "ui.deck.order": "Sorted by name; the draw order stays hidden.",
   "ui.deck.close": "Close",
   "ui.collection.title": "Endings found: {n} of {total}",
-  "ui.collection.undiscovered": "Undiscovered"
+  "ui.collection.undiscovered": "Undiscovered",
+  "ui.motion.printed": "PRINTED"
 }

@@ -5,9 +5,49 @@ import { cardPoint, centre, loadStates, reach, type DeskState } from './desk-rep
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.plain.full')?.textContent})`;
 async function waitIdle(page:Page) {
-  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy==='1'`)){
+  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'`)){
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
+}
+export async function checkOsMotion(page:Page,url:string) {
+  if(!page.reducedMotion){console.log(`SKIP OS preference ${page.name}: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately`);return;}
+  const states=loadStates();
+  try {
+    for(const [name,fixture,selector] of [
+      ['play',states.s02!,'.hand .card[data-card="open_mic"]'],
+      ['month',states.s07b!,'.endbtn'],
+    ] as const){
+      await page.reducedMotion(false);assert.equal(await reach(page,url,fixture,80),'ok');
+      await page.click(...(selector.includes('.card')?await cardPoint(page,await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].indexOf(document.querySelector(${JSON.stringify(selector)}))`)):await centre(page,selector))!);
+      await waitIdle(page);await page.move(10,100);await sleep(200);const expected=await page.evaluate<string>(settled);
+      for(const switching of [false,true]){
+        assert.equal(await reach(page,url,fixture,80),'ok');await page.reducedMotion(!switching);
+        await page.evaluate('delete document.documentElement.dataset.motion');await sleep(80);
+        assert.equal(await page.evaluate(`document.documentElement.dataset.motionResolved`),switching?'full':'reduced');
+        const point=selector.includes('.card')?await cardPoint(page,await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].indexOf(document.querySelector(${JSON.stringify(selector)}))`)):await centre(page,selector);
+        assert.ok(point);await page.click(...point);
+        if(switching){await sleep(100);assert.equal(await page.evaluate(`document.querySelector('.desk')?.dataset.busy`),'1');await page.reducedMotion(true);await sleep(80);assert.equal(await page.evaluate(`document.querySelector('.desk')?.dataset.busy`),'0','OS switch did not settle promptly');}
+        const start=Date.now();let samples=0;
+        do {
+          const bad=await page.evaluate<string[]>(`document.getAnimations().flatMap(a=>{const k=a.effect?.getKeyframes()??[],d=Number(a.effect?.getTiming().duration??0);return d>200?['duration '+d]:['transform','clipPath','filter'].filter(p=>new Set(k.map(f=>f[p]).filter(v=>v!==undefined)).size>1).map(p=>'travel '+p)})`);
+          assert.deepEqual(bad,[],`${name} OS reduced has non-fade motion`);samples++;
+          assert.ok(Date.now()-start<45000,'OS motion deadline');await sleep(30);
+        }while(await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy==='1'`));
+        await page.move(10,100);await sleep(200);assert.equal(await page.evaluate<string>(settled),expected,`${name} OS ${switching?'switch':'reduced'} parity`);
+        await sleep(1100);assert.equal(await page.evaluate<string>(settled),expected,'OS preference stale callback');
+        console.log(`OS preference ${page.name}: ${name} ${switching?'mid-sequence change':'reduced'} exact parity; ${samples} animation samples <=200ms, no travel`);
+      }
+    }
+  }finally{await page.reducedMotion(false);}
+}
+export async function checkMonthEntry(page:Page,url:string) {
+  assert.equal(await reach(page,url,loadStates().early!,80),'ok');
+  await page.evaluate(`document.documentElement.dataset.motion='full'`);
+  await page.click(...(await centre(page,'.endbtn'))!);await sleep(100);
+  const exits=await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].filter(c=>c.getAnimations().some(a=>a.effect?.getKeyframes().some(k=>Number(k.opacity)===0))).length`);
+  assert.ok(exits>0,'END TURN first beat must actually animate the remaining hand (including development StrictMode)');
+  await page.click(640,350);await waitIdle(page);
+  console.log(`month entry ${page.name}: ${exits} remaining cards animate before the stamp; skip settles`);
 }
 export async function checkMonthInput(page:Page,url:string) {
   const states=loadStates();
@@ -71,12 +111,14 @@ export async function checkPileInput(page:Page,url:string) {
 
 export async function checkBoundaryInput(page:Page,url:string) {
   const states=loadStates(),s=states.s02!,gate=s.steps.findIndex(x=>x[0]==='gate');
+  const winter=states['ending:redemption_arc']!;
   const cases:[string,DeskState,string,string][]=[
     ['flip',states.s07b!,'.endbtn','scandalFlip'],['carry',states.s07b!,'.endbtn','scandalCarry'],['sweep',states.s07b!,'.endbtn','sweep'],
     ['season',{...s,steps:s.steps.slice(0,gate)},'.gates .take','season'],
     ['after-season-publication',{...s,steps:s.steps.slice(0,gate)},'.gates .take','publish'],
     ['deal',{...states.early!,steps:states.early!.steps.slice(0,-1)},'.draft .take','deal'],
     ['arrival',states.s07b!,'.endbtn','message'],
+    ['winter-publication',{...winter,steps:winter.steps.slice(0,-1)},'.gates .take','publish'],
   ];
   for(const [name,fixture,selector,beat] of cases){
     const selected=process.argv.find(a=>a.startsWith('--boundary='))?.slice(11);if(selected&&name!==selected)continue;
@@ -87,11 +129,11 @@ export async function checkBoundaryInput(page:Page,url:string) {
       if(input!=='click'&&!await page.evaluate<boolean>('document.hasFocus()')){console.log(`SKIP ${name} ${input} ${page.name}: headless keyboard focus`);continue;}
       await page.evaluate(`document.documentElement.dataset.motion='full'`);await page.click(...(await centre(page,selector))!);
       const start=Date.now();
-      while(!await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.beat===${JSON.stringify(beat)}`)){
+      while(!await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.beat===${JSON.stringify(beat)}`)){
         assert.ok(Date.now()-start<45000,`${name}: did not observe ${beat}`);await sleep(15);
       }
-      if(input==='click')await page.click(640,350);else await page.key(input as 'Enter'|'Space');
-      await sleep(40);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy==='1'`),false,`${name}: input failed to skip`);
+      if(input==='click')await page.click(...(name==='winter-publication'?(await centre(page,'.play-again'))!:[640,350] as [number,number]));else await page.key(input as 'Enter'|'Space');
+      await sleep(40);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'`),false,`${name}: input failed to skip`);
       await page.move(10,100);await sleep(180);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: skip also chose/played`);
       await sleep(1600);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: stale callback`);
       console.log(`boundary input ${page.name}: ${name} ${input} exact final parity, no stale callbacks`);

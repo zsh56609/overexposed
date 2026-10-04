@@ -32,7 +32,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
   },[step]);
   const elapsed=plan!.beats.slice(0,(active.index??0)+1);
   const season=elapsed.some(b=>b.kind==='season')&&!elapsed.some(b=>b.kind==='seasonEnd');
-  useLayoutEffect(()=>()=>{for(const stop of cleanups.current.splice(0))stop();for(const stop of rolls.current.values())stop();rolls.current.clear();},[]);
+  useLayoutEffect(()=>()=>{for(const stop of cleanups.current.splice(0))stop();for(const stop of rolls.current.values())stop();rolls.current.clear();last.current=-1;},[]);
   useLayoutEffect(()=>{
     const root=host.current?.closest<HTMLElement>('.desk'); if(!root||!host.current)return;
     const reduced=mode!=='full';

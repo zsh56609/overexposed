@@ -22,7 +22,7 @@
 
 import { createServer } from 'vite';
 import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
-import { loadStates, PLAY_STEPS, ROOT } from './desk-replay.ts';
+import { loadStates, openReady, PLAY_STEPS, ROOT } from './desk-replay.ts';
 import { auditStep } from './audit-progress.ts';
 
 const arg = (name: string, fallback: string) => process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
@@ -268,7 +268,7 @@ try {
       const tag = `${browser} ${size.width}x${size.height}${size.mobile ? ' (phone)' : ''}`;
       const page = await launch(browser, size);
       try {
-        await page.navigate(`${url}?seed=20260929`, 3000);
+        await openReady(page,`${url}?seed=20260929`);
         const t0 = performance.now();
         console.log(`starting overflow ${tag}`);
         await auditStep(page, `${tag} longest-text patch`, PATCH);
@@ -289,7 +289,7 @@ try {
           let broke = 0;
           const held = new Set<string>();
           for (const [key, state] of Object.entries(states)) {
-            await page.navigate(`${url}?seed=${state.seed}`, 2500);
+            await openReady(page,`${url}?seed=${state.seed}`);
             await auditStep(page, `${tag} ${key} longest-text patch`, PATCH);
             await page.evaluate(AUDIT);
             await page.evaluate(PLAIN);

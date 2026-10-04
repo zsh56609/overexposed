@@ -40,8 +40,8 @@ try {
   const point=await page.evaluate(`(()=>{const el=document.querySelector(${JSON.stringify(selector)});if(!el)throw Error('target missing');if(el.classList.contains('card')){const p=document.createElement('i');p.style.cssText='position:absolute;left:40px;top:120px;width:1px;height:1px;pointer-events:none';el.appendChild(p);const r=p.getBoundingClientRect();p.remove();return [r.x,r.y]}const r=el.getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2]})()`) as [number,number];
   await page.evaluate(`(()=>{const clock=document.createElement('div');clock.id='record-clock';clock.style.cssText='position:fixed;left:8px;top:54px;background:#000;color:#fff;z-index:2147483647;font:12px monospace;padding:4px;pointer-events:none';document.body.appendChild(clock);document.addEventListener('pointerdown',()=>{window.__recordStart=performance.now();const frame=()=>{clock.textContent=Math.round(performance.now()-window.__recordStart)+'ms | '+(document.querySelector('.desk')?.dataset.beat??${JSON.stringify(source)});window.__recordRaf=requestAnimationFrame(frame)};frame()},{once:true,capture:true})})()`);
   await page.mouse.click(...point); // Do not move the pointer away.
-  if(source==='game')await page.waitForFunction(`document.querySelector('.desk')?.dataset.busy!=='1'`,undefined,{timeout:60000});
-  else await page.waitForTimeout(label==='frenzy'?8500:label==='season'?6000:4000);
+  if(source==='game')await page.waitForFunction(`document.querySelector('.desk,[data-presentation]')?.dataset.busy!=='1'`,undefined,{timeout:60000});
+  else await page.waitForFunction(`performance.now()-window.__recordStart>1000&&!busy&&!document.querySelector('#fly3d .plane')&&${label==='frenzy'||label==='season'?"!document.querySelector('#bubbles .bw:not(.done)')&&":''}document.getAnimations().every(a=>a.playState==='finished'||a.effect?.getTiming().iterations===Infinity)`,undefined,{timeout:30000});
   await page.waitForTimeout(1500);
   const elapsed=await page.evaluate<number>('performance.now()-window.__recordStart');
   const video=page.video()!;await context.close();const videoPath=join(recordings,`${label}-${source}.webm`);await video.saveAs(videoPath);

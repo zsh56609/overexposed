@@ -18,7 +18,7 @@ Overexposed is the browser deckbuilder for the Game Gauntlet SIM Jam. One career
 | V1b A | Timed queue, 740ms print / 930ms card settle; visual tails retain a skip-only hold; busy click/Enter/Space fast-forwards only; stale timers cancelled. URL-seeded restarts use base + run index |
 | V1b B | Card lift/carry/settle in the desk plane, gap closure, persistent played pile, actual composed story prints, back-paper ping, quiet notebook writing |
 | V1b C | Resource GameEvents drive signed figures and number rolls; countdown bump and spent bulbs |
-| D/E implementation in progress | Month-end event timeline, outgoing snapshot, actual scandal UID/press identity, sweep/date/season/deal/messages; history-derived pile; shared reduced/off switch. Final acceptance remains incomplete; PRINTED has no existing i18n key and currently renders its missing key pending the prose/key ruling |
+| D/E implementation in progress | Month-end event timeline, outgoing snapshot, actual scandal UID/press identity, sweep/date/season/deal/messages; history-derived pile; shared reduced/off switch. PRINTED imports the author's literal instruction. A real-input test found and fixed StrictMode cancelling the first hand-exit beat. OS media switching and winter restart-boundary tests pass in Chromium; final cross-browser/performance acceptance remains incomplete |
 
 The frozen run, resources, starting deck and heat formula are unchanged. Minor reachability is 1.0% pooled plus 3% for at least one player-like persona, under each manager. Prose is authored/approved, never invented by implementers.
 

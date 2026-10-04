@@ -52,8 +52,22 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
 })(${JSON.stringify(steps)})`;
 
 /** Loads the game on the state's seed and replays its steps; the page settles before it returns. */
+let navigationId=0;
+export async function openReady(page:Page,url:string):Promise<void> {
+  const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));
+  await page.navigate(target.href,0);
+  const start=Date.now();let last='';
+  while(Date.now()-start<15000){
+    try {
+      const ready=await page.evaluate<boolean>(`location.href===${JSON.stringify(target.href)}&&document.readyState==='complete'&&!!document.querySelector('button.big')&&document.fonts.status==='loaded'`,2000);
+      if(ready)return;
+    }catch(error){last=String(error);} // A navigation can replace the execution context between samples.
+    await new Promise(r=>setTimeout(r,50));
+  }
+  throw Error(`game did not become ready in 15s: ${target.href}; ${last}`);
+}
 export async function reach(page: Page, url: string, state: DeskState, settle = 700): Promise<string> {
-  await page.navigate(`${url}?seed=${state.seed}`, 2500);
+  await openReady(page,`${url}?seed=${state.seed}`);
   const r = await page.evaluate<string>(PLAY_STEPS(state.steps));
   await page.move(640, 300);
   await new Promise((res) => setTimeout(res, settle));

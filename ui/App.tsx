@@ -244,7 +244,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     [act, queue],
   );
 
-  if (s.phase === 'ended') return <div className="plain full"><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
+  if (s.phase === 'ended') return <div className="plain full" data-presentation="ending" data-busy={snap.busy?'1':'0'} data-beat={snap.active?.beat??'idle'} data-step={snap.steps.length}><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
   if (s.phase === 'manager') return <div className="plain full"><ManagerChoice s={s} legal={legal} act={act} error={error} /></div>;
 
   const endPreview = model.endPreview;

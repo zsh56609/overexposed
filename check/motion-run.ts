@@ -3,7 +3,7 @@ import { launch, browsersFromArgs, sizesFromArgs } from './browser.ts';
 import { ROOT } from './desk-replay.ts';
 import { checkD7 } from './motion.ts';
 import { checkPreviewInput } from './preview-input.ts';
-import { checkBoundaryInput, checkMonthInput, checkPileInput } from './month-input.ts';
+import { checkBoundaryInput, checkMonthEntry, checkMonthInput, checkOsMotion, checkPileInput } from './month-input.ts';
 import { mkdirSync,writeFileSync } from 'node:fs';
 const server=await createServer({root:ROOT,logLevel:'error',server:{port:5197,strictPort:false}});await server.listen();
 try {
@@ -11,9 +11,11 @@ try {
   const page=await launch(browser,size);
   try {
     const url=server.resolvedUrls!.local[0]!;
-    if(process.argv.includes('--pile-only'))await checkPileInput(page,url);
+    if(process.argv.includes('--entry-only'))await checkMonthEntry(page,url);
+    else if(process.argv.includes('--os-only'))await checkOsMotion(page,url);
+    else if(process.argv.includes('--pile-only'))await checkPileInput(page,url);
     else if(process.argv.includes('--boundaries-only'))await checkBoundaryInput(page,url);
-    else {if(!process.argv.includes('--month-only')){await checkD7(page,url);await checkPreviewInput(page,url);await checkPileInput(page,url);await checkBoundaryInput(page,url);}await checkMonthInput(page,url);}
+    else {if(!process.argv.includes('--month-only')){await checkMonthEntry(page,url);await checkD7(page,url);await checkPreviewInput(page,url);await checkPileInput(page,url);await checkBoundaryInput(page,url);await checkOsMotion(page,url);}await checkMonthInput(page,url);}
     const diagnosticFile=`check/out/motion-${browser}-${size.width}-${Date.now()}-diagnostics.json`;
     mkdirSync('check/out',{recursive:true});writeFileSync(diagnosticFile,JSON.stringify(page.diagnostics,null,2));
     const candidates=page.diagnostics.filter(line=>line.startsWith('pageerror:')||line.startsWith('error:')||line.includes('Runtime.exceptionThrown')||/"type":"error"|"level":"error"/.test(line));

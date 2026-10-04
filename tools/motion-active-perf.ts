@@ -14,6 +14,8 @@ const end=states['ending:redemption_arc']!,season=states.s02!,gate=season.steps.
 const longest=longestQuietPlay(),profiling=process.argv.includes('--profile');
 const scenarios:[string,DeskState,string][]=[['loud',states.s02!,'.hand .card[data-card="open_mic"]'],['quiet',states.s02!,'.hand .card[data-card="lay_low"]'],['calm-end',states.early!,'.endbtn'],['frenzy-end',states.s07b!,'.endbtn'],['copycat-end',states.celebCrisis!,'.endbtn'],['season',{...season,steps:season.steps.slice(0,gate)},'.gates .take'],['winter-ending',{...end,steps:end.steps.slice(0,-1)},'.gates .take']];
 scenarios.push(['quiet-longest-recorded',longest.fixture,longest.selector]);
+// Retain the exact A-C timing fixtures to investigate the reported 83.34/124.9ms outliers.
+scenarios.push(['reviewed-calm-end',states.s02!,'.endbtn'],['reviewed-frenzy-end',states.s09!,'.endbtn']);
 console.log(`Longest quiet line in fixed replay corpus: ${longest.key}, ${longest.writingMs}ms handwriting, ${longest.corpus}`);
 try {
  for(const browser of (arg('browsers')??'chrome,firefox,webkit').split(',') as BrowserName[]) for(const rate of browser==='chrome'?[1,4]:[1]){
@@ -29,11 +31,11 @@ try {
       document.documentElement.dataset.motion='full';
       const p=window.__perf={done:false,start:0,last:null,firstFrameMs:null,active:[],idle:[],beats:[],slowFrames:[],longTasks:[],landing:null,settled:null,seenFlight:false};
       if(PerformanceObserver.supportedEntryTypes.includes('longtask')){p.observer=new PerformanceObserver(list=>{for(const e of list.getEntries())if(p.start&&e.startTime>=p.start)p.longTasks.push({at:e.startTime-p.start,duration:e.duration})});p.observer.observe({type:'longtask'});}
-      const before=document.querySelector('.desk')?.dataset.step;
+      const before=document.querySelector('.desk,[data-presentation]')?.dataset.step;
       document.addEventListener('pointerdown',()=>{
         p.start=performance.now();let previous='';
         const tick=t=>{
-          const desk=document.querySelector('.desk'),busy=desk?.dataset.busy==='1',beat=desk?.dataset.beat??(busy?'busy':'idle');
+          const desk=document.querySelector('.desk,[data-presentation]'),busy=desk?.dataset.busy==='1',beat=desk?.dataset.beat??(busy?'busy':'idle');
           const changed=!desk||desk.dataset.step!==before;
           const flight=!!document.querySelector('.motion-flight .plane');if(flight)p.seenFlight=true;
           if(p.seenFlight&&!flight&&p.landing===null)p.landing=t-p.start;

@@ -35,6 +35,8 @@ export interface Page {
   /** Separate Chromium diagnostic run, never enabled during frame acceptance measurements. */
   profileStart?(): Promise<void>;
   profileStop?(): Promise<unknown>;
+  /** Real browser media emulation; unavailable drivers report a capability skip. */
+  reducedMotion?(reduce: boolean): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -138,6 +140,7 @@ async function launchWebKit(size: { width: number; height: number; mobile?: bool
     },
     async key(name) { await page.keyboard.press(name); },
     async throttle(rate) { if (rate !== 1) throw new Error('WebKit CPU throttling unavailable'); },
+    async reducedMotion(reduce) { await page.emulateMedia({reducedMotion:reduce?'reduce':'no-preference'}); },
     async close() { await browser.close(); },
   };
 }
@@ -229,6 +232,9 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
     },
     async profileStart() {
       await send('Profiler.enable');await send('Profiler.start');
+    },
+    async reducedMotion(reduce) {
+      await send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:reduce?'reduce':'no-preference'}]});
     },
     async profileStop() {
       const result=await send('Profiler.stop');await send('Profiler.disable');return result.result?.profile;
