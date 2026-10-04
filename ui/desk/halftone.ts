@@ -4,7 +4,7 @@
 // with a different seed — mirrored, reframed, and its crowds, rain and lights shifted. Each picture is drawn
 // the first time a paper needs it and cached as a data URL for the rest of the run.
 
-import type { SceneId, SeasonId } from '../../core/index.ts';
+import { SCENE_IDS, SEASON_IDS, type SceneId, type SeasonId } from '../../core/index.ts';
 import { t } from '../i18n.ts';
 
 type G = CanvasRenderingContext2D;
@@ -756,6 +756,28 @@ function halftone(draw: (g: G, w: number, h: number) => void, w: number, h: numb
 }
 
 const cache = new Map<string, string>();
+
+/** Prepare the finite scene atlas in small idle jobs, as the visual reference specifies.
+ * Drawing/PNG encoding must not first occur in a month's publication frame. The on-demand
+ * path remains available immediately, so starting a run never waits for this preparation. */
+export function warmPhotos(variants:number):void {
+  const pending:[SceneId|'headshot',SeasonId,number][]=[['headshot','spring',0]];
+  for(const scene of SCENE_IDS)for(const season of scene==='street'?SEASON_IDS:['spring'] as const)
+    for(let variant=0;variant<variants;variant++)pending.push([scene,season,variant]);
+  const next=()=>{
+    // An idle callback's timeout can expire during a long presentation. Never turn that
+    // timeout into extra canvas work in its middle; the normal lazy path still works.
+    if(document.querySelector('[data-busy="1"]')){setTimeout(schedule,250);return;}
+    const item=pending.shift();if(!item)return;
+    photoUrl(...item);
+    if(pending.length)schedule();
+  };
+  const schedule=()=>{
+    if('requestIdleCallback' in window)window.requestIdleCallback(next,{timeout:2000});
+    else setTimeout(next,40);
+  };
+  schedule();
+}
 
 /**
  * A lead story's photograph: `scene` in `season` (only the street shows it), drawing `variant` — 0 the

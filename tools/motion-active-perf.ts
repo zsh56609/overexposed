@@ -12,19 +12,23 @@ const server=await preview({root,logLevel:'error',preview:{port:4175,strictPort:
 const url=server.resolvedUrls!.local[0]!,states=loadStates(),rows:unknown[]=[];
 const end=states['ending:redemption_arc']!,season=states.s02!,gate=season.steps.findIndex(s=>s[0]==='gate');
 const longest=longestQuietPlay(),profiling=process.argv.includes('--profile');
+const diagnosticBackdropOff=process.argv.includes('--without-backdrop');
+const diagnosticPromoteCards=process.argv.includes('--promote-cards');
 const scenarios:[string,DeskState,string][]=[['loud',states.s02!,'.hand .card[data-card="open_mic"]'],['quiet',states.s02!,'.hand .card[data-card="lay_low"]'],['calm-end',states.early!,'.endbtn'],['frenzy-end',states.s07b!,'.endbtn'],['copycat-end',states.celebCrisis!,'.endbtn'],['season',{...season,steps:season.steps.slice(0,gate)},'.gates .take'],['winter-ending',{...end,steps:end.steps.slice(0,-1)},'.gates .take']];
 scenarios.push(['quiet-longest-recorded',longest.fixture,longest.selector]);
 // Retain the exact A-C timing fixtures to investigate the reported 83.34/124.9ms outliers.
 scenarios.push(['reviewed-calm-end',states.s02!,'.endbtn'],['reviewed-frenzy-end',states.s09!,'.endbtn']);
 console.log(`Longest quiet line in fixed replay corpus: ${longest.key}, ${longest.writingMs}ms handwriting, ${longest.corpus}`);
 try {
- for(const browser of (arg('browsers')??'chrome,firefox,webkit').split(',') as BrowserName[]) for(const rate of browser==='chrome'?[1,4]:[1]){
+ for(const browser of (arg('browsers')??'chrome,firefox,webkit').split(',') as BrowserName[]) for(const rate of browser==='chrome'?(arg('rates')??'1,4').split(',').map(Number):[1]){
   const page=await launch(browser,{width:1280,height:720});
   try {
    await page.throttle(rate);
    for(const [label,fixture,selector] of scenarios){
     if(arg('case')&&arg('case')!==label)continue;
     if(await reach(page,url,fixture)!=='ok')throw Error(`cannot reach ${label}`);
+    if(diagnosticBackdropOff)await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.screen-over > .screen-scrim{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}';document.head.appendChild(style)})()`);
+    if(diagnosticPromoteCards){await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.desk .hand .card{will-change:transform}';document.head.appendChild(style)})()`);await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');}
     const point=selector.includes('.card')?await cardPoint(page,await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].indexOf(document.querySelector(${JSON.stringify(selector)}))`)):await centre(page,selector);
     if(!point)throw Error(`missing ${label}`);
     await page.evaluate(`(()=>{
@@ -55,10 +59,10 @@ try {
     const result=await page.evaluate<Record<string,unknown>>(`(()=>{const p=window.__perf;const stats=a=>{const x=[...a].sort((a,b)=>a-b),q=k=>x[Math.min(x.length-1,Math.floor(x.length*k))]??null;return {frames:x.length,p50:q(.5),p95:q(.95),max:q(1),over33:x.filter(v=>v>33.4).length}};return {firstFrameMs:p.firstFrameMs,landingMs:p.landing,totalBusyMs:p.settled,active:stats(p.active),idleObservationMs:1500,idle:stats(p.idle),beats:p.beats,slowFrames:p.slowFrames,longTasks:p.longTasks,error:p.error??null}})()`);
     const row={browser,rate,label,...result};rows.push(row);console.log(JSON.stringify(row));
     if(result.error)throw Error(String(result.error));
-    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,longest,rows},null,2)+'\n');
+    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,longest,rows},null,2)+'\n');
    }
   }finally{await page.close();}
  }
  rows.push({browser:'firefox',rate:4,capabilitySkip:'BiDi has no CPU throttling; no substitute labelled 4x.'});
- writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,longest,rows},null,2)+'\n');
+ writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,longest,rows},null,2)+'\n');
 }finally{await new Promise<void>(r=>server.httpServer.close(()=>r()));}

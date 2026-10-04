@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path';
 import { createServer } from 'vite';
 import { PLAY_STEPS, loadStates, ROOT, type DeskState } from '../check/desk-replay.ts';
 const revision=execFileSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).trim();
+try{execFileSync('git',['diff','--quiet','HEAD','--','ui','i18n','core','content']);}catch{throw Error('Commit game source before recording so the video names identify its actual source.');}
 const recordings=resolve(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??`.npm-cache/v1b-recordings-${revision}`);
 const evidence=join(ROOT,'docs/handoff/v1b-compare/continuous');mkdirSync(recordings,{recursive:true});mkdirSync(evidence,{recursive:true});
 const ffmpeg=join(ROOT,'.npm-cache/pw-browsers/ffmpeg-1011/ffmpeg-win64.exe');

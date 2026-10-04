@@ -1,0 +1,430 @@
+{
+  "profileFile": ".npm-cache/profiles/reviewed-profile-chrome-4-reviewed-calm-end.cpuprofile",
+  "mapFile": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\profile-map-reviewed\\assets\\index-C1_EMUlE.js.map",
+  "samples": 1882,
+  "totalSampledMs": 3066.156,
+  "self": [
+    {
+      "function": "(idle)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1840.76
+    },
+    {
+      "function": "(program)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1061.5
+    },
+    {
+      "function": "t",
+      "source": "../../v1b-review-ace1c41/ui/desk/DeskItems.tsx",
+      "line": 185,
+      "sampledMs": 26.68
+    },
+    {
+      "function": "querySelector",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 16.1
+    },
+    {
+      "function": "toDataURL",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 15.54
+    },
+    {
+      "function": "tick",
+      "source": "(browser)",
+      "line": 8,
+      "sampledMs": 12.93
+    },
+    {
+      "function": "c",
+      "source": "../../v1b-review-ace1c41/ui/desk/Motion.tsx",
+      "line": 150,
+      "sampledMs": 12.69
+    },
+    {
+      "function": "getBoundingClientRect",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 12.29
+    },
+    {
+      "function": "requestAnimationFrame",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 10.22
+    },
+    {
+      "function": "Sn",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 1439,
+      "sampledMs": 8.05
+    },
+    {
+      "function": "qt",
+      "source": "../../v1b-review-ace1c41/core/press.ts",
+      "line": 194,
+      "sampledMs": 3.22
+    },
+    {
+      "function": "fi",
+      "source": "../../v1b-review-ace1c41/ui/desk/halftone.ts",
+      "line": 695,
+      "sampledMs": 3.07
+    },
+    {
+      "function": "requestAnimationFrame",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 2.84
+    },
+    {
+      "function": "hi",
+      "source": "../../v1b-review-ace1c41/ui/desk/halftone.ts",
+      "line": 765,
+      "sampledMs": 2.75
+    },
+    {
+      "function": "Gn",
+      "source": "../../v1b-review-ace1c41/ui/text.ts",
+      "line": 71,
+      "sampledMs": 1.65
+    },
+    {
+      "function": "arc",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.62
+    },
+    {
+      "function": "Bt",
+      "source": "../../v1b-review-ace1c41/core/press.ts",
+      "line": 79,
+      "sampledMs": 1.6
+    },
+    {
+      "function": "rn",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 1125,
+      "sampledMs": 1.6
+    },
+    {
+      "function": "play",
+      "source": "../../v1b-review-ace1c41/core/lines.ts",
+      "line": 76,
+      "sampledMs": 1.6
+    },
+    {
+      "function": "yh",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 17907,
+      "sampledMs": 1.6
+    },
+    {
+      "function": "qt",
+      "source": "../../v1b-review-ace1c41/core/press.ts",
+      "line": 194,
+      "sampledMs": 1.59
+    },
+    {
+      "function": "removeChild",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.59
+    },
+    {
+      "function": "Pn",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 1663,
+      "sampledMs": 1.58
+    },
+    {
+      "function": "(anonymous)",
+      "source": "../../v1b-review-ace1c41/ui/desk/halftone.ts",
+      "line": 506,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "v",
+      "source": "../../v1b-review-ace1c41/ui/desk/Motion.tsx",
+      "line": 98,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "qt",
+      "source": "../../v1b-review-ace1c41/core/press.ts",
+      "line": 194,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "poll",
+      "source": "(browser)",
+      "line": 1,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "$u",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11912,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "getImageData",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "Fn",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 1686,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "vs",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 4980,
+      "sampledMs": 1.57
+    },
+    {
+      "function": "setTimeout",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.56
+    },
+    {
+      "function": "pp",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 15482,
+      "sampledMs": 1.56
+    },
+    {
+      "function": "(garbage collector)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.55
+    },
+    {
+      "function": "fill",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1.45
+    }
+  ],
+  "inclusive": [
+    {
+      "function": "(root)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 3066.16
+    },
+    {
+      "function": "(idle)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1840.76
+    },
+    {
+      "function": "(program)",
+      "source": "(browser)",
+      "line": 0,
+      "sampledMs": 1061.5
+    },
+    {
+      "function": "Fd",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12069,
+      "sampledMs": 72.87
+    },
+    {
+      "function": "Mf",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 13574,
+      "sampledMs": 72.87
+    },
+    {
+      "function": "Df",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 13408,
+      "sampledMs": 72.87
+    },
+    {
+      "function": "kf",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 13456,
+      "sampledMs": 72.87
+    },
+    {
+      "function": "(anonymous)",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 13579,
+      "sampledMs": 72.87
+    },
+    {
+      "function": "Jd",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12583,
+      "sampledMs": 42.68
+    },
+    {
+      "function": "qd",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12522,
+      "sampledMs": 42.68
+    },
+    {
+      "function": "hl",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 7768,
+      "sampledMs": 40.74
+    },
+    {
+      "function": "ns",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 4627,
+      "sampledMs": 38.77
+    },
+    {
+      "function": "Jc",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 6791,
+      "sampledMs": 38.77
+    },
+    {
+      "function": "t",
+      "source": "../../v1b-review-ace1c41/ui/desk/DeskItems.tsx",
+      "line": 185,
+      "sampledMs": 36.9
+    },
+    {
+      "function": "tick",
+      "source": "(browser)",
+      "line": 8,
+      "sampledMs": 31.87
+    },
+    {
+      "function": "rf",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12906,
+      "sampledMs": 30.19
+    },
+    {
+      "function": "nf",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12867,
+      "sampledMs": 30.19
+    },
+    {
+      "function": "Id",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 12240,
+      "sampledMs": 30.19
+    },
+    {
+      "function": "hi",
+      "source": "../../v1b-review-ace1c41/ui/desk/halftone.ts",
+      "line": 765,
+      "sampledMs": 27.57
+    },
+    {
+      "function": "Wi",
+      "source": "../../v1b-review-ace1c41/ui/desk/Papers.tsx",
+      "line": 17,
+      "sampledMs": 27.57
+    },
+    {
+      "function": "pi",
+      "source": "../../v1b-review-ace1c41/ui/desk/halftone.ts",
+      "line": 718,
+      "sampledMs": 24.82
+    },
+    {
+      "function": "(anonymous)",
+      "source": "../../v1b-review-ace1c41/ui/desk/Motion.tsx",
+      "line": 33,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "wl",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9011,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "vu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 9962,
+      "sampledMs": 16.29
+    },
+    {
+      "function": "Lu",
+      "source": "../../../node_modules/react-dom/cjs/react-dom-client.production.js",
+      "line": 11117,
+      "sampledMs": 16.29
+    }
+  ]
+}
