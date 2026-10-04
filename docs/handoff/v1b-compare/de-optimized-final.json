@@ -1,0 +1,7417 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "loud",
+      "firstFrameMs": 1.30000000037262,
+      "landingMs": 942.9000000003725,
+      "totalBusyMs": 2110.000000000373,
+      "active": {
+        "frames": 253,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.799999999999727,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 179,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1.30000000037262,
+          "beat": "idle"
+        },
+        {
+          "at": 9.500000000372438,
+          "beat": "lift"
+        },
+        {
+          "at": 751.3000000003726,
+          "beat": "land"
+        },
+        {
+          "at": 942.9000000003725,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet",
+      "firstFrameMs": -1.500000000186219,
+      "landingMs": 940.1999999998138,
+      "totalBusyMs": 3290.1999999998134,
+      "active": {
+        "frames": 395,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999909,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -1.500000000186219,
+          "beat": "idle"
+        },
+        {
+          "at": 6.8999999998136445,
+          "beat": "lift"
+        },
+        {
+          "at": 756.9999999998136,
+          "beat": "land"
+        },
+        {
+          "at": 940.1999999998138,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "calm-end",
+      "firstFrameMs": -8.599999999627471,
+      "landingMs": null,
+      "totalBusyMs": 3508.1000000003723,
+      "active": {
+        "frames": 421,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.5,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 174,
+        "p50": 8.300000000000182,
+        "p95": 8.699999999999818,
+        "max": 16.800000000000182,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -8.599999999627471,
+          "beat": "idle"
+        },
+        {
+          "at": 8.000000000372552,
+          "beat": "endPress"
+        },
+        {
+          "at": 333.1000000003726,
+          "beat": "stamp"
+        },
+        {
+          "at": 916.3000000003726,
+          "beat": "sweep"
+        },
+        {
+          "at": 1533.0000000003724,
+          "beat": "date"
+        },
+        {
+          "at": 1783.1000000003723,
+          "beat": "publish"
+        },
+        {
+          "at": 2241.5000000003724,
+          "beat": "message"
+        },
+        {
+          "at": 3508.1000000003723,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "frenzy-end",
+      "firstFrameMs": -2.2999999996275164,
+      "landingMs": null,
+      "totalBusyMs": 10664.400000000373,
+      "active": {
+        "frames": 1273,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 24.69999999999891,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 179,
+        "p50": 8.300000000001091,
+        "p95": 8.699999999998909,
+        "max": 16.900000000001455,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -2.2999999996275164,
+          "beat": "idle"
+        },
+        {
+          "at": 14.30000000037262,
+          "beat": "endPress"
+        },
+        {
+          "at": 339.6000000003726,
+          "beat": "stamp"
+        },
+        {
+          "at": 914.4000000003725,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1964.4000000003725,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3164.800000000372,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.4000000003725,
+          "beat": "impact"
+        },
+        {
+          "at": 3822.800000000372,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4439.500000000373,
+          "beat": "impact"
+        },
+        {
+          "at": 4839.4000000003725,
+          "beat": "resources"
+        },
+        {
+          "at": 6189.700000000373,
+          "beat": "sweep"
+        },
+        {
+          "at": 7039.700000000372,
+          "beat": "date"
+        },
+        {
+          "at": 7306.600000000373,
+          "beat": "publish"
+        },
+        {
+          "at": 7756.100000000373,
+          "beat": "message"
+        },
+        {
+          "at": 10664.400000000373,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "copycat-end",
+      "firstFrameMs": -7.2999999999999545,
+      "landingMs": null,
+      "totalBusyMs": 11309.5,
+      "active": {
+        "frames": 1353,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.799999999999272,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -7.2999999999999545,
+          "beat": "idle"
+        },
+        {
+          "at": 9.400000000000091,
+          "beat": "endPress"
+        },
+        {
+          "at": 342.9000000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 926.1999999999998,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1976.5,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3176,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3792.8999999999996,
+          "beat": "impact"
+        },
+        {
+          "at": 4192.9,
+          "beat": "resources"
+        },
+        {
+          "at": 5542.8,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6592.700000000001,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7792.799999999999,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8417.9,
+          "beat": "impact"
+        },
+        {
+          "at": 8817.9,
+          "beat": "resources"
+        },
+        {
+          "at": 10167.8,
+          "beat": "sweep"
+        },
+        {
+          "at": 11101.1,
+          "beat": "publish"
+        },
+        {
+          "at": 11309.5,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "season",
+      "firstFrameMs": -13.899999999627425,
+      "landingMs": null,
+      "totalBusyMs": 8044.600000000373,
+      "active": {
+        "frames": 966,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 177,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 24.69999999999891,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -13.899999999627425,
+          "beat": "idle"
+        },
+        {
+          "at": -5.599999999627471,
+          "beat": "gate"
+        },
+        {
+          "at": 277.8000000003726,
+          "beat": "resources"
+        },
+        {
+          "at": 1619.6000000003723,
+          "beat": "date"
+        },
+        {
+          "at": 1877.9000000003725,
+          "beat": "season"
+        },
+        {
+          "at": 2586.3000000003726,
+          "beat": "publish"
+        },
+        {
+          "at": 4886.300000000372,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5136.500000000373,
+          "beat": "message"
+        },
+        {
+          "at": 8044.600000000373,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "winter-ending",
+      "firstFrameMs": 1.000000000372438,
+      "landingMs": null,
+      "totalBusyMs": 1826.3000000003726,
+      "active": {
+        "frames": 216,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.799999999999727,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 178,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 16.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1.000000000372438,
+          "beat": "idle"
+        },
+        {
+          "at": 9.30000000037262,
+          "beat": "gate"
+        },
+        {
+          "at": 284.60000000037235,
+          "beat": "resources"
+        },
+        {
+          "at": 1634.3000000003726,
+          "beat": "publish"
+        },
+        {
+          "at": 1826.3000000003726,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "firstFrameMs": -1.799999999254851,
+      "landingMs": 940.1000000007452,
+      "totalBusyMs": 4040.1000000007452,
+      "active": {
+        "frames": 484,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -1.799999999254851,
+          "beat": "idle"
+        },
+        {
+          "at": 6.5000000007451035,
+          "beat": "lift"
+        },
+        {
+          "at": 748.2000000007451,
+          "beat": "land"
+        },
+        {
+          "at": 940.1000000007452,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "firstFrameMs": 0.10000000018635546,
+      "landingMs": null,
+      "totalBusyMs": 6641.700000000186,
+      "active": {
+        "frames": 795,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 178,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 17,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 0.10000000018635546,
+          "beat": "idle"
+        },
+        {
+          "at": 8.600000000186355,
+          "beat": "endPress"
+        },
+        {
+          "at": 358.5000000001862,
+          "beat": "stamp"
+        },
+        {
+          "at": 942.1000000001864,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1992.1000000001864,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3192.0000000001864,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3816.8000000001866,
+          "beat": "impact"
+        },
+        {
+          "at": 4208.500000000186,
+          "beat": "resources"
+        },
+        {
+          "at": 5558.700000000186,
+          "beat": "sweep"
+        },
+        {
+          "at": 6183.800000000187,
+          "beat": "date"
+        },
+        {
+          "at": 6441.800000000187,
+          "beat": "publish"
+        },
+        {
+          "at": 6641.700000000186,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "firstFrameMs": -4.800000000558839,
+      "landingMs": null,
+      "totalBusyMs": 7245.499999999442,
+      "active": {
+        "frames": 868,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 25.30000000000109,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.799999999999272,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -4.800000000558839,
+          "beat": "idle"
+        },
+        {
+          "at": 3.4999999994411155,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.9999999994411,
+          "beat": "stamp"
+        },
+        {
+          "at": 912.2999999994413,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1961.9999999994411,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3170.6999999994414,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3795.599999999441,
+          "beat": "impact"
+        },
+        {
+          "at": 3820.1999999994414,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4437.299999999441,
+          "beat": "impact"
+        },
+        {
+          "at": 4837.199999999441,
+          "beat": "resources"
+        },
+        {
+          "at": 6187.099999999441,
+          "beat": "sweep"
+        },
+        {
+          "at": 7045.299999999441,
+          "beat": "publish"
+        },
+        {
+          "at": 7245.499999999442,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "loud",
+      "firstFrameMs": -7.500000000186446,
+      "landingMs": 950.7999999998137,
+      "totalBusyMs": 2151.1999999998134,
+      "active": {
+        "frames": 250,
+        "p50": 8.300000000000182,
+        "p95": 8.700000000000273,
+        "max": 33.40000000000009,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 140,
+        "p50": 8.399999999999636,
+        "p95": 25,
+        "max": 75,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": -7.500000000186446,
+          "beat": "idle"
+        },
+        {
+          "at": 9.199999999813826,
+          "beat": "lift"
+        },
+        {
+          "at": 767.3999999998136,
+          "beat": "land"
+        },
+        {
+          "at": 950.7999999998137,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 800.7999999998137,
+          "beat": "land",
+          "ms": 33.40000000000009
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 2433.100000000559,
+          "duration": 77
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet",
+      "firstFrameMs": -2.1000000001863555,
+      "landingMs": 939.6999999998138,
+      "totalBusyMs": 3297.9999999998136,
+      "active": {
+        "frames": 391,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 33.5,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 133,
+        "p50": 8.300000000000182,
+        "p95": 33.30000000000018,
+        "max": 41.80000000000018,
+        "over33": 4
+      },
+      "beats": [
+        {
+          "at": -2.1000000001863555,
+          "beat": "idle"
+        },
+        {
+          "at": 6.199999999813826,
+          "beat": "lift"
+        },
+        {
+          "at": 747.8999999998136,
+          "beat": "land"
+        },
+        {
+          "at": 939.6999999998138,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 781.3999999998136,
+          "beat": "land",
+          "ms": 33.5
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "calm-end",
+      "firstFrameMs": -4.900000000372529,
+      "landingMs": null,
+      "totalBusyMs": 3520.0999999996275,
+      "active": {
+        "frames": 412,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 66.90000000000009,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 126,
+        "p50": 8.399999999999636,
+        "p95": 33.30000000000018,
+        "max": 41.69999999999982,
+        "over33": 5
+      },
+      "beats": [
+        {
+          "at": -4.900000000372529,
+          "beat": "idle"
+        },
+        {
+          "at": 3.499999999627562,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.8999999996274,
+          "beat": "stamp"
+        },
+        {
+          "at": 920.0999999996275,
+          "beat": "sweep"
+        },
+        {
+          "at": 1536.7999999996273,
+          "beat": "date"
+        },
+        {
+          "at": 1803.4999999996276,
+          "beat": "publish"
+        },
+        {
+          "at": 2245.0999999996275,
+          "beat": "message"
+        },
+        {
+          "at": 3520.0999999996275,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 1870.3999999996277,
+          "beat": "publish",
+          "ms": 66.90000000000009
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 1797.5999999996275,
+          "duration": 61
+        },
+        {
+          "at": 4004.5,
+          "duration": 50
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "frenzy-end",
+      "firstFrameMs": -10.599999999999909,
+      "landingMs": null,
+      "totalBusyMs": 10672.8,
+      "active": {
+        "frames": 1266,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 83.39999999999964,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 133,
+        "p50": 8.300000000001091,
+        "p95": 33.29999999999927,
+        "max": 41.80000000000109,
+        "over33": 2
+      },
+      "beats": [
+        {
+          "at": -10.599999999999909,
+          "beat": "idle"
+        },
+        {
+          "at": 6.099999999999909,
+          "beat": "endPress"
+        },
+        {
+          "at": 339.5999999999999,
+          "beat": "stamp"
+        },
+        {
+          "at": 922.9000000000001,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1972.8000000000002,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3172.8999999999996,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.3999999999996,
+          "beat": "impact"
+        },
+        {
+          "at": 3822.8999999999996,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4439.5,
+          "beat": "impact"
+        },
+        {
+          "at": 4839.5,
+          "beat": "resources"
+        },
+        {
+          "at": 6189.6,
+          "beat": "sweep"
+        },
+        {
+          "at": 7056.200000000001,
+          "beat": "date"
+        },
+        {
+          "at": 7314.5,
+          "beat": "publish"
+        },
+        {
+          "at": 7764.4,
+          "beat": "message"
+        },
+        {
+          "at": 10672.8,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 47.80000000000018,
+          "beat": "endPress",
+          "ms": 41.70000000000027
+        },
+        {
+          "at": 7397.9,
+          "beat": "publish",
+          "ms": 83.39999999999964
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 7311,
+          "duration": 63
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "copycat-end",
+      "firstFrameMs": -1.6680000001861117,
+      "landingMs": null,
+      "totalBusyMs": 11306.599999999813,
+      "active": {
+        "frames": 1338,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 83.29999999999927,
+        "over33": 3
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 160,
+        "p50": 8.399999999999636,
+        "p95": 16.700000000000728,
+        "max": 25.100000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -1.6680000001861117,
+          "beat": "endPress"
+        },
+        {
+          "at": 348.29999999981374,
+          "beat": "stamp"
+        },
+        {
+          "at": 923.4999999998136,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1973.2999999998137,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3173.2999999998137,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.9999999998136,
+          "beat": "impact"
+        },
+        {
+          "at": 4198.299999999814,
+          "beat": "resources"
+        },
+        {
+          "at": 5548.299999999814,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6598.4999999998145,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7798.299999999814,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8414.999999999814,
+          "beat": "impact"
+        },
+        {
+          "at": 8806.699999999813,
+          "beat": "resources"
+        },
+        {
+          "at": 10164.999999999814,
+          "beat": "sweep"
+        },
+        {
+          "at": 11106.599999999813,
+          "beat": "publish"
+        },
+        {
+          "at": 11306.599999999813,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 39.899999999813645,
+          "beat": "endPress",
+          "ms": 41.567999999999756
+        },
+        {
+          "at": 8331.699999999813,
+          "beat": "scandalCarry",
+          "ms": 83.29999999999927
+        },
+        {
+          "at": 11139.999999999814,
+          "beat": "publish",
+          "ms": 33.400000000001455
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "season",
+      "firstFrameMs": 0.2999999998137355,
+      "landingMs": null,
+      "totalBusyMs": 8075.299999999814,
+      "active": {
+        "frames": 955,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 75,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 143,
+        "p50": 8.399999999999636,
+        "p95": 25,
+        "max": 33.399999999999636,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 0.2999999998137355,
+          "beat": "idle"
+        },
+        {
+          "at": 8.59999999981369,
+          "beat": "gate"
+        },
+        {
+          "at": 308.79999999981374,
+          "beat": "resources"
+        },
+        {
+          "at": 1658.599999999814,
+          "beat": "date"
+        },
+        {
+          "at": 1916.9999999998136,
+          "beat": "season"
+        },
+        {
+          "at": 2617.099999999814,
+          "beat": "publish"
+        },
+        {
+          "at": 4917.099999999814,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5158.699999999813,
+          "beat": "message"
+        },
+        {
+          "at": 8075.299999999814,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 41.99999999981378,
+          "beat": "gate",
+          "ms": 33.40000000000009
+        },
+        {
+          "at": 2692.099999999814,
+          "beat": "publish",
+          "ms": 75
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 2611.5999999996275,
+          "duration": 51
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "winter-ending",
+      "firstFrameMs": -3.899999999627653,
+      "landingMs": null,
+      "totalBusyMs": 1846.1000000003723,
+      "active": {
+        "frames": 211,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 66.69999999999982,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 155,
+        "p50": 8.399999999999636,
+        "p95": 16.699999999999818,
+        "max": 33.29999999999927,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -3.899999999627653,
+          "beat": "gate"
+        },
+        {
+          "at": 296.2000000003727,
+          "beat": "resources"
+        },
+        {
+          "at": 1646.1000000003723,
+          "beat": "publish"
+        },
+        {
+          "at": 1846.1000000003723,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 1712.8000000003722,
+          "beat": "publish",
+          "ms": 66.69999999999982
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet-longest-recorded",
+      "firstFrameMs": 2.599999999627471,
+      "landingMs": 944.2999999996273,
+      "totalBusyMs": 4060.999999999627,
+      "active": {
+        "frames": 482,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 33.5,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 148,
+        "p50": 8.300000000000182,
+        "p95": 24.900000000000546,
+        "max": 33.30000000000018,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 2.599999999627471,
+          "beat": "idle"
+        },
+        {
+          "at": 10.899999999627425,
+          "beat": "lift"
+        },
+        {
+          "at": 752.5999999996275,
+          "beat": "land"
+        },
+        {
+          "at": 944.2999999996273,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 786.0999999996275,
+          "beat": "land",
+          "ms": 33.5
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-calm-end",
+      "firstFrameMs": -5.09999999981369,
+      "landingMs": null,
+      "totalBusyMs": 6619.900000000187,
+      "active": {
+        "frames": 783,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 66.69999999999982,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 141,
+        "p50": 8.300000000001091,
+        "p95": 25.099999999998545,
+        "max": 41.599999999998545,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": -5.09999999981369,
+          "beat": "idle"
+        },
+        {
+          "at": 3.3000000001861736,
+          "beat": "endPress"
+        },
+        {
+          "at": 345.00000000018645,
+          "beat": "stamp"
+        },
+        {
+          "at": 928.7000000001863,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1978.5000000001864,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3178.3000000001866,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3795.100000000186,
+          "beat": "impact"
+        },
+        {
+          "at": 4195.100000000186,
+          "beat": "resources"
+        },
+        {
+          "at": 5545.000000000186,
+          "beat": "sweep"
+        },
+        {
+          "at": 6161.800000000187,
+          "beat": "date"
+        },
+        {
+          "at": 6428.400000000186,
+          "beat": "publish"
+        },
+        {
+          "at": 6619.900000000187,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 6495.100000000186,
+          "beat": "publish",
+          "ms": 66.69999999999982
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 6422.700000000186,
+          "duration": 63
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-frenzy-end",
+      "firstFrameMs": -3.300000000000182,
+      "landingMs": null,
+      "totalBusyMs": 7289.9,
+      "active": {
+        "frames": 618,
+        "p50": 8.400000000000091,
+        "p95": 16.5,
+        "max": 895.3000000000002,
+        "over33": 3
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 93,
+        "p50": 16.100000000000364,
+        "p95": 32,
+        "max": 32.79999999999927,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -3.300000000000182,
+          "beat": "idle"
+        },
+        {
+          "at": 13.599999999999909,
+          "beat": "endPress"
+        },
+        {
+          "at": 363.5,
+          "beat": "stamp"
+        },
+        {
+          "at": 938.5,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1988.8999999999996,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3196.8,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4546.6,
+          "beat": "impact"
+        },
+        {
+          "at": 4877.9,
+          "beat": "resources"
+        },
+        {
+          "at": 6213.4,
+          "beat": "sweep"
+        },
+        {
+          "at": 7071.1,
+          "beat": "publish"
+        },
+        {
+          "at": 7289.9,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 55.19999999999982,
+          "beat": "endPress",
+          "ms": 41.59999999999991
+        },
+        {
+          "at": 4533.7,
+          "beat": "scandalCarry",
+          "ms": 895.3000000000002
+        },
+        {
+          "at": 7109.1,
+          "beat": "publish",
+          "ms": 38
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "loud",
+      "firstFrameMs": 10.519999999999982,
+      "landingMs": 939.6400000000003,
+      "totalBusyMs": 2121.34,
+      "active": {
+        "frames": 93,
+        "p50": 16.90000000000009,
+        "p95": 40.63999999999987,
+        "max": 54.100000000000364,
+        "over33": 9
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 101,
+        "p50": 16.279999999999745,
+        "p95": 23.220000000000255,
+        "max": 31.780000000000655,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 10.519999999999982,
+          "beat": "lift"
+        },
+        {
+          "at": 756.8000000000002,
+          "beat": "land"
+        },
+        {
+          "at": 939.6400000000003,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 127.46000000000004,
+          "beat": "lift",
+          "ms": 35.159999999999854
+        },
+        {
+          "at": 274.3000000000002,
+          "beat": "lift",
+          "ms": 49.40000000000009
+        },
+        {
+          "at": 415.9000000000001,
+          "beat": "lift",
+          "ms": 40.63999999999987
+        },
+        {
+          "at": 540.0799999999999,
+          "beat": "lift",
+          "ms": 41.179999999999836
+        },
+        {
+          "at": 920.1400000000003,
+          "beat": "land",
+          "ms": 49.38000000000011
+        },
+        {
+          "at": 979.7399999999998,
+          "beat": "idle",
+          "ms": 40.099999999999454
+        },
+        {
+          "at": 1029.12,
+          "beat": "idle",
+          "ms": 33.51999999999953
+        },
+        {
+          "at": 1170.0200000000004,
+          "beat": "idle",
+          "ms": 54.100000000000364
+        },
+        {
+          "at": 1822.9799999999996,
+          "beat": "idle",
+          "ms": 33.69999999999982
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "quiet",
+      "firstFrameMs": 19.299999999999955,
+      "landingMs": 942.7600000000002,
+      "totalBusyMs": 3289.76,
+      "active": {
+        "frames": 196,
+        "p50": 16.559999999999945,
+        "p95": 32.820000000000164,
+        "max": 49.180000000000064,
+        "over33": 4
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 105,
+        "p50": 16.340000000000146,
+        "p95": 16.920000000000073,
+        "max": 17.5600000000004,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 19.299999999999955,
+          "beat": "lift"
+        },
+        {
+          "at": 768.94,
+          "beat": "land"
+        },
+        {
+          "at": 942.7600000000002,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 123.51999999999998,
+          "beat": "lift",
+          "ms": 37.87999999999988
+        },
+        {
+          "at": 307.02,
+          "beat": "lift",
+          "ms": 49.180000000000064
+        },
+        {
+          "at": 810.8399999999999,
+          "beat": "land",
+          "ms": 41.899999999999864
+        },
+        {
+          "at": 893.7199999999998,
+          "beat": "land",
+          "ms": 33.7199999999998
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "calm-end",
+      "firstFrameMs": 12.5,
+      "landingMs": null,
+      "totalBusyMs": 3515.5200000000004,
+      "active": {
+        "frames": 193,
+        "p50": 16.559999999999945,
+        "p95": 40.86000000000013,
+        "max": 66.03999999999985,
+        "over33": 14
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 109,
+        "p50": 16.17999999999938,
+        "p95": 16.779999999999745,
+        "max": 17.11999999999989,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 12.5,
+          "beat": "endPress"
+        },
+        {
+          "at": 364,
+          "beat": "stamp"
+        },
+        {
+          "at": 936.1600000000001,
+          "beat": "sweep"
+        },
+        {
+          "at": 1525.6599999999999,
+          "beat": "date"
+        },
+        {
+          "at": 1814.7199999999998,
+          "beat": "publish"
+        },
+        {
+          "at": 2253.26,
+          "beat": "message"
+        },
+        {
+          "at": 3515.5200000000004,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 111.61999999999989,
+          "beat": "endPress",
+          "ms": 66.03999999999985
+        },
+        {
+          "at": 315.52,
+          "beat": "endPress",
+          "ms": 41.74000000000001
+        },
+        {
+          "at": 364,
+          "beat": "stamp",
+          "ms": 48.48000000000002
+        },
+        {
+          "at": 448.6600000000001,
+          "beat": "stamp",
+          "ms": 34.72000000000003
+        },
+        {
+          "at": 496.26,
+          "beat": "stamp",
+          "ms": 47.59999999999991
+        },
+        {
+          "at": 553.5999999999999,
+          "beat": "stamp",
+          "ms": 40.69999999999982
+        },
+        {
+          "at": 688.3599999999999,
+          "beat": "stamp",
+          "ms": 34.61999999999989
+        },
+        {
+          "at": 2004.5,
+          "beat": "publish",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2062.7,
+          "beat": "publish",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 2121.48,
+          "beat": "publish",
+          "ms": 33.61999999999989
+        },
+        {
+          "at": 2318.62,
+          "beat": "message",
+          "ms": 48.92000000000007
+        },
+        {
+          "at": 2376.5,
+          "beat": "message",
+          "ms": 46.059999999999945
+        },
+        {
+          "at": 2548.48,
+          "beat": "message",
+          "ms": 40.86000000000013
+        },
+        {
+          "at": 2606.98,
+          "beat": "message",
+          "ms": 58.5
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "frenzy-end",
+      "firstFrameMs": 1,
+      "landingMs": null,
+      "totalBusyMs": 10673.9,
+      "active": {
+        "frames": 446,
+        "p50": 19.100000000000364,
+        "p95": 47.18000000000029,
+        "max": 82,
+        "over33": 56
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 104,
+        "p50": 16.44000000000051,
+        "p95": 17.31999999999971,
+        "max": 24.219999999999345,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1,
+          "beat": "endPress"
+        },
+        {
+          "at": 348.1600000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 920.8600000000001,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1963.58,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3167.66,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4430.96,
+          "beat": "impact"
+        },
+        {
+          "at": 4826.14,
+          "beat": "resources"
+        },
+        {
+          "at": 6177.5,
+          "beat": "sweep"
+        },
+        {
+          "at": 7054.0599999999995,
+          "beat": "date"
+        },
+        {
+          "at": 7296.120000000001,
+          "beat": "publish"
+        },
+        {
+          "at": 7779.32,
+          "beat": "message"
+        },
+        {
+          "at": 10673.9,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 67.83999999999992,
+          "beat": "endPress",
+          "ms": 41.419999999999845
+        },
+        {
+          "at": 126.6400000000001,
+          "beat": "endPress",
+          "ms": 41.90000000000009
+        },
+        {
+          "at": 184.4000000000001,
+          "beat": "endPress",
+          "ms": 41.700000000000045
+        },
+        {
+          "at": 249.68000000000006,
+          "beat": "endPress",
+          "ms": 65.27999999999997
+        },
+        {
+          "at": 348.1600000000001,
+          "beat": "stamp",
+          "ms": 49.40000000000009
+        },
+        {
+          "at": 527.8399999999999,
+          "beat": "stamp",
+          "ms": 47.679999999999836
+        },
+        {
+          "at": 666.6600000000001,
+          "beat": "stamp",
+          "ms": 49.22000000000003
+        },
+        {
+          "at": 725.56,
+          "beat": "stamp",
+          "ms": 42.07999999999993
+        },
+        {
+          "at": 839.2600000000002,
+          "beat": "stamp",
+          "ms": 47.94000000000028
+        },
+        {
+          "at": 880.8800000000001,
+          "beat": "stamp",
+          "ms": 41.61999999999989
+        },
+        {
+          "at": 954.48,
+          "beat": "scandalLift",
+          "ms": 33.61999999999989
+        },
+        {
+          "at": 1182.3400000000001,
+          "beat": "scandalLift",
+          "ms": 34.039999999999964
+        },
+        {
+          "at": 1240.42,
+          "beat": "scandalLift",
+          "ms": 58.07999999999993
+        },
+        {
+          "at": 1420.02,
+          "beat": "scandalLift",
+          "ms": 48.86000000000013
+        },
+        {
+          "at": 1486.12,
+          "beat": "scandalLift",
+          "ms": 49.779999999999745
+        },
+        {
+          "at": 2071.46,
+          "beat": "scandalFlip",
+          "ms": 41.960000000000036
+        },
+        {
+          "at": 2129.6,
+          "beat": "scandalFlip",
+          "ms": 58.13999999999987
+        },
+        {
+          "at": 2179.56,
+          "beat": "scandalFlip",
+          "ms": 41.40000000000009
+        },
+        {
+          "at": 2219.92,
+          "beat": "scandalFlip",
+          "ms": 40.36000000000013
+        },
+        {
+          "at": 2270.1,
+          "beat": "scandalFlip",
+          "ms": 33.51999999999998
+        },
+        {
+          "at": 2475.96,
+          "beat": "scandalFlip",
+          "ms": 36.159999999999854
+        },
+        {
+          "at": 2757.46,
+          "beat": "scandalFlip",
+          "ms": 33.48000000000002
+        },
+        {
+          "at": 2835.02,
+          "beat": "scandalFlip",
+          "ms": 36.5
+        },
+        {
+          "at": 2986.04,
+          "beat": "scandalFlip",
+          "ms": 49.779999999999745
+        },
+        {
+          "at": 3695.84,
+          "beat": "scandalCarry",
+          "ms": 59.86000000000058
+        },
+        {
+          "at": 3793.3199999999997,
+          "beat": "scandalCarry",
+          "ms": 41.05999999999949
+        },
+        {
+          "at": 3917.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 33.460000000000036
+        },
+        {
+          "at": 3991.92,
+          "beat": "scandalCarry",
+          "ms": 40.69999999999982
+        },
+        {
+          "at": 4153.62,
+          "beat": "scandalCarry",
+          "ms": 54.30000000000018
+        },
+        {
+          "at": 4212.2,
+          "beat": "scandalCarry",
+          "ms": 38.399999999999636
+        },
+        {
+          "at": 4297.2,
+          "beat": "scandalCarry",
+          "ms": 65.89999999999964
+        },
+        {
+          "at": 4585.56,
+          "beat": "impact",
+          "ms": 57.460000000000036
+        },
+        {
+          "at": 4643.8,
+          "beat": "impact",
+          "ms": 41.23999999999978
+        },
+        {
+          "at": 4797.06,
+          "beat": "impact",
+          "ms": 54.68000000000029
+        },
+        {
+          "at": 5111.1,
+          "beat": "resources",
+          "ms": 47.18000000000029
+        },
+        {
+          "at": 5288.32,
+          "beat": "resources",
+          "ms": 39.97999999999956
+        },
+        {
+          "at": 5385.52,
+          "beat": "resources",
+          "ms": 40.64000000000033
+        },
+        {
+          "at": 5548.12,
+          "beat": "resources",
+          "ms": 40.55999999999949
+        },
+        {
+          "at": 6219.06,
+          "beat": "sweep",
+          "ms": 41.5600000000004
+        },
+        {
+          "at": 6456.7,
+          "beat": "sweep",
+          "ms": 38.73999999999978
+        },
+        {
+          "at": 7095.799999999999,
+          "beat": "date",
+          "ms": 41.73999999999978
+        },
+        {
+          "at": 7359.459999999999,
+          "beat": "publish",
+          "ms": 47.69999999999891
+        },
+        {
+          "at": 7450.379999999999,
+          "beat": "publish",
+          "ms": 65.27999999999884
+        },
+        {
+          "at": 7536.68,
+          "beat": "publish",
+          "ms": 78.18000000000029
+        },
+        {
+          "at": 7626.1,
+          "beat": "publish",
+          "ms": 74.10000000000036
+        },
+        {
+          "at": 7723.68,
+          "beat": "publish",
+          "ms": 82
+        },
+        {
+          "at": 7779.32,
+          "beat": "message",
+          "ms": 39.86000000000058
+        },
+        {
+          "at": 7899.9400000000005,
+          "beat": "message",
+          "ms": 41.399999999999636
+        },
+        {
+          "at": 7964.76,
+          "beat": "message",
+          "ms": 64.81999999999971
+        },
+        {
+          "at": 8020.540000000001,
+          "beat": "message",
+          "ms": 39.66000000000167
+        },
+        {
+          "at": 8084.379999999999,
+          "beat": "message",
+          "ms": 39.719999999999345
+        },
+        {
+          "at": 8154.5,
+          "beat": "message",
+          "ms": 70.1200000000008
+        },
+        {
+          "at": 8212.04,
+          "beat": "message",
+          "ms": 41.94000000000051
+        },
+        {
+          "at": 9084.38,
+          "beat": "message",
+          "ms": 40.63999999999942
+        },
+        {
+          "at": 9765.9,
+          "beat": "message",
+          "ms": 39.26000000000022
+        },
+        {
+          "at": 10649.5,
+          "beat": "message",
+          "ms": 40.95999999999913
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "copycat-end",
+      "firstFrameMs": 29.360000000000127,
+      "landingMs": null,
+      "totalBusyMs": 11296.44,
+      "active": {
+        "frames": 591,
+        "p50": 16.520000000000437,
+        "p95": 34.07999999999993,
+        "max": 91.13999999999987,
+        "over33": 40
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 101,
+        "p50": 16.159999999999854,
+        "p95": 16.8799999999992,
+        "max": 63.719999999999345,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 29.360000000000127,
+          "beat": "endPress"
+        },
+        {
+          "at": 359.8800000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 913,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1971.1999999999998,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3162.24,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3784.0200000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 4212.84,
+          "beat": "resources"
+        },
+        {
+          "at": 5557.1,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6581.68,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7782.52,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8405.36,
+          "beat": "impact"
+        },
+        {
+          "at": 8823.98,
+          "beat": "resources"
+        },
+        {
+          "at": 10162.84,
+          "beat": "sweep"
+        },
+        {
+          "at": 11089.52,
+          "beat": "publish"
+        },
+        {
+          "at": 11296.44,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 85.51999999999998,
+          "beat": "endPress",
+          "ms": 40.01999999999998
+        },
+        {
+          "at": 135.01999999999998,
+          "beat": "endPress",
+          "ms": 49.5
+        },
+        {
+          "at": 226.15999999999985,
+          "beat": "endPress",
+          "ms": 91.13999999999987
+        },
+        {
+          "at": 276.82000000000016,
+          "beat": "endPress",
+          "ms": 33.5
+        },
+        {
+          "at": 639.02,
+          "beat": "stamp",
+          "ms": 44.940000000000055
+        },
+        {
+          "at": 1016.0799999999999,
+          "beat": "scandalLift",
+          "ms": 36.79999999999973
+        },
+        {
+          "at": 1095.6999999999998,
+          "beat": "scandalLift",
+          "ms": 34.07999999999993
+        },
+        {
+          "at": 1286.2800000000002,
+          "beat": "scandalLift",
+          "ms": 51.58000000000038
+        },
+        {
+          "at": 2218.8999999999996,
+          "beat": "scandalFlip",
+          "ms": 33.67999999999938
+        },
+        {
+          "at": 2641.04,
+          "beat": "scandalFlip",
+          "ms": 58.30000000000018
+        },
+        {
+          "at": 2690.7,
+          "beat": "scandalFlip",
+          "ms": 39.67999999999938
+        },
+        {
+          "at": 3386.54,
+          "beat": "scandalCarry",
+          "ms": 42
+        },
+        {
+          "at": 3435.96,
+          "beat": "scandalCarry",
+          "ms": 41.31999999999971
+        },
+        {
+          "at": 3502.74,
+          "beat": "scandalCarry",
+          "ms": 51.01999999999953
+        },
+        {
+          "at": 3667.6400000000003,
+          "beat": "scandalCarry",
+          "ms": 41.340000000000146
+        },
+        {
+          "at": 3784.0200000000004,
+          "beat": "impact",
+          "ms": 33.5
+        },
+        {
+          "at": 3907.46,
+          "beat": "impact",
+          "ms": 40.960000000000036
+        },
+        {
+          "at": 4064.2,
+          "beat": "impact",
+          "ms": 33.42000000000007
+        },
+        {
+          "at": 4113.6,
+          "beat": "impact",
+          "ms": 49.400000000000546
+        },
+        {
+          "at": 4212.84,
+          "beat": "resources",
+          "ms": 82.84000000000015
+        },
+        {
+          "at": 5192.24,
+          "beat": "resources",
+          "ms": 33.61999999999989
+        },
+        {
+          "at": 5391.32,
+          "beat": "resources",
+          "ms": 41.81999999999971
+        },
+        {
+          "at": 5557.1,
+          "beat": "scandalLift",
+          "ms": 42.039999999999964
+        },
+        {
+          "at": 5603.46,
+          "beat": "scandalLift",
+          "ms": 46.35999999999967
+        },
+        {
+          "at": 5857.96,
+          "beat": "scandalLift",
+          "ms": 35.9399999999996
+        },
+        {
+          "at": 6095.5,
+          "beat": "scandalLift",
+          "ms": 33.52000000000044
+        },
+        {
+          "at": 6829.139999999999,
+          "beat": "scandalFlip",
+          "ms": 40.11999999999898
+        },
+        {
+          "at": 6904.5,
+          "beat": "scandalFlip",
+          "ms": 33.5
+        },
+        {
+          "at": 7004.280000000001,
+          "beat": "scandalFlip",
+          "ms": 33.42000000000007
+        },
+        {
+          "at": 7045.860000000001,
+          "beat": "scandalFlip",
+          "ms": 41.57999999999993
+        },
+        {
+          "at": 7850.200000000001,
+          "beat": "scandalCarry",
+          "ms": 33.720000000001164
+        },
+        {
+          "at": 7916.879999999999,
+          "beat": "scandalCarry",
+          "ms": 41.81999999999971
+        },
+        {
+          "at": 8330.24,
+          "beat": "scandalCarry",
+          "ms": 33.47999999999956
+        },
+        {
+          "at": 8405.36,
+          "beat": "impact",
+          "ms": 42.840000000000146
+        },
+        {
+          "at": 8626.78,
+          "beat": "impact",
+          "ms": 41.98000000000138
+        },
+        {
+          "at": 8676.9,
+          "beat": "impact",
+          "ms": 50.11999999999898
+        },
+        {
+          "at": 8765.02,
+          "beat": "impact",
+          "ms": 79.88000000000102
+        },
+        {
+          "at": 8823.98,
+          "beat": "resources",
+          "ms": 49.05999999999949
+        },
+        {
+          "at": 11153.3,
+          "beat": "publish",
+          "ms": 47.73999999999978
+        },
+        {
+          "at": 11216.56,
+          "beat": "publish",
+          "ms": 47.47999999999956
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "season",
+      "firstFrameMs": 1.7200000000000273,
+      "landingMs": null,
+      "totalBusyMs": 8037.26,
+      "active": {
+        "frames": 459,
+        "p50": 16.480000000000018,
+        "p95": 33.159999999999854,
+        "max": 50.57999999999993,
+        "over33": 20
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 104,
+        "p50": 16.44000000000051,
+        "p95": 16.899999999999636,
+        "max": 24.76000000000022,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1.7200000000000273,
+          "beat": "gate"
+        },
+        {
+          "at": 267.31999999999994,
+          "beat": "resources"
+        },
+        {
+          "at": 1618.1999999999998,
+          "beat": "date"
+        },
+        {
+          "at": 1876.6999999999998,
+          "beat": "season"
+        },
+        {
+          "at": 2584.5,
+          "beat": "publish"
+        },
+        {
+          "at": 4883.96,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5141.84,
+          "beat": "message"
+        },
+        {
+          "at": 8037.26,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 1972.12,
+          "beat": "season",
+          "ms": 49.659999999999854
+        },
+        {
+          "at": 2039.9,
+          "beat": "season",
+          "ms": 50.57999999999993
+        },
+        {
+          "at": 2197.06,
+          "beat": "season",
+          "ms": 33.460000000000036
+        },
+        {
+          "at": 2658.86,
+          "beat": "publish",
+          "ms": 41
+        },
+        {
+          "at": 2699.86,
+          "beat": "publish",
+          "ms": 41
+        },
+        {
+          "at": 2748.76,
+          "beat": "publish",
+          "ms": 33.600000000000364
+        },
+        {
+          "at": 2806.9,
+          "beat": "publish",
+          "ms": 33.5
+        },
+        {
+          "at": 2856.04,
+          "beat": "publish",
+          "ms": 49.13999999999987
+        },
+        {
+          "at": 2943.5,
+          "beat": "publish",
+          "ms": 37.36000000000013
+        },
+        {
+          "at": 3028.8599999999997,
+          "beat": "publish",
+          "ms": 40.539999999999964
+        },
+        {
+          "at": 3294.7,
+          "beat": "publish",
+          "ms": 42.720000000000255
+        },
+        {
+          "at": 5349.94,
+          "beat": "message",
+          "ms": 33.659999999999854
+        },
+        {
+          "at": 6199,
+          "beat": "message",
+          "ms": 33.69999999999982
+        },
+        {
+          "at": 6322.92,
+          "beat": "message",
+          "ms": 33.779999999999745
+        },
+        {
+          "at": 6845.88,
+          "beat": "message",
+          "ms": 34.30000000000018
+        },
+        {
+          "at": 7028.04,
+          "beat": "message",
+          "ms": 33.64000000000033
+        },
+        {
+          "at": 7187.219999999999,
+          "beat": "message",
+          "ms": 33.51999999999862
+        },
+        {
+          "at": 7254.799999999999,
+          "beat": "message",
+          "ms": 34.840000000000146
+        },
+        {
+          "at": 7790.360000000001,
+          "beat": "message",
+          "ms": 33.460000000000946
+        },
+        {
+          "at": 7913.780000000001,
+          "beat": "message",
+          "ms": 33.400000000001455
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "winter-ending",
+      "firstFrameMs": 22.019999999999982,
+      "landingMs": null,
+      "totalBusyMs": 1848.4,
+      "active": {
+        "frames": 125,
+        "p50": 16.340000000000146,
+        "p95": 17,
+        "max": 32.659999999999854,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 106,
+        "p50": 16.159999999999854,
+        "p95": 16.720000000000255,
+        "max": 17.300000000000182,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 22.019999999999982,
+          "beat": "gate"
+        },
+        {
+          "at": 294.3000000000002,
+          "beat": "resources"
+        },
+        {
+          "at": 1649.6,
+          "beat": "publish"
+        },
+        {
+          "at": 1848.4,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "firstFrameMs": 4.180000000000064,
+      "landingMs": 938.98,
+      "totalBusyMs": 4042.04,
+      "active": {
+        "frames": 265,
+        "p50": 16.360000000000127,
+        "p95": 24.079999999999927,
+        "max": 40.6400000000001,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 110,
+        "p50": 15.719999999999345,
+        "p95": 16.94000000000051,
+        "max": 24.5600000000004,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.180000000000064,
+          "beat": "lift"
+        },
+        {
+          "at": 761.0799999999999,
+          "beat": "land"
+        },
+        {
+          "at": 938.98,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 882.3600000000001,
+          "beat": "land",
+          "ms": 40.6400000000001
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "firstFrameMs": 9.799999999999955,
+      "landingMs": null,
+      "totalBusyMs": 6634.82,
+      "active": {
+        "frames": 351,
+        "p50": 16.359999999999673,
+        "p95": 41.30000000000018,
+        "max": 65.41999999999962,
+        "over33": 25
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 103,
+        "p50": 15.579999999999927,
+        "p95": 17.600000000000364,
+        "max": 41.659999999999854,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 9.799999999999955,
+          "beat": "endPress"
+        },
+        {
+          "at": 349.8800000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 915.6799999999998,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1960.7199999999998,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3153.8599999999997,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.54,
+          "beat": "impact"
+        },
+        {
+          "at": 4191.04,
+          "beat": "resources"
+        },
+        {
+          "at": 5539.84,
+          "beat": "sweep"
+        },
+        {
+          "at": 6159.54,
+          "beat": "date"
+        },
+        {
+          "at": 6427.84,
+          "beat": "publish"
+        },
+        {
+          "at": 6634.82,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 71.57999999999993,
+          "beat": "endPress",
+          "ms": 43.799999999999955
+        },
+        {
+          "at": 145.94000000000005,
+          "beat": "endPress",
+          "ms": 49.100000000000136
+        },
+        {
+          "at": 209.6199999999999,
+          "beat": "endPress",
+          "ms": 48.299999999999955
+        },
+        {
+          "at": 292.1600000000001,
+          "beat": "endPress",
+          "ms": 56.51999999999998
+        },
+        {
+          "at": 349.8800000000001,
+          "beat": "stamp",
+          "ms": 47.2800000000002
+        },
+        {
+          "at": 425.55999999999995,
+          "beat": "stamp",
+          "ms": 42.039999999999964
+        },
+        {
+          "at": 482.76,
+          "beat": "stamp",
+          "ms": 57.200000000000045
+        },
+        {
+          "at": 540.74,
+          "beat": "stamp",
+          "ms": 49.75999999999999
+        },
+        {
+          "at": 597.02,
+          "beat": "stamp",
+          "ms": 44.72000000000003
+        },
+        {
+          "at": 699.1600000000001,
+          "beat": "stamp",
+          "ms": 33.940000000000055
+        },
+        {
+          "at": 1324.2199999999998,
+          "beat": "scandalLift",
+          "ms": 40.69999999999982
+        },
+        {
+          "at": 1375.7399999999998,
+          "beat": "scandalLift",
+          "ms": 35.59999999999991
+        },
+        {
+          "at": 1641.12,
+          "beat": "scandalLift",
+          "ms": 40.38000000000011
+        },
+        {
+          "at": 2088.8,
+          "beat": "scandalFlip",
+          "ms": 37.70000000000027
+        },
+        {
+          "at": 2187.28,
+          "beat": "scandalFlip",
+          "ms": 49.58000000000038
+        },
+        {
+          "at": 2328.62,
+          "beat": "scandalFlip",
+          "ms": 42.07999999999993
+        },
+        {
+          "at": 2456.78,
+          "beat": "scandalFlip",
+          "ms": 37.24000000000024
+        },
+        {
+          "at": 2653.22,
+          "beat": "scandalFlip",
+          "ms": 65.41999999999962
+        },
+        {
+          "at": 2915.6800000000003,
+          "beat": "scandalFlip",
+          "ms": 41.48000000000047
+        },
+        {
+          "at": 3321.54,
+          "beat": "scandalCarry",
+          "ms": 33.61999999999989
+        },
+        {
+          "at": 3946.6000000000004,
+          "beat": "impact",
+          "ms": 55.98000000000047
+        },
+        {
+          "at": 4135.28,
+          "beat": "impact",
+          "ms": 59.23999999999978
+        },
+        {
+          "at": 4191.04,
+          "beat": "resources",
+          "ms": 41.30000000000018
+        },
+        {
+          "at": 6576.9,
+          "beat": "publish",
+          "ms": 41.42000000000007
+        },
+        {
+          "at": 6634.82,
+          "beat": "idle",
+          "ms": 57.92000000000007
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "firstFrameMs": 46.92000000000007,
+      "landingMs": null,
+      "totalBusyMs": 7247.6,
+      "active": {
+        "frames": 313,
+        "p50": 16.920000000000073,
+        "p95": 44.100000000000364,
+        "max": 81.55999999999949,
+        "over33": 44
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 103,
+        "p50": 15.8799999999992,
+        "p95": 16.980000000001382,
+        "max": 61.100000000000364,
+        "over33": 2
+      },
+      "beats": [
+        {
+          "at": 46.92000000000007,
+          "beat": "endPress"
+        },
+        {
+          "at": 351.7199999999998,
+          "beat": "stamp"
+        },
+        {
+          "at": 922.52,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1960.6399999999999,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3169.26,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3792.0600000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 3816.46,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4448.6,
+          "beat": "impact"
+        },
+        {
+          "at": 4855.38,
+          "beat": "resources"
+        },
+        {
+          "at": 6197.24,
+          "beat": "sweep"
+        },
+        {
+          "at": 7057.82,
+          "beat": "publish"
+        },
+        {
+          "at": 7247.6,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 113.80000000000018,
+          "beat": "endPress",
+          "ms": 50.30000000000018
+        },
+        {
+          "at": 163.69999999999982,
+          "beat": "endPress",
+          "ms": 49.899999999999636
+        },
+        {
+          "at": 205.80000000000018,
+          "beat": "endPress",
+          "ms": 42.100000000000364
+        },
+        {
+          "at": 248.03999999999996,
+          "beat": "endPress",
+          "ms": 42.23999999999978
+        },
+        {
+          "at": 304.5,
+          "beat": "endPress",
+          "ms": 56.460000000000036
+        },
+        {
+          "at": 351.7199999999998,
+          "beat": "stamp",
+          "ms": 38.48000000000002
+        },
+        {
+          "at": 529.1599999999999,
+          "beat": "stamp",
+          "ms": 48.179999999999836
+        },
+        {
+          "at": 651.46,
+          "beat": "stamp",
+          "ms": 40.61999999999989
+        },
+        {
+          "at": 735.06,
+          "beat": "stamp",
+          "ms": 34.42000000000007
+        },
+        {
+          "at": 889.8000000000002,
+          "beat": "stamp",
+          "ms": 37.5
+        },
+        {
+          "at": 996.2399999999998,
+          "beat": "scandalLift",
+          "ms": 39.23999999999978
+        },
+        {
+          "at": 1046.6799999999998,
+          "beat": "scandalLift",
+          "ms": 34.279999999999745
+        },
+        {
+          "at": 1248.54,
+          "beat": "scandalLift",
+          "ms": 65.01999999999998
+        },
+        {
+          "at": 1387.12,
+          "beat": "scandalLift",
+          "ms": 40.779999999999745
+        },
+        {
+          "at": 1436.98,
+          "beat": "scandalLift",
+          "ms": 49.86000000000013
+        },
+        {
+          "at": 1492.3200000000002,
+          "beat": "scandalLift",
+          "ms": 44.24000000000024
+        },
+        {
+          "at": 2083.46,
+          "beat": "scandalFlip",
+          "ms": 33.51999999999998
+        },
+        {
+          "at": 2447.2,
+          "beat": "scandalFlip",
+          "ms": 33.88000000000011
+        },
+        {
+          "at": 2749.08,
+          "beat": "scandalFlip",
+          "ms": 35.19999999999982
+        },
+        {
+          "at": 2852.26,
+          "beat": "scandalFlip",
+          "ms": 40.61999999999989
+        },
+        {
+          "at": 3296.84,
+          "beat": "scandalCarry",
+          "ms": 55.5
+        },
+        {
+          "at": 3385.76,
+          "beat": "scandalCarry",
+          "ms": 41.600000000000364
+        },
+        {
+          "at": 3426.38,
+          "beat": "scandalCarry",
+          "ms": 40.61999999999989
+        },
+        {
+          "at": 3482.8199999999997,
+          "beat": "scandalCarry",
+          "ms": 48
+        },
+        {
+          "at": 3549.66,
+          "beat": "scandalCarry",
+          "ms": 33.4399999999996
+        },
+        {
+          "at": 3596.2200000000003,
+          "beat": "scandalCarry",
+          "ms": 46.5600000000004
+        },
+        {
+          "at": 3718.58,
+          "beat": "scandalCarry",
+          "ms": 40.539999999999964
+        },
+        {
+          "at": 3872.1000000000004,
+          "beat": "scandalCarry",
+          "ms": 40.14000000000033
+        },
+        {
+          "at": 3936.6400000000003,
+          "beat": "scandalCarry",
+          "ms": 37.48000000000047
+        },
+        {
+          "at": 4038.9399999999996,
+          "beat": "scandalCarry",
+          "ms": 43.35999999999967
+        },
+        {
+          "at": 4093.38,
+          "beat": "scandalCarry",
+          "ms": 54.44000000000051
+        },
+        {
+          "at": 4156.5,
+          "beat": "scandalCarry",
+          "ms": 51.61999999999989
+        },
+        {
+          "at": 4489.12,
+          "beat": "impact",
+          "ms": 40.51999999999953
+        },
+        {
+          "at": 4678.02,
+          "beat": "impact",
+          "ms": 49.54000000000087
+        },
+        {
+          "at": 4775.4,
+          "beat": "impact",
+          "ms": 81.55999999999949
+        },
+        {
+          "at": 5433.56,
+          "beat": "resources",
+          "ms": 39.68000000000029
+        },
+        {
+          "at": 5541.82,
+          "beat": "resources",
+          "ms": 39.13999999999942
+        },
+        {
+          "at": 6071.92,
+          "beat": "resources",
+          "ms": 33.92000000000007
+        },
+        {
+          "at": 6294.639999999999,
+          "beat": "sweep",
+          "ms": 37.8799999999992
+        },
+        {
+          "at": 6396.42,
+          "beat": "sweep",
+          "ms": 35.600000000000364
+        },
+        {
+          "at": 6556.18,
+          "beat": "sweep",
+          "ms": 33.52000000000044
+        },
+        {
+          "at": 7102.379999999999,
+          "beat": "publish",
+          "ms": 34.47999999999956
+        },
+        {
+          "at": 7176.42,
+          "beat": "publish",
+          "ms": 62.73999999999978
+        },
+        {
+          "at": 7236.5599999999995,
+          "beat": "publish",
+          "ms": 44.100000000000364
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "loud",
+      "firstFrameMs": 69,
+      "landingMs": 992,
+      "totalBusyMs": 2116,
+      "active": {
+        "frames": 23,
+        "p50": 87,
+        "p95": 100,
+        "max": 114,
+        "over33": 23
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 16,
+        "p50": 94,
+        "p95": 112,
+        "max": 112,
+        "over33": 16
+      },
+      "beats": [
+        {
+          "at": 69,
+          "beat": "lift"
+        },
+        {
+          "at": 804,
+          "beat": "land"
+        },
+        {
+          "at": 992,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 183,
+          "beat": "lift",
+          "ms": 114
+        },
+        {
+          "at": 275,
+          "beat": "lift",
+          "ms": 92
+        },
+        {
+          "at": 369,
+          "beat": "lift",
+          "ms": 94
+        },
+        {
+          "at": 454,
+          "beat": "lift",
+          "ms": 85
+        },
+        {
+          "at": 542,
+          "beat": "lift",
+          "ms": 88
+        },
+        {
+          "at": 627,
+          "beat": "lift",
+          "ms": 85
+        },
+        {
+          "at": 714,
+          "beat": "lift",
+          "ms": 87
+        },
+        {
+          "at": 804,
+          "beat": "land",
+          "ms": 90
+        },
+        {
+          "at": 898,
+          "beat": "land",
+          "ms": 94
+        },
+        {
+          "at": 992,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 1076,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1158,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 1241,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 1326,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1410,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1496,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1578,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 1659,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 1741,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 1835,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 1928,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 2016,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 2116,
+          "beat": "idle",
+          "ms": 100
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet",
+      "firstFrameMs": 76,
+      "landingMs": 951,
+      "totalBusyMs": 3296,
+      "active": {
+        "frames": 36,
+        "p50": 88,
+        "p95": 107,
+        "max": 124,
+        "over33": 36
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 108,
+        "p95": 134,
+        "max": 134,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 76,
+          "beat": "lift"
+        },
+        {
+          "at": 753,
+          "beat": "land"
+        },
+        {
+          "at": 951,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 200,
+          "beat": "lift",
+          "ms": 124
+        },
+        {
+          "at": 290,
+          "beat": "lift",
+          "ms": 90
+        },
+        {
+          "at": 383,
+          "beat": "lift",
+          "ms": 93
+        },
+        {
+          "at": 471,
+          "beat": "lift",
+          "ms": 88
+        },
+        {
+          "at": 563,
+          "beat": "lift",
+          "ms": 92
+        },
+        {
+          "at": 652,
+          "beat": "lift",
+          "ms": 89
+        },
+        {
+          "at": 753,
+          "beat": "land",
+          "ms": 101
+        },
+        {
+          "at": 844,
+          "beat": "land",
+          "ms": 91
+        },
+        {
+          "at": 951,
+          "beat": "idle",
+          "ms": 107
+        },
+        {
+          "at": 1038,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1127,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 1215,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 1310,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 1396,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1480,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1564,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1644,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 1731,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1817,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1898,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 1983,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 2067,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 2154,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 2248,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 2333,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 2415,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 2499,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 2582,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2661,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 2749,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 2842,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 2935,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 3029,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 3122,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 3204,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 3296,
+          "beat": "idle",
+          "ms": 92
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "calm-end",
+      "firstFrameMs": 15,
+      "landingMs": null,
+      "totalBusyMs": 3531,
+      "active": {
+        "frames": 49,
+        "p50": 70,
+        "p95": 84,
+        "max": 96,
+        "over33": 49
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 17,
+        "p50": 94,
+        "p95": 96,
+        "max": 96,
+        "over33": 17
+      },
+      "beats": [
+        {
+          "at": 15,
+          "beat": "endPress"
+        },
+        {
+          "at": 350,
+          "beat": "stamp"
+        },
+        {
+          "at": 925,
+          "beat": "sweep"
+        },
+        {
+          "at": 1553,
+          "beat": "date"
+        },
+        {
+          "at": 1853,
+          "beat": "publish"
+        },
+        {
+          "at": 2286,
+          "beat": "message"
+        },
+        {
+          "at": 3531,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 99,
+          "beat": "endPress",
+          "ms": 84
+        },
+        {
+          "at": 179,
+          "beat": "endPress",
+          "ms": 80
+        },
+        {
+          "at": 271,
+          "beat": "endPress",
+          "ms": 92
+        },
+        {
+          "at": 350,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 425,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 495,
+          "beat": "stamp",
+          "ms": 70
+        },
+        {
+          "at": 566,
+          "beat": "stamp",
+          "ms": 71
+        },
+        {
+          "at": 646,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 717,
+          "beat": "stamp",
+          "ms": 71
+        },
+        {
+          "at": 785,
+          "beat": "stamp",
+          "ms": 68
+        },
+        {
+          "at": 852,
+          "beat": "stamp",
+          "ms": 67
+        },
+        {
+          "at": 925,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 995,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 1063,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1131,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1207,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 1275,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1342,
+          "beat": "sweep",
+          "ms": 67
+        },
+        {
+          "at": 1410,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1479,
+          "beat": "sweep",
+          "ms": 69
+        },
+        {
+          "at": 1553,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 1618,
+          "beat": "date",
+          "ms": 65
+        },
+        {
+          "at": 1686,
+          "beat": "date",
+          "ms": 68
+        },
+        {
+          "at": 1757,
+          "beat": "date",
+          "ms": 71
+        },
+        {
+          "at": 1853,
+          "beat": "publish",
+          "ms": 96
+        },
+        {
+          "at": 1933,
+          "beat": "publish",
+          "ms": 80
+        },
+        {
+          "at": 2000,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 2068,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 2137,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 2210,
+          "beat": "publish",
+          "ms": 73
+        },
+        {
+          "at": 2286,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 2356,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 2424,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 2491,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 2560,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 2632,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 2698,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 2765,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 2837,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 2904,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 2978,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 3045,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 3113,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 3186,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 3256,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 3321,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 3388,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 3455,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 3531,
+          "beat": "idle",
+          "ms": 76
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "frenzy-end",
+      "firstFrameMs": 129,
+      "landingMs": null,
+      "totalBusyMs": 10688,
+      "active": {
+        "frames": 132,
+        "p50": 79,
+        "p95": 97,
+        "max": 117,
+        "over33": 132
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 89,
+        "p95": 99,
+        "max": 99,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 129,
+          "beat": "endPress"
+        },
+        {
+          "at": 374,
+          "beat": "stamp"
+        },
+        {
+          "at": 914,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2012,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3213,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3793,
+          "beat": "impact"
+        },
+        {
+          "at": 3878,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4504,
+          "beat": "impact"
+        },
+        {
+          "at": 4902,
+          "beat": "resources"
+        },
+        {
+          "at": 6198,
+          "beat": "sweep"
+        },
+        {
+          "at": 7066,
+          "beat": "date"
+        },
+        {
+          "at": 7406,
+          "beat": "publish"
+        },
+        {
+          "at": 7807,
+          "beat": "message"
+        },
+        {
+          "at": 10688,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 213,
+          "beat": "endPress",
+          "ms": 84
+        },
+        {
+          "at": 291,
+          "beat": "endPress",
+          "ms": 78
+        },
+        {
+          "at": 374,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 452,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 533,
+          "beat": "stamp",
+          "ms": 81
+        },
+        {
+          "at": 609,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 683,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 760,
+          "beat": "stamp",
+          "ms": 77
+        },
+        {
+          "at": 833,
+          "beat": "stamp",
+          "ms": 73
+        },
+        {
+          "at": 914,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 997,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1076,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 1163,
+          "beat": "scandalLift",
+          "ms": 87
+        },
+        {
+          "at": 1251,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1333,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1416,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1499,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1588,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 1674,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1758,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1841,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1925,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 2012,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2095,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 2186,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2270,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 2361,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2446,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 2550,
+          "beat": "scandalFlip",
+          "ms": 104
+        },
+        {
+          "at": 2659,
+          "beat": "scandalFlip",
+          "ms": 109
+        },
+        {
+          "at": 2755,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 2841,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 2926,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 3022,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 3117,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 3213,
+          "beat": "scandalCarry",
+          "ms": 96
+        },
+        {
+          "at": 3316,
+          "beat": "scandalCarry",
+          "ms": 103
+        },
+        {
+          "at": 3399,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 3496,
+          "beat": "scandalCarry",
+          "ms": 97
+        },
+        {
+          "at": 3604,
+          "beat": "scandalCarry",
+          "ms": 108
+        },
+        {
+          "at": 3698,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3793,
+          "beat": "impact",
+          "ms": 95
+        },
+        {
+          "at": 3878,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 3968,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 4059,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 4165,
+          "beat": "scandalCarry",
+          "ms": 106
+        },
+        {
+          "at": 4250,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 4337,
+          "beat": "scandalCarry",
+          "ms": 87
+        },
+        {
+          "at": 4417,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 4504,
+          "beat": "impact",
+          "ms": 87
+        },
+        {
+          "at": 4587,
+          "beat": "impact",
+          "ms": 83
+        },
+        {
+          "at": 4669,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 4746,
+          "beat": "impact",
+          "ms": 77
+        },
+        {
+          "at": 4825,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 4902,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 4984,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5074,
+          "beat": "resources",
+          "ms": 90
+        },
+        {
+          "at": 5154,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 5246,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 5325,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5405,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 5487,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5566,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5644,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 5723,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5799,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5875,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5959,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 6038,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 6115,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 6198,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6280,
+          "beat": "sweep",
+          "ms": 82
+        },
+        {
+          "at": 6359,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6437,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6513,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6592,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6670,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6745,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 6821,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6906,
+          "beat": "sweep",
+          "ms": 85
+        },
+        {
+          "at": 6983,
+          "beat": "sweep",
+          "ms": 77
+        },
+        {
+          "at": 7066,
+          "beat": "date",
+          "ms": 83
+        },
+        {
+          "at": 7142,
+          "beat": "date",
+          "ms": 76
+        },
+        {
+          "at": 7215,
+          "beat": "date",
+          "ms": 73
+        },
+        {
+          "at": 7289,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 7406,
+          "beat": "publish",
+          "ms": 117
+        },
+        {
+          "at": 7494,
+          "beat": "publish",
+          "ms": 88
+        },
+        {
+          "at": 7568,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 7649,
+          "beat": "publish",
+          "ms": 81
+        },
+        {
+          "at": 7723,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 7807,
+          "beat": "message",
+          "ms": 84
+        },
+        {
+          "at": 7888,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 7965,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 8032,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 8103,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 8172,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 8239,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 8308,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 8376,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8443,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 8509,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 8583,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 8651,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8724,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 8790,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 8867,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 8934,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 8999,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 9064,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 9135,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 9205,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 9272,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 9345,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9424,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 9494,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 9564,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 9632,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9700,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9772,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 9838,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 9906,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9977,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10042,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 10119,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 10191,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 10260,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 10332,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 10400,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 10470,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 10537,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 10607,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 10688,
+          "beat": "idle",
+          "ms": 81
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "copycat-end",
+      "firstFrameMs": 14,
+      "landingMs": null,
+      "totalBusyMs": 11321,
+      "active": {
+        "frames": 136,
+        "p50": 81,
+        "p95": 99,
+        "max": 123,
+        "over33": 136
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 19,
+        "p50": 80,
+        "p95": 94,
+        "max": 94,
+        "over33": 19
+      },
+      "beats": [
+        {
+          "at": 14,
+          "beat": "endPress"
+        },
+        {
+          "at": 391,
+          "beat": "stamp"
+        },
+        {
+          "at": 948,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2007,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3218,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3853,
+          "beat": "impact"
+        },
+        {
+          "at": 4194,
+          "beat": "resources"
+        },
+        {
+          "at": 5579,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6667,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7812,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8447,
+          "beat": "impact"
+        },
+        {
+          "at": 8864,
+          "beat": "resources"
+        },
+        {
+          "at": 10227,
+          "beat": "sweep"
+        },
+        {
+          "at": 11143,
+          "beat": "publish"
+        },
+        {
+          "at": 11321,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 137,
+          "beat": "endPress",
+          "ms": 123
+        },
+        {
+          "at": 232,
+          "beat": "endPress",
+          "ms": 95
+        },
+        {
+          "at": 313,
+          "beat": "endPress",
+          "ms": 81
+        },
+        {
+          "at": 391,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 475,
+          "beat": "stamp",
+          "ms": 84
+        },
+        {
+          "at": 551,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 626,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 710,
+          "beat": "stamp",
+          "ms": 84
+        },
+        {
+          "at": 792,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 867,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 948,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 1034,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1111,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1187,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1279,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1360,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 1452,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1534,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1612,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1692,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1770,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1855,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1931,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 2007,
+          "beat": "scandalFlip",
+          "ms": 76
+        },
+        {
+          "at": 2086,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2167,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2248,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2334,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 2419,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 2510,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2588,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 2672,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 2753,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2830,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 2909,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2988,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 3065,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 3141,
+          "beat": "scandalFlip",
+          "ms": 76
+        },
+        {
+          "at": 3218,
+          "beat": "scandalCarry",
+          "ms": 77
+        },
+        {
+          "at": 3306,
+          "beat": "scandalCarry",
+          "ms": 88
+        },
+        {
+          "at": 3386,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3465,
+          "beat": "scandalCarry",
+          "ms": 79
+        },
+        {
+          "at": 3541,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3622,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 3698,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3776,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 3853,
+          "beat": "impact",
+          "ms": 77
+        },
+        {
+          "at": 3938,
+          "beat": "impact",
+          "ms": 85
+        },
+        {
+          "at": 4026,
+          "beat": "impact",
+          "ms": 88
+        },
+        {
+          "at": 4110,
+          "beat": "impact",
+          "ms": 84
+        },
+        {
+          "at": 4194,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 4285,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 4365,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 4445,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 4521,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 4594,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 4677,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 4759,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 4846,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 4922,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5012,
+          "beat": "resources",
+          "ms": 90
+        },
+        {
+          "at": 5087,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5172,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5264,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 5345,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5424,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5501,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5579,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 5662,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 5739,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 5820,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 5908,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 5997,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 6101,
+          "beat": "scandalLift",
+          "ms": 104
+        },
+        {
+          "at": 6179,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 6257,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 6336,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 6413,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 6492,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 6572,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 6667,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 6746,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 6825,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 6912,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 6995,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 7092,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 7179,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 7263,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 7346,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 7434,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 7515,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 7611,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 7703,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 7812,
+          "beat": "scandalCarry",
+          "ms": 109
+        },
+        {
+          "at": 7931,
+          "beat": "scandalCarry",
+          "ms": 119
+        },
+        {
+          "at": 8030,
+          "beat": "scandalCarry",
+          "ms": 99
+        },
+        {
+          "at": 8114,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 8194,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 8277,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 8361,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 8447,
+          "beat": "impact",
+          "ms": 86
+        },
+        {
+          "at": 8543,
+          "beat": "impact",
+          "ms": 96
+        },
+        {
+          "at": 8659,
+          "beat": "impact",
+          "ms": 116
+        },
+        {
+          "at": 8775,
+          "beat": "impact",
+          "ms": 116
+        },
+        {
+          "at": 8864,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 8950,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 9037,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 9117,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 9192,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 9276,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 9355,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 9437,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 9522,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9600,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 9677,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 9758,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 9835,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 9910,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 9988,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 10064,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 10150,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 10227,
+          "beat": "sweep",
+          "ms": 77
+        },
+        {
+          "at": 10307,
+          "beat": "sweep",
+          "ms": 80
+        },
+        {
+          "at": 10382,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 10463,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 10542,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 10618,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 10693,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 10767,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 10841,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 10915,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 10991,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 11064,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 11143,
+          "beat": "publish",
+          "ms": 79
+        },
+        {
+          "at": 11227,
+          "beat": "publish",
+          "ms": 84
+        },
+        {
+          "at": 11321,
+          "beat": "idle",
+          "ms": 94
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "season",
+      "firstFrameMs": 1,
+      "landingMs": null,
+      "totalBusyMs": 8061,
+      "active": {
+        "frames": 115,
+        "p50": 68,
+        "p95": 83,
+        "max": 109,
+        "over33": 115
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 93,
+        "p95": 96,
+        "max": 96,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 1,
+          "beat": "idle"
+        },
+        {
+          "at": 110,
+          "beat": "gate"
+        },
+        {
+          "at": 270,
+          "beat": "resources"
+        },
+        {
+          "at": 1620,
+          "beat": "date"
+        },
+        {
+          "at": 1919,
+          "beat": "season"
+        },
+        {
+          "at": 2658,
+          "beat": "publish"
+        },
+        {
+          "at": 4907,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5175,
+          "beat": "message"
+        },
+        {
+          "at": 8061,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 110,
+          "beat": "gate",
+          "ms": 109
+        },
+        {
+          "at": 192,
+          "beat": "gate",
+          "ms": 82
+        },
+        {
+          "at": 270,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 353,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 439,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 523,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 588,
+          "beat": "resources",
+          "ms": 65
+        },
+        {
+          "at": 653,
+          "beat": "resources",
+          "ms": 65
+        },
+        {
+          "at": 721,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 787,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 854,
+          "beat": "resources",
+          "ms": 67
+        },
+        {
+          "at": 920,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 984,
+          "beat": "resources",
+          "ms": 64
+        },
+        {
+          "at": 1052,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1120,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1197,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 1265,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1334,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 1398,
+          "beat": "resources",
+          "ms": 64
+        },
+        {
+          "at": 1480,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 1550,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 1620,
+          "beat": "date",
+          "ms": 70
+        },
+        {
+          "at": 1686,
+          "beat": "date",
+          "ms": 66
+        },
+        {
+          "at": 1761,
+          "beat": "date",
+          "ms": 75
+        },
+        {
+          "at": 1840,
+          "beat": "date",
+          "ms": 79
+        },
+        {
+          "at": 1919,
+          "beat": "season",
+          "ms": 79
+        },
+        {
+          "at": 1992,
+          "beat": "season",
+          "ms": 73
+        },
+        {
+          "at": 2059,
+          "beat": "season",
+          "ms": 67
+        },
+        {
+          "at": 2125,
+          "beat": "season",
+          "ms": 66
+        },
+        {
+          "at": 2204,
+          "beat": "season",
+          "ms": 79
+        },
+        {
+          "at": 2273,
+          "beat": "season",
+          "ms": 69
+        },
+        {
+          "at": 2341,
+          "beat": "season",
+          "ms": 68
+        },
+        {
+          "at": 2407,
+          "beat": "season",
+          "ms": 66
+        },
+        {
+          "at": 2474,
+          "beat": "season",
+          "ms": 67
+        },
+        {
+          "at": 2554,
+          "beat": "season",
+          "ms": 80
+        },
+        {
+          "at": 2658,
+          "beat": "publish",
+          "ms": 104
+        },
+        {
+          "at": 2745,
+          "beat": "publish",
+          "ms": 87
+        },
+        {
+          "at": 2813,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 2883,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 2951,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 3025,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3093,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 3160,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 3226,
+          "beat": "publish",
+          "ms": 66
+        },
+        {
+          "at": 3309,
+          "beat": "publish",
+          "ms": 83
+        },
+        {
+          "at": 3380,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 3450,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 3516,
+          "beat": "publish",
+          "ms": 66
+        },
+        {
+          "at": 3581,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 3649,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 3712,
+          "beat": "publish",
+          "ms": 63
+        },
+        {
+          "at": 3777,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 3844,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 3909,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 3974,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 4038,
+          "beat": "publish",
+          "ms": 64
+        },
+        {
+          "at": 4103,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 4168,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 4232,
+          "beat": "publish",
+          "ms": 64
+        },
+        {
+          "at": 4295,
+          "beat": "publish",
+          "ms": 63
+        },
+        {
+          "at": 4362,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 4427,
+          "beat": "publish",
+          "ms": 65
+        },
+        {
+          "at": 4496,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 4563,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 4639,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 4705,
+          "beat": "publish",
+          "ms": 66
+        },
+        {
+          "at": 4772,
+          "beat": "publish",
+          "ms": 67
+        },
+        {
+          "at": 4835,
+          "beat": "publish",
+          "ms": 63
+        },
+        {
+          "at": 4907,
+          "beat": "seasonEnd",
+          "ms": 72
+        },
+        {
+          "at": 4970,
+          "beat": "seasonEnd",
+          "ms": 63
+        },
+        {
+          "at": 5034,
+          "beat": "seasonEnd",
+          "ms": 64
+        },
+        {
+          "at": 5098,
+          "beat": "seasonEnd",
+          "ms": 64
+        },
+        {
+          "at": 5175,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 5248,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 5314,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 5383,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 5447,
+          "beat": "message",
+          "ms": 64
+        },
+        {
+          "at": 5511,
+          "beat": "message",
+          "ms": 64
+        },
+        {
+          "at": 5576,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 5641,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 5708,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 5774,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 5841,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 5906,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 5983,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 6051,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 6116,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 6183,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 6247,
+          "beat": "message",
+          "ms": 64
+        },
+        {
+          "at": 6313,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 6382,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 6446,
+          "beat": "message",
+          "ms": 64
+        },
+        {
+          "at": 6522,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 6588,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 6654,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 6721,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 6793,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 6860,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 6928,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 6997,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 7066,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 7132,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 7198,
+          "beat": "message",
+          "ms": 66
+        },
+        {
+          "at": 7263,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 7332,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 7411,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 7476,
+          "beat": "message",
+          "ms": 65
+        },
+        {
+          "at": 7550,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 7633,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 7703,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 7772,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 7840,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 7917,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 7985,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8061,
+          "beat": "idle",
+          "ms": 76
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "winter-ending",
+      "firstFrameMs": 16,
+      "landingMs": null,
+      "totalBusyMs": 1840,
+      "active": {
+        "frames": 34,
+        "p50": 68,
+        "p95": 82,
+        "max": 96,
+        "over33": 23
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 93,
+        "p50": 15,
+        "p95": 29,
+        "max": 30,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 16,
+          "beat": "gate"
+        },
+        {
+          "at": 317,
+          "beat": "resources"
+        },
+        {
+          "at": 1653,
+          "beat": "publish"
+        },
+        {
+          "at": 1840,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 112,
+          "beat": "gate",
+          "ms": 96
+        },
+        {
+          "at": 181,
+          "beat": "gate",
+          "ms": 69
+        },
+        {
+          "at": 246,
+          "beat": "gate",
+          "ms": 65
+        },
+        {
+          "at": 317,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 397,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 469,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 538,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 608,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 677,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 745,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 811,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 878,
+          "beat": "resources",
+          "ms": 67
+        },
+        {
+          "at": 960,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 1031,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1099,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1167,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1237,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 1303,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 1369,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 1437,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1505,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1574,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 1653,
+          "beat": "publish",
+          "ms": 79
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "firstFrameMs": 107,
+      "landingMs": 1003,
+      "totalBusyMs": 4049,
+      "active": {
+        "frames": 47,
+        "p50": 79,
+        "p95": 111,
+        "max": 161,
+        "over33": 47
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 17,
+        "p50": 93,
+        "p95": 96,
+        "max": 96,
+        "over33": 17
+      },
+      "beats": [
+        {
+          "at": 107,
+          "beat": "lift"
+        },
+        {
+          "at": 764,
+          "beat": "land"
+        },
+        {
+          "at": 1003,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 268,
+          "beat": "lift",
+          "ms": 161
+        },
+        {
+          "at": 352,
+          "beat": "lift",
+          "ms": 84
+        },
+        {
+          "at": 436,
+          "beat": "lift",
+          "ms": 84
+        },
+        {
+          "at": 519,
+          "beat": "lift",
+          "ms": 83
+        },
+        {
+          "at": 596,
+          "beat": "lift",
+          "ms": 77
+        },
+        {
+          "at": 676,
+          "beat": "lift",
+          "ms": 80
+        },
+        {
+          "at": 764,
+          "beat": "land",
+          "ms": 88
+        },
+        {
+          "at": 848,
+          "beat": "land",
+          "ms": 84
+        },
+        {
+          "at": 923,
+          "beat": "land",
+          "ms": 75
+        },
+        {
+          "at": 1003,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 1085,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 1161,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 1239,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 1317,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 1396,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 1472,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 1564,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1643,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 1719,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 1795,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 1868,
+          "beat": "idle",
+          "ms": 73
+        },
+        {
+          "at": 1943,
+          "beat": "idle",
+          "ms": 75
+        },
+        {
+          "at": 2019,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 2094,
+          "beat": "idle",
+          "ms": 75
+        },
+        {
+          "at": 2175,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 2256,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 2332,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 2410,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 2484,
+          "beat": "idle",
+          "ms": 74
+        },
+        {
+          "at": 2562,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 2643,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 2720,
+          "beat": "idle",
+          "ms": 77
+        },
+        {
+          "at": 2799,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 2893,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 2998,
+          "beat": "idle",
+          "ms": 105
+        },
+        {
+          "at": 3115,
+          "beat": "idle",
+          "ms": 117
+        },
+        {
+          "at": 3204,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 3281,
+          "beat": "idle",
+          "ms": 77
+        },
+        {
+          "at": 3357,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 3431,
+          "beat": "idle",
+          "ms": 74
+        },
+        {
+          "at": 3516,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 3609,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 3720,
+          "beat": "idle",
+          "ms": 111
+        },
+        {
+          "at": 3813,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 3894,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 3970,
+          "beat": "idle",
+          "ms": 76
+        },
+        {
+          "at": 4049,
+          "beat": "idle",
+          "ms": 79
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "firstFrameMs": 168,
+      "landingMs": null,
+      "totalBusyMs": 6647,
+      "active": {
+        "frames": 87,
+        "p50": 72,
+        "p95": 84,
+        "max": 136,
+        "over33": 87
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 89,
+        "p95": 110,
+        "max": 110,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 168,
+          "beat": "endPress"
+        },
+        {
+          "at": 342,
+          "beat": "stamp"
+        },
+        {
+          "at": 923,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1986,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3177,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3794,
+          "beat": "impact"
+        },
+        {
+          "at": 4237,
+          "beat": "resources"
+        },
+        {
+          "at": 5573,
+          "beat": "sweep"
+        },
+        {
+          "at": 6210,
+          "beat": "date"
+        },
+        {
+          "at": 6478,
+          "beat": "publish"
+        },
+        {
+          "at": 6647,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 266,
+          "beat": "endPress",
+          "ms": 98
+        },
+        {
+          "at": 342,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 417,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 488,
+          "beat": "stamp",
+          "ms": 71
+        },
+        {
+          "at": 558,
+          "beat": "stamp",
+          "ms": 70
+        },
+        {
+          "at": 637,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 708,
+          "beat": "stamp",
+          "ms": 71
+        },
+        {
+          "at": 778,
+          "beat": "stamp",
+          "ms": 70
+        },
+        {
+          "at": 844,
+          "beat": "stamp",
+          "ms": 66
+        },
+        {
+          "at": 923,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 999,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1075,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1150,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1232,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1305,
+          "beat": "scandalLift",
+          "ms": 73
+        },
+        {
+          "at": 1387,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1459,
+          "beat": "scandalLift",
+          "ms": 72
+        },
+        {
+          "at": 1543,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1622,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 1690,
+          "beat": "scandalLift",
+          "ms": 68
+        },
+        {
+          "at": 1763,
+          "beat": "scandalLift",
+          "ms": 73
+        },
+        {
+          "at": 1832,
+          "beat": "scandalLift",
+          "ms": 69
+        },
+        {
+          "at": 1905,
+          "beat": "scandalLift",
+          "ms": 73
+        },
+        {
+          "at": 1986,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2059,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 2141,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2211,
+          "beat": "scandalFlip",
+          "ms": 70
+        },
+        {
+          "at": 2283,
+          "beat": "scandalFlip",
+          "ms": 72
+        },
+        {
+          "at": 2354,
+          "beat": "scandalFlip",
+          "ms": 71
+        },
+        {
+          "at": 2426,
+          "beat": "scandalFlip",
+          "ms": 72
+        },
+        {
+          "at": 2497,
+          "beat": "scandalFlip",
+          "ms": 71
+        },
+        {
+          "at": 2577,
+          "beat": "scandalFlip",
+          "ms": 80
+        },
+        {
+          "at": 2651,
+          "beat": "scandalFlip",
+          "ms": 74
+        },
+        {
+          "at": 2724,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 2798,
+          "beat": "scandalFlip",
+          "ms": 74
+        },
+        {
+          "at": 2870,
+          "beat": "scandalFlip",
+          "ms": 72
+        },
+        {
+          "at": 2943,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 3016,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 3096,
+          "beat": "scandalFlip",
+          "ms": 80
+        },
+        {
+          "at": 3177,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 3250,
+          "beat": "scandalCarry",
+          "ms": 73
+        },
+        {
+          "at": 3322,
+          "beat": "scandalCarry",
+          "ms": 72
+        },
+        {
+          "at": 3397,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 3469,
+          "beat": "scandalCarry",
+          "ms": 72
+        },
+        {
+          "at": 3541,
+          "beat": "scandalCarry",
+          "ms": 72
+        },
+        {
+          "at": 3637,
+          "beat": "scandalCarry",
+          "ms": 96
+        },
+        {
+          "at": 3715,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 3794,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 3866,
+          "beat": "impact",
+          "ms": 72
+        },
+        {
+          "at": 3937,
+          "beat": "impact",
+          "ms": 71
+        },
+        {
+          "at": 4012,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4093,
+          "beat": "impact",
+          "ms": 81
+        },
+        {
+          "at": 4168,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4237,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 4308,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 4379,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 4448,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 4521,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 4599,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4668,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 4739,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 4808,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 4876,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 4945,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 5014,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 5082,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 5153,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 5229,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5298,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 5367,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 5435,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 5501,
+          "beat": "resources",
+          "ms": 66
+        },
+        {
+          "at": 5573,
+          "beat": "sweep",
+          "ms": 72
+        },
+        {
+          "at": 5643,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 5713,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 5781,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 5854,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 5921,
+          "beat": "sweep",
+          "ms": 67
+        },
+        {
+          "at": 5996,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 6066,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 6137,
+          "beat": "sweep",
+          "ms": 71
+        },
+        {
+          "at": 6210,
+          "beat": "date",
+          "ms": 73
+        },
+        {
+          "at": 6276,
+          "beat": "date",
+          "ms": 66
+        },
+        {
+          "at": 6342,
+          "beat": "date",
+          "ms": 66
+        },
+        {
+          "at": 6478,
+          "beat": "publish",
+          "ms": 136
+        },
+        {
+          "at": 6582,
+          "beat": "publish",
+          "ms": 104
+        },
+        {
+          "at": 6647,
+          "beat": "idle",
+          "ms": 65
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "firstFrameMs": 124,
+      "landingMs": null,
+      "totalBusyMs": 7262,
+      "active": {
+        "frames": 87,
+        "p50": 81,
+        "p95": 94,
+        "max": 117,
+        "over33": 87
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 19,
+        "p50": 78,
+        "p95": 91,
+        "max": 91,
+        "over33": 19
+      },
+      "beats": [
+        {
+          "at": 124,
+          "beat": "endPress"
+        },
+        {
+          "at": 405,
+          "beat": "stamp"
+        },
+        {
+          "at": 962,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2030,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3229,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4486,
+          "beat": "impact"
+        },
+        {
+          "at": 4901,
+          "beat": "resources"
+        },
+        {
+          "at": 6238,
+          "beat": "sweep"
+        },
+        {
+          "at": 7079,
+          "beat": "publish"
+        },
+        {
+          "at": 7262,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 241,
+          "beat": "endPress",
+          "ms": 117
+        },
+        {
+          "at": 329,
+          "beat": "endPress",
+          "ms": 88
+        },
+        {
+          "at": 405,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 480,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 559,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 647,
+          "beat": "stamp",
+          "ms": 88
+        },
+        {
+          "at": 725,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 798,
+          "beat": "stamp",
+          "ms": 73
+        },
+        {
+          "at": 873,
+          "beat": "stamp",
+          "ms": 75
+        },
+        {
+          "at": 962,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 1048,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1130,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1213,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1295,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1373,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1451,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1531,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1612,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 1696,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1780,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1862,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1941,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 2030,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2124,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2219,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 2300,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2385,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 2471,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 2553,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2643,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 2726,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 2811,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 2892,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2977,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 3060,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 3144,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 3229,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 3316,
+          "beat": "scandalCarry",
+          "ms": 87
+        },
+        {
+          "at": 3400,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 3484,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 3566,
+          "beat": "scandalCarry",
+          "ms": 82
+        },
+        {
+          "at": 3654,
+          "beat": "scandalCarry",
+          "ms": 88
+        },
+        {
+          "at": 3734,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3828,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3919,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 4001,
+          "beat": "scandalCarry",
+          "ms": 82
+        },
+        {
+          "at": 4079,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 4160,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 4241,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 4324,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 4402,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 4486,
+          "beat": "impact",
+          "ms": 84
+        },
+        {
+          "at": 4568,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 4652,
+          "beat": "impact",
+          "ms": 84
+        },
+        {
+          "at": 4738,
+          "beat": "impact",
+          "ms": 86
+        },
+        {
+          "at": 4818,
+          "beat": "impact",
+          "ms": 80
+        },
+        {
+          "at": 4901,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 4991,
+          "beat": "resources",
+          "ms": 90
+        },
+        {
+          "at": 5066,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5146,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 5224,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 5303,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5382,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5458,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5535,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5614,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5691,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5767,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5844,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5924,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 6002,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 6081,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 6157,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 6238,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 6314,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6393,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6469,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6551,
+          "beat": "sweep",
+          "ms": 82
+        },
+        {
+          "at": 6630,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6706,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6779,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 6855,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6930,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 7005,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 7079,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 7182,
+          "beat": "publish",
+          "ms": 103
+        },
+        {
+          "at": 7262,
+          "beat": "idle",
+          "ms": 80
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

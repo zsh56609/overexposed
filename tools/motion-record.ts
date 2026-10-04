@@ -1,13 +1,13 @@
 // Continuous WebKit video, then ordered frames decoded from that recording (not delayed screenshots).
 import { webkit } from 'playwright';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createServer } from 'vite';
 import { PLAY_STEPS, loadStates, ROOT, type DeskState } from '../check/desk-replay.ts';
 const revision=execFileSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).trim();
 try{execFileSync('git',['diff','--quiet','HEAD','--','ui','i18n','core','content']);}catch{throw Error('Commit game source before recording so the video names identify its actual source.');}
-const recordings=resolve(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??`.npm-cache/v1b-recordings-${revision}`);
+const recordings=resolve(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??`.npm-cache/v1b-recordings-${revision}-${Date.now()}`);
 const evidence=join(ROOT,'docs/handoff/v1b-compare/continuous');mkdirSync(recordings,{recursive:true});mkdirSync(evidence,{recursive:true});
 const ffmpeg=join(ROOT,'.npm-cache/pw-browsers/ffmpeg-1011/ffmpeg-win64.exe');
 const server=await createServer({root:ROOT,logLevel:'error',server:{port:5199,strictPort:false}});await server.listen();
@@ -21,6 +21,7 @@ const fixtures:Record<string,{state:DeskState;selector:string}>={
 };
 const manifest:unknown[]=[];
 const browser=await webkit.launch({headless:true});
+const encoder=await browser.newPage(); // Native canvas JPEG encoding; the bundled FFmpeg only encodes PNG/VP8.
 try {
  for(const [label,fixture] of Object.entries(fixtures)) for(const source of label==='winter'||label==='calm'?['game']:['reference','game']){
   const context=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:recordings,size:{width:1280,height:720}}});
@@ -47,11 +48,17 @@ try {
   const elapsed=await page.evaluate<number>('performance.now()-window.__recordStart');
   const video=page.video()!;await context.close();const videoPath=join(recordings,`${label}-${source}.webm`);await video.saveAs(videoPath);
   const frames=join(recordings,`${label}-${source}-frames`);mkdirSync(frames,{recursive:true});
-  execFileSync(ffmpeg,['-y','-i',videoPath,'-vf','fps=4','-q:v','4',join(frames,'frame-%04d.jpg')],{stdio:'ignore'});
-  const all=readdirSync(frames).filter(f=>f.endsWith('.jpg')).sort();
+  try{execFileSync(ffmpeg,['-y','-i',videoPath,'-r','4','-c:v','png',join(frames,'frame-%04d.png')],{stdio:'pipe'});}
+  catch(error){const log=join(recordings,`${label}-${source}-decode-error.txt`);writeFileSync(log,String(error));throw Error(`Frame extraction failed; full decoder output: ${log}`);}
+  const all=readdirSync(frames).filter(f=>f.endsWith('.png')).sort();
   const start=Math.max(0,all.length-Math.ceil(elapsed/250)-4),n=all.length-start;
   const chosen=[...new Set(Array.from({length:Math.min(16,n)},(_,i)=>start+Math.round(i*(n-1)/Math.max(1,Math.min(16,n)-1))))];
-  const selected=chosen.map(i=>{const file=`${label}-${source}-${all[i]}`;copyFileSync(join(frames,all[i]!),join(evidence,file));return {file,videoPtsSeconds:i/4};});
+  const selected:{file:string;videoPtsSeconds:number}[]=[];
+  for(const i of chosen){
+    const file=`${label}-${source}-${all[i]!.replace('.png','.jpg')}`,png=readFileSync(join(frames,all[i]!)).toString('base64');
+    const jpg=await encoder.evaluate<string>(`(async()=>{const img=new Image();img.src=${JSON.stringify('data:image/png;base64,'+png)};await img.decode();const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;canvas.getContext('2d').drawImage(img,0,0);return canvas.toDataURL('image/jpeg',.86).split(',')[1]})()`);
+    writeFileSync(join(evidence,file),Buffer.from(jpg,'base64'));selected.push({file,videoPtsSeconds:i/4});
+  }
   manifest.push({label,source,revision,videoPath,elapsedAfterPointerMs:elapsed,selected,diagnostics});
   writeFileSync(join(evidence,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
   console.log(`${label} ${source}: ${Math.round(elapsed)}ms, ${all.length} decoded frames; ${videoPath}`);

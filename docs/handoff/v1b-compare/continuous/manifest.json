@@ -1,0 +1,742 @@
+[
+  {
+    "label": "loud",
+    "source": "reference",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\loud-reference.webm",
+    "elapsedAfterPointerMs": 3762,
+    "selected": [
+      {
+        "file": "loud-reference-frame-0007.jpg",
+        "videoPtsSeconds": 1.5
+      },
+      {
+        "file": "loud-reference-frame-0008.jpg",
+        "videoPtsSeconds": 1.75
+      },
+      {
+        "file": "loud-reference-frame-0010.jpg",
+        "videoPtsSeconds": 2.25
+      },
+      {
+        "file": "loud-reference-frame-0011.jpg",
+        "videoPtsSeconds": 2.5
+      },
+      {
+        "file": "loud-reference-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "loud-reference-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "loud-reference-frame-0015.jpg",
+        "videoPtsSeconds": 3.5
+      },
+      {
+        "file": "loud-reference-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "loud-reference-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "loud-reference-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "loud-reference-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "loud-reference-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "loud-reference-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "loud-reference-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "loud-reference-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "loud-reference-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "loud",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\loud-game.webm",
+    "elapsedAfterPointerMs": 3749,
+    "selected": [
+      {
+        "file": "loud-game-frame-0011.jpg",
+        "videoPtsSeconds": 2.5
+      },
+      {
+        "file": "loud-game-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "loud-game-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "loud-game-frame-0015.jpg",
+        "videoPtsSeconds": 3.5
+      },
+      {
+        "file": "loud-game-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "loud-game-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "loud-game-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "loud-game-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "loud-game-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "loud-game-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "loud-game-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "loud-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "loud-game-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "loud-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "loud-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "loud-game-frame-0029.jpg",
+        "videoPtsSeconds": 7
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "quiet",
+    "source": "reference",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\quiet-reference.webm",
+    "elapsedAfterPointerMs": 4254,
+    "selected": [
+      {
+        "file": "quiet-reference-frame-0006.jpg",
+        "videoPtsSeconds": 1.25
+      },
+      {
+        "file": "quiet-reference-frame-0007.jpg",
+        "videoPtsSeconds": 1.5
+      },
+      {
+        "file": "quiet-reference-frame-0009.jpg",
+        "videoPtsSeconds": 2
+      },
+      {
+        "file": "quiet-reference-frame-0010.jpg",
+        "videoPtsSeconds": 2.25
+      },
+      {
+        "file": "quiet-reference-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "quiet-reference-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "quiet-reference-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "quiet-reference-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "quiet-reference-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "quiet-reference-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "quiet-reference-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "quiet-reference-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "quiet-reference-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "quiet-reference-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "quiet-reference-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "quiet-reference-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "quiet",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\quiet-game.webm",
+    "elapsedAfterPointerMs": 4877,
+    "selected": [
+      {
+        "file": "quiet-game-frame-0010.jpg",
+        "videoPtsSeconds": 2.25
+      },
+      {
+        "file": "quiet-game-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "quiet-game-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "quiet-game-frame-0015.jpg",
+        "videoPtsSeconds": 3.5
+      },
+      {
+        "file": "quiet-game-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "quiet-game-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "quiet-game-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "quiet-game-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "quiet-game-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "quiet-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "quiet-game-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "quiet-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "quiet-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "quiet-game-frame-0030.jpg",
+        "videoPtsSeconds": 7.25
+      },
+      {
+        "file": "quiet-game-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "quiet-game-frame-0033.jpg",
+        "videoPtsSeconds": 8
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "calm",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\calm-game.webm",
+    "elapsedAfterPointerMs": 5062,
+    "selected": [
+      {
+        "file": "calm-game-frame-0006.jpg",
+        "videoPtsSeconds": 1.25
+      },
+      {
+        "file": "calm-game-frame-0008.jpg",
+        "videoPtsSeconds": 1.75
+      },
+      {
+        "file": "calm-game-frame-0009.jpg",
+        "videoPtsSeconds": 2
+      },
+      {
+        "file": "calm-game-frame-0011.jpg",
+        "videoPtsSeconds": 2.5
+      },
+      {
+        "file": "calm-game-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "calm-game-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "calm-game-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "calm-game-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "calm-game-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "calm-game-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "calm-game-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "calm-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "calm-game-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "calm-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "calm-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "calm-game-frame-0030.jpg",
+        "videoPtsSeconds": 7.25
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "frenzy",
+    "source": "reference",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\frenzy-reference.webm",
+    "elapsedAfterPointerMs": 12482,
+    "selected": [
+      {
+        "file": "frenzy-reference-frame-0007.jpg",
+        "videoPtsSeconds": 1.5
+      },
+      {
+        "file": "frenzy-reference-frame-0011.jpg",
+        "videoPtsSeconds": 2.5
+      },
+      {
+        "file": "frenzy-reference-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "frenzy-reference-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "frenzy-reference-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "frenzy-reference-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "frenzy-reference-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "frenzy-reference-frame-0032.jpg",
+        "videoPtsSeconds": 7.75
+      },
+      {
+        "file": "frenzy-reference-frame-0035.jpg",
+        "videoPtsSeconds": 8.5
+      },
+      {
+        "file": "frenzy-reference-frame-0039.jpg",
+        "videoPtsSeconds": 9.5
+      },
+      {
+        "file": "frenzy-reference-frame-0042.jpg",
+        "videoPtsSeconds": 10.25
+      },
+      {
+        "file": "frenzy-reference-frame-0046.jpg",
+        "videoPtsSeconds": 11.25
+      },
+      {
+        "file": "frenzy-reference-frame-0049.jpg",
+        "videoPtsSeconds": 12
+      },
+      {
+        "file": "frenzy-reference-frame-0053.jpg",
+        "videoPtsSeconds": 13
+      },
+      {
+        "file": "frenzy-reference-frame-0056.jpg",
+        "videoPtsSeconds": 13.75
+      },
+      {
+        "file": "frenzy-reference-frame-0060.jpg",
+        "videoPtsSeconds": 14.75
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "frenzy",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\frenzy-game.webm",
+    "elapsedAfterPointerMs": 12261,
+    "selected": [
+      {
+        "file": "frenzy-game-frame-0010.jpg",
+        "videoPtsSeconds": 2.25
+      },
+      {
+        "file": "frenzy-game-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "frenzy-game-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "frenzy-game-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "frenzy-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "frenzy-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "frenzy-game-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "frenzy-game-frame-0035.jpg",
+        "videoPtsSeconds": 8.5
+      },
+      {
+        "file": "frenzy-game-frame-0038.jpg",
+        "videoPtsSeconds": 9.25
+      },
+      {
+        "file": "frenzy-game-frame-0042.jpg",
+        "videoPtsSeconds": 10.25
+      },
+      {
+        "file": "frenzy-game-frame-0045.jpg",
+        "videoPtsSeconds": 11
+      },
+      {
+        "file": "frenzy-game-frame-0049.jpg",
+        "videoPtsSeconds": 12
+      },
+      {
+        "file": "frenzy-game-frame-0052.jpg",
+        "videoPtsSeconds": 12.75
+      },
+      {
+        "file": "frenzy-game-frame-0056.jpg",
+        "videoPtsSeconds": 13.75
+      },
+      {
+        "file": "frenzy-game-frame-0059.jpg",
+        "videoPtsSeconds": 14.5
+      },
+      {
+        "file": "frenzy-game-frame-0063.jpg",
+        "videoPtsSeconds": 15.5
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "season",
+    "source": "reference",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\season-reference.webm",
+    "elapsedAfterPointerMs": 7823,
+    "selected": [
+      {
+        "file": "season-reference-frame-0007.jpg",
+        "videoPtsSeconds": 1.5
+      },
+      {
+        "file": "season-reference-frame-0009.jpg",
+        "videoPtsSeconds": 2
+      },
+      {
+        "file": "season-reference-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "season-reference-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "season-reference-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "season-reference-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "season-reference-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "season-reference-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "season-reference-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "season-reference-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "season-reference-frame-0030.jpg",
+        "videoPtsSeconds": 7.25
+      },
+      {
+        "file": "season-reference-frame-0033.jpg",
+        "videoPtsSeconds": 8
+      },
+      {
+        "file": "season-reference-frame-0035.jpg",
+        "videoPtsSeconds": 8.5
+      },
+      {
+        "file": "season-reference-frame-0037.jpg",
+        "videoPtsSeconds": 9
+      },
+      {
+        "file": "season-reference-frame-0040.jpg",
+        "videoPtsSeconds": 9.75
+      },
+      {
+        "file": "season-reference-frame-0042.jpg",
+        "videoPtsSeconds": 10.25
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "season",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\season-game.webm",
+    "elapsedAfterPointerMs": 9587,
+    "selected": [
+      {
+        "file": "season-game-frame-0009.jpg",
+        "videoPtsSeconds": 2
+      },
+      {
+        "file": "season-game-frame-0012.jpg",
+        "videoPtsSeconds": 2.75
+      },
+      {
+        "file": "season-game-frame-0015.jpg",
+        "videoPtsSeconds": 3.5
+      },
+      {
+        "file": "season-game-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "season-game-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "season-game-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "season-game-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "season-game-frame-0029.jpg",
+        "videoPtsSeconds": 7
+      },
+      {
+        "file": "season-game-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "season-game-frame-0034.jpg",
+        "videoPtsSeconds": 8.25
+      },
+      {
+        "file": "season-game-frame-0037.jpg",
+        "videoPtsSeconds": 9
+      },
+      {
+        "file": "season-game-frame-0040.jpg",
+        "videoPtsSeconds": 9.75
+      },
+      {
+        "file": "season-game-frame-0043.jpg",
+        "videoPtsSeconds": 10.5
+      },
+      {
+        "file": "season-game-frame-0045.jpg",
+        "videoPtsSeconds": 11
+      },
+      {
+        "file": "season-game-frame-0048.jpg",
+        "videoPtsSeconds": 11.75
+      },
+      {
+        "file": "season-game-frame-0051.jpg",
+        "videoPtsSeconds": 12.5
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "winter",
+    "source": "game",
+    "revision": "2e6a3f8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2e6a3f8-1791115338409\\winter-game.webm",
+    "elapsedAfterPointerMs": 3335,
+    "selected": [
+      {
+        "file": "winter-game-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "winter-game-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "winter-game-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "winter-game-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "winter-game-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "winter-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "winter-game-frame-0025.jpg",
+        "videoPtsSeconds": 6
+      },
+      {
+        "file": "winter-game-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "winter-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "winter-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "winter-game-frame-0029.jpg",
+        "videoPtsSeconds": 7
+      },
+      {
+        "file": "winter-game-frame-0030.jpg",
+        "videoPtsSeconds": 7.25
+      },
+      {
+        "file": "winter-game-frame-0032.jpg",
+        "videoPtsSeconds": 7.75
+      },
+      {
+        "file": "winter-game-frame-0033.jpg",
+        "videoPtsSeconds": 8
+      },
+      {
+        "file": "winter-game-frame-0034.jpg",
+        "videoPtsSeconds": 8.25
+      },
+      {
+        "file": "winter-game-frame-0035.jpg",
+        "videoPtsSeconds": 8.5
+      }
+    ],
+    "diagnostics": []
+  }
+]

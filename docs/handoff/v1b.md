@@ -1,8 +1,31 @@
-# Round V1b handoff — D/E completion in progress (2026-10-04)
+# Round V1b handoff — final acceptance in progress (2026-10-05)
 
 Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/content/docs, Playwright WebKit, per-part commits/pushes and a committed report. The latest completion prompt supersedes the former permission to stop after C: **finish D/E and acceptance before phase 3; do not mark all V1b done yet.** The A–C report stays intact. The older implementation/remaining-work sections below describe the A–C checkpoint; the completion checkpoint immediately below supersedes them where noted.
 
-## Completion checkpoint
+## Current checkpoint — 2026-10-05
+
+**V1b remains incomplete.** Measured game source is `2e6a3f8`. See [the current Chinese report](../reports/2026-10-05-v1b-acceptance.md). D/E, preview suppression, history-derived pile, the StrictMode first-beat fix and winter restart-boundary protection are implemented. Build/typecheck, validate 0/27, queue 690 actions / 13,976 skips pass again. The new press run is identical to the approved baseline except elapsed time. The full nine-config matrix is running sequentially; logs are `.npm-cache/v1b-final-<browser>-<size>-<check>.log`. Do not infer a final pass from earlier checkpoints below.
+
+### Structure and reproducible checks
+
+- `ui/queue.ts` holds one actual reducer result; `ui/timeline.ts` derives ordered month/gate/draft beats. `ui/desk/presentation.ts` projects the outgoing snapshot, resources, hand, bulbs and messages without changing rules. `MonthMotion.tsx` performs exit/stamp/UID-based scandal flip/sweep/date/season/deal/message effects. Actual choices pause; actual draw events alone deal cards.
+- `Pile.tsx` reads recorded play events, including exhausted opportunities and repeated plays of one UID. `ui/motion.ts` unifies OS and explicit full/reduced/off preferences. Changing mode settles cleanly; reduced effects are in-place, <=150ms. Busy previews and tail holds remain in force. `Motion.tsx` retains v18 landing at about 0.95s, separate from about 2.1s loud / 3.3s quiet busy time.
+- For each browser `chrome, firefox, webkit` and size `1280x720, 800x450, 844x390m`, run each separately: `node check/clicks.ts --browsers=chrome --sizes=1280x720`, then `node check/overflow.ts` with the same flags, then overflow with `--runs=10 --replays`, `node check/interactions.ts`, and `node check/motion-run.ts`. Never run a performance measurement concurrently. Motion includes first entry, D7, previews, pile parity, actual boundaries, OS preference and month/season/ending parity. Narrow options listed in the prior checkpoint are diagnostics, not substitutes for full acceptance.
+- `node sim/compare.ts sim/out/baseline-v1b-after sim/out/baseline-v1b-de-20261004` gives 18 identical normalized files. Neither that reference nor `v1b-evidence/press-after.txt` changes. Run `node check/preview.ts` and `node check/press-contract.ts` for reducer/preview and cooling contracts; `npm run check:queue` for queue/timeline.
+
+### Performance and visual evidence
+
+Both prepared tools have now run. `node tools/motion-active-perf.ts --name=<fresh-name>` uses production dist, real pointer input, active frames and a separate 1500ms idle window. Build first; stop correctness checks. `--root=.npm-cache/v1b-review-ace1c41` uses the exported reviewed source. `--profile` is a separate diagnostic, not acceptance timing; `--case=reviewed-frenzy-end --browsers=chrome --rates=4` isolates the slow-frame case. Preserve previous output names.
+
+[Reviewed source](v1b-compare/reviewed-active.json), [D/E before optimization](v1b-compare/de-active.json), [after](v1b-compare/de-optimized-final.json). Idle photo preparation and removing choice-screen backdrop blur improved measured costs, but one 895.3ms Chromium 4x interval, sustained Firefox/WebKit slow frames and idle cache long tasks remain unresolved. Three `de-outlier-repeat-*.json` runs did not reproduce the 895ms event; they do not replace it. `firstFrameMs` is a rAF/pointer timestamp difference, not input latency.
+
+`node tools/motion-record.ts` produced ten continuous videos and 160 ordered extracted frames: [gallery](v1b-compare/continuous/index.html), [manifest](v1b-compare/continuous/manifest.json). Full videos are outside Git at `C:\Users\91205\Documents\overexposed\.npm-cache\v1b-recordings-2e6a3f8-1791115338409\`. The pointer stays at card-local (40,120). The burned-in `idle` is the base beat name and may coexist with busy visual tails; use the production `totalBusyMs` for unlock. Bundled FFmpeg decodes PNG (`-r 4 -c:v png`); browser canvas encodes selected JPEG frames because MJPEG/fps filter are absent. No new dependency. Recordings are visual evidence, not production frame benchmarks.
+
+### Remaining work and publication
+
+Complete the nine-config matrix, retain all capability skips, investigate unresolved performance, provide the tested-source itch ZIP, and commit/push final report/status. Firefox 4x/media emulation/headless focus and WebKit held-touch limits remain explicit; real Safari/iPad requires actual device evidence. **No smoothness acceptance and no phase 3 yet.** Only commits through `4bd2938` were confirmed pushed at this checkpoint; GitHub 443 failures blocked later pushes. Verify the remote before claiming otherwise.
+
+## Prior completion checkpoint — historical 2026-10-04
 
 **Recovery:** `4bd2938` is pushed. Windows reported critical thermal hibernation at 2026-10-04 01:16:31 and recovery at 01:40:11 (Shanghai). The author confirmed cooling is restored. Use one browser and one size per run; do not change thermal protection. WebKit phone clicks passed (30.9s), Chromium phone ordinary overflow passed (41.8s), and the remaining serial matrix is in progress. The latest report preserves the exact pass/failure split. `clicks` now has bounded progress, and Firefox diagnostics filter out info/timeStamp performance traces; recovery runs exercise this harness.
 
@@ -45,7 +68,7 @@ npm run desk:reference
 
 On another machine, Firefox's normal install is discovered, or set FIREFOX_PATH. WebKit's standard Playwright cache works without the local browser-path override. `.npm-cache/` is in .git/info/exclude, never .gitignore. Browser tools need local server/process permission. Vite ignores docs and generated/cache directories to prevent a regenerated comparison HTML from reloading the game during an audit. Chrome closes over CDP before its launcher is stopped (Edge can relaunch under another PID).
 
-## Implementation
+## Historical A–C implementation (superseded by current structure above)
 
 - `ui/queue.ts`: pure timed presentation queue, mode callback, lift/land active snapshot, 740 ms publication, 930 ms card settle; visual tails register a hold so a click still only skips while printing, handwriting or deltas remain. Other actions have immediate structural resolution for now. `skip()` applies the pending result once and cancels timers; `dispose()` cancels on unmount. `latest` includes pending actions. `check/queue.ts` covers skip on either side of land, pending actions and stale timers.
 - `ui/App.tsx`: document capture-phase click and Enter/Space consume a busy input as skip only. The reducer action guard also returns after skipping. Seeded URLs restart with base + run index; ordinary starts remain crypto-seeded.
@@ -56,7 +79,7 @@ On another machine, Firefox's normal install is discovered, or set FIREFOX_PATH.
 - Static browser audits set `document.documentElement.dataset.motion='off'`. Real D7 checks explicitly re-enable motion. This is a shared mode switch, not a game-rule shortcut.
 - Interaction checks await three stable zero-angle samples for the metronome, then verify it stays stopped and can restart (7s deadline). The old fixed 2.8s wait failed in headless WebKit: v18 and the game cap each frame's progress at 50ms, so slow frame delivery can take over 4s in wall time. Real clicks were confirmed; the game animation was unchanged. The initial failure remains in the evidence folder.
 
-## Remaining D/E work and limitations
+## Historical A–C remaining work (not the current implementation state)
 
 1. Part D: END TURN press, hand exit, PRINTED stamp, each actual pending story lifting/flipping to its scandal card, stagger/drop/shake, sweep, date/season/opener/light, deal, bulbs, per-bubble manager arrivals and phone notifications. Present month-end/frame measurements describe **instant resolution**, not this sequence. Add calm/frenzy/season skip tests and reference frames.
 2. Part E: the OS motion preference already selects the short in-place path for A–C, but full reduced-motion final-layout parity, pile rendering and all D beats still need acceptance. Do not call E complete.
