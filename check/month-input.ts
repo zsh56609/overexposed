@@ -1,13 +1,26 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { Page } from './browser.ts';
-import { cardPoint, centre, loadStates, reach, type DeskState } from './desk-replay.ts';
+import { cardPoint, centre, loadStates, reach, type DeskState, type Step } from './desk-replay.ts';
+import { qualifyingMonths } from './month-fixtures.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.plain.full')?.textContent})`;
 async function waitIdle(page:Page) {
   const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'`)){
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
+}
+async function settledHits(page:Page) {
+  const failures=await page.evaluate<string[]>(`(()=>{
+    const issues=[];
+    const test=(el,x,y)=>{if(x<0||y<0||x>=innerWidth||y>=innerHeight||!el.contains(document.elementFromPoint(x,y)))issues.push(el.dataset.card??el.className)};
+    for(const c of document.querySelectorAll('.hand .card[aria-disabled="false"]')){
+      const p=document.createElement('i');p.style.cssText='position:absolute;left:40px;top:120px;width:1px;height:1px;pointer-events:none';c.appendChild(p);const r=p.getBoundingClientRect();p.remove();test(c,r.x,r.y);
+    }
+    const end=document.querySelector('.endbtn');if(end){const r=end.getBoundingClientRect();test(end,r.x+r.width/2,r.y+r.height/2)}
+    return issues;
+  })()`);
+  assert.deepEqual(failures,[],'settled legal hand/END TURN points must be visible and hit their real controls');
 }
 export async function checkOsMotion(page:Page,url:string) {
   if(!page.reducedMotion){console.log(`SKIP OS preference ${page.name}: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately`);return;}
@@ -51,17 +64,20 @@ export async function checkMonthEntry(page:Page,url:string) {
 }
 export async function checkMonthInput(page:Page,url:string) {
   const states=loadStates();
+  const qualifying=qualifyingMonths();
   const ending=states['ending:redemption_arc']!;
   const seasonSteps=states.s02!.steps;
   const gateIndex=seasonSteps.findIndex(s=>s[0]==='gate');
   const fixtures:[string,DeskState,string][]=[
     ['calm',states.early!,'.endbtn'],['frenzy',states.s07b!,'.endbtn'],
+    ['single-scandal',qualifying.single,'.endbtn'],['mags-relief',qualifying.relief,'.endbtn'],
     ['copycat-winter',states.celebCrisis!,'.endbtn'],
     ['season',{...states.s02!,steps:seasonSteps.slice(0,gateIndex)},'.gates .take'],
     ['draft',{...states.early!,steps:states.early!.steps.slice(0,-1)},'.draft .take'],
     ['winter-ending',{...ending,steps:ending.steps.slice(0,-1)},'.gates .take'],
   ];
   for(const [name,fixture,selector] of fixtures) {
+    if(process.argv.includes('--coverage-only')&&!['single-scandal','mags-relief'].includes(name))continue;
     let expected='';
     for(const mode of ['off','full','reduced','skip-early','skip-late']) {
       assert.equal(await reach(page,url,fixture,80),'ok',name);
@@ -84,14 +100,17 @@ export async function checkPileInput(page:Page,url:string) {
   for(const [key,cards] of [['s02',['networking']],['card:self_tape',['self_tape']],['s02',['streaming_role']],['s02',['open_mic','lay_low']],['bigHand',['@recorded']]] as const) {
     if(process.argv.includes('--big-hand-only')&&key!=='bigHand')continue;
     let expected='';
+    let staticFixture:DeskState|undefined;
     for(const mode of ['off','full','reduced','skip-early','skip-late','switch-reduced']) {
       const fixture=key==='bigHand'?{...states[key]!,steps:states[key]!.steps.slice(0,-1)}:states[key]!;
       assert.equal(await reach(page,url,fixture,80),'ok');
       await page.evaluate(`document.documentElement.dataset.motion=${JSON.stringify(mode.startsWith('skip')||mode.startsWith('switch')?'full':mode)}`);
       const before=await page.evaluate<number>(`document.querySelectorAll('[data-pile-uid]').length`);
+      const played:Step[]=[];
       for(const id of cards) {
         const index=id==='@recorded'?states.bigHand!.steps.at(-1)![1]:await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].findIndex(c=>c.dataset.card===${JSON.stringify(id)}&&c.getAttribute('aria-disabled')==='false')`);
         assert.ok(index>=0,`${key} ${id} is not legal`);
+        played.push(['play',index]);
         const point=await cardPoint(page,index);assert.ok(point);await page.click(...point);
         if(mode.startsWith('skip')){await sleep(mode==='skip-early'?60:1100);assert.ok(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`));if(await page.evaluate<boolean>('document.hasFocus()'))await page.key('Space');else{console.log(`SKIP pile keyboard ${page.name}: headless focus unavailable; separately using real pointer skip`);await page.click(640,350);}await sleep(30);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`),false,'skip not consumed');}
         if(mode==='switch-reduced'){await sleep(100);await page.evaluate(`document.documentElement.dataset.motion='reduced'`);}
@@ -99,6 +118,8 @@ export async function checkPileInput(page:Page,url:string) {
       }
       await page.move(10,100);await sleep(500);
       const actual=await page.evaluate<string>(settled);
+      await settledHits(page);
+      if(mode==='off')staticFixture={...fixture,steps:[...fixture.steps,...played]};
       if(mode==='off')expected=actual;else assert.equal(actual,expected,`${key} ${cards} ${mode}: pile/desk parity`);
       assert.equal(await page.evaluate<number>(`document.querySelectorAll('[data-pile-uid]').length`),before+cards.length,'played face missing or duplicated');
       if(key==='bigHand')assert.equal(await page.evaluate<number>(`document.querySelectorAll('.hand .card').length`),states.bigHand!.hand.length,'recorded large hand not restored');
@@ -106,6 +127,10 @@ export async function checkPileInput(page:Page,url:string) {
       if(mode.startsWith('skip')||mode.startsWith('switch')){await sleep(1100);assert.equal(await page.evaluate<string>(settled),expected,'stale play callback');}
       console.log(`pile input ${page.name}: ${key} ${cards.join('+')} ${mode} exact final parity`);
     }
+    assert.ok(staticFixture);assert.equal(await reach(page,url,staticFixture,500),'ok');
+    assert.equal(await page.evaluate<string>(settled),expected,`${key}: static history replay parity`);
+    await settledHits(page);
+    console.log(`pile input ${page.name}: ${key} static replay parity; all settled modes preserve real control hit points`);
   }
 }
 

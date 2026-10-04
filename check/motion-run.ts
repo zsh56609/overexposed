@@ -13,6 +13,7 @@ try {
   try {
     const url=server.resolvedUrls!.local[0]!;
     if(process.argv.includes('--entry-only'))await checkMonthEntry(page,url);
+    else if(process.argv.includes('--coverage-only')){await checkPileInput(page,url);await checkMonthInput(page,url);}
     else if(process.argv.includes('--os-only'))await checkOsMotion(page,url);
     else if(process.argv.includes('--pile-only'))await checkPileInput(page,url);
     else if(process.argv.includes('--boundaries-only'))await checkBoundaryInput(page,url);

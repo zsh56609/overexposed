@@ -109,9 +109,15 @@ async function bubblesAndMetronome(page: Page, url: string): Promise<Result[]> {
     await page.evaluate(`document.documentElement.dataset.motion='full'`);
     await sleep(100);
     const angle = () => page.evaluate<string>(`document.querySelector('.desk .metro-arm').style.transform`);
-    const a1 = await angle();
-    await sleep(300);
-    out.push(['the metronome swings', a1 !== (await angle())]);
+    // A periodic swing can have equal angles at two distinct instants. Observe the
+    // intermediate positions in the same 300ms window rather than just its endpoints.
+    const moving=async(count:number,gap:number)=>{
+      const angles=[await angle()];
+      for(let i=0;i<count;i++){await sleep(gap);angles.push(await angle());}
+      console.log(`  metronome ${page.name}: motion samples ${JSON.stringify(angles)}`);
+      return new Set(angles).size>1;
+    };
+    out.push(['the metronome swings', await moving(3,100)]);
     await page.click(...metro);
     // The reference caps each frame's elapsed time at 50ms. A low-frame-rate WebKit window can
     // therefore take longer than 2.8s in wall time to finish its stroke and settle. Observe the
@@ -129,9 +135,7 @@ async function bubblesAndMetronome(page: Page, url: string): Promise<Result[]> {
     out.push(['a click settles it at the centre', zeroSamples >= 3 && s1 === (await angle())]);
     await page.click(...metro);
     await sleep(700);
-    const r1 = await angle();
-    await sleep(250);
-    out.push(['another click swings it again', r1 !== (await angle())]);
+    out.push(['another click swings it again', await moving(5,50)]);
   }
   return out;
 }

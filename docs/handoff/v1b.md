@@ -23,7 +23,7 @@ Both prepared tools have now run. `node tools/motion-active-perf.ts --name=<fres
 
 ### Remaining work and publication
 
-Complete the nine-config matrix, retain all capability skips, investigate unresolved performance, provide the tested-source itch ZIP, and commit/push final report/status. Firefox 4x/media emulation/headless focus and WebKit held-touch limits remain explicit; real Safari/iPad requires actual device evidence. **No smoothness acceptance and no phase 3 yet.** Only commits through `4bd2938` were confirmed pushed at this checkpoint; GitHub 443 failures blocked later pushes. Verify the remote before claiming otherwise.
+Complete the nine-config matrix, retain all capability skips, investigate unresolved performance, and commit/push final report/status. Firefox 4x/media emulation/headless focus and WebKit held-touch limits remain explicit; real Safari/iPad requires actual device evidence. **No smoothness acceptance and no phase 3 yet.** Normal push succeeded through `51125f9` on October 5 after earlier GitHub failures. Candidate itch ZIP: `.npm-cache/overexposed-v1b-2e6a3f8.zip` (root index and relative JS/CSS/font paths verified, outside Git); checksum and exact absolute path are in the current report. It is not a claim of complete acceptance.
 
 ## Prior completion checkpoint — historical 2026-10-04
 
