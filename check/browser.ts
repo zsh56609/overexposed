@@ -32,6 +32,9 @@ export interface Page {
   key(name: 'Tab' | 'Enter' | 'Space'): Promise<void>;
   /** Chrome only: slows the CPU by `rate` (1 is off). */
   throttle(rate: number): Promise<void>;
+  /** Separate Chromium diagnostic run, never enabled during frame acceptance measurements. */
+  profileStart?(): Promise<void>;
+  profileStop?(): Promise<unknown>;
   close(): Promise<void>;
 }
 
@@ -224,6 +227,12 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
     async throttle(rate) {
       await send('Emulation.setCPUThrottlingRate', { rate });
     },
+    async profileStart() {
+      await send('Profiler.enable');await send('Profiler.start');
+    },
+    async profileStop() {
+      const result=await send('Profiler.stop');await send('Profiler.disable');return result.result?.profile;
+    },
     async close() {
       try {
         // Edge may relaunch itself: its launcher PID is not the browser PID.
@@ -327,7 +336,9 @@ async function startFirefox({ width, height }: { width: number; height: number }
   const pending = new Map<number, (m: { type: string; result?: Record<string, unknown>; error?: string; message?: string }) => void>();
   socket.addEventListener('message', (e) => {
     const m = JSON.parse(String(e.data));
-    if (m.method === 'log.entryAdded') diagnostics.push(JSON.stringify(m.params));
+    // React's development performance tracks emit large numbers of info/timeStamp entries.
+    // Keep actual warnings/errors, not that unrelated trace stream, in failure diagnostics.
+    if (m.method === 'log.entryAdded' && ['warn','warning','error'].includes(m.params?.level)) diagnostics.push(JSON.stringify(m.params));
     if (m.id && pending.has(m.id)) {
       pending.get(m.id)?.(m);
       pending.delete(m.id);

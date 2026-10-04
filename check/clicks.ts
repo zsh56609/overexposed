@@ -23,6 +23,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { auditStep } from './audit-progress.ts';
 import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
 import { checkD7 } from './motion.ts';
 
@@ -137,6 +138,7 @@ const DRIVE = (runs: number) => `(async () => {
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
+      window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.hand')?.className};
       stats.states++;
       reachable();
       if (document.querySelector('.manager-choice')) {
@@ -218,7 +220,7 @@ try {
         await checkD7(page, url);
         await page.navigate(`${url}?seed=20260929`, 3000);
         const t0 = performance.now();
-        const out = await page.evaluate<Out>(DRIVE(RUNS));
+        const out = await auditStep<Out>(page,`clicks ${tag} ${RUNS} runs`,DRIVE(RUNS),600_000);
         const screens = Object.entries(out.byScreen)
           .map(([k, n]) => `${k} ${n}`)
           .join(', ');

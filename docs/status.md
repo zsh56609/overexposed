@@ -2,6 +2,8 @@
 
 As of **2026-10-04**, V1b completion work has added the event-driven month-end presentation and history-derived played pile. **V1b remains incomplete: D/E cross-browser acceptance, continuous visual evidence and production performance diagnosis are still in progress. Phase 3 is not next yet.** The current author instruction supersedes the earlier permission to stop after C. Read this first; update it at session end.
 
+**Machine recovery:** implementation `4bd2938` is pushed. At 01:16:31 Shanghai time Windows recorded Kernel-Power 88 (critical thermal hibernation), recovering at 01:40:11. The author confirmed cooling was restored; checks now run one browser/size at a time. WebKit phone clicks passed on recovery (30.9s), completing this round's nine click configurations with unchanged counts. Isolated Chromium phone overflow passed again (41.8s), as did 1280×720 (41.5s). Full/interactions/motion final matrix is still running. Prior interrupted logs remain; this does not establish the cause of the independent review's 1200s failure. Do not bypass thermal or sleep protection. Details: [reports/2026-10-04-v1b-de.md](reports/2026-10-04-v1b-de.md).
+
 Overexposed is the browser deckbuilder for the Game Gauntlet SIM Jam. One career year is 12 turns, four seasons, March 2027 to February 2028. Fast hype creates heat; heat becomes scandal cards. A run always completes with one of four major and fourteen minor endings. Target play time: 10–15 minutes. English ships; Chinese remains scaffolding.
 
 ## Current implementation
