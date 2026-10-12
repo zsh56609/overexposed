@@ -1,6 +1,8 @@
 # Status
 
-As of **2026-10-05**, V1b D/E and the A–C carry-over repairs are implemented; continuous game/v18 recordings and optimized production measurements are available. **V1b remains incomplete: the final nine-config browser matrix and unresolved performance prevent acceptance. Phase 3 is not next yet.** Measured game source is `2e6a3f8`. Read this first; update it at session end.
+As of **2026-10-13**, V1b D/E and the A–C carry-over repairs are implemented; continuous game/v18 recordings and optimized production measurements are available. **V1b remains incomplete: the final nine-config browser matrix and unresolved performance prevent acceptance. Phase 3 is not next yet.** Measured game source is `2e6a3f8`. Read this first; update it at session end.
+
+**October 13 resume:** HEAD `1e15ebe`, remote main `51125f9`; no intervening remote work. The previous commit/push attempt never ran because automatic approval review exhausted its usage allowance. Existing uncommitted diagnostics/evidence are retained. Chromium's final three-size matrix and Firefox's three-size clicks had completed; Firefox overflow/full/interactions/motion and the final WebKit matrix remain to run. Typecheck passes again; Node is unchanged. New logs: `.npm-cache/v1b-1013-*`; [current report](reports/2026-10-13-v1b-acceptance.md). Earlier measurements/passes below are historical evidence, not a claim of today's rerun.
 
 **Latest checkpoint:** build/typecheck, validate 0/27 and queue 690 actions / 13,976 skips pass again. The press run matches its approved baseline except elapsed time. Final Chromium 1280×720 five-check suite plus added single-scandal/Mags/static-replay/settled-hit coverage pass. At 800×450, clicks and both overflow suites pass; interactions first failed a two-endpoint metronome sample (23/24), then passed 24/24 with intermediate angle samples in the same window. Full motion is running, followed by the remaining sequential configurations. Logs: `.npm-cache/v1b-final-*.log`, preserving failures. Production normal Chromium active p95 is 8.5–8.6ms, but a 4× 895.3ms outlier and sustained Firefox/WebKit slow frames remain unresolved. [Current report](reports/2026-10-05-v1b-acceptance.md), [continuous frames](handoff/v1b-compare/continuous/index.html), [performance](handoff/v1b-compare/de-optimized-final.json). Bundle: JS 473.61 kB / gzip 145.14, CSS 52.46 / 11.74; fonts unchanged. Normal push succeeded through `51125f9`. Candidate `.npm-cache/overexposed-v1b-2e6a3f8.zip` has root index and relative assets; it does not imply complete acceptance.
 
@@ -44,11 +46,11 @@ Starting commit: `3be87b43cd747964a33a54db425c61b647c30bb3` (2026-10-01T11:37:22
 
 Node 24.16.0 satisfies `>=22.18` (no .nvmrc). Dev browser dependency: Playwright 1.63.0 / WebKit 26.6. The local cache is excluded only via .git/info/exclude. Game bundle: JS **458.54 kB / gzip 140.45**, CSS **49.65 kB / gzip 11.20**; fonts unchanged.
 
-Production motion measurements: cards land in 942–950ms; loud tails finish in 2106–2142ms and quiet handwriting in 3274–3304ms. Chromium p95 is 8.5–8.6ms, but CPU 4× has one 124.9ms frame; Firefox normal month-end p95 reaches 83.34ms. D/E must investigate and remeasure; performance acceptance is not complete. Full data: [handoff/v1b-compare/performance.json](handoff/v1b-compare/performance.json).
+Historical A–C production measurements: cards land in 942–950ms; loud tails finish in 2106–2142ms and quiet handwriting in 3274–3304ms. Chromium p95 is 8.5–8.6ms, CPU 4× had one 124.9ms frame, and Firefox month-end p95 reached 83.34ms. Original data remains [handoff/v1b-compare/performance.json](handoff/v1b-compare/performance.json); current D/E measurements and unresolved issues are linked in the latest checkpoint above. Performance acceptance is still incomplete.
 
 ## Next work, in order
 
-1. Finish V1b D/E against v18's monthEnd/scandalFlip/sweep/deal/phone sequence; keep all current checks, add calm/frenzy/season skip assertions and motion frames. See [handoff/v1b.md](handoff/v1b.md).
+1. Finish V1b acceptance: D/E and carry-over implementation is present; complete the final browser matrix, resolve or explicitly bound performance and intermittent-input findings, and record real-device limits. Continuous game/v18 frames are available. See [handoff/v1b.md](handoff/v1b.md). V1b remains incomplete.
 2. Phase 3: event engine/content, additive GameEvents only, approved prose imported from its draft.
 3. V2: the surrounding screens in the dressing room.
 4. Phase 4: year in review, once-per-run variants, full retune; then 10/15 feature freeze.

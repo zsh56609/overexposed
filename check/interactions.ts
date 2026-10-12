@@ -11,7 +11,7 @@
 //   a click ends the month; the deck opens from the stat bar and closes.
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createServer } from 'vite';
 import { browsersFromArgs, sizesFromArgs, launch, type Page } from './browser.ts';
@@ -41,9 +41,18 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
   out.push(['it closes when the pointer leaves', !(await on())]);
   const money = (await centre(page, '.desk [data-tip="money"]')) as [number, number];
   try {
+    await page.evaluate(`(()=>{
+      const trace=window.__tipTrace=[];const start=performance.now();
+      for(const type of ['pointerdown','pointerup','pointercancel','pointerover','pointerout','focusin','focusout','click','contextmenu'])document.addEventListener(type,e=>trace.push({at:performance.now()-start,type,pointer:e.pointerType,trusted:e.isTrusted,target:e.target.closest?.('[data-tip]')?.dataset.tip??e.target.tagName,visible:!!document.querySelector('.tip.on')}),{capture:true});
+      let last=false;const sample=()=>{const visible=!!document.querySelector('.tip.on');if(last!==visible){trace.push({at:performance.now()-start,type:'visibility',visible});last=visible;}if(performance.now()-start<1200)requestAnimationFrame(sample)};sample();
+    })()`);
     await page.press(...money, 700);
     await sleep(200);
-    out.push(['it opens on a long-press', await on()]);
+    const opened=await on();
+    mkdirSync('check/out',{recursive:true});const traceFile=`check/out/tooltip-touch-${page.name}-${Date.now()}.json`;
+    writeFileSync(traceFile,JSON.stringify(await page.evaluate('window.__tipTrace'),null,2));
+    console.log(`  tooltip long-press ${page.name}: ${opened?'open':'FAILED'}; trusted-event trace ${traceFile}`);
+    out.push(['it opens on a long-press', opened]);
     await page.press(...await neutral(page), 40);
     await sleep(300);
     out.push(['a tap elsewhere closes it', !(await on())]);
@@ -51,6 +60,7 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
     await sleep(600);
     out.push(['a short tap does not open it', !(await on())]);
   } catch (err) {
+    if(page.name!=='webkit'||!(err instanceof Error)||err.message!=='WebKit driver: trusted long-press unsupported by Playwright Touchscreen')throw err;
     out.push([`touch: ${err instanceof Error ? err.message.slice(0, 60) : String(err)}`, 'skipped']);
   }
   // Keyboard: Tab until a stat cell has the focus. A headless window that is never in front (Firefox) sends no
@@ -245,6 +255,8 @@ try {
       for (const [what, ok] of results) if (ok !== true) console.log(`  ${ok === 'skipped' ? 'skipped' : 'FAIL'}  ${what}`);
       if (results.some(([, ok]) => ok === false)) failed = true;
     } finally {
+      mkdirSync('check/out',{recursive:true});
+      writeFileSync(`check/out/interactions-${browser}-${size.width}-${Date.now()}.json`,JSON.stringify(page.diagnostics,null,2));
       await page.close();
     }
   }

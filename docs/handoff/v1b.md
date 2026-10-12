@@ -1,8 +1,12 @@
-# Round V1b handoff — final acceptance in progress (2026-10-05)
+# Round V1b handoff — final acceptance in progress (2026-10-13)
 
 Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/content/docs, Playwright WebKit, per-part commits/pushes and a committed report. The latest completion prompt supersedes the former permission to stop after C: **finish D/E and acceptance before phase 3; do not mark all V1b done yet.** The A–C report stays intact. The older implementation/remaining-work sections below describe the A–C checkpoint; the completion checkpoint immediately below supersedes them where noted.
 
-## Current checkpoint — 2026-10-05
+## Current checkpoint — 2026-10-13
+
+Resume source `1e15ebe` (game source `2e6a3f8`), remote still `51125f9`; no intervening remote changes. Previous automatic approval review failed due to its usage allowance before the pending commit/push executed. Typecheck and read-only remote verification pass now. Chromium all three final configurations and Firefox all three clicks completed in the previous run; Firefox's remaining checks and the final WebKit matrix are next, sequentially. See [October 13 report](../reports/2026-10-13-v1b-acceptance.md) and `.npm-cache/v1b-1013-*` logs. Do not rerun passed work merely because the earlier status paragraph was stale. No phase 3/V2; unresolved performance and intermittent long-press findings remain.
+
+## Prior checkpoint — 2026-10-05
 
 **V1b remains incomplete.** Measured game source is `2e6a3f8`. See [the current Chinese report](../reports/2026-10-05-v1b-acceptance.md). D/E, preview suppression, history-derived pile, the StrictMode first-beat fix and winter restart-boundary protection are implemented. Build/typecheck, validate 0/27, queue 690 actions / 13,976 skips pass again. The new press run is identical to the approved baseline except elapsed time. The full nine-config matrix is running sequentially; logs are `.npm-cache/v1b-final-<browser>-<size>-<check>.log`. Do not infer a final pass from earlier checkpoints below.
 

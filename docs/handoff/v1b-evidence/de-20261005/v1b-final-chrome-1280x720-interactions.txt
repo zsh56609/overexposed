@@ -1,0 +1,3 @@
+  metronome chrome: stable centre after 1425ms
+interactions, chrome 1280x720: 24 of 24 pass
+PASS: every interaction behaves, in every browser

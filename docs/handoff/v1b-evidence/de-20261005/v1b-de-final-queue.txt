@@ -1,0 +1,7 @@
+
+> overexposed@0.0.0 check:queue
+> node check/queue.ts && node check/timeline.ts
+
+queue: skip before/after landing, queued actions, stale timers, disposal and reduced timing — PASS
+timeline: 690 real reducer steps, 13976 before/after beat skips, ordered resources, actual draws, UID dedup, publication and stale callbacks — PASS
+CHOOSE_GATE->draft, CHOOSE_GATE->ended, DRAFT_PICK->play, END_TURN->draft, END_TURN->gate, END_TURN->play, copycat, mags-relief, scandals:0, scandals:1, scandals:2, season

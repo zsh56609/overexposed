@@ -1,0 +1,54 @@
+month entry chrome: 5 remaining cards animate before the stamp; skip settles
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input chrome: stationary suppressed while busy, restored when idle
+preview input chrome: moving suppressed while busy, restored when idle
+preview input chrome: keyboard suppressed while busy, restored when idle
+preview input chrome: touch suppressed while busy, restored when idle
+pile input chrome: s02 networking off exact final parity
+pile input chrome: s02 networking full exact final parity
+pile input chrome: s02 networking reduced exact final parity
+pile input chrome: s02 networking skip-early exact final parity
+pile input chrome: s02 networking skip-late exact final parity
+pile input chrome: s02 networking switch-reduced exact final parity
+pile input chrome: s02 static replay parity; all settled modes preserve real control hit points
+pile input chrome: card:self_tape self_tape off exact final parity
+pile input chrome: card:self_tape self_tape full exact final parity
+pile input chrome: card:self_tape self_tape reduced exact final parity
+pile input chrome: card:self_tape self_tape skip-early exact final parity
+pile input chrome: card:self_tape self_tape skip-late exact final parity
+pile input chrome: card:self_tape self_tape switch-reduced exact final parity
+pile input chrome: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input chrome: s02 streaming_role off exact final parity
+pile input chrome: s02 streaming_role full exact final parity
+pile input chrome: s02 streaming_role reduced exact final parity
+pile input chrome: s02 streaming_role skip-early exact final parity
+pile input chrome: s02 streaming_role skip-late exact final parity
+pile input chrome: s02 streaming_role switch-reduced exact final parity
+pile input chrome: s02 static replay parity; all settled modes preserve real control hit points
+pile input chrome: s02 open_mic+lay_low off exact final parity
+pile input chrome: s02 open_mic+lay_low full exact final parity
+pile input chrome: s02 open_mic+lay_low reduced exact final parity
+pile input chrome: s02 open_mic+lay_low skip-early exact final parity
+pile input chrome: s02 open_mic+lay_low skip-late exact final parity
+pile input chrome: s02 open_mic+lay_low switch-reduced exact final parity
+pile input chrome: s02 static replay parity; all settled modes preserve real control hit points
+pile input chrome: bigHand @recorded off exact final parity
+pile input chrome: bigHand @recorded full exact final parity
+pile input chrome: bigHand @recorded reduced exact final parity
+pile input chrome: bigHand @recorded skip-early exact final parity
+pile input chrome: bigHand @recorded skip-late exact final parity
+pile input chrome: bigHand @recorded switch-reduced exact final parity
+pile input chrome: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input chrome: flip click exact final parity, no stale callbacks
+boundary input chrome: flip Enter exact final parity, no stale callbacks
+boundary input chrome: flip Space exact final parity, no stale callbacks
+boundary input chrome: carry click exact final parity, no stale callbacks
+boundary input chrome: carry Enter exact final parity, no stale callbacks
+boundary input chrome: carry Space exact final parity, no stale callbacks
+boundary input chrome: sweep click exact final parity, no stale callbacks
+boundary input chrome: sweep Enter exact final parity, no stale callbacks
+boundary input chrome: sweep Space exact final parity, no stale callbacks
+boundary input chrome: season click exact final parity, no stale callbacks
+boundary input chrome: season Enter exact final parity, no stale callbacks
+boundary input chrome: season Space exact final parity, no stale callbacks

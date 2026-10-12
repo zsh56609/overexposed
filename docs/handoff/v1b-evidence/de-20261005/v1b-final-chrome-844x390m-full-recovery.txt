@@ -1,0 +1,68 @@
+starting overflow chrome 844x390 (phone)
+progress 2026-10-05T00:20:58.357Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":0,"guard":39,"phase":"play","states":39,"previews":94,"tips":168},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"39","busy":"0"}
+progress 2026-10-05T00:21:08.371Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":17,"phase":"play","states":77,"previews":190,"tips":343},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"17","busy":"0"}
+progress 2026-10-05T00:21:18.384Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":48,"phase":"play","states":108,"previews":278,"tips":504},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"48","busy":"0"}
+progress 2026-10-05T00:21:28.392Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":30,"phase":"draft","states":147,"previews":379,"tips":686},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"draft","step":"31","busy":"0"}
+progress 2026-10-05T00:21:38.406Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":3,"guard":17,"phase":"play","states":189,"previews":474,"tips":854},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"17","busy":"0"}
+progress 2026-10-05T00:21:48.413Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":13,"phase":"play","states":226,"previews":575,"tips":1029},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-05T00:21:58.423Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":54,"phase":"play","states":267,"previews":678,"tips":1218},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-05T00:22:08.435Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":38,"phase":"play","states":306,"previews":774,"tips":1393},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"38","busy":"0"}
+progress 2026-10-05T00:22:18.441Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":13,"phase":"play","states":339,"previews":874,"tips":1568},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-05T00:22:28.453Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":52,"phase":"play","states":378,"previews":973,"tips":1736},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"52","busy":"0"}
+progress 2026-10-05T00:22:38.455Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":34,"phase":"play","states":415,"previews":1064,"tips":1904},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-05T00:22:48.469Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":13,"phase":"play","states":449,"previews":1160,"tips":2065},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-05T00:22:58.486Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":48,"phase":"play","states":484,"previews":1251,"tips":2226},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"48","busy":"0"}
+progress 2026-10-05T00:23:08.498Z chrome chrome 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":21,"phase":"play","states":518,"previews":1341,"tips":2394},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"21","busy":"0"}
+overflow check, chrome 844x390 (phone): 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (149.0s)
+replay chrome 844x390 (phone) early: 0 issues
+replay chrome 844x390 (phone) cdCalm: 0 issues
+replay chrome 844x390 (phone) cdRed: 0 issues
+replay chrome 844x390 (phone) cdCrossed: 0 issues
+replay chrome 844x390 (phone) cdAmber: 0 issues
+replay chrome 844x390 (phone) screenCrisis: 0 issues
+replay chrome 844x390 (phone) s01b: 0 issues
+replay chrome 844x390 (phone) s02: 0 issues
+replay chrome 844x390 (phone) s07b: 0 issues
+replay chrome 844x390 (phone) celebFamous: 0 issues
+replay chrome 844x390 (phone) celebCrisis: 0 issues
+replay chrome 844x390 (phone) s10: 0 issues
+replay chrome 844x390 (phone) s05: 0 issues
+replay chrome 844x390 (phone) s03b: 0 issues
+replay chrome 844x390 (phone) s09: 0 issues
+replay chrome 844x390 (phone) s07c: 0 issues
+replay chrome 844x390 (phone) s04: 0 issues
+replay chrome 844x390 (phone) s07: 0 issues
+replay chrome 844x390 (phone) bigHand: 0 issues
+replay chrome 844x390 (phone) card:screen_test: 0 issues
+replay chrome 844x390 (phone) card:film_cameo: 0 issues
+replay chrome 844x390 (phone) card:demo_tape: 0 issues
+replay chrome 844x390 (phone) card:mentorship: 0 issues
+replay chrome 844x390 (phone) card:ghostwriter: 0 issues
+replay chrome 844x390 (phone) card:acting_class: 0 issues
+replay chrome 844x390 (phone) card:public_feud: 0 issues
+replay chrome 844x390 (phone) card:self_tape: 0 issues
+replay chrome 844x390 (phone) card:indie_label: 0 issues
+replay chrome 844x390 (phone) card:award_campaign: 0 issues
+replay chrome 844x390 (phone) card:voice_over: 0 issues
+replay chrome 844x390 (phone) card:sellout_ad: 0 issues
+replay chrome 844x390 (phone) card:brand_deal: 0 issues
+replay chrome 844x390 (phone) card:world_tour: 0 issues
+replay chrome 844x390 (phone) card:reinvent_image: 0 issues
+replay chrome 844x390 (phone) card:legal_team: 0 issues
+replay chrome 844x390 (phone) card:meditation_retreat: 0 issues
+replay chrome 844x390 (phone) ending:leading_role: 0 issues
+replay chrome 844x390 (phone) ending:craftsman: 0 issues
+replay chrome 844x390 (phone) ending:meltdown: 0 issues
+replay chrome 844x390 (phone) ending:household_name: 0 issues
+replay chrome 844x390 (phone) ending:character_actor: 0 issues
+replay chrome 844x390 (phone) ending:tabloid_royalty: 0 issues
+replay chrome 844x390 (phone) ending:nobody: 0 issues
+replay chrome 844x390 (phone) ending:flash_in_the_pan: 0 issues
+replay chrome 844x390 (phone) ending:the_independent: 0 issues
+replay chrome 844x390 (phone) ending:the_one_to_watch: 0 issues
+replay chrome 844x390 (phone) ending:star: 0 issues
+replay chrome 844x390 (phone) ending:running_on_empty: 0 issues
+replay chrome 844x390 (phone) ending:starting_over: 0 issues
+replay chrome 844x390 (phone) ending:redemption_arc: 0 issues
+overflow check, chrome 844x390 (phone): 50 recorded states replayed, 42 cards in their hands — 0 issues
+PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size
