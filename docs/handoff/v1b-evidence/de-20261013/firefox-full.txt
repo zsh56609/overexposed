@@ -1,0 +1,210 @@
+starting overflow firefox 1280x720
+progress 2026-10-12T17:21:55.638Z firefox firefox 1280x720 10 runs: {"progress":{"run":0,"guard":34,"phase":"play","states":34,"previews":85,"tips":147},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-12T17:22:05.645Z firefox firefox 1280x720 10 runs: {"progress":{"run":1,"guard":6,"phase":"play","states":66,"previews":166,"tips":294},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"6","busy":"0"}
+progress 2026-10-12T17:22:15.659Z firefox firefox 1280x720 10 runs: {"progress":{"run":1,"guard":35,"phase":"play","states":95,"previews":242,"tips":441},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"35","busy":"0"}
+progress 2026-10-12T17:22:25.673Z firefox firefox 1280x720 10 runs: {"progress":{"run":2,"guard":9,"phase":"play","states":126,"previews":324,"tips":588},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"9","busy":"0"}
+progress 2026-10-12T17:22:35.685Z firefox firefox 1280x720 10 runs: {"progress":{"run":2,"guard":45,"phase":"play","states":162,"previews":413,"tips":742},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"45","busy":"0"}
+progress 2026-10-12T17:22:45.687Z firefox firefox 1280x720 10 runs: {"progress":{"run":3,"guard":25,"phase":"play","states":197,"previews":498,"tips":889},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"25","busy":"0"}
+progress 2026-10-12T17:22:55.695Z firefox firefox 1280x720 10 runs: {"progress":{"run":4,"guard":20,"phase":"play","states":233,"previews":582,"tips":1043},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"20","busy":"0"}
+progress 2026-10-12T17:23:05.710Z firefox firefox 1280x720 10 runs: {"progress":{"run":4,"guard":51,"phase":"play","states":264,"previews":664,"tips":1197},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"51","busy":"0"}
+progress 2026-10-12T17:23:15.719Z firefox firefox 1280x720 10 runs: {"progress":{"run":5,"guard":25,"phase":"play","states":293,"previews":750,"tips":1344},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"25","busy":"0"}
+progress 2026-10-12T17:23:25.736Z firefox firefox 1280x720 10 runs: {"progress":{"run":5,"guard":56,"phase":"play","states":324,"previews":836,"tips":1498},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"56","busy":"0"}
+progress 2026-10-12T17:23:35.739Z firefox firefox 1280x720 10 runs: {"progress":{"run":6,"guard":34,"phase":"play","states":360,"previews":920,"tips":1652},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-12T17:23:45.742Z firefox firefox 1280x720 10 runs: {"progress":{"run":7,"guard":10,"phase":"play","states":391,"previews":1006,"tips":1792},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"10","busy":"0"}
+progress 2026-10-12T17:23:55.746Z firefox firefox 1280x720 10 runs: {"progress":{"run":7,"guard":41,"phase":"play","states":422,"previews":1092,"tips":1946},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"41","busy":"0"}
+progress 2026-10-12T17:24:05.753Z firefox firefox 1280x720 10 runs: {"progress":{"run":8,"guard":20,"phase":"play","states":456,"previews":1178,"tips":2100},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"20","busy":"0"}
+progress 2026-10-12T17:24:15.756Z firefox firefox 1280x720 10 runs: {"progress":{"run":8,"guard":53,"phase":"play","states":489,"previews":1260,"tips":2247},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"53","busy":"0"}
+progress 2026-10-12T17:24:25.758Z firefox firefox 1280x720 10 runs: {"progress":{"run":9,"guard":22,"phase":"play","states":519,"previews":1345,"tips":2401},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"22","busy":"0"}
+overflow check, firefox 1280x720: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (169.8s)
+replay firefox 1280x720 early: 0 issues
+replay firefox 1280x720 cdCalm: 0 issues
+replay firefox 1280x720 cdRed: 0 issues
+replay firefox 1280x720 cdCrossed: 0 issues
+replay firefox 1280x720 cdAmber: 0 issues
+replay firefox 1280x720 screenCrisis: 0 issues
+replay firefox 1280x720 s01b: 0 issues
+replay firefox 1280x720 s02: 0 issues
+replay firefox 1280x720 s07b: 0 issues
+replay firefox 1280x720 celebFamous: 0 issues
+replay firefox 1280x720 celebCrisis: 0 issues
+replay firefox 1280x720 s10: 0 issues
+replay firefox 1280x720 s05: 0 issues
+replay firefox 1280x720 s03b: 0 issues
+replay firefox 1280x720 s09: 0 issues
+replay firefox 1280x720 s07c: 0 issues
+replay firefox 1280x720 s04: 0 issues
+replay firefox 1280x720 s07: 0 issues
+replay firefox 1280x720 bigHand: 0 issues
+replay firefox 1280x720 card:screen_test: 0 issues
+replay firefox 1280x720 card:film_cameo: 0 issues
+replay firefox 1280x720 card:demo_tape: 0 issues
+replay firefox 1280x720 card:mentorship: 0 issues
+replay firefox 1280x720 card:ghostwriter: 0 issues
+replay firefox 1280x720 card:acting_class: 0 issues
+replay firefox 1280x720 card:public_feud: 0 issues
+replay firefox 1280x720 card:self_tape: 0 issues
+replay firefox 1280x720 card:indie_label: 0 issues
+replay firefox 1280x720 card:award_campaign: 0 issues
+replay firefox 1280x720 card:voice_over: 0 issues
+replay firefox 1280x720 card:sellout_ad: 0 issues
+replay firefox 1280x720 card:brand_deal: 0 issues
+replay firefox 1280x720 card:world_tour: 0 issues
+replay firefox 1280x720 card:reinvent_image: 0 issues
+replay firefox 1280x720 card:legal_team: 0 issues
+replay firefox 1280x720 card:meditation_retreat: 0 issues
+replay firefox 1280x720 ending:leading_role: 0 issues
+replay firefox 1280x720 ending:craftsman: 0 issues
+replay firefox 1280x720 ending:meltdown: 0 issues
+replay firefox 1280x720 ending:household_name: 0 issues
+replay firefox 1280x720 ending:character_actor: 0 issues
+replay firefox 1280x720 ending:tabloid_royalty: 0 issues
+replay firefox 1280x720 ending:nobody: 0 issues
+replay firefox 1280x720 ending:flash_in_the_pan: 0 issues
+replay firefox 1280x720 ending:the_independent: 0 issues
+replay firefox 1280x720 ending:the_one_to_watch: 0 issues
+replay firefox 1280x720 ending:star: 0 issues
+replay firefox 1280x720 ending:running_on_empty: 0 issues
+replay firefox 1280x720 ending:starting_over: 0 issues
+replay firefox 1280x720 ending:redemption_arc: 0 issues
+overflow check, firefox 1280x720: 50 recorded states replayed, 42 cards in their hands — 0 issues
+starting overflow firefox 800x450
+progress 2026-10-12T17:26:03.307Z firefox firefox 800x450 10 runs: {"progress":{"run":0,"guard":34,"phase":"play","states":34,"previews":85,"tips":147},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-12T17:26:13.315Z firefox firefox 800x450 10 runs: {"progress":{"run":1,"guard":5,"phase":"play","states":65,"previews":162,"tips":287},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"5","busy":"0"}
+progress 2026-10-12T17:26:23.329Z firefox firefox 800x450 10 runs: {"progress":{"run":1,"guard":35,"phase":"play","states":95,"previews":242,"tips":441},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"35","busy":"0"}
+progress 2026-10-12T17:26:33.331Z firefox firefox 800x450 10 runs: {"progress":{"run":2,"guard":9,"phase":"play","states":126,"previews":324,"tips":588},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"9","busy":"0"}
+progress 2026-10-12T17:26:43.338Z firefox firefox 800x450 10 runs: {"progress":{"run":2,"guard":44,"phase":"play","states":161,"previews":410,"tips":735},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"44","busy":"0"}
+progress 2026-10-12T17:26:53.341Z firefox firefox 800x450 10 runs: {"progress":{"run":3,"guard":24,"phase":"play","states":196,"previews":493,"tips":882},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-12T17:27:03.344Z firefox firefox 800x450 10 runs: {"progress":{"run":4,"guard":17,"phase":"draft","states":230,"previews":577,"tips":1036},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"draft","step":"18","busy":"0"}
+progress 2026-10-12T17:27:13.351Z firefox firefox 800x450 10 runs: {"progress":{"run":4,"guard":49,"phase":"play","states":262,"previews":655,"tips":1183},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"49","busy":"0"}
+progress 2026-10-12T17:27:23.364Z firefox firefox 800x450 10 runs: {"progress":{"run":5,"guard":24,"phase":"play","states":292,"previews":746,"tips":1337},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-12T17:27:33.373Z firefox firefox 800x450 10 runs: {"progress":{"run":5,"guard":54,"phase":"play","states":322,"previews":827,"tips":1484},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-12T17:27:43.383Z firefox firefox 800x450 10 runs: {"progress":{"run":6,"guard":29,"phase":"play","states":355,"previews":908,"tips":1631},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"29","busy":"0"}
+progress 2026-10-12T17:27:53.394Z firefox firefox 800x450 10 runs: {"progress":{"run":7,"guard":6,"phase":"play","states":387,"previews":996,"tips":1771},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"6","busy":"0"}
+progress 2026-10-12T17:28:03.401Z firefox firefox 800x450 10 runs: {"progress":{"run":7,"guard":37,"phase":"play","states":418,"previews":1075,"tips":1918},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"37","busy":"0"}
+progress 2026-10-12T17:28:13.402Z firefox firefox 800x450 10 runs: {"progress":{"run":8,"guard":13,"phase":"play","states":449,"previews":1160,"tips":2065},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-12T17:28:23.413Z firefox firefox 800x450 10 runs: {"progress":{"run":8,"guard":44,"phase":"play","states":480,"previews":1244,"tips":2212},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"44","busy":"0"}
+progress 2026-10-12T17:28:33.421Z firefox firefox 800x450 10 runs: {"progress":{"run":9,"guard":12,"phase":"play","states":509,"previews":1322,"tips":2359},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"12","busy":"0"}
+progress 2026-10-12T17:28:43.471Z firefox firefox 800x450 10 runs: {"progress":{"run":9,"guard":45,"phase":"play","states":542,"previews":1397,"tips":2499},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"46","busy":"0"}
+overflow check, firefox 800x450: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (172.9s)
+replay firefox 800x450 early: 0 issues
+replay firefox 800x450 cdCalm: 0 issues
+replay firefox 800x450 cdRed: 0 issues
+replay firefox 800x450 cdCrossed: 0 issues
+replay firefox 800x450 cdAmber: 0 issues
+replay firefox 800x450 screenCrisis: 0 issues
+replay firefox 800x450 s01b: 0 issues
+replay firefox 800x450 s02: 0 issues
+replay firefox 800x450 s07b: 0 issues
+replay firefox 800x450 celebFamous: 0 issues
+replay firefox 800x450 celebCrisis: 0 issues
+replay firefox 800x450 s10: 0 issues
+replay firefox 800x450 s05: 0 issues
+replay firefox 800x450 s03b: 0 issues
+replay firefox 800x450 s09: 0 issues
+replay firefox 800x450 s07c: 0 issues
+replay firefox 800x450 s04: 0 issues
+replay firefox 800x450 s07: 0 issues
+replay firefox 800x450 bigHand: 0 issues
+replay firefox 800x450 card:screen_test: 0 issues
+replay firefox 800x450 card:film_cameo: 0 issues
+replay firefox 800x450 card:demo_tape: 0 issues
+replay firefox 800x450 card:mentorship: 0 issues
+replay firefox 800x450 card:ghostwriter: 0 issues
+replay firefox 800x450 card:acting_class: 0 issues
+replay firefox 800x450 card:public_feud: 0 issues
+replay firefox 800x450 card:self_tape: 0 issues
+replay firefox 800x450 card:indie_label: 0 issues
+replay firefox 800x450 card:award_campaign: 0 issues
+replay firefox 800x450 card:voice_over: 0 issues
+replay firefox 800x450 card:sellout_ad: 0 issues
+replay firefox 800x450 card:brand_deal: 0 issues
+replay firefox 800x450 card:world_tour: 0 issues
+replay firefox 800x450 card:reinvent_image: 0 issues
+replay firefox 800x450 card:legal_team: 0 issues
+replay firefox 800x450 card:meditation_retreat: 0 issues
+replay firefox 800x450 ending:leading_role: 0 issues
+replay firefox 800x450 ending:craftsman: 0 issues
+replay firefox 800x450 ending:meltdown: 0 issues
+replay firefox 800x450 ending:household_name: 0 issues
+replay firefox 800x450 ending:character_actor: 0 issues
+replay firefox 800x450 ending:tabloid_royalty: 0 issues
+replay firefox 800x450 ending:nobody: 0 issues
+replay firefox 800x450 ending:flash_in_the_pan: 0 issues
+replay firefox 800x450 ending:the_independent: 0 issues
+replay firefox 800x450 ending:the_one_to_watch: 0 issues
+replay firefox 800x450 ending:star: 0 issues
+replay firefox 800x450 ending:running_on_empty: 0 issues
+replay firefox 800x450 ending:starting_over: 0 issues
+replay firefox 800x450 ending:redemption_arc: 0 issues
+overflow check, firefox 800x450: 50 recorded states replayed, 42 cards in their hands — 0 issues
+starting overflow firefox 844x390 (phone)
+progress 2026-10-12T17:30:10.710Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":0,"guard":34,"phase":"play","states":34,"previews":85,"tips":147},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-12T17:30:20.715Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":6,"phase":"play","states":66,"previews":166,"tips":294},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"6","busy":"0"}
+progress 2026-10-12T17:30:30.720Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":35,"phase":"play","states":95,"previews":242,"tips":441},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"35","busy":"0"}
+progress 2026-10-12T17:30:40.735Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":9,"phase":"play","states":126,"previews":324,"tips":588},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"9","busy":"0"}
+progress 2026-10-12T17:30:50.750Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":44,"phase":"play","states":161,"previews":410,"tips":735},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"44","busy":"0"}
+progress 2026-10-12T17:31:00.764Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":3,"guard":24,"phase":"play","states":196,"previews":493,"tips":882},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-12T17:31:10.787Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":19,"phase":"play","states":232,"previews":577,"tips":1036},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"19","busy":"0"}
+progress 2026-10-12T17:31:20.791Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":49,"phase":"play","states":262,"previews":655,"tips":1183},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"49","busy":"0"}
+progress 2026-10-12T17:31:30.799Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":23,"phase":"play","states":291,"previews":741,"tips":1330},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"23","busy":"0"}
+progress 2026-10-12T17:31:40.810Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":54,"phase":"play","states":322,"previews":827,"tips":1484},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-12T17:31:50.835Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":29,"phase":"play","states":355,"previews":908,"tips":1631},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"29","busy":"0"}
+progress 2026-10-12T17:32:00.834Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":6,"phase":"play","states":387,"previews":996,"tips":1771},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"6","busy":"0"}
+progress 2026-10-12T17:32:10.856Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":38,"phase":"play","states":419,"previews":1080,"tips":1925},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"38","busy":"0"}
+progress 2026-10-12T17:32:20.862Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":13,"phase":"play","states":449,"previews":1160,"tips":2065},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-12T17:32:30.867Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":47,"phase":"play","states":483,"previews":1246,"tips":2219},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"47","busy":"0"}
+progress 2026-10-12T17:32:40.882Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":13,"phase":"play","states":510,"previews":1326,"tips":2366},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"13","busy":"0"}
+progress 2026-10-12T17:32:50.888Z firefox firefox 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":47,"phase":"play","states":544,"previews":1406,"tips":2513},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"47","busy":"0"}
+overflow check, firefox 844x390 (phone): 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (172.2s)
+replay firefox 844x390 (phone) early: 0 issues
+replay firefox 844x390 (phone) cdCalm: 0 issues
+replay firefox 844x390 (phone) cdRed: 0 issues
+replay firefox 844x390 (phone) cdCrossed: 0 issues
+replay firefox 844x390 (phone) cdAmber: 0 issues
+replay firefox 844x390 (phone) screenCrisis: 0 issues
+replay firefox 844x390 (phone) s01b: 0 issues
+replay firefox 844x390 (phone) s02: 0 issues
+replay firefox 844x390 (phone) s07b: 0 issues
+replay firefox 844x390 (phone) celebFamous: 0 issues
+replay firefox 844x390 (phone) celebCrisis: 0 issues
+replay firefox 844x390 (phone) s10: 0 issues
+replay firefox 844x390 (phone) s05: 0 issues
+replay firefox 844x390 (phone) s03b: 0 issues
+replay firefox 844x390 (phone) s09: 0 issues
+replay firefox 844x390 (phone) s07c: 0 issues
+replay firefox 844x390 (phone) s04: 0 issues
+replay firefox 844x390 (phone) s07: 0 issues
+replay firefox 844x390 (phone) bigHand: 0 issues
+replay firefox 844x390 (phone) card:screen_test: 0 issues
+replay firefox 844x390 (phone) card:film_cameo: 0 issues
+replay firefox 844x390 (phone) card:demo_tape: 0 issues
+replay firefox 844x390 (phone) card:mentorship: 0 issues
+replay firefox 844x390 (phone) card:ghostwriter: 0 issues
+replay firefox 844x390 (phone) card:acting_class: 0 issues
+replay firefox 844x390 (phone) card:public_feud: 0 issues
+replay firefox 844x390 (phone) card:self_tape: 0 issues
+replay firefox 844x390 (phone) card:indie_label: 0 issues
+replay firefox 844x390 (phone) card:award_campaign: 0 issues
+replay firefox 844x390 (phone) card:voice_over: 0 issues
+replay firefox 844x390 (phone) card:sellout_ad: 0 issues
+replay firefox 844x390 (phone) card:brand_deal: 0 issues
+replay firefox 844x390 (phone) card:world_tour: 0 issues
+replay firefox 844x390 (phone) card:reinvent_image: 0 issues
+replay firefox 844x390 (phone) card:legal_team: 0 issues
+replay firefox 844x390 (phone) card:meditation_retreat: 0 issues
+replay firefox 844x390 (phone) ending:leading_role: 0 issues
+replay firefox 844x390 (phone) ending:craftsman: 0 issues
+replay firefox 844x390 (phone) ending:meltdown: 0 issues
+replay firefox 844x390 (phone) ending:household_name: 0 issues
+replay firefox 844x390 (phone) ending:character_actor: 0 issues
+replay firefox 844x390 (phone) ending:tabloid_royalty: 0 issues
+replay firefox 844x390 (phone) ending:nobody: 0 issues
+replay firefox 844x390 (phone) ending:flash_in_the_pan: 0 issues
+replay firefox 844x390 (phone) ending:the_independent: 0 issues
+replay firefox 844x390 (phone) ending:the_one_to_watch: 0 issues
+replay firefox 844x390 (phone) ending:star: 0 issues
+replay firefox 844x390 (phone) ending:running_on_empty: 0 issues
+replay firefox 844x390 (phone) ending:starting_over: 0 issues
+replay firefox 844x390 (phone) ending:redemption_arc: 0 issues
+overflow check, firefox 844x390 (phone): 50 recorded states replayed, 42 cards in their hands — 0 issues
+PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size

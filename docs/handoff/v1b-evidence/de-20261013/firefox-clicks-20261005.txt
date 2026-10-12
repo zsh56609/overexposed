@@ -1,0 +1,16 @@
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-05T00:46:36.591Z firefox clicks firefox 1280x720 4 runs: {"progress":{"run":1,"guard":29,"states":80,"controls":383,"previews":253,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"29","busy":"0"}
+progress 2026-10-05T00:46:46.617Z firefox clicks firefox 1280x720 4 runs: {"progress":{"run":2,"guard":55,"states":164,"controls":798,"previews":509,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"56","busy":"0"}
+click-through check, firefox 1280x720: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (28.0s)
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-05T00:47:18.566Z firefox clicks firefox 800x450 4 runs: {"progress":{"run":1,"guard":29,"states":80,"controls":383,"previews":253,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"29","busy":"0"}
+progress 2026-10-05T00:47:28.572Z firefox clicks firefox 800x450 4 runs: {"progress":{"run":2,"guard":56,"states":165,"controls":803,"previews":515,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"56","busy":"0"}
+click-through check, firefox 800x450: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (27.7s)
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-05T00:48:00.663Z firefox clicks firefox 844x390 (phone) 4 runs: {"progress":{"run":1,"guard":29,"states":80,"controls":383,"previews":253,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"29","busy":"0"}
+progress 2026-10-05T00:48:10.676Z firefox clicks firefox 844x390 (phone) 4 runs: {"progress":{"run":2,"guard":57,"states":166,"controls":807,"previews":520,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"57","busy":"0"}
+click-through check, firefox 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (27.9s)
+PASS: every control for a legal action is on the stage and takes its click, in every browser and size

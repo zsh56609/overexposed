@@ -10,6 +10,7 @@ const root=resolve(arg('root')??ROOT),name=arg('name')??'de-active';
 const out=join(ROOT,'docs/handoff/v1b-compare');mkdirSync(out,{recursive:true});
 const server=await preview({root,logLevel:'error',preview:{port:4175,strictPort:false}});
 const url=server.resolvedUrls!.local[0]!,states=loadStates(),rows:unknown[]=[];
+const runStartedAt=new Date().toISOString();
 const end=states['ending:redemption_arc']!,season=states.s02!,gate=season.steps.findIndex(s=>s[0]==='gate');
 const longest=longestQuietPlay(),profiling=process.argv.includes('--profile');
 const diagnosticBackdropOff=process.argv.includes('--without-backdrop');
@@ -26,6 +27,7 @@ try {
    await page.throttle(rate);
    for(const [label,fixture,selector] of scenarios){
     if(arg('case')&&arg('case')!==label)continue;
+    const caseStartedAt=new Date().toISOString();
     if(await reach(page,url,fixture)!=='ok')throw Error(`cannot reach ${label}`);
     if(diagnosticBackdropOff)await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.screen-over > .screen-scrim{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}';document.head.appendChild(style)})()`);
     if(diagnosticPromoteCards){await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.desk .hand .card{will-change:transform}';document.head.appendChild(style)})()`);await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');}
@@ -33,11 +35,11 @@ try {
     if(!point)throw Error(`missing ${label}`);
     await page.evaluate(`(()=>{
       document.documentElement.dataset.motion='full';
-      const p=window.__perf={done:false,start:0,last:null,firstFrameMs:null,active:[],idle:[],beats:[],slowFrames:[],longTasks:[],landing:null,settled:null,seenFlight:false};
+      const p=window.__perf={done:false,start:0,startWall:0,last:null,firstFrameMs:null,active:[],idle:[],beats:[],slowFrames:[],longTasks:[],landing:null,settled:null,seenFlight:false};
       if(PerformanceObserver.supportedEntryTypes.includes('longtask')){p.observer=new PerformanceObserver(list=>{for(const e of list.getEntries())if(p.start&&e.startTime>=p.start)p.longTasks.push({at:e.startTime-p.start,duration:e.duration})});p.observer.observe({type:'longtask'});}
       const before=document.querySelector('.desk,[data-presentation]')?.dataset.step;
       document.addEventListener('pointerdown',()=>{
-        p.start=performance.now();let previous='';
+        p.start=performance.now();p.startWall=Date.now();let previous='';
         const tick=t=>{
           const desk=document.querySelector('.desk,[data-presentation]'),busy=desk?.dataset.busy==='1',beat=desk?.dataset.beat??(busy?'busy':'idle');
           const changed=!desk||desk.dataset.step!==before;
@@ -56,8 +58,8 @@ try {
     await page.click(...point); // Real pointer; it stays above the fan until the sequence finishes.
     await page.evaluate(`new Promise((resolve,reject)=>{const start=performance.now();const poll=()=>{if(window.__perf.done)return resolve(true);if(performance.now()-start>65000)return reject(Error('measurement deadline'));setTimeout(poll,50)};poll()})`,70000);
     if(profiling){mkdirSync(join(ROOT,'.npm-cache/profiles'),{recursive:true});writeFileSync(join(ROOT,`.npm-cache/profiles/${name}-${browser}-${rate}-${label}.cpuprofile`),JSON.stringify(await page.profileStop!()));}
-    const result=await page.evaluate<Record<string,unknown>>(`(()=>{const p=window.__perf;const stats=a=>{const x=[...a].sort((a,b)=>a-b),q=k=>x[Math.min(x.length-1,Math.floor(x.length*k))]??null;return {frames:x.length,p50:q(.5),p95:q(.95),max:q(1),over33:x.filter(v=>v>33.4).length}};return {firstFrameMs:p.firstFrameMs,landingMs:p.landing,totalBusyMs:p.settled,active:stats(p.active),idleObservationMs:1500,idle:stats(p.idle),beats:p.beats,slowFrames:p.slowFrames,longTasks:p.longTasks,error:p.error??null}})()`);
-    const row={browser,rate,label,...result};rows.push(row);console.log(JSON.stringify(row));
+    const result=await page.evaluate<Record<string,unknown>>(`(()=>{const p=window.__perf;const stats=a=>{const x=[...a].sort((a,b)=>a-b),q=k=>x[Math.min(x.length-1,Math.floor(x.length*k))]??null;return {frames:x.length,p50:q(.5),p95:q(.95),max:q(1),over33:x.filter(v=>v>33.4).length}};return {inputAt:new Date(p.startWall).toISOString(),firstFrameMs:p.firstFrameMs,landingMs:p.landing,totalBusyMs:p.settled,active:stats(p.active),idleObservationMs:1500,idle:stats(p.idle),beats:p.beats,slowFrames:p.slowFrames,longTasks:p.longTasks,error:p.error??null}})()`);
+    const row={browser,rate,label,runStartedAt,caseStartedAt,caseFinishedAt:new Date().toISOString(),...result};rows.push(row);console.log(JSON.stringify(row));
     if(result.error)throw Error(String(result.error));
     writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,longest,rows},null,2)+'\n');
    }

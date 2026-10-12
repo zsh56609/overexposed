@@ -4,6 +4,10 @@ Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/
 
 ## Current checkpoint — 2026-10-13
 
+`ea8e573` is now pushed. Firefox ordinary/full overflow and interactions pass at all three sizes; full overflow retains 50 recorded states / 42 cards, interactions are 22/22 plus the explicit headless-focus capability skip. Firefox full motion is running. Logs are being archived in `v1b-evidence/de-20261013/`; its Firefox clicks log is the completed October 5 run, not a new run.
+
+**Performance evidence correction:** Windows power events show that the old reviewed/before/after files crossed Modern Standby in different wake conditions. Their numerical differences are diagnostic observations, not controlled proof of an improvement. Preserve them. The new tool records absolute run/case/input timestamps; repeat production measurements in confirmed awake intervals with correctness checks stopped. A temporary per-process wake request has been proposed, but is not enabled pending the author's reply. No power plan or thermal protection is changed. See the October 13 report for the correlation and its limits.
+
 Resume source `1e15ebe` (game source `2e6a3f8`), remote still `51125f9`; no intervening remote changes. Previous automatic approval review failed due to its usage allowance before the pending commit/push executed. Typecheck and read-only remote verification pass now. Chromium all three final configurations and Firefox all three clicks completed in the previous run; Firefox's remaining checks and the final WebKit matrix are next, sequentially. See [October 13 report](../reports/2026-10-13-v1b-acceptance.md) and `.npm-cache/v1b-1013-*` logs. Do not rerun passed work merely because the earlier status paragraph was stale. No phase 3/V2; unresolved performance and intermittent long-press findings remain.
 
 ## Prior checkpoint — 2026-10-05
