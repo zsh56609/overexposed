@@ -2,14 +2,15 @@
 // scene is drawn in greyscale on a canvas, softened, sampled on a 45° grid and printed as dots whose area follows
 // the darkness. The drawings are the mockup's (v18) `SCENES`; a scene's variants come from the same drawing
 // with a different seed — mirrored, reframed, and its crowds, rain and lights shifted. Each picture is drawn
-// the first time a paper needs it and cached as a data URL for the rest of the run.
+// ahead of time in a worker when supported, with the original lazy canvas path as fallback.
 
-import { SCENE_IDS, SEASON_IDS, type SceneId, type SeasonId } from '../../core/index.ts';
+import type { SceneId, SeasonId } from '../../core/index.ts';
 import { t } from '../i18n.ts';
 
 type G = CanvasRenderingContext2D;
 type Drawing = (g: G, w: number, h: number, o: SceneOptions) => void;
 interface SceneOptions {
+  readonly directorLabel: string;
   readonly season: SeasonId;
   /** Shifts the drawing's own patterns: which crowd heads, raindrops and lights fall where. */
   readonly off: number;
@@ -466,7 +467,7 @@ const SCENES: Record<SceneId | 'headshot', Drawing> = {
     // The chair's back: its label reads the right way round in a mirrored variant too.
     g.fillStyle = '#0a0a0a';
     g.font = 'bold 10px sans-serif';
-    const label = t('desk.photo.director');
+    const label = o.directorLabel;
     const tw = Math.min(46, g.measureText(label).width);
     if (o.flip) {
       g.save();
@@ -715,20 +716,20 @@ function soften(d: Uint8ClampedArray, w: number, h: number): Float32Array {
  * Screens a drawing into halftone dots (the mockup's `halftone`): luminance sampled on a 45° grid, area-sampled
  * over five points, each dot's area following the darkness.
  */
-function halftone(draw: (g: G, w: number, h: number) => void, w: number, h: number, o: { ink: string; paper: string; cell?: number }): string {
+function drawingCanvas(w:number,h:number,offscreen:boolean):HTMLCanvasElement|OffscreenCanvas {
+  const canvas=offscreen?new OffscreenCanvas(w,h):document.createElement('canvas');
+  canvas.width=w;canvas.height=h;return canvas;
+}
+function halftone(draw: (g: G, w: number, h: number) => void, w: number, h: number, o: { ink: string; paper: string; cell?: number },offscreen:boolean):HTMLCanvasElement|OffscreenCanvas {
   const cell = o.cell ?? 5.4;
-  const src = document.createElement('canvas');
-  src.width = w;
-  src.height = h;
+  const src = drawingCanvas(w,h,offscreen);
   const g = src.getContext('2d') as G;
   g.fillStyle = '#fff';
   g.fillRect(0, 0, w, h);
   draw(g, w, h);
   const lum = soften(g.getImageData(0, 0, w, h).data, w, h);
   const L = (x: number, y: number): number => lum[Math.max(0, Math.min(h - 1, y | 0)) * w + Math.max(0, Math.min(w - 1, x | 0))] as number;
-  const out = document.createElement('canvas');
-  out.width = w;
-  out.height = h;
+  const out = drawingCanvas(w,h,offscreen);
   const c = out.getContext('2d') as G;
   c.fillStyle = o.paper;
   c.fillRect(0, 0, w, h);
@@ -752,31 +753,16 @@ function halftone(draw: (g: G, w: number, h: number) => void, w: number, h: numb
         c.fill();
       }
     }
-  return out.toDataURL();
+  return out;
 }
 
 const cache = new Map<string, string>();
 
-/** Prepare the finite scene atlas in small idle jobs, as the visual reference specifies.
- * Drawing/PNG encoding must not first occur in a month's publication frame. The on-demand
- * path remains available immediately, so starting a run never waits for this preparation. */
-export function warmPhotos(variants:number):void {
-  const pending:[SceneId|'headshot',SeasonId,number][]=[['headshot','spring',0]];
-  for(const scene of SCENE_IDS)for(const season of scene==='street'?SEASON_IDS:['spring'] as const)
-    for(let variant=0;variant<variants;variant++)pending.push([scene,season,variant]);
-  const next=()=>{
-    // An idle callback's timeout can expire during a long presentation. Never turn that
-    // timeout into extra canvas work in its middle; the normal lazy path still works.
-    if(document.querySelector('[data-busy="1"]')){setTimeout(schedule,250);return;}
-    const item=pending.shift();if(!item)return;
-    photoUrl(...item);
-    if(pending.length)schedule();
-  };
-  const schedule=()=>{
-    if('requestIdleCallback' in window)window.requestIdleCallback(next,{timeout:2000});
-    else setTimeout(next,40);
-  };
-  schedule();
+export type PhotoJob=readonly [scene:SceneId|'headshot',season:SeasonId,variant:number];
+const photoKey=([scene,season,variant]:PhotoJob)=>`${scene}:${scene==='street'?season:''}:${variant}`;
+/** Never replace an already displayed URL. Blob URLs live with this finite page-lifetime cache. */
+export function cachePhotoBlob(job:PhotoJob,blob:Blob):void {
+  const key=photoKey(job);if(!cache.has(key))cache.set(key,URL.createObjectURL(blob));
 }
 
 /**
@@ -785,16 +771,29 @@ export function warmPhotos(variants:number):void {
  * first time it is asked for, then cached.
  */
 export function photoUrl(scene: SceneId | 'headshot', season: SeasonId, variant: number): string {
-  const key = `${scene}:${scene === 'street' ? season : ''}:${variant}`;
+  const key = photoKey([scene,season,variant]);
   const hit = cache.get(key);
   if (hit) return hit;
+  const url=photoCanvas(scene,season,variant).toDataURL();
+  cache.set(key,url);return url;
+}
+
+/** Same drawing and pixels on both paths; only the canvas owner and PNG encoder differ. */
+export function photoCanvas(scene:SceneId|'headshot',season:SeasonId,variant:number):HTMLCanvasElement {
+  return renderPhotoCanvas(scene,season,variant,t('desk.photo.director'),false);
+}
+
+// The worker receives this existing approved label; it does not need the whole prose catalog.
+export function renderPhotoCanvas(scene:SceneId|'headshot',season:SeasonId,variant:number,directorLabel:string,offscreen:false):HTMLCanvasElement;
+export function renderPhotoCanvas(scene:SceneId|'headshot',season:SeasonId,variant:number,directorLabel:string,offscreen:true):OffscreenCanvas;
+export function renderPhotoCanvas(scene:SceneId|'headshot',season:SeasonId,variant:number,directorLabel:string,offscreen:boolean):HTMLCanvasElement|OffscreenCanvas {
   const r = mulberry(variant * 7919 + scene.length * 131 + 17);
   const flip = variant % 3 === 1;
   const zoom = variant % 3 === 2 ? 1.14 + r() * 0.08 : 1;
-  const opts: SceneOptions = { season, off: variant * 5, flip };
+  const opts: SceneOptions = { season, off: variant * 5, flip, directorLabel };
   const w = scene === 'headshot' ? 372 : 480;
   const h = scene === 'headshot' ? 504 : 172;
-  const url = halftone(
+  return halftone(
     (g, W, H) => {
       if (flip) {
         g.translate(W, 0);
@@ -813,7 +812,6 @@ export function photoUrl(scene: SceneId | 'headshot', season: SeasonId, variant:
     w,
     h,
     scene === 'paparazzi' ? RED : scene === 'headshot' ? { ...HEADSHOT, cell: 5.2 } : INK,
+    offscreen,
   );
-  cache.set(key, url);
-  return url;
 }

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';
 import { checkContentInDev } from './content.ts';
 import { Stage } from './Stage.tsx';
-import { warmPhotos } from './desk/halftone.ts';
+import { warmPhotos } from './desk/photo-preload.ts';
 import { PHOTO_VARIANTS } from './desk/model.ts';
 import './style.css';
 
@@ -17,5 +17,5 @@ if (root) {
       </Stage>
     </StrictMode>,
   );
-  warmPhotos(PHOTO_VARIANTS);
+  void warmPhotos(PHOTO_VARIANTS);
 }

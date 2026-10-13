@@ -1,0 +1,336 @@
+month entry webkit: 5 remaining cards animate before the stamp; skip settles
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input webkit: stationary suppressed while busy, restored when idle
+preview input webkit: moving suppressed while busy, restored when idle
+preview input webkit: keyboard suppressed while busy, restored when idle
+SKIP preview touch WebKit: trusted held touch unavailable
+pile input webkit: s02 networking off exact final parity
+pile input webkit: s02 networking full exact final parity
+pile input webkit: s02 networking reduced exact final parity
+pile input webkit: s02 networking skip-early exact final parity
+pile input webkit: s02 networking skip-late exact final parity
+pile input webkit: s02 networking switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: card:self_tape self_tape off exact final parity
+pile input webkit: card:self_tape self_tape full exact final parity
+pile input webkit: card:self_tape self_tape reduced exact final parity
+pile input webkit: card:self_tape self_tape skip-early exact final parity
+pile input webkit: card:self_tape self_tape skip-late exact final parity
+pile input webkit: card:self_tape self_tape switch-reduced exact final parity
+pile input webkit: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 streaming_role off exact final parity
+pile input webkit: s02 streaming_role full exact final parity
+pile input webkit: s02 streaming_role reduced exact final parity
+pile input webkit: s02 streaming_role skip-early exact final parity
+pile input webkit: s02 streaming_role skip-late exact final parity
+pile input webkit: s02 streaming_role switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 open_mic+lay_low off exact final parity
+pile input webkit: s02 open_mic+lay_low full exact final parity
+pile input webkit: s02 open_mic+lay_low reduced exact final parity
+pile input webkit: s02 open_mic+lay_low skip-early exact final parity
+pile input webkit: s02 open_mic+lay_low skip-late exact final parity
+pile input webkit: s02 open_mic+lay_low switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: bigHand @recorded off exact final parity
+pile input webkit: bigHand @recorded full exact final parity
+pile input webkit: bigHand @recorded reduced exact final parity
+pile input webkit: bigHand @recorded skip-early exact final parity
+pile input webkit: bigHand @recorded skip-late exact final parity
+pile input webkit: bigHand @recorded switch-reduced exact final parity
+pile input webkit: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input webkit: flip click exact final parity, no stale callbacks
+boundary input webkit: flip Enter exact final parity, no stale callbacks
+boundary input webkit: flip Space exact final parity, no stale callbacks
+boundary input webkit: carry click exact final parity, no stale callbacks
+boundary input webkit: carry Enter exact final parity, no stale callbacks
+boundary input webkit: carry Space exact final parity, no stale callbacks
+boundary input webkit: sweep click exact final parity, no stale callbacks
+boundary input webkit: sweep Enter exact final parity, no stale callbacks
+boundary input webkit: sweep Space exact final parity, no stale callbacks
+boundary input webkit: season click exact final parity, no stale callbacks
+boundary input webkit: season Enter exact final parity, no stale callbacks
+boundary input webkit: season Space exact final parity, no stale callbacks
+boundary input webkit: after-season-publication click exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Enter exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Space exact final parity, no stale callbacks
+boundary input webkit: deal click exact final parity, no stale callbacks
+boundary input webkit: deal Enter exact final parity, no stale callbacks
+boundary input webkit: deal Space exact final parity, no stale callbacks
+boundary input webkit: arrival click exact final parity, no stale callbacks
+boundary input webkit: arrival Enter exact final parity, no stale callbacks
+boundary input webkit: arrival Space exact final parity, no stale callbacks
+boundary input webkit: winter-publication click exact final parity, no stale callbacks
+boundary input webkit: winter-publication Enter exact final parity, no stale callbacks
+boundary input webkit: winter-publication Space exact final parity, no stale callbacks
+OS preference webkit: play reduced exact parity; 4 animation samples <=200ms, no travel
+OS preference webkit: play mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+OS preference webkit: month reduced exact parity; 91 animation samples <=200ms, no travel
+OS preference webkit: month mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+month input webkit: calm off exact final parity
+month input webkit: calm full exact final parity
+month input webkit: calm reduced exact final parity
+month input webkit: calm skip-early exact final parity
+month input webkit: calm skip-late exact final parity
+month input webkit: frenzy off exact final parity
+month input webkit: frenzy full exact final parity
+month input webkit: frenzy reduced exact final parity
+month input webkit: frenzy skip-early exact final parity
+month input webkit: frenzy skip-late exact final parity
+month input webkit: single-scandal off exact final parity
+month input webkit: single-scandal full exact final parity
+month input webkit: single-scandal reduced exact final parity
+month input webkit: single-scandal skip-early exact final parity
+month input webkit: single-scandal skip-late exact final parity
+month input webkit: mags-relief off exact final parity
+month input webkit: mags-relief full exact final parity
+month input webkit: mags-relief reduced exact final parity
+month input webkit: mags-relief skip-early exact final parity
+month input webkit: mags-relief skip-late exact final parity
+month input webkit: copycat-winter off exact final parity
+month input webkit: copycat-winter full exact final parity
+month input webkit: copycat-winter reduced exact final parity
+month input webkit: copycat-winter skip-early exact final parity
+month input webkit: copycat-winter skip-late exact final parity
+month input webkit: season off exact final parity
+month input webkit: season full exact final parity
+month input webkit: season reduced exact final parity
+month input webkit: season skip-early exact final parity
+month input webkit: season skip-late exact final parity
+month input webkit: draft off exact final parity
+month input webkit: draft full exact final parity
+month input webkit: draft reduced exact final parity
+month input webkit: draft skip-early exact final parity
+month input webkit: draft skip-late exact final parity
+month input webkit: winter-ending off exact final parity
+month input webkit: winter-ending full exact final parity
+month input webkit: winter-ending reduced exact final parity
+month input webkit: winter-ending skip-early exact final parity
+month input webkit: winter-ending skip-late exact final parity
+browser diagnostics: 3332 entries preserved in check/out/month-webkit-diagnostics.json
+PASS motion input webkit 1280x720
+month entry webkit: 5 remaining cards animate before the stamp; skip settles
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input webkit: stationary suppressed while busy, restored when idle
+preview input webkit: moving suppressed while busy, restored when idle
+preview input webkit: keyboard suppressed while busy, restored when idle
+SKIP preview touch WebKit: trusted held touch unavailable
+pile input webkit: s02 networking off exact final parity
+pile input webkit: s02 networking full exact final parity
+pile input webkit: s02 networking reduced exact final parity
+pile input webkit: s02 networking skip-early exact final parity
+pile input webkit: s02 networking skip-late exact final parity
+pile input webkit: s02 networking switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: card:self_tape self_tape off exact final parity
+pile input webkit: card:self_tape self_tape full exact final parity
+pile input webkit: card:self_tape self_tape reduced exact final parity
+pile input webkit: card:self_tape self_tape skip-early exact final parity
+pile input webkit: card:self_tape self_tape skip-late exact final parity
+pile input webkit: card:self_tape self_tape switch-reduced exact final parity
+pile input webkit: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 streaming_role off exact final parity
+pile input webkit: s02 streaming_role full exact final parity
+pile input webkit: s02 streaming_role reduced exact final parity
+pile input webkit: s02 streaming_role skip-early exact final parity
+pile input webkit: s02 streaming_role skip-late exact final parity
+pile input webkit: s02 streaming_role switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 open_mic+lay_low off exact final parity
+pile input webkit: s02 open_mic+lay_low full exact final parity
+pile input webkit: s02 open_mic+lay_low reduced exact final parity
+pile input webkit: s02 open_mic+lay_low skip-early exact final parity
+pile input webkit: s02 open_mic+lay_low skip-late exact final parity
+pile input webkit: s02 open_mic+lay_low switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: bigHand @recorded off exact final parity
+pile input webkit: bigHand @recorded full exact final parity
+pile input webkit: bigHand @recorded reduced exact final parity
+pile input webkit: bigHand @recorded skip-early exact final parity
+pile input webkit: bigHand @recorded skip-late exact final parity
+pile input webkit: bigHand @recorded switch-reduced exact final parity
+pile input webkit: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input webkit: flip click exact final parity, no stale callbacks
+boundary input webkit: flip Enter exact final parity, no stale callbacks
+boundary input webkit: flip Space exact final parity, no stale callbacks
+boundary input webkit: carry click exact final parity, no stale callbacks
+boundary input webkit: carry Enter exact final parity, no stale callbacks
+boundary input webkit: carry Space exact final parity, no stale callbacks
+boundary input webkit: sweep click exact final parity, no stale callbacks
+boundary input webkit: sweep Enter exact final parity, no stale callbacks
+boundary input webkit: sweep Space exact final parity, no stale callbacks
+boundary input webkit: season click exact final parity, no stale callbacks
+boundary input webkit: season Enter exact final parity, no stale callbacks
+boundary input webkit: season Space exact final parity, no stale callbacks
+boundary input webkit: after-season-publication click exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Enter exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Space exact final parity, no stale callbacks
+boundary input webkit: deal click exact final parity, no stale callbacks
+boundary input webkit: deal Enter exact final parity, no stale callbacks
+boundary input webkit: deal Space exact final parity, no stale callbacks
+boundary input webkit: arrival click exact final parity, no stale callbacks
+boundary input webkit: arrival Enter exact final parity, no stale callbacks
+boundary input webkit: arrival Space exact final parity, no stale callbacks
+boundary input webkit: winter-publication click exact final parity, no stale callbacks
+boundary input webkit: winter-publication Enter exact final parity, no stale callbacks
+boundary input webkit: winter-publication Space exact final parity, no stale callbacks
+OS preference webkit: play reduced exact parity; 4 animation samples <=200ms, no travel
+OS preference webkit: play mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+OS preference webkit: month reduced exact parity; 92 animation samples <=200ms, no travel
+OS preference webkit: month mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+month input webkit: calm off exact final parity
+month input webkit: calm full exact final parity
+month input webkit: calm reduced exact final parity
+month input webkit: calm skip-early exact final parity
+month input webkit: calm skip-late exact final parity
+month input webkit: frenzy off exact final parity
+month input webkit: frenzy full exact final parity
+month input webkit: frenzy reduced exact final parity
+month input webkit: frenzy skip-early exact final parity
+month input webkit: frenzy skip-late exact final parity
+month input webkit: single-scandal off exact final parity
+month input webkit: single-scandal full exact final parity
+month input webkit: single-scandal reduced exact final parity
+month input webkit: single-scandal skip-early exact final parity
+month input webkit: single-scandal skip-late exact final parity
+month input webkit: mags-relief off exact final parity
+month input webkit: mags-relief full exact final parity
+month input webkit: mags-relief reduced exact final parity
+month input webkit: mags-relief skip-early exact final parity
+month input webkit: mags-relief skip-late exact final parity
+month input webkit: copycat-winter off exact final parity
+month input webkit: copycat-winter full exact final parity
+month input webkit: copycat-winter reduced exact final parity
+month input webkit: copycat-winter skip-early exact final parity
+month input webkit: copycat-winter skip-late exact final parity
+month input webkit: season off exact final parity
+month input webkit: season full exact final parity
+month input webkit: season reduced exact final parity
+month input webkit: season skip-early exact final parity
+month input webkit: season skip-late exact final parity
+month input webkit: draft off exact final parity
+month input webkit: draft full exact final parity
+month input webkit: draft reduced exact final parity
+month input webkit: draft skip-early exact final parity
+month input webkit: draft skip-late exact final parity
+month input webkit: winter-ending off exact final parity
+month input webkit: winter-ending full exact final parity
+month input webkit: winter-ending reduced exact final parity
+month input webkit: winter-ending skip-early exact final parity
+month input webkit: winter-ending skip-late exact final parity
+browser diagnostics: 3332 entries preserved in check/out/month-webkit-diagnostics.json
+PASS motion input webkit 800x450
+month entry webkit: 5 remaining cards animate before the stamp; skip settles
+D7 webkit at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 webkit at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input webkit: stationary suppressed while busy, restored when idle
+preview input webkit: moving suppressed while busy, restored when idle
+preview input webkit: keyboard suppressed while busy, restored when idle
+SKIP preview touch WebKit: trusted held touch unavailable
+pile input webkit: s02 networking off exact final parity
+pile input webkit: s02 networking full exact final parity
+pile input webkit: s02 networking reduced exact final parity
+pile input webkit: s02 networking skip-early exact final parity
+pile input webkit: s02 networking skip-late exact final parity
+pile input webkit: s02 networking switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: card:self_tape self_tape off exact final parity
+pile input webkit: card:self_tape self_tape full exact final parity
+pile input webkit: card:self_tape self_tape reduced exact final parity
+pile input webkit: card:self_tape self_tape skip-early exact final parity
+pile input webkit: card:self_tape self_tape skip-late exact final parity
+pile input webkit: card:self_tape self_tape switch-reduced exact final parity
+pile input webkit: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 streaming_role off exact final parity
+pile input webkit: s02 streaming_role full exact final parity
+pile input webkit: s02 streaming_role reduced exact final parity
+pile input webkit: s02 streaming_role skip-early exact final parity
+pile input webkit: s02 streaming_role skip-late exact final parity
+pile input webkit: s02 streaming_role switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 open_mic+lay_low off exact final parity
+pile input webkit: s02 open_mic+lay_low full exact final parity
+pile input webkit: s02 open_mic+lay_low reduced exact final parity
+pile input webkit: s02 open_mic+lay_low skip-early exact final parity
+pile input webkit: s02 open_mic+lay_low skip-late exact final parity
+pile input webkit: s02 open_mic+lay_low switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: bigHand @recorded off exact final parity
+pile input webkit: bigHand @recorded full exact final parity
+pile input webkit: bigHand @recorded reduced exact final parity
+pile input webkit: bigHand @recorded skip-early exact final parity
+pile input webkit: bigHand @recorded skip-late exact final parity
+pile input webkit: bigHand @recorded switch-reduced exact final parity
+pile input webkit: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input webkit: flip click exact final parity, no stale callbacks
+boundary input webkit: flip Enter exact final parity, no stale callbacks
+boundary input webkit: flip Space exact final parity, no stale callbacks
+boundary input webkit: carry click exact final parity, no stale callbacks
+boundary input webkit: carry Enter exact final parity, no stale callbacks
+boundary input webkit: carry Space exact final parity, no stale callbacks
+boundary input webkit: sweep click exact final parity, no stale callbacks
+boundary input webkit: sweep Enter exact final parity, no stale callbacks
+boundary input webkit: sweep Space exact final parity, no stale callbacks
+boundary input webkit: season click exact final parity, no stale callbacks
+boundary input webkit: season Enter exact final parity, no stale callbacks
+boundary input webkit: season Space exact final parity, no stale callbacks
+boundary input webkit: after-season-publication click exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Enter exact final parity, no stale callbacks
+boundary input webkit: after-season-publication Space exact final parity, no stale callbacks
+boundary input webkit: deal click exact final parity, no stale callbacks
+boundary input webkit: deal Enter exact final parity, no stale callbacks
+boundary input webkit: deal Space exact final parity, no stale callbacks
+boundary input webkit: arrival click exact final parity, no stale callbacks
+boundary input webkit: arrival Enter exact final parity, no stale callbacks
+boundary input webkit: arrival Space exact final parity, no stale callbacks
+boundary input webkit: winter-publication click exact final parity, no stale callbacks
+boundary input webkit: winter-publication Enter exact final parity, no stale callbacks
+boundary input webkit: winter-publication Space exact final parity, no stale callbacks
+OS preference webkit: play reduced exact parity; 4 animation samples <=200ms, no travel
+OS preference webkit: play mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+OS preference webkit: month reduced exact parity; 92 animation samples <=200ms, no travel
+OS preference webkit: month mid-sequence change exact parity; 1 animation samples <=200ms, no travel
+month input webkit: calm off exact final parity
+month input webkit: calm full exact final parity
+month input webkit: calm reduced exact final parity
+month input webkit: calm skip-early exact final parity
+month input webkit: calm skip-late exact final parity
+month input webkit: frenzy off exact final parity
+month input webkit: frenzy full exact final parity
+month input webkit: frenzy reduced exact final parity
+month input webkit: frenzy skip-early exact final parity
+month input webkit: frenzy skip-late exact final parity
+month input webkit: single-scandal off exact final parity
+month input webkit: single-scandal full exact final parity
+month input webkit: single-scandal reduced exact final parity
+month input webkit: single-scandal skip-early exact final parity
+month input webkit: single-scandal skip-late exact final parity
+month input webkit: mags-relief off exact final parity
+month input webkit: mags-relief full exact final parity
+month input webkit: mags-relief reduced exact final parity
+month input webkit: mags-relief skip-early exact final parity
+month input webkit: mags-relief skip-late exact final parity
+month input webkit: copycat-winter off exact final parity
+month input webkit: copycat-winter full exact final parity
+month input webkit: copycat-winter reduced exact final parity
+month input webkit: copycat-winter skip-early exact final parity
+month input webkit: copycat-winter skip-late exact final parity
+month input webkit: season off exact final parity
+month input webkit: season full exact final parity
+month input webkit: season reduced exact final parity
+month input webkit: season skip-early exact final parity
+month input webkit: season skip-late exact final parity
+month input webkit: draft off exact final parity
+month input webkit: draft full exact final parity
+month input webkit: draft reduced exact final parity
+month input webkit: draft skip-early exact final parity
+month input webkit: draft skip-late exact final parity
+month input webkit: winter-ending off exact final parity
+month input webkit: winter-ending full exact final parity
+month input webkit: winter-ending reduced exact final parity
+month input webkit: winter-ending skip-early exact final parity
+month input webkit: winter-ending skip-late exact final parity
+browser diagnostics: 3332 entries preserved in check/out/month-webkit-diagnostics.json
+PASS motion input webkit 844x390

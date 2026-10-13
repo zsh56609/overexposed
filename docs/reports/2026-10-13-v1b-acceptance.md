@@ -4,6 +4,16 @@
 
 ## 恢复点
 
+### 15 时后续：照片发布卡顿修复（待最终验收）
+
+- `014eab3` 已推送。游戏源 `2e6a3f8` 的 WebKit 完整溢出、交互、动效三尺寸现已全部通过，至此九配置正确性矩阵齐全。完整溢出保持 50 固定回放/42 卡；交互各 21/21，可信长按能力跳过。下文“正在执行”描述较早检查点。
+- 独立生产 CPU profile 在发布附近采样到 React 同步工作约 70.39ms，其中照片绘制/编码约 32.66ms，PNG 编码自身约 17.51ms。区间对齐是近似值；该 profile 不充当正式帧率验收。原始文件在 `.npm-cache/profiles/de-publication-profile-20261013-chrome-4-frenzy-end.cpuprofile`，映射副本在 `.npm-cache/profile-current-014eab3/dist/`。
+- 原先空闲预热可能赶不上立即输入，忙碌保护又将其延后，发布便重新走同步路径。现用浏览器原生工作线程准备同样的 34 张照片，有限缓存保留已显示 URL；15 秒期限或出错终止线程并走原回退。没有改变动效节奏或读文时间。已批准的 `desk.photo.director` 从主线程传入，避免把整份文案表打入 worker。
+- Chromium/Firefox 的 34 张照片逐 RGBA 字节一致；强制无 Worker 回退和忙碌保护通过。本机 WebKit 无所需 OffscreenCanvas，明确跳过 worker 像素比较，原回退通过。新日志 `v1b-1013-photo-worker-final-configured.log`；首次忘记设置本进程 Firefox 路径的启动失败也保留，未计通过。
+- 构建/类型检查通过；主 JS 473.61→474.69 kB，gzip 145.14→145.62；新增 worker 15.13 kB，CSS 52.46 / gzip 11.74 不变。没有新增依赖。最初 worker 误带整份文案表达 83.62 kB，已排除。
+- 定向试跑的 Chromium 4× frenzy 最大帧 108.3→66.4ms、season 100→33.4ms，均未再记录 Long Task；这是两个场景的前后观察，不替代全场景验收。Firefox 仍有 58.34ms p95 / 108.32ms 最大帧；不称流畅通过。数据 `de-worker-probe-20261013.json` 带独立无待机记录。
+- 新修复的完整生产测量与真实输入检查尚待完成；此前完整矩阵、连续录像和 `014eab3` ZIP 属于修复前游戏源，不能冒称新修复已验收。未开始 phase 3/V2。
+
 - 上轮后半段提交/推送未执行：自动权限审查因使用额度耗尽失败，不是认定操作不安全。本次只读远端核对与浏览器启动的权限审查已通过；typecheck 通过，Node 仍为 24.16.0。
 - D/E、A–C 忙碌预览、StrictMode 第一拍和历史出牌堆实现均保持不变。已完成的四项模拟/18 文件一致性、预览、冷却、queue、生产测量及录像证据详见 [10 月 5 日报告](2026-10-05-v1b-acceptance.md)。本段属于已复跑的上轮证据，不冒称今天重跑。
 - 10 月 5 日 Chromium 三尺寸 clicks、普通/完整 overflow、interactions 和扩展 motion 最终均有通过记录。1280×720 的新增覆盖另有 `coverage` 日志。初次节拍器采样失败、一次长按未打开、待机中断均保留；重跑通过不抹掉它们。

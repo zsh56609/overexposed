@@ -1,0 +1,6 @@
+PASS photo worker chrome: 34 photos, exact RGBA parity
+PASS photo fallback chrome: busy guard and complete finite cache
+PASS photo worker firefox: 34 photos, exact RGBA parity
+PASS photo fallback firefox: busy guard and complete finite cache
+SKIP worker pixels webkit: Worker/OffscreenCanvas unavailable; original idle rendering retained
+PASS photo fallback webkit: busy guard and complete finite cache

@@ -11,5 +11,9 @@ Game source is unchanged from `2e6a3f8`; this continuation starts from audit/evi
 | `firefox-motion.txt` | October 13 01:37–01:55 local time, all three sizes pass. Stationary/moving/held-touch preview suppression and restored access; five pile fixtures with static replay and real settled hit points; eight month fixtures and actual boundaries. Headless keyboard and OS-media emulation skips remain explicit. No Kernel-Power 42/88/506/507 event occurred during this run. |
 | `webkit-clicks.txt` | October 13, all three sizes pass; same 233 / 1,101 / 716 / 3,756 / 18,780 counts and D7. |
 | `webkit-overflow.txt` | October 13, all three sizes pass; same 213 / 544 / 973 / 106 / 36 counts. |
+| `webkit-full.txt` | October 13, all three sizes pass; 549 / 1,422 / 2,548 and 50 fixed replays / 42 cards. |
+| `webkit-interactions.txt` | October 13, all three sizes 21/21; unsupported trusted held-touch group explicitly skipped. |
+| `webkit-motion.txt` | October 13, all three sizes pass; full/reduced/off, previews, pile parity, actual boundaries and OS-media changes. Trusted held touch remains a capability skip. |
+| `zip-verification.json` | Candidate `014eab3`, root index and relative assets verified. This ZIP predates the new photo-worker repair. |
 
 These are correctness observations, not performance acceptance. Windows entered Modern Standby during part of the overflow run; progress and final assertions completed, but its duration must not be used as a controlled speed benchmark. Old invalid/interrupted runs and input failures remain under `../de-20261005/` and the local ignored cache. Nothing here replaces the reviewed simulation or press baselines.

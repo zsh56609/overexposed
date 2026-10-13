@@ -1,0 +1,204 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\profile-current-014eab3",
+  "profiling": true,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": null,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "frenzy-end",
+      "runStartedAt": "2026-10-13T07:13:16.832Z",
+      "caseStartedAt": "2026-10-13T07:13:17.625Z",
+      "caseFinishedAt": "2026-10-13T07:13:33.674Z",
+      "inputAt": "2026-10-13T07:13:21.448Z",
+      "firstFrameMs": -3.999999976158051,
+      "landingMs": null,
+      "totalBusyMs": 10679.400000023841,
+      "active": {
+        "frames": 1260,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 100,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 145,
+        "p50": 8.399999999999636,
+        "p95": 25,
+        "max": 66.60000000000036,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": -3.999999976158051,
+          "beat": "idle"
+        },
+        {
+          "at": 4.40000002384204,
+          "beat": "endPress"
+        },
+        {
+          "at": 346.0000000238415,
+          "beat": "stamp"
+        },
+        {
+          "at": 920.900000023842,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1971.400000023842,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3171.0000000238415,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3796.0000000238415,
+          "beat": "impact"
+        },
+        {
+          "at": 3820.900000023842,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4445.900000023841,
+          "beat": "impact"
+        },
+        {
+          "at": 4845.900000023841,
+          "beat": "resources"
+        },
+        {
+          "at": 6187.600000023842,
+          "beat": "sweep"
+        },
+        {
+          "at": 7054.300000023843,
+          "beat": "date"
+        },
+        {
+          "at": 7312.600000023842,
+          "beat": "publish"
+        },
+        {
+          "at": 7762.600000023842,
+          "beat": "message"
+        },
+        {
+          "at": 10679.400000023841,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 62.70000002384177,
+          "beat": "endPress",
+          "ms": 58.29999999999973
+        },
+        {
+          "at": 7412.600000023842,
+          "beat": "publish",
+          "ms": 100
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 8,
+          "duration": 51
+        },
+        {
+          "at": 7309.699999988079,
+          "duration": 66
+        },
+        {
+          "at": 10926.400000035763,
+          "duration": 76
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

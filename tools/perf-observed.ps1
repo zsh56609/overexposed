@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Name,[string]$SourceRoot='.',[string]$Browsers='chrome,firefox,webkit',[string]$Cases='',[string]$PaintProbe='')
+param([Parameter(Mandatory=$true)][string]$Name,[string]$SourceRoot='.',[string]$Browsers='chrome,firefox,webkit',[string]$Cases='',[string]$PaintProbe='',[string]$Rates='',[switch]$Profile)
 $ErrorActionPreference='Stop'
 # Read-only power observation. This never requests wakefulness or changes settings.
 $filter=@{LogName='System';ProviderName='Microsoft-Windows-Kernel-Power';Id=42,88,506,507}
@@ -7,6 +7,8 @@ $started=Get-Date
 $arguments=@('tools/motion-active-perf.ts',"--name=$Name","--root=$SourceRoot","--browsers=$Browsers")
 if($Cases){$arguments+="--case=$Cases"}
 if($PaintProbe){$arguments+="--paint-probe=$PaintProbe"}
+if($Rates){$arguments+="--rates=$Rates"}
+if($Profile){$arguments+='--profile'}
 $auditExitCode=1
 try {
   & node @arguments
