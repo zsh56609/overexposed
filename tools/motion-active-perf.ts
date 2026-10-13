@@ -15,6 +15,17 @@ const end=states['ending:redemption_arc']!,season=states.s02!,gate=season.steps.
 const longest=longestQuietPlay(),profiling=process.argv.includes('--profile');
 const diagnosticBackdropOff=process.argv.includes('--without-backdrop');
 const diagnosticPromoteCards=process.argv.includes('--promote-cards');
+// Controlled CSS probes only; never count these altered presentations as acceptance.
+const paintProbes:Record<string,string>={
+ 'compact-planes':'.desk .scene3d .plane{width:0!important;height:0!important}',
+ 'ambient-layer':'.desk .up,.desk .bulb.flicker{will-change:transform}',
+ 'no-blend':'.desk .lightpool{mix-blend-mode:normal!important}',
+ 'no-ambient':'.desk .metro,.desk .steam,.desk .bulb.flicker{visibility:hidden!important}',
+ 'flat-presentation':'.desk .scene3d,.desk .deskscene{perspective:none!important}.desk .plane,.desk .desktop{transform:none!important}',
+ 'no-grain':'.desk .pp{background-image:radial-gradient(ellipse at 50% 42%,rgba(255,252,242,.55) 0%,rgba(0,0,0,0) 58%,rgba(125,100,62,.18) 100%)!important}',
+};
+const diagnosticPaintProbe=arg('paint-probe')??null;
+if(diagnosticPaintProbe&&!paintProbes[diagnosticPaintProbe])throw Error(`unknown paint probe ${diagnosticPaintProbe}`);
 const scenarios:[string,DeskState,string][]=[['loud',states.s02!,'.hand .card[data-card="open_mic"]'],['quiet',states.s02!,'.hand .card[data-card="lay_low"]'],['calm-end',states.early!,'.endbtn'],['frenzy-end',states.s07b!,'.endbtn'],['copycat-end',states.celebCrisis!,'.endbtn'],['season',{...season,steps:season.steps.slice(0,gate)},'.gates .take'],['winter-ending',{...end,steps:end.steps.slice(0,-1)},'.gates .take']];
 scenarios.push(['quiet-longest-recorded',longest.fixture,longest.selector]);
 // Retain the exact A-C timing fixtures to investigate the reported 83.34/124.9ms outliers.
@@ -26,11 +37,12 @@ try {
   try {
    await page.throttle(rate);
    for(const [label,fixture,selector] of scenarios){
-    if(arg('case')&&arg('case')!==label)continue;
+    if(arg('case')&&!arg('case')!.split(',').includes(label))continue;
     const caseStartedAt=new Date().toISOString();
     if(await reach(page,url,fixture)!=='ok')throw Error(`cannot reach ${label}`);
     if(diagnosticBackdropOff)await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.screen-over > .screen-scrim{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}';document.head.appendChild(style)})()`);
     if(diagnosticPromoteCards){await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent='.desk .hand .card{will-change:transform}';document.head.appendChild(style)})()`);await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');}
+    if(diagnosticPaintProbe)await page.evaluate(`(()=>{const style=document.createElement('style');style.textContent=${JSON.stringify(paintProbes[diagnosticPaintProbe])};document.head.appendChild(style)})()`);
     const point=selector.includes('.card')?await cardPoint(page,await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].indexOf(document.querySelector(${JSON.stringify(selector)}))`)):await centre(page,selector);
     if(!point)throw Error(`missing ${label}`);
     await page.evaluate(`(()=>{
@@ -61,10 +73,10 @@ try {
     const result=await page.evaluate<Record<string,unknown>>(`(()=>{const p=window.__perf;const stats=a=>{const x=[...a].sort((a,b)=>a-b),q=k=>x[Math.min(x.length-1,Math.floor(x.length*k))]??null;return {frames:x.length,p50:q(.5),p95:q(.95),max:q(1),over33:x.filter(v=>v>33.4).length}};return {inputAt:new Date(p.startWall).toISOString(),firstFrameMs:p.firstFrameMs,landingMs:p.landing,totalBusyMs:p.settled,active:stats(p.active),idleObservationMs:1500,idle:stats(p.idle),beats:p.beats,slowFrames:p.slowFrames,longTasks:p.longTasks,error:p.error??null}})()`);
     const row={browser,rate,label,runStartedAt,caseStartedAt,caseFinishedAt:new Date().toISOString(),...result};rows.push(row);console.log(JSON.stringify(row));
     if(result.error)throw Error(String(result.error));
-    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,longest,rows},null,2)+'\n');
+    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
    }
   }finally{await page.close();}
  }
  rows.push({browser:'firefox',rate:4,capabilitySkip:'BiDi has no CPU throttling; no substitute labelled 4x.'});
- writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,longest,rows},null,2)+'\n');
+ writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
 }finally{await new Promise<void>(r=>server.httpServer.close(()=>r()));}

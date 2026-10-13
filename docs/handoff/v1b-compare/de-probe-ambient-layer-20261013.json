@@ -1,0 +1,1552 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": "ambient-layer",
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:16:55.469Z",
+      "caseStartedAt": "2026-10-13T02:16:57.776Z",
+      "caseFinishedAt": "2026-10-13T02:17:09.749Z",
+      "inputAt": "2026-10-13T02:17:01.579Z",
+      "firstFrameMs": 32.460000000000036,
+      "landingMs": null,
+      "totalBusyMs": 6640.780000000001,
+      "active": {
+        "frames": 218,
+        "p50": 25,
+        "p95": 66.68000000000029,
+        "max": 150,
+        "over33": 72
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 165,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 41.659999999999854,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 32.460000000000036,
+          "beat": "endPress"
+        },
+        {
+          "at": 382.46000000000004,
+          "beat": "stamp"
+        },
+        {
+          "at": 949.1199999999999,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2015.7799999999997,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3182.46,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3840.7799999999997,
+          "beat": "impact"
+        },
+        {
+          "at": 4232.46,
+          "beat": "resources"
+        },
+        {
+          "at": 5565.780000000001,
+          "beat": "sweep"
+        },
+        {
+          "at": 6174.1,
+          "beat": "date"
+        },
+        {
+          "at": 6457.4400000000005,
+          "beat": "publish"
+        },
+        {
+          "at": 6640.780000000001,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 82.46000000000004,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 124.11999999999989,
+          "beat": "endPress",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 174.1199999999999,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 224.1199999999999,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 290.7800000000002,
+          "beat": "endPress",
+          "ms": 66.66000000000031
+        },
+        {
+          "at": 332.46000000000004,
+          "beat": "endPress",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 382.46000000000004,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 440.77999999999975,
+          "beat": "stamp",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 482.46000000000004,
+          "beat": "stamp",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 549.1199999999999,
+          "beat": "stamp",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 649.1199999999999,
+          "beat": "stamp",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 740.7799999999997,
+          "beat": "stamp",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 840.7799999999997,
+          "beat": "stamp",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 899.1199999999999,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 949.1199999999999,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 990.7799999999997,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1032.46,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1074.12,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1182.46,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1240.7799999999997,
+          "beat": "scandalLift",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 1332.46,
+          "beat": "scandalLift",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 1424.12,
+          "beat": "scandalLift",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 1482.46,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1582.4399999999996,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 1740.7799999999997,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1782.4399999999996,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1849.12,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1932.4399999999996,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1974.12,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2015.7799999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2057.4399999999996,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2132.4399999999996,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2174.12,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2257.4399999999996,
+          "beat": "scandalFlip",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 2324.12,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2424.12,
+          "beat": "scandalFlip",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 2532.4399999999996,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2599.12,
+          "beat": "scandalFlip",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 2674.12,
+          "beat": "scandalFlip",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 2749.12,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2799.12,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2849.12,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2899.12,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2949.12,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2999.12,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 3040.7799999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3099.12,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 3140.7799999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3182.46,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3232.46,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3299.12,
+          "beat": "scandalCarry",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 3340.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3382.46,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3449.12,
+          "beat": "scandalCarry",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 3490.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3540.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3615.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3657.46,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3699.12,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3740.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3790.7799999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3840.7799999999997,
+          "beat": "impact",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3915.7799999999997,
+          "beat": "impact",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 4074.12,
+          "beat": "impact",
+          "ms": 150
+        },
+        {
+          "at": 4232.46,
+          "beat": "resources",
+          "ms": 150
+        },
+        {
+          "at": 4374.12,
+          "beat": "resources",
+          "ms": 133.34000000000015
+        },
+        {
+          "at": 4449.120000000001,
+          "beat": "resources",
+          "ms": 66.6800000000012
+        },
+        {
+          "at": 5615.780000000001,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6457.4400000000005,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6540.780000000001,
+          "beat": "publish",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 6590.780000000001,
+          "beat": "publish",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 6640.780000000001,
+          "beat": "idle",
+          "ms": 50
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:16:55.469Z",
+      "caseStartedAt": "2026-10-13T02:17:09.751Z",
+      "caseFinishedAt": "2026-10-13T02:17:21.058Z",
+      "inputAt": "2026-10-13T02:17:12.155Z",
+      "firstFrameMs": 13.539999999999964,
+      "landingMs": null,
+      "totalBusyMs": 7338.52,
+      "active": {
+        "frames": 206,
+        "p50": 33.31999999999971,
+        "p95": 91.68000000000029,
+        "max": 141.65999999999985,
+        "over33": 81
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 103,
+        "p50": 8.340000000000146,
+        "p95": 33.340000000000146,
+        "max": 100,
+        "over33": 3
+      },
+      "beats": [
+        {
+          "at": 13.539999999999964,
+          "beat": "idle"
+        },
+        {
+          "at": 46.88000000000011,
+          "beat": "endPress"
+        },
+        {
+          "at": 413.53999999999996,
+          "beat": "stamp"
+        },
+        {
+          "at": 988.54,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2005.1999999999998,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3205.2,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4496.86,
+          "beat": "impact"
+        },
+        {
+          "at": 4888.52,
+          "beat": "resources"
+        },
+        {
+          "at": 6246.860000000001,
+          "beat": "sweep"
+        },
+        {
+          "at": 7113.52,
+          "beat": "publish"
+        },
+        {
+          "at": 7338.52,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 88.53999999999996,
+          "beat": "endPress",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 155.2199999999998,
+          "beat": "endPress",
+          "ms": 66.67999999999984
+        },
+        {
+          "at": 213.53999999999996,
+          "beat": "endPress",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 313.53999999999996,
+          "beat": "endPress",
+          "ms": 100
+        },
+        {
+          "at": 413.53999999999996,
+          "beat": "stamp",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 480.2199999999998,
+          "beat": "stamp",
+          "ms": 58.33999999999969
+        },
+        {
+          "at": 555.2199999999998,
+          "beat": "stamp",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 621.8800000000001,
+          "beat": "stamp",
+          "ms": 66.66000000000031
+        },
+        {
+          "at": 688.54,
+          "beat": "stamp",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 738.54,
+          "beat": "stamp",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 805.2199999999998,
+          "beat": "stamp",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 880.2199999999998,
+          "beat": "stamp",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 988.54,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1046.88,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1130.1999999999998,
+          "beat": "scandalLift",
+          "ms": 74.98000000000002
+        },
+        {
+          "at": 1180.1999999999998,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1263.54,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1346.88,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1438.54,
+          "beat": "scandalLift",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 1538.54,
+          "beat": "scandalLift",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 1838.54,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1955.1999999999998,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2063.54,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2121.88,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2163.54,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2221.88,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2321.88,
+          "beat": "scandalFlip",
+          "ms": 91.68000000000029
+        },
+        {
+          "at": 2430.2,
+          "beat": "scandalFlip",
+          "ms": 100
+        },
+        {
+          "at": 2546.88,
+          "beat": "scandalFlip",
+          "ms": 108.34000000000015
+        },
+        {
+          "at": 2655.2,
+          "beat": "scandalFlip",
+          "ms": 100
+        },
+        {
+          "at": 2771.88,
+          "beat": "scandalFlip",
+          "ms": 108.34000000000015
+        },
+        {
+          "at": 2821.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2946.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3071.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 3121.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3205.2,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3288.54,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 3346.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3388.54,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3463.54,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3521.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 3563.54,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3613.54,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3696.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 3788.54,
+          "beat": "scandalCarry",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 3871.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 3980.2,
+          "beat": "scandalCarry",
+          "ms": 100
+        },
+        {
+          "at": 4130.2,
+          "beat": "scandalCarry",
+          "ms": 141.65999999999985
+        },
+        {
+          "at": 4255.2,
+          "beat": "scandalCarry",
+          "ms": 116.65999999999985
+        },
+        {
+          "at": 4371.86,
+          "beat": "scandalCarry",
+          "ms": 108.31999999999971
+        },
+        {
+          "at": 4455.2,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 4546.86,
+          "beat": "impact",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 4680.2,
+          "beat": "impact",
+          "ms": 125
+        },
+        {
+          "at": 4763.52,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4805.2,
+          "beat": "impact",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 4888.52,
+          "beat": "resources",
+          "ms": 83.32000000000062
+        },
+        {
+          "at": 4971.86,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5021.86,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5080.2,
+          "beat": "resources",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 5155.2,
+          "beat": "resources",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 5221.86,
+          "beat": "resources",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 5321.86,
+          "beat": "resources",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 5405.2,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5471.86,
+          "beat": "resources",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 5546.86,
+          "beat": "resources",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 5596.86,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5946.860000000001,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5996.860000000001,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6071.860000000001,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6163.52,
+          "beat": "resources",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 6246.860000000001,
+          "beat": "sweep",
+          "ms": 50
+        },
+        {
+          "at": 6338.52,
+          "beat": "sweep",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 6438.52,
+          "beat": "sweep",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 6530.18,
+          "beat": "sweep",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 6613.52,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 6713.52,
+          "beat": "sweep",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 6763.52,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7113.52,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7196.860000000001,
+          "beat": "publish",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 7288.52,
+          "beat": "publish",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 7338.52,
+          "beat": "idle",
+          "ms": 50
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:16:55.469Z",
+      "caseStartedAt": "2026-10-13T02:17:22.380Z",
+      "caseFinishedAt": "2026-10-13T02:17:33.913Z",
+      "inputAt": "2026-10-13T02:17:25.230Z",
+      "firstFrameMs": 168,
+      "landingMs": null,
+      "totalBusyMs": 6904,
+      "active": {
+        "frames": 39,
+        "p50": 181,
+        "p95": 283,
+        "max": 287,
+        "over33": 39
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 7,
+        "p50": 219,
+        "p95": 234,
+        "max": 234,
+        "over33": 7
+      },
+      "beats": [
+        {
+          "at": 168,
+          "beat": "endPress"
+        },
+        {
+          "at": 440,
+          "beat": "stamp"
+        },
+        {
+          "at": 965,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1987,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3273,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3888,
+          "beat": "impact"
+        },
+        {
+          "at": 4281,
+          "beat": "resources"
+        },
+        {
+          "at": 5586,
+          "beat": "sweep"
+        },
+        {
+          "at": 6170,
+          "beat": "date"
+        },
+        {
+          "at": 6636,
+          "beat": "publish"
+        },
+        {
+          "at": 6904,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 296,
+          "beat": "endPress",
+          "ms": 128
+        },
+        {
+          "at": 440,
+          "beat": "stamp",
+          "ms": 144
+        },
+        {
+          "at": 546,
+          "beat": "stamp",
+          "ms": 106
+        },
+        {
+          "at": 667,
+          "beat": "stamp",
+          "ms": 121
+        },
+        {
+          "at": 771,
+          "beat": "stamp",
+          "ms": 104
+        },
+        {
+          "at": 868,
+          "beat": "stamp",
+          "ms": 97
+        },
+        {
+          "at": 965,
+          "beat": "scandalLift",
+          "ms": 97
+        },
+        {
+          "at": 1082,
+          "beat": "scandalLift",
+          "ms": 117
+        },
+        {
+          "at": 1186,
+          "beat": "scandalLift",
+          "ms": 104
+        },
+        {
+          "at": 1292,
+          "beat": "scandalLift",
+          "ms": 106
+        },
+        {
+          "at": 1409,
+          "beat": "scandalLift",
+          "ms": 117
+        },
+        {
+          "at": 1534,
+          "beat": "scandalLift",
+          "ms": 125
+        },
+        {
+          "at": 1644,
+          "beat": "scandalLift",
+          "ms": 110
+        },
+        {
+          "at": 1767,
+          "beat": "scandalLift",
+          "ms": 123
+        },
+        {
+          "at": 1987,
+          "beat": "scandalFlip",
+          "ms": 220
+        },
+        {
+          "at": 2190,
+          "beat": "scandalFlip",
+          "ms": 203
+        },
+        {
+          "at": 2421,
+          "beat": "scandalFlip",
+          "ms": 231
+        },
+        {
+          "at": 2704,
+          "beat": "scandalFlip",
+          "ms": 283
+        },
+        {
+          "at": 2913,
+          "beat": "scandalFlip",
+          "ms": 209
+        },
+        {
+          "at": 3094,
+          "beat": "scandalFlip",
+          "ms": 181
+        },
+        {
+          "at": 3273,
+          "beat": "scandalCarry",
+          "ms": 179
+        },
+        {
+          "at": 3486,
+          "beat": "scandalCarry",
+          "ms": 213
+        },
+        {
+          "at": 3686,
+          "beat": "scandalCarry",
+          "ms": 200
+        },
+        {
+          "at": 3888,
+          "beat": "impact",
+          "ms": 202
+        },
+        {
+          "at": 4090,
+          "beat": "impact",
+          "ms": 202
+        },
+        {
+          "at": 4281,
+          "beat": "resources",
+          "ms": 191
+        },
+        {
+          "at": 4477,
+          "beat": "resources",
+          "ms": 196
+        },
+        {
+          "at": 4658,
+          "beat": "resources",
+          "ms": 181
+        },
+        {
+          "at": 4838,
+          "beat": "resources",
+          "ms": 180
+        },
+        {
+          "at": 5013,
+          "beat": "resources",
+          "ms": 175
+        },
+        {
+          "at": 5207,
+          "beat": "resources",
+          "ms": 194
+        },
+        {
+          "at": 5397,
+          "beat": "resources",
+          "ms": 190
+        },
+        {
+          "at": 5586,
+          "beat": "sweep",
+          "ms": 189
+        },
+        {
+          "at": 5777,
+          "beat": "sweep",
+          "ms": 191
+        },
+        {
+          "at": 5976,
+          "beat": "sweep",
+          "ms": 199
+        },
+        {
+          "at": 6170,
+          "beat": "date",
+          "ms": 194
+        },
+        {
+          "at": 6349,
+          "beat": "date",
+          "ms": 179
+        },
+        {
+          "at": 6636,
+          "beat": "publish",
+          "ms": 287
+        },
+        {
+          "at": 6904,
+          "beat": "idle",
+          "ms": 268
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:16:55.469Z",
+      "caseStartedAt": "2026-10-13T02:17:33.915Z",
+      "caseFinishedAt": "2026-10-13T02:17:50.915Z",
+      "inputAt": "2026-10-13T02:17:41.879Z",
+      "firstFrameMs": 171,
+      "landingMs": null,
+      "totalBusyMs": 7394,
+      "active": {
+        "frames": 40,
+        "p50": 177,
+        "p95": 216,
+        "max": 220,
+        "over33": 40
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 9,
+        "p50": 175,
+        "p95": 184,
+        "max": 184,
+        "over33": 9
+      },
+      "beats": [
+        {
+          "at": 171,
+          "beat": "endPress"
+        },
+        {
+          "at": 342,
+          "beat": "stamp"
+        },
+        {
+          "at": 1011,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2083,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3266,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4576,
+          "beat": "impact"
+        },
+        {
+          "at": 4948,
+          "beat": "resources"
+        },
+        {
+          "at": 6337,
+          "beat": "sweep"
+        },
+        {
+          "at": 7174,
+          "beat": "publish"
+        },
+        {
+          "at": 7394,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 342,
+          "beat": "stamp",
+          "ms": 171
+        },
+        {
+          "at": 510,
+          "beat": "stamp",
+          "ms": 168
+        },
+        {
+          "at": 675,
+          "beat": "stamp",
+          "ms": 165
+        },
+        {
+          "at": 844,
+          "beat": "stamp",
+          "ms": 169
+        },
+        {
+          "at": 1011,
+          "beat": "scandalLift",
+          "ms": 167
+        },
+        {
+          "at": 1202,
+          "beat": "scandalLift",
+          "ms": 191
+        },
+        {
+          "at": 1385,
+          "beat": "scandalLift",
+          "ms": 183
+        },
+        {
+          "at": 1555,
+          "beat": "scandalLift",
+          "ms": 170
+        },
+        {
+          "at": 1723,
+          "beat": "scandalLift",
+          "ms": 168
+        },
+        {
+          "at": 1906,
+          "beat": "scandalLift",
+          "ms": 183
+        },
+        {
+          "at": 2083,
+          "beat": "scandalFlip",
+          "ms": 177
+        },
+        {
+          "at": 2272,
+          "beat": "scandalFlip",
+          "ms": 189
+        },
+        {
+          "at": 2456,
+          "beat": "scandalFlip",
+          "ms": 184
+        },
+        {
+          "at": 2670,
+          "beat": "scandalFlip",
+          "ms": 214
+        },
+        {
+          "at": 2876,
+          "beat": "scandalFlip",
+          "ms": 206
+        },
+        {
+          "at": 3079,
+          "beat": "scandalFlip",
+          "ms": 203
+        },
+        {
+          "at": 3266,
+          "beat": "scandalCarry",
+          "ms": 187
+        },
+        {
+          "at": 3460,
+          "beat": "scandalCarry",
+          "ms": 194
+        },
+        {
+          "at": 3645,
+          "beat": "scandalCarry",
+          "ms": 185
+        },
+        {
+          "at": 3825,
+          "beat": "scandalCarry",
+          "ms": 180
+        },
+        {
+          "at": 4041,
+          "beat": "scandalCarry",
+          "ms": 216
+        },
+        {
+          "at": 4231,
+          "beat": "scandalCarry",
+          "ms": 190
+        },
+        {
+          "at": 4405,
+          "beat": "scandalCarry",
+          "ms": 174
+        },
+        {
+          "at": 4576,
+          "beat": "impact",
+          "ms": 171
+        },
+        {
+          "at": 4762,
+          "beat": "impact",
+          "ms": 186
+        },
+        {
+          "at": 4948,
+          "beat": "resources",
+          "ms": 186
+        },
+        {
+          "at": 5128,
+          "beat": "resources",
+          "ms": 180
+        },
+        {
+          "at": 5305,
+          "beat": "resources",
+          "ms": 177
+        },
+        {
+          "at": 5489,
+          "beat": "resources",
+          "ms": 184
+        },
+        {
+          "at": 5655,
+          "beat": "resources",
+          "ms": 166
+        },
+        {
+          "at": 5823,
+          "beat": "resources",
+          "ms": 168
+        },
+        {
+          "at": 5992,
+          "beat": "resources",
+          "ms": 169
+        },
+        {
+          "at": 6161,
+          "beat": "resources",
+          "ms": 169
+        },
+        {
+          "at": 6337,
+          "beat": "sweep",
+          "ms": 176
+        },
+        {
+          "at": 6509,
+          "beat": "sweep",
+          "ms": 172
+        },
+        {
+          "at": 6680,
+          "beat": "sweep",
+          "ms": 171
+        },
+        {
+          "at": 6843,
+          "beat": "sweep",
+          "ms": 163
+        },
+        {
+          "at": 7008,
+          "beat": "sweep",
+          "ms": 165
+        },
+        {
+          "at": 7174,
+          "beat": "publish",
+          "ms": 166
+        },
+        {
+          "at": 7394,
+          "beat": "idle",
+          "ms": 220
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

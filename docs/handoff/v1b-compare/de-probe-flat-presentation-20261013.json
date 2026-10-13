@@ -1,0 +1,1406 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": "flat-presentation",
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:27:01.301Z",
+      "caseStartedAt": "2026-10-13T02:27:02.593Z",
+      "caseFinishedAt": "2026-10-13T02:27:14.171Z",
+      "inputAt": "2026-10-13T02:27:06.028Z",
+      "firstFrameMs": 14.980000000000018,
+      "landingMs": null,
+      "totalBusyMs": 6606.639999999999,
+      "active": {
+        "frames": 431,
+        "p50": 16.659999999999854,
+        "p95": 33.32000000000062,
+        "max": 50.04000000000087,
+        "over33": 9
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 173,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 58.31999999999971,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 14.980000000000018,
+          "beat": "endPress"
+        },
+        {
+          "at": 339.98,
+          "beat": "stamp"
+        },
+        {
+          "at": 923.3199999999997,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1956.6400000000003,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3156.6400000000003,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.9799999999996,
+          "beat": "impact"
+        },
+        {
+          "at": 4190.02,
+          "beat": "resources"
+        },
+        {
+          "at": 5531.639999999999,
+          "beat": "sweep"
+        },
+        {
+          "at": 6156.639999999999,
+          "beat": "date"
+        },
+        {
+          "at": 6414.98,
+          "beat": "publish"
+        },
+        {
+          "at": 6606.639999999999,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 248.32000000000016,
+          "beat": "endPress",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 539.98,
+          "beat": "stamp",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1331.6599999999999,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 2064.9799999999996,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3873.3,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 3990.0200000000004,
+          "beat": "impact",
+          "ms": 50.04000000000087
+        },
+        {
+          "at": 4106.68,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4231.68,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6606.639999999999,
+          "beat": "idle",
+          "ms": 41.659999999999854
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:27:01.301Z",
+      "caseStartedAt": "2026-10-13T02:27:14.171Z",
+      "caseFinishedAt": "2026-10-13T02:27:24.987Z",
+      "inputAt": "2026-10-13T02:27:16.186Z",
+      "firstFrameMs": 13.8599999999999,
+      "landingMs": null,
+      "totalBusyMs": 7247.200000000001,
+      "active": {
+        "frames": 359,
+        "p50": 16.660000000000764,
+        "p95": 41.68000000000029,
+        "max": 66.65999999999985,
+        "over33": 28
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 139,
+        "p50": 8.340000000000146,
+        "p95": 25,
+        "max": 66.68000000000029,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 13.8599999999999,
+          "beat": "endPress"
+        },
+        {
+          "at": 347.1999999999998,
+          "beat": "stamp"
+        },
+        {
+          "at": 922.1999999999998,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1955.52,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3172.1800000000003,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3788.8599999999997,
+          "beat": "impact"
+        },
+        {
+          "at": 3805.5200000000004,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4447.18,
+          "beat": "impact"
+        },
+        {
+          "at": 4838.88,
+          "beat": "resources"
+        },
+        {
+          "at": 6188.860000000001,
+          "beat": "sweep"
+        },
+        {
+          "at": 7055.52,
+          "beat": "publish"
+        },
+        {
+          "at": 7247.200000000001,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 147.19999999999982,
+          "beat": "endPress",
+          "ms": 58.33999999999969
+        },
+        {
+          "at": 197.19999999999982,
+          "beat": "endPress",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 263.8600000000001,
+          "beat": "endPress",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 547.1999999999998,
+          "beat": "stamp",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1055.52,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1163.8600000000001,
+          "beat": "scandalLift",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 1297.1999999999998,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1372.1999999999998,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1472.1999999999998,
+          "beat": "scandalLift",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 2122.2,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2280.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 58.32000000000062
+        },
+        {
+          "at": 2430.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2547.1800000000003,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2663.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2805.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3438.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3913.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 3988.84,
+          "beat": "scandalCarry",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 4172.18,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 4555.54,
+          "beat": "impact",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 4672.22,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4722.22,
+          "beat": "impact",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 4813.88,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4930.54,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5355.54,
+          "beat": "resources",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 5997.2,
+          "beat": "resources",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 7180.52,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7247.200000000001,
+          "beat": "idle",
+          "ms": 58.340000000000146
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:27:01.301Z",
+      "caseStartedAt": "2026-10-13T02:27:25.939Z",
+      "caseFinishedAt": "2026-10-13T02:27:36.106Z",
+      "inputAt": "2026-10-13T02:27:27.867Z",
+      "firstFrameMs": 112,
+      "landingMs": null,
+      "totalBusyMs": 6651,
+      "active": {
+        "frames": 83,
+        "p50": 78,
+        "p95": 88,
+        "max": 108,
+        "over33": 83
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 90,
+        "p95": 94,
+        "max": 94,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 112,
+          "beat": "endPress"
+        },
+        {
+          "at": 384,
+          "beat": "stamp"
+        },
+        {
+          "at": 945,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1961,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3209,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3832,
+          "beat": "impact"
+        },
+        {
+          "at": 4222,
+          "beat": "resources"
+        },
+        {
+          "at": 5550,
+          "beat": "sweep"
+        },
+        {
+          "at": 6160,
+          "beat": "date"
+        },
+        {
+          "at": 6496,
+          "beat": "publish"
+        },
+        {
+          "at": 6651,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 204,
+          "beat": "endPress",
+          "ms": 92
+        },
+        {
+          "at": 296,
+          "beat": "endPress",
+          "ms": 92
+        },
+        {
+          "at": 384,
+          "beat": "stamp",
+          "ms": 88
+        },
+        {
+          "at": 471,
+          "beat": "stamp",
+          "ms": 87
+        },
+        {
+          "at": 555,
+          "beat": "stamp",
+          "ms": 84
+        },
+        {
+          "at": 631,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 708,
+          "beat": "stamp",
+          "ms": 77
+        },
+        {
+          "at": 786,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 862,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 945,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1029,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1105,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1183,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1262,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 1339,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1416,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1493,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1571,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1648,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1725,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1805,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1883,
+          "beat": "scandalLift",
+          "ms": 78
+        },
+        {
+          "at": 1961,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 2036,
+          "beat": "scandalFlip",
+          "ms": 75
+        },
+        {
+          "at": 2117,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2195,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 2274,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2351,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 2428,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 2507,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2584,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 2662,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 2743,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2821,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 2896,
+          "beat": "scandalFlip",
+          "ms": 75
+        },
+        {
+          "at": 2973,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 3055,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 3133,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 3209,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3289,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3365,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3445,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3521,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3597,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3678,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 3755,
+          "beat": "scandalCarry",
+          "ms": 77
+        },
+        {
+          "at": 3832,
+          "beat": "impact",
+          "ms": 77
+        },
+        {
+          "at": 3910,
+          "beat": "impact",
+          "ms": 78
+        },
+        {
+          "at": 3989,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 4068,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 4144,
+          "beat": "impact",
+          "ms": 76
+        },
+        {
+          "at": 4222,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4302,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 4380,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4454,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 4529,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 4614,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 4692,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4768,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 4842,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 4926,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5004,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 5081,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5155,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 5230,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5304,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 5379,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5452,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 5550,
+          "beat": "sweep",
+          "ms": 98
+        },
+        {
+          "at": 5627,
+          "beat": "sweep",
+          "ms": 77
+        },
+        {
+          "at": 5701,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 5776,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 5852,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 5925,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 6003,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6077,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 6160,
+          "beat": "date",
+          "ms": 83
+        },
+        {
+          "at": 6234,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 6316,
+          "beat": "date",
+          "ms": 82
+        },
+        {
+          "at": 6388,
+          "beat": "date",
+          "ms": 72
+        },
+        {
+          "at": 6496,
+          "beat": "publish",
+          "ms": 108
+        },
+        {
+          "at": 6580,
+          "beat": "publish",
+          "ms": 84
+        },
+        {
+          "at": 6651,
+          "beat": "idle",
+          "ms": 71
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:27:01.301Z",
+      "caseStartedAt": "2026-10-13T02:27:36.106Z",
+      "caseFinishedAt": "2026-10-13T02:27:48.592Z",
+      "inputAt": "2026-10-13T02:27:39.760Z",
+      "firstFrameMs": 113,
+      "landingMs": null,
+      "totalBusyMs": 7276,
+      "active": {
+        "frames": 82,
+        "p50": 87,
+        "p95": 98,
+        "max": 109,
+        "over33": 82
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 83,
+        "p95": 94,
+        "max": 94,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 113,
+          "beat": "endPress"
+        },
+        {
+          "at": 387,
+          "beat": "stamp"
+        },
+        {
+          "at": 974,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2008,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3201,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4482,
+          "beat": "impact"
+        },
+        {
+          "at": 4834,
+          "beat": "resources"
+        },
+        {
+          "at": 6222,
+          "beat": "sweep"
+        },
+        {
+          "at": 7099,
+          "beat": "publish"
+        },
+        {
+          "at": 7276,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 206,
+          "beat": "endPress",
+          "ms": 93
+        },
+        {
+          "at": 296,
+          "beat": "endPress",
+          "ms": 90
+        },
+        {
+          "at": 387,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 473,
+          "beat": "stamp",
+          "ms": 86
+        },
+        {
+          "at": 560,
+          "beat": "stamp",
+          "ms": 87
+        },
+        {
+          "at": 643,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 725,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 808,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 891,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 974,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1062,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1145,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1228,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1314,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1399,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1481,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1569,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1652,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1740,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1834,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1921,
+          "beat": "scandalLift",
+          "ms": 87
+        },
+        {
+          "at": 2008,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2093,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 2181,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 2276,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 2370,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2466,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 2553,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2650,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 2734,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 2823,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2913,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 3011,
+          "beat": "scandalFlip",
+          "ms": 98
+        },
+        {
+          "at": 3103,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 3201,
+          "beat": "scandalCarry",
+          "ms": 98
+        },
+        {
+          "at": 3299,
+          "beat": "scandalCarry",
+          "ms": 98
+        },
+        {
+          "at": 3393,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3483,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3572,
+          "beat": "scandalCarry",
+          "ms": 89
+        },
+        {
+          "at": 3662,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3755,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 3860,
+          "beat": "scandalCarry",
+          "ms": 105
+        },
+        {
+          "at": 3969,
+          "beat": "scandalCarry",
+          "ms": 109
+        },
+        {
+          "at": 4062,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 4146,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4230,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4316,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 4400,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4482,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 4570,
+          "beat": "impact",
+          "ms": 88
+        },
+        {
+          "at": 4660,
+          "beat": "impact",
+          "ms": 90
+        },
+        {
+          "at": 4745,
+          "beat": "impact",
+          "ms": 85
+        },
+        {
+          "at": 4834,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 4924,
+          "beat": "resources",
+          "ms": 90
+        },
+        {
+          "at": 5008,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5101,
+          "beat": "resources",
+          "ms": 93
+        },
+        {
+          "at": 5197,
+          "beat": "resources",
+          "ms": 96
+        },
+        {
+          "at": 5288,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 5372,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5459,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 5543,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5624,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5705,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5796,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 5881,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5964,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 6051,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 6136,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 6222,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 6305,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6392,
+          "beat": "sweep",
+          "ms": 87
+        },
+        {
+          "at": 6471,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6550,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6628,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6707,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6786,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6864,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6945,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 7021,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 7099,
+          "beat": "publish",
+          "ms": 78
+        },
+        {
+          "at": 7198,
+          "beat": "publish",
+          "ms": 99
+        },
+        {
+          "at": 7276,
+          "beat": "idle",
+          "ms": 78
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

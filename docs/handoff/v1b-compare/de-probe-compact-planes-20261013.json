@@ -1,0 +1,1607 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": "compact-planes",
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:16:01.374Z",
+      "caseStartedAt": "2026-10-13T02:16:03.669Z",
+      "caseFinishedAt": "2026-10-13T02:16:15.863Z",
+      "inputAt": "2026-10-13T02:16:07.618Z",
+      "firstFrameMs": 18.360000000000127,
+      "landingMs": null,
+      "totalBusyMs": 6676.719999999999,
+      "active": {
+        "frames": 273,
+        "p50": 16.68000000000029,
+        "p95": 66.66000000000076,
+        "max": 116.68000000000029,
+        "over33": 58
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 169,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 108.31999999999971,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 18.360000000000127,
+          "beat": "idle"
+        },
+        {
+          "at": 43.36000000000013,
+          "beat": "endPress"
+        },
+        {
+          "at": 368.3599999999997,
+          "beat": "stamp"
+        },
+        {
+          "at": 943.3800000000001,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2001.7200000000003,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3185.0200000000004,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3818.3599999999997,
+          "beat": "impact"
+        },
+        {
+          "at": 4235.02,
+          "beat": "resources"
+        },
+        {
+          "at": 5560.02,
+          "beat": "sweep"
+        },
+        {
+          "at": 6185.0599999999995,
+          "beat": "date"
+        },
+        {
+          "at": 6443.379999999999,
+          "beat": "publish"
+        },
+        {
+          "at": 6676.719999999999,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 85.01999999999998,
+          "beat": "endPress",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 126.69999999999982,
+          "beat": "endPress",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 185.02000000000044,
+          "beat": "endPress",
+          "ms": 58.32000000000062
+        },
+        {
+          "at": 293.3599999999997,
+          "beat": "endPress",
+          "ms": 100
+        },
+        {
+          "at": 368.3599999999997,
+          "beat": "stamp",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 410.02000000000044,
+          "beat": "stamp",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 451.6999999999998,
+          "beat": "stamp",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 501.6999999999998,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 593.3599999999997,
+          "beat": "stamp",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 685.0200000000004,
+          "beat": "stamp",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 810.04,
+          "beat": "stamp",
+          "ms": 116.68000000000029
+        },
+        {
+          "at": 893.3800000000001,
+          "beat": "stamp",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 943.3800000000001,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 993.3800000000001,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1035.04,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1076.7200000000003,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1160.04,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1235.04,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1276.7200000000003,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1360.04,
+          "beat": "scandalLift",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 1401.7200000000003,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1476.7200000000003,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1518.38,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1593.38,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1668.38,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1743.38,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1785.04,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1926.7200000000003,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2001.7200000000003,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2051.7200000000003,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2201.7,
+          "beat": "scandalFlip",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 2276.7,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2343.38,
+          "beat": "scandalFlip",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 2385.04,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2435.0200000000004,
+          "beat": "scandalFlip",
+          "ms": 49.98000000000047
+        },
+        {
+          "at": 2510.0200000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 2576.6800000000003,
+          "beat": "scandalFlip",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 2618.3599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 2660.0200000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 2760.0200000000004,
+          "beat": "scandalFlip",
+          "ms": 66.66000000000076
+        },
+        {
+          "at": 2801.6800000000003,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2843.3599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 3010.0200000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3185.0200000000004,
+          "beat": "scandalCarry",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3226.6800000000003,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3268.3599999999997,
+          "beat": "scandalCarry",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 3318.3599999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3418.3599999999997,
+          "beat": "scandalCarry",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 3485.0200000000004,
+          "beat": "scandalCarry",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3551.6800000000003,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3876.6800000000003,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 3976.6800000000003,
+          "beat": "impact",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 4093.3599999999997,
+          "beat": "impact",
+          "ms": 108.33999999999924
+        },
+        {
+          "at": 4168.36,
+          "beat": "impact",
+          "ms": 66.67999999999938
+        },
+        {
+          "at": 4343.360000000001,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 6518.379999999999,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 6601.719999999999,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6676.719999999999,
+          "beat": "idle",
+          "ms": 75
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:16:01.374Z",
+      "caseStartedAt": "2026-10-13T02:16:15.865Z",
+      "caseFinishedAt": "2026-10-13T02:16:27.172Z",
+      "inputAt": "2026-10-13T02:16:18.293Z",
+      "firstFrameMs": 16.860000000000127,
+      "landingMs": null,
+      "totalBusyMs": 7300.18,
+      "active": {
+        "frames": 228,
+        "p50": 33.320000000000164,
+        "p95": 75,
+        "max": 116.65999999999985,
+        "over33": 76
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 113,
+        "p50": 8.340000000000146,
+        "p95": 33.340000000000146,
+        "max": 83.31999999999971,
+        "over33": 2
+      },
+      "beats": [
+        {
+          "at": 16.860000000000127,
+          "beat": "endPress"
+        },
+        {
+          "at": 358.52,
+          "beat": "stamp"
+        },
+        {
+          "at": 933.52,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1975.1800000000003,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3191.8599999999997,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4458.5,
+          "beat": "impact"
+        },
+        {
+          "at": 4858.56,
+          "beat": "resources"
+        },
+        {
+          "at": 6183.5599999999995,
+          "beat": "sweep"
+        },
+        {
+          "at": 7075.18,
+          "beat": "publish"
+        },
+        {
+          "at": 7300.18,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 108.51999999999998,
+          "beat": "endPress",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 158.51999999999998,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 208.51999999999998,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 308.52,
+          "beat": "endPress",
+          "ms": 100
+        },
+        {
+          "at": 358.52,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 408.52,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 466.8600000000001,
+          "beat": "stamp",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 541.8600000000001,
+          "beat": "stamp",
+          "ms": 66.66000000000031
+        },
+        {
+          "at": 666.8600000000001,
+          "beat": "stamp",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 783.52,
+          "beat": "stamp",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 858.52,
+          "beat": "stamp",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 983.52,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1058.52,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 1133.52,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 1183.52,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1225.1799999999998,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1275.1799999999998,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1400.1799999999998,
+          "beat": "scandalLift",
+          "ms": 116.65999999999985
+        },
+        {
+          "at": 1475.1799999999998,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 1550.1799999999998,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1591.8600000000001,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1641.8600000000001,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1891.8599999999997,
+          "beat": "scandalLift",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 1975.1800000000003,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2083.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2158.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 66.66000000000076
+        },
+        {
+          "at": 2233.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 2308.5200000000004,
+          "beat": "scandalFlip",
+          "ms": 75
+        },
+        {
+          "at": 2350.1800000000003,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2391.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 2466.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 2541.8599999999997,
+          "beat": "scandalFlip",
+          "ms": 75
+        },
+        {
+          "at": 2625.2200000000003,
+          "beat": "scandalFlip",
+          "ms": 75.03999999999996
+        },
+        {
+          "at": 2666.8999999999996,
+          "beat": "scandalFlip",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 2708.5600000000004,
+          "beat": "scandalFlip",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 2933.54,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3108.54,
+          "beat": "scandalFlip",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 3158.54,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3241.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3341.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 3416.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3483.5200000000004,
+          "beat": "scandalCarry",
+          "ms": 66.66000000000076
+        },
+        {
+          "at": 3541.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3583.5200000000004,
+          "beat": "scandalCarry",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3641.8599999999997,
+          "beat": "scandalCarry",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 3783.5,
+          "beat": "scandalCarry",
+          "ms": 41.64000000000033
+        },
+        {
+          "at": 3858.5,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3916.84,
+          "beat": "scandalCarry",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 4016.84,
+          "beat": "scandalCarry",
+          "ms": 91.68000000000029
+        },
+        {
+          "at": 4133.5,
+          "beat": "scandalCarry",
+          "ms": 108.34000000000015
+        },
+        {
+          "at": 4200.16,
+          "beat": "scandalCarry",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 4308.5,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 4350.16,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 4533.5,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4700.24,
+          "beat": "impact",
+          "ms": 100.07999999999993
+        },
+        {
+          "at": 4750.24,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4825.24,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4933.56,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5083.56,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5191.9,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5258.56,
+          "beat": "resources",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 5325.24,
+          "beat": "resources",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 5391.9,
+          "beat": "resources",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 5966.9,
+          "beat": "resources",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 6016.9,
+          "beat": "resources",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 6183.5599999999995,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6250.219999999999,
+          "beat": "sweep",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 6325.219999999999,
+          "beat": "sweep",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 6458.5599999999995,
+          "beat": "sweep",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 6541.9,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6608.5599999999995,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6691.9,
+          "beat": "sweep",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 7075.18,
+          "beat": "publish",
+          "ms": 41.6200000000008
+        },
+        {
+          "at": 7133.52,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 7233.5,
+          "beat": "publish",
+          "ms": 91.65999999999985
+        },
+        {
+          "at": 7300.18,
+          "beat": "idle",
+          "ms": 58.340000000000146
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T02:16:01.374Z",
+      "caseStartedAt": "2026-10-13T02:16:28.411Z",
+      "caseFinishedAt": "2026-10-13T02:16:39.532Z",
+      "inputAt": "2026-10-13T02:16:31.142Z",
+      "firstFrameMs": 146,
+      "landingMs": null,
+      "totalBusyMs": 6692,
+      "active": {
+        "frames": 55,
+        "p50": 120,
+        "p95": 140,
+        "max": 148,
+        "over33": 55
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 11,
+        "p50": 143,
+        "p95": 188,
+        "max": 188,
+        "over33": 11
+      },
+      "beats": [
+        {
+          "at": 146,
+          "beat": "endPress"
+        },
+        {
+          "at": 387,
+          "beat": "stamp"
+        },
+        {
+          "at": 933,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1993,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3209,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3822,
+          "beat": "impact"
+        },
+        {
+          "at": 4211,
+          "beat": "resources"
+        },
+        {
+          "at": 5634,
+          "beat": "sweep"
+        },
+        {
+          "at": 6165,
+          "beat": "date"
+        },
+        {
+          "at": 6544,
+          "beat": "publish"
+        },
+        {
+          "at": 6692,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 261,
+          "beat": "endPress",
+          "ms": 115
+        },
+        {
+          "at": 387,
+          "beat": "stamp",
+          "ms": 126
+        },
+        {
+          "at": 496,
+          "beat": "stamp",
+          "ms": 109
+        },
+        {
+          "at": 607,
+          "beat": "stamp",
+          "ms": 111
+        },
+        {
+          "at": 712,
+          "beat": "stamp",
+          "ms": 105
+        },
+        {
+          "at": 823,
+          "beat": "stamp",
+          "ms": 111
+        },
+        {
+          "at": 933,
+          "beat": "scandalLift",
+          "ms": 110
+        },
+        {
+          "at": 1048,
+          "beat": "scandalLift",
+          "ms": 115
+        },
+        {
+          "at": 1153,
+          "beat": "scandalLift",
+          "ms": 105
+        },
+        {
+          "at": 1261,
+          "beat": "scandalLift",
+          "ms": 108
+        },
+        {
+          "at": 1385,
+          "beat": "scandalLift",
+          "ms": 124
+        },
+        {
+          "at": 1509,
+          "beat": "scandalLift",
+          "ms": 124
+        },
+        {
+          "at": 1633,
+          "beat": "scandalLift",
+          "ms": 124
+        },
+        {
+          "at": 1744,
+          "beat": "scandalLift",
+          "ms": 111
+        },
+        {
+          "at": 1865,
+          "beat": "scandalLift",
+          "ms": 121
+        },
+        {
+          "at": 1993,
+          "beat": "scandalFlip",
+          "ms": 128
+        },
+        {
+          "at": 2105,
+          "beat": "scandalFlip",
+          "ms": 112
+        },
+        {
+          "at": 2227,
+          "beat": "scandalFlip",
+          "ms": 122
+        },
+        {
+          "at": 2347,
+          "beat": "scandalFlip",
+          "ms": 120
+        },
+        {
+          "at": 2480,
+          "beat": "scandalFlip",
+          "ms": 133
+        },
+        {
+          "at": 2601,
+          "beat": "scandalFlip",
+          "ms": 121
+        },
+        {
+          "at": 2723,
+          "beat": "scandalFlip",
+          "ms": 122
+        },
+        {
+          "at": 2843,
+          "beat": "scandalFlip",
+          "ms": 120
+        },
+        {
+          "at": 2958,
+          "beat": "scandalFlip",
+          "ms": 115
+        },
+        {
+          "at": 3074,
+          "beat": "scandalFlip",
+          "ms": 116
+        },
+        {
+          "at": 3209,
+          "beat": "scandalCarry",
+          "ms": 135
+        },
+        {
+          "at": 3329,
+          "beat": "scandalCarry",
+          "ms": 120
+        },
+        {
+          "at": 3451,
+          "beat": "scandalCarry",
+          "ms": 122
+        },
+        {
+          "at": 3576,
+          "beat": "scandalCarry",
+          "ms": 125
+        },
+        {
+          "at": 3694,
+          "beat": "scandalCarry",
+          "ms": 118
+        },
+        {
+          "at": 3822,
+          "beat": "impact",
+          "ms": 128
+        },
+        {
+          "at": 3945,
+          "beat": "impact",
+          "ms": 123
+        },
+        {
+          "at": 4071,
+          "beat": "impact",
+          "ms": 126
+        },
+        {
+          "at": 4211,
+          "beat": "resources",
+          "ms": 140
+        },
+        {
+          "at": 4323,
+          "beat": "resources",
+          "ms": 112
+        },
+        {
+          "at": 4432,
+          "beat": "resources",
+          "ms": 109
+        },
+        {
+          "at": 4570,
+          "beat": "resources",
+          "ms": 138
+        },
+        {
+          "at": 4704,
+          "beat": "resources",
+          "ms": 134
+        },
+        {
+          "at": 4823,
+          "beat": "resources",
+          "ms": 119
+        },
+        {
+          "at": 4962,
+          "beat": "resources",
+          "ms": 139
+        },
+        {
+          "at": 5072,
+          "beat": "resources",
+          "ms": 110
+        },
+        {
+          "at": 5173,
+          "beat": "resources",
+          "ms": 101
+        },
+        {
+          "at": 5291,
+          "beat": "resources",
+          "ms": 118
+        },
+        {
+          "at": 5404,
+          "beat": "resources",
+          "ms": 113
+        },
+        {
+          "at": 5511,
+          "beat": "resources",
+          "ms": 107
+        },
+        {
+          "at": 5634,
+          "beat": "sweep",
+          "ms": 123
+        },
+        {
+          "at": 5743,
+          "beat": "sweep",
+          "ms": 109
+        },
+        {
+          "at": 5867,
+          "beat": "sweep",
+          "ms": 124
+        },
+        {
+          "at": 5962,
+          "beat": "sweep",
+          "ms": 95
+        },
+        {
+          "at": 6059,
+          "beat": "sweep",
+          "ms": 97
+        },
+        {
+          "at": 6165,
+          "beat": "date",
+          "ms": 106
+        },
+        {
+          "at": 6264,
+          "beat": "date",
+          "ms": 99
+        },
+        {
+          "at": 6396,
+          "beat": "date",
+          "ms": 132
+        },
+        {
+          "at": 6544,
+          "beat": "publish",
+          "ms": 148
+        },
+        {
+          "at": 6692,
+          "beat": "idle",
+          "ms": 148
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T02:16:01.374Z",
+      "caseStartedAt": "2026-10-13T02:16:39.533Z",
+      "caseFinishedAt": "2026-10-13T02:16:54.455Z",
+      "inputAt": "2026-10-13T02:16:45.505Z",
+      "firstFrameMs": 146,
+      "landingMs": null,
+      "totalBusyMs": 7327,
+      "active": {
+        "frames": 54,
+        "p50": 132,
+        "p95": 155,
+        "max": 192,
+        "over33": 54
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 14,
+        "p50": 113,
+        "p95": 123,
+        "max": 123,
+        "over33": 14
+      },
+      "beats": [
+        {
+          "at": 146,
+          "beat": "endPress"
+        },
+        {
+          "at": 429,
+          "beat": "stamp"
+        },
+        {
+          "at": 945,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1967,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3211,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4540,
+          "beat": "impact"
+        },
+        {
+          "at": 4940,
+          "beat": "resources"
+        },
+        {
+          "at": 6256,
+          "beat": "sweep"
+        },
+        {
+          "at": 7070,
+          "beat": "publish"
+        },
+        {
+          "at": 7327,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 293,
+          "beat": "endPress",
+          "ms": 147
+        },
+        {
+          "at": 429,
+          "beat": "stamp",
+          "ms": 136
+        },
+        {
+          "at": 551,
+          "beat": "stamp",
+          "ms": 122
+        },
+        {
+          "at": 682,
+          "beat": "stamp",
+          "ms": 131
+        },
+        {
+          "at": 799,
+          "beat": "stamp",
+          "ms": 117
+        },
+        {
+          "at": 945,
+          "beat": "scandalLift",
+          "ms": 146
+        },
+        {
+          "at": 1094,
+          "beat": "scandalLift",
+          "ms": 149
+        },
+        {
+          "at": 1254,
+          "beat": "scandalLift",
+          "ms": 160
+        },
+        {
+          "at": 1383,
+          "beat": "scandalLift",
+          "ms": 129
+        },
+        {
+          "at": 1522,
+          "beat": "scandalLift",
+          "ms": 139
+        },
+        {
+          "at": 1670,
+          "beat": "scandalLift",
+          "ms": 148
+        },
+        {
+          "at": 1825,
+          "beat": "scandalLift",
+          "ms": 155
+        },
+        {
+          "at": 1967,
+          "beat": "scandalFlip",
+          "ms": 142
+        },
+        {
+          "at": 2084,
+          "beat": "scandalFlip",
+          "ms": 117
+        },
+        {
+          "at": 2213,
+          "beat": "scandalFlip",
+          "ms": 129
+        },
+        {
+          "at": 2339,
+          "beat": "scandalFlip",
+          "ms": 126
+        },
+        {
+          "at": 2458,
+          "beat": "scandalFlip",
+          "ms": 119
+        },
+        {
+          "at": 2650,
+          "beat": "scandalFlip",
+          "ms": 192
+        },
+        {
+          "at": 2787,
+          "beat": "scandalFlip",
+          "ms": 137
+        },
+        {
+          "at": 2939,
+          "beat": "scandalFlip",
+          "ms": 152
+        },
+        {
+          "at": 3070,
+          "beat": "scandalFlip",
+          "ms": 131
+        },
+        {
+          "at": 3211,
+          "beat": "scandalCarry",
+          "ms": 141
+        },
+        {
+          "at": 3346,
+          "beat": "scandalCarry",
+          "ms": 135
+        },
+        {
+          "at": 3458,
+          "beat": "scandalCarry",
+          "ms": 112
+        },
+        {
+          "at": 3575,
+          "beat": "scandalCarry",
+          "ms": 117
+        },
+        {
+          "at": 3725,
+          "beat": "scandalCarry",
+          "ms": 150
+        },
+        {
+          "at": 3863,
+          "beat": "scandalCarry",
+          "ms": 138
+        },
+        {
+          "at": 4005,
+          "beat": "scandalCarry",
+          "ms": 142
+        },
+        {
+          "at": 4145,
+          "beat": "scandalCarry",
+          "ms": 140
+        },
+        {
+          "at": 4268,
+          "beat": "scandalCarry",
+          "ms": 123
+        },
+        {
+          "at": 4401,
+          "beat": "scandalCarry",
+          "ms": 133
+        },
+        {
+          "at": 4540,
+          "beat": "impact",
+          "ms": 139
+        },
+        {
+          "at": 4689,
+          "beat": "impact",
+          "ms": 149
+        },
+        {
+          "at": 4811,
+          "beat": "impact",
+          "ms": 122
+        },
+        {
+          "at": 4940,
+          "beat": "resources",
+          "ms": 129
+        },
+        {
+          "at": 5081,
+          "beat": "resources",
+          "ms": 141
+        },
+        {
+          "at": 5236,
+          "beat": "resources",
+          "ms": 155
+        },
+        {
+          "at": 5359,
+          "beat": "resources",
+          "ms": 123
+        },
+        {
+          "at": 5475,
+          "beat": "resources",
+          "ms": 116
+        },
+        {
+          "at": 5598,
+          "beat": "resources",
+          "ms": 123
+        },
+        {
+          "at": 5727,
+          "beat": "resources",
+          "ms": 129
+        },
+        {
+          "at": 5860,
+          "beat": "resources",
+          "ms": 133
+        },
+        {
+          "at": 5992,
+          "beat": "resources",
+          "ms": 132
+        },
+        {
+          "at": 6131,
+          "beat": "resources",
+          "ms": 139
+        },
+        {
+          "at": 6256,
+          "beat": "sweep",
+          "ms": 125
+        },
+        {
+          "at": 6369,
+          "beat": "sweep",
+          "ms": 113
+        },
+        {
+          "at": 6483,
+          "beat": "sweep",
+          "ms": 114
+        },
+        {
+          "at": 6595,
+          "beat": "sweep",
+          "ms": 112
+        },
+        {
+          "at": 6714,
+          "beat": "sweep",
+          "ms": 119
+        },
+        {
+          "at": 6833,
+          "beat": "sweep",
+          "ms": 119
+        },
+        {
+          "at": 6950,
+          "beat": "sweep",
+          "ms": 117
+        },
+        {
+          "at": 7070,
+          "beat": "publish",
+          "ms": 120
+        },
+        {
+          "at": 7216,
+          "beat": "publish",
+          "ms": 146
+        },
+        {
+          "at": 7327,
+          "beat": "idle",
+          "ms": 111
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

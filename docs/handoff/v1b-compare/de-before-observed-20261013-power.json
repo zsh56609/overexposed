@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-13T02:11:54.8901009Z",
+  "finishedAt": "2026-10-13T02:13:38.3860827Z",
+  "sourceRoot": ".npm-cache/v1b-de-before-aa2cc8d",
+  "initialEvent": {
+    "at": "2026-10-13T01:33:51.4356589Z",
+    "id": 507
+  },
+  "events": [],
+  "continuouslyAwake": true,
+  "exitCode": 0,
+  "wakeRequestUsed": false
+}
