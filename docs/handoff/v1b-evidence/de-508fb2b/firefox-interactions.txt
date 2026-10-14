@@ -1,0 +1,19 @@
+  tooltip long-press firefox: open; trusted-event trace check/out/tooltip-touch-firefox-1791993009812.json
+  metronome firefox: motion samples ["rotate(4.88deg)","rotate(9.24deg)","rotate(12.86deg)","rotate(15.3deg)"]
+  metronome firefox: stable centre after 1420ms
+  metronome firefox: motion samples ["rotate(4.84deg)","rotate(4.92deg)","rotate(4.86deg)","rotate(4.61deg)","rotate(4.1deg)","rotate(3.33deg)"]
+interactions, firefox 1280x720: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+  tooltip long-press firefox: open; trusted-event trace check/out/tooltip-touch-firefox-1791993036908.json
+  metronome firefox: motion samples ["rotate(5.4deg)","rotate(9.7deg)","rotate(13.22deg)","rotate(15.68deg)"]
+  metronome firefox: stable centre after 1426ms
+  metronome firefox: motion samples ["rotate(4.84deg)","rotate(4.92deg)","rotate(4.84deg)","rotate(4.51deg)","rotate(4.01deg)","rotate(3.33deg)"]
+interactions, firefox 800x450: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+  tooltip long-press firefox: open; trusted-event trace check/out/tooltip-touch-firefox-1791993064877.json
+  metronome firefox: motion samples ["rotate(5.01deg)","rotate(8.73deg)","rotate(12.46deg)","rotate(15.52deg)"]
+  metronome firefox: stable centre after 1435ms
+  metronome firefox: motion samples ["rotate(4.82deg)","rotate(4.92deg)","rotate(4.87deg)","rotate(4.61deg)","rotate(4.17deg)","rotate(3.54deg)"]
+interactions, firefox 844x390: 22 of 22 pass, 1 skipped
+  skipped  keyboard focus: this headless window never has focus
+PASS: every interaction behaves, in every browser

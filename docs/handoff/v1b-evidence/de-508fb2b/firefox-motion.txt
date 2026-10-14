@@ -1,0 +1,363 @@
+month entry firefox: 5 remaining cards animate before the stamp; skip settles
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input firefox: stationary suppressed while busy, restored when idle
+preview input firefox: moving suppressed while busy, restored when idle
+SKIP preview keyboard firefox: headless window has no focus
+preview input firefox: touch suppressed while busy, restored when idle
+pile input firefox: s02 networking off exact final parity
+pile input firefox: s02 networking full exact final parity
+pile input firefox: s02 networking reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-late exact final parity
+pile input firefox: s02 networking switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: card:self_tape self_tape off exact final parity
+pile input firefox: card:self_tape self_tape full exact final parity
+pile input firefox: card:self_tape self_tape reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-late exact final parity
+pile input firefox: card:self_tape self_tape switch-reduced exact final parity
+pile input firefox: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 streaming_role off exact final parity
+pile input firefox: s02 streaming_role full exact final parity
+pile input firefox: s02 streaming_role reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-late exact final parity
+pile input firefox: s02 streaming_role switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 open_mic+lay_low off exact final parity
+pile input firefox: s02 open_mic+lay_low full exact final parity
+pile input firefox: s02 open_mic+lay_low reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-late exact final parity
+pile input firefox: s02 open_mic+lay_low switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: bigHand @recorded off exact final parity
+pile input firefox: bigHand @recorded full exact final parity
+pile input firefox: bigHand @recorded reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-late exact final parity
+pile input firefox: bigHand @recorded switch-reduced exact final parity
+pile input firefox: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input firefox: flip click exact final parity, no stale callbacks
+SKIP flip Enter firefox: headless keyboard focus
+SKIP flip Space firefox: headless keyboard focus
+boundary input firefox: carry click exact final parity, no stale callbacks
+SKIP carry Enter firefox: headless keyboard focus
+SKIP carry Space firefox: headless keyboard focus
+boundary input firefox: sweep click exact final parity, no stale callbacks
+SKIP sweep Enter firefox: headless keyboard focus
+SKIP sweep Space firefox: headless keyboard focus
+boundary input firefox: season click exact final parity, no stale callbacks
+SKIP season Enter firefox: headless keyboard focus
+SKIP season Space firefox: headless keyboard focus
+boundary input firefox: after-season-publication click exact final parity, no stale callbacks
+SKIP after-season-publication Enter firefox: headless keyboard focus
+SKIP after-season-publication Space firefox: headless keyboard focus
+boundary input firefox: deal click exact final parity, no stale callbacks
+SKIP deal Enter firefox: headless keyboard focus
+SKIP deal Space firefox: headless keyboard focus
+boundary input firefox: arrival click exact final parity, no stale callbacks
+SKIP arrival Enter firefox: headless keyboard focus
+SKIP arrival Space firefox: headless keyboard focus
+boundary input firefox: winter-publication click exact final parity, no stale callbacks
+SKIP winter-publication Enter firefox: headless keyboard focus
+SKIP winter-publication Space firefox: headless keyboard focus
+SKIP OS preference firefox: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately
+month input firefox: calm off exact final parity
+month input firefox: calm full exact final parity
+month input firefox: calm reduced exact final parity
+month input firefox: calm skip-early exact final parity
+month input firefox: calm skip-late exact final parity
+month input firefox: frenzy off exact final parity
+month input firefox: frenzy full exact final parity
+month input firefox: frenzy reduced exact final parity
+month input firefox: frenzy skip-early exact final parity
+month input firefox: frenzy skip-late exact final parity
+month input firefox: single-scandal off exact final parity
+month input firefox: single-scandal full exact final parity
+month input firefox: single-scandal reduced exact final parity
+month input firefox: single-scandal skip-early exact final parity
+month input firefox: single-scandal skip-late exact final parity
+month input firefox: mags-relief off exact final parity
+month input firefox: mags-relief full exact final parity
+month input firefox: mags-relief reduced exact final parity
+month input firefox: mags-relief skip-early exact final parity
+month input firefox: mags-relief skip-late exact final parity
+month input firefox: copycat-winter off exact final parity
+month input firefox: copycat-winter full exact final parity
+month input firefox: copycat-winter reduced exact final parity
+month input firefox: copycat-winter skip-early exact final parity
+month input firefox: copycat-winter skip-late exact final parity
+month input firefox: season off exact final parity
+month input firefox: season full exact final parity
+month input firefox: season reduced exact final parity
+month input firefox: season skip-early exact final parity
+month input firefox: season skip-late exact final parity
+month input firefox: draft off exact final parity
+month input firefox: draft full exact final parity
+month input firefox: draft reduced exact final parity
+month input firefox: draft skip-early exact final parity
+month input firefox: draft skip-late exact final parity
+month input firefox: winter-ending off exact final parity
+month input firefox: winter-ending full exact final parity
+month input firefox: winter-ending reduced exact final parity
+month input firefox: winter-ending skip-early exact final parity
+month input firefox: winter-ending skip-late exact final parity
+browser diagnostics: 3192 entries preserved in check/out/month-firefox-diagnostics.json
+PASS motion input firefox 1280x720
+month entry firefox: 5 remaining cards animate before the stamp; skip settles
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input firefox: stationary suppressed while busy, restored when idle
+preview input firefox: moving suppressed while busy, restored when idle
+SKIP preview keyboard firefox: headless window has no focus
+preview input firefox: touch suppressed while busy, restored when idle
+pile input firefox: s02 networking off exact final parity
+pile input firefox: s02 networking full exact final parity
+pile input firefox: s02 networking reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-late exact final parity
+pile input firefox: s02 networking switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: card:self_tape self_tape off exact final parity
+pile input firefox: card:self_tape self_tape full exact final parity
+pile input firefox: card:self_tape self_tape reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-late exact final parity
+pile input firefox: card:self_tape self_tape switch-reduced exact final parity
+pile input firefox: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 streaming_role off exact final parity
+pile input firefox: s02 streaming_role full exact final parity
+pile input firefox: s02 streaming_role reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-late exact final parity
+pile input firefox: s02 streaming_role switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 open_mic+lay_low off exact final parity
+pile input firefox: s02 open_mic+lay_low full exact final parity
+pile input firefox: s02 open_mic+lay_low reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-late exact final parity
+pile input firefox: s02 open_mic+lay_low switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: bigHand @recorded off exact final parity
+pile input firefox: bigHand @recorded full exact final parity
+pile input firefox: bigHand @recorded reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-late exact final parity
+pile input firefox: bigHand @recorded switch-reduced exact final parity
+pile input firefox: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input firefox: flip click exact final parity, no stale callbacks
+SKIP flip Enter firefox: headless keyboard focus
+SKIP flip Space firefox: headless keyboard focus
+boundary input firefox: carry click exact final parity, no stale callbacks
+SKIP carry Enter firefox: headless keyboard focus
+SKIP carry Space firefox: headless keyboard focus
+boundary input firefox: sweep click exact final parity, no stale callbacks
+SKIP sweep Enter firefox: headless keyboard focus
+SKIP sweep Space firefox: headless keyboard focus
+boundary input firefox: season click exact final parity, no stale callbacks
+SKIP season Enter firefox: headless keyboard focus
+SKIP season Space firefox: headless keyboard focus
+boundary input firefox: after-season-publication click exact final parity, no stale callbacks
+SKIP after-season-publication Enter firefox: headless keyboard focus
+SKIP after-season-publication Space firefox: headless keyboard focus
+boundary input firefox: deal click exact final parity, no stale callbacks
+SKIP deal Enter firefox: headless keyboard focus
+SKIP deal Space firefox: headless keyboard focus
+boundary input firefox: arrival click exact final parity, no stale callbacks
+SKIP arrival Enter firefox: headless keyboard focus
+SKIP arrival Space firefox: headless keyboard focus
+boundary input firefox: winter-publication click exact final parity, no stale callbacks
+SKIP winter-publication Enter firefox: headless keyboard focus
+SKIP winter-publication Space firefox: headless keyboard focus
+SKIP OS preference firefox: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately
+month input firefox: calm off exact final parity
+month input firefox: calm full exact final parity
+month input firefox: calm reduced exact final parity
+month input firefox: calm skip-early exact final parity
+month input firefox: calm skip-late exact final parity
+month input firefox: frenzy off exact final parity
+month input firefox: frenzy full exact final parity
+month input firefox: frenzy reduced exact final parity
+month input firefox: frenzy skip-early exact final parity
+month input firefox: frenzy skip-late exact final parity
+month input firefox: single-scandal off exact final parity
+month input firefox: single-scandal full exact final parity
+month input firefox: single-scandal reduced exact final parity
+month input firefox: single-scandal skip-early exact final parity
+month input firefox: single-scandal skip-late exact final parity
+month input firefox: mags-relief off exact final parity
+month input firefox: mags-relief full exact final parity
+month input firefox: mags-relief reduced exact final parity
+month input firefox: mags-relief skip-early exact final parity
+month input firefox: mags-relief skip-late exact final parity
+month input firefox: copycat-winter off exact final parity
+month input firefox: copycat-winter full exact final parity
+month input firefox: copycat-winter reduced exact final parity
+month input firefox: copycat-winter skip-early exact final parity
+month input firefox: copycat-winter skip-late exact final parity
+month input firefox: season off exact final parity
+month input firefox: season full exact final parity
+month input firefox: season reduced exact final parity
+month input firefox: season skip-early exact final parity
+month input firefox: season skip-late exact final parity
+month input firefox: draft off exact final parity
+month input firefox: draft full exact final parity
+month input firefox: draft reduced exact final parity
+month input firefox: draft skip-early exact final parity
+month input firefox: draft skip-late exact final parity
+month input firefox: winter-ending off exact final parity
+month input firefox: winter-ending full exact final parity
+month input firefox: winter-ending reduced exact final parity
+month input firefox: winter-ending skip-early exact final parity
+month input firefox: winter-ending skip-late exact final parity
+browser diagnostics: 3192 entries preserved in check/out/month-firefox-diagnostics.json
+PASS motion input firefox 800x450
+month entry firefox: 5 remaining cards animate before the stamp; skip settles
+D7 firefox at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 firefox at 1100ms: click fast-forwards exactly one play; END TURN not executed
+preview input firefox: stationary suppressed while busy, restored when idle
+preview input firefox: moving suppressed while busy, restored when idle
+SKIP preview keyboard firefox: headless window has no focus
+preview input firefox: touch suppressed while busy, restored when idle
+pile input firefox: s02 networking off exact final parity
+pile input firefox: s02 networking full exact final parity
+pile input firefox: s02 networking reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 networking skip-late exact final parity
+pile input firefox: s02 networking switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: card:self_tape self_tape off exact final parity
+pile input firefox: card:self_tape self_tape full exact final parity
+pile input firefox: card:self_tape self_tape reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: card:self_tape self_tape skip-late exact final parity
+pile input firefox: card:self_tape self_tape switch-reduced exact final parity
+pile input firefox: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 streaming_role off exact final parity
+pile input firefox: s02 streaming_role full exact final parity
+pile input firefox: s02 streaming_role reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 streaming_role skip-late exact final parity
+pile input firefox: s02 streaming_role switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: s02 open_mic+lay_low off exact final parity
+pile input firefox: s02 open_mic+lay_low full exact final parity
+pile input firefox: s02 open_mic+lay_low reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: s02 open_mic+lay_low skip-late exact final parity
+pile input firefox: s02 open_mic+lay_low switch-reduced exact final parity
+pile input firefox: s02 static replay parity; all settled modes preserve real control hit points
+pile input firefox: bigHand @recorded off exact final parity
+pile input firefox: bigHand @recorded full exact final parity
+pile input firefox: bigHand @recorded reduced exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-early exact final parity
+SKIP pile keyboard firefox: headless focus unavailable; separately using real pointer skip
+pile input firefox: bigHand @recorded skip-late exact final parity
+pile input firefox: bigHand @recorded switch-reduced exact final parity
+pile input firefox: bigHand static replay parity; all settled modes preserve real control hit points
+boundary input firefox: flip click exact final parity, no stale callbacks
+SKIP flip Enter firefox: headless keyboard focus
+SKIP flip Space firefox: headless keyboard focus
+boundary input firefox: carry click exact final parity, no stale callbacks
+SKIP carry Enter firefox: headless keyboard focus
+SKIP carry Space firefox: headless keyboard focus
+boundary input firefox: sweep click exact final parity, no stale callbacks
+SKIP sweep Enter firefox: headless keyboard focus
+SKIP sweep Space firefox: headless keyboard focus
+boundary input firefox: season click exact final parity, no stale callbacks
+SKIP season Enter firefox: headless keyboard focus
+SKIP season Space firefox: headless keyboard focus
+boundary input firefox: after-season-publication click exact final parity, no stale callbacks
+SKIP after-season-publication Enter firefox: headless keyboard focus
+SKIP after-season-publication Space firefox: headless keyboard focus
+boundary input firefox: deal click exact final parity, no stale callbacks
+SKIP deal Enter firefox: headless keyboard focus
+SKIP deal Space firefox: headless keyboard focus
+boundary input firefox: arrival click exact final parity, no stale callbacks
+SKIP arrival Enter firefox: headless keyboard focus
+SKIP arrival Space firefox: headless keyboard focus
+boundary input firefox: winter-publication click exact final parity, no stale callbacks
+SKIP winter-publication Enter firefox: headless keyboard focus
+SKIP winter-publication Space firefox: headless keyboard focus
+SKIP OS preference firefox: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately
+month input firefox: calm off exact final parity
+month input firefox: calm full exact final parity
+month input firefox: calm reduced exact final parity
+month input firefox: calm skip-early exact final parity
+month input firefox: calm skip-late exact final parity
+month input firefox: frenzy off exact final parity
+month input firefox: frenzy full exact final parity
+month input firefox: frenzy reduced exact final parity
+month input firefox: frenzy skip-early exact final parity
+month input firefox: frenzy skip-late exact final parity
+month input firefox: single-scandal off exact final parity
+month input firefox: single-scandal full exact final parity
+month input firefox: single-scandal reduced exact final parity
+month input firefox: single-scandal skip-early exact final parity
+month input firefox: single-scandal skip-late exact final parity
+month input firefox: mags-relief off exact final parity
+month input firefox: mags-relief full exact final parity
+month input firefox: mags-relief reduced exact final parity
+month input firefox: mags-relief skip-early exact final parity
+month input firefox: mags-relief skip-late exact final parity
+month input firefox: copycat-winter off exact final parity
+month input firefox: copycat-winter full exact final parity
+month input firefox: copycat-winter reduced exact final parity
+month input firefox: copycat-winter skip-early exact final parity
+month input firefox: copycat-winter skip-late exact final parity
+month input firefox: season off exact final parity
+month input firefox: season full exact final parity
+month input firefox: season reduced exact final parity
+month input firefox: season skip-early exact final parity
+month input firefox: season skip-late exact final parity
+month input firefox: draft off exact final parity
+month input firefox: draft full exact final parity
+month input firefox: draft reduced exact final parity
+month input firefox: draft skip-early exact final parity
+month input firefox: draft skip-late exact final parity
+month input firefox: winter-ending off exact final parity
+month input firefox: winter-ending full exact final parity
+month input firefox: winter-ending reduced exact final parity
+month input firefox: winter-ending skip-early exact final parity
+month input firefox: winter-ending skip-late exact final parity
+browser diagnostics: 3192 entries preserved in check/out/month-firefox-diagnostics.json
+PASS motion input firefox 844x390
