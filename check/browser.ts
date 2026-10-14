@@ -304,7 +304,9 @@ async function startFirefox({ width, height }: { width: number; height: number }
       '\nuser_pref("fission.autostart", false);\n',
   );
   // Port 0: Firefox picks one and says which on stderr.
-  const proc = spawn(exe, ['--headless', '--remote-debugging-port=0', '-profile', profile, '-no-remote', `--width=${width}`, `--height=${height}`, 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
+  // Explicit diagnostic opt-in only; ordinary correctness checks keep the original headless path.
+  const modeArgs=process.env.OVEREXPOSED_FIREFOX_HEADED==='1'?[]:['--headless'];
+  const proc = spawn(exe, [...modeArgs, '--remote-debugging-port=0', '-profile', profile, '-no-remote', `--width=${width}`, `--height=${height}`, 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
   let ws: WebSocket | undefined;
   const fail = async (err: unknown): Promise<never> => {
     try {

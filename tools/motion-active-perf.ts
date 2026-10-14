@@ -11,6 +11,8 @@ const out=join(ROOT,'docs/handoff/v1b-compare');mkdirSync(out,{recursive:true});
 const server=await preview({root,logLevel:'error',preview:{port:4175,strictPort:false}});
 const url=server.resolvedUrls!.local[0]!,states=loadStates(),rows:unknown[]=[];
 const runStartedAt=new Date().toISOString();
+const firefoxHeaded=process.env.OVEREXPOSED_FIREFOX_HEADED==='1';
+const rendererEvidence:unknown[]=[];
 const end=states['ending:redemption_arc']!,season=states.s02!,gate=season.steps.findIndex(s=>s[0]==='gate');
 const longest=longestQuietPlay(),profiling=process.argv.includes('--profile');
 const diagnosticBackdropOff=process.argv.includes('--without-backdrop');
@@ -35,6 +37,14 @@ try {
  for(const browser of (arg('browsers')??'chrome,firefox,webkit').split(',') as BrowserName[]) for(const rate of browser==='chrome'?(arg('rates')??'1,4').split(',').map(Number):[1]){
   const page=await launch(browser,{width:1280,height:720});
   try {
+   if(browser==='firefox'&&firefoxHeaded){
+    await page.navigate('about:support',1000);
+    const renderer=await page.evaluate<{compositing:string;decisions:string}>(`({compositing:[...document.querySelectorAll('#graphics-features-tbody tr')].find(tr=>tr.innerText.startsWith('Compositing'))?.innerText??'',decisions:document.getElementById('graphics-decisions-tbody')?.innerText??''})`,5000);
+    rendererEvidence.push({browser,at:new Date().toISOString(),...renderer});
+    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,firefoxHeaded,rendererEvidence,rows},null,2)+'\n');
+    if(!renderer.compositing||/Software|Basic/i.test(renderer.compositing))throw Error(`Headed Firefox hardware compositing is not established: ${renderer.compositing}; diagnostic saved, no hardware performance pass`);
+    console.log(`Headed Firefox compositor: ${renderer.compositing}`);
+   }
    await page.throttle(rate);
    for(const [label,fixture,selector] of scenarios){
     if(arg('case')&&!arg('case')!.split(',').includes(label))continue;
@@ -71,12 +81,12 @@ try {
     await page.evaluate(`new Promise((resolve,reject)=>{const start=performance.now();const poll=()=>{if(window.__perf.done)return resolve(true);if(performance.now()-start>65000)return reject(Error('measurement deadline'));setTimeout(poll,50)};poll()})`,70000);
     if(profiling){mkdirSync(join(ROOT,'.npm-cache/profiles'),{recursive:true});writeFileSync(join(ROOT,`.npm-cache/profiles/${name}-${browser}-${rate}-${label}.cpuprofile`),JSON.stringify(await page.profileStop!()));}
     const result=await page.evaluate<Record<string,unknown>>(`(()=>{const p=window.__perf;const stats=a=>{const x=[...a].sort((a,b)=>a-b),q=k=>x[Math.min(x.length-1,Math.floor(x.length*k))]??null;return {frames:x.length,p50:q(.5),p95:q(.95),max:q(1),over33:x.filter(v=>v>33.4).length}};return {inputAt:new Date(p.startWall).toISOString(),firstFrameMs:p.firstFrameMs,landingMs:p.landing,totalBusyMs:p.settled,active:stats(p.active),idleObservationMs:1500,idle:stats(p.idle),beats:p.beats,slowFrames:p.slowFrames,longTasks:p.longTasks,error:p.error??null}})()`);
-    const row={browser,rate,label,runStartedAt,caseStartedAt,caseFinishedAt:new Date().toISOString(),...result};rows.push(row);console.log(JSON.stringify(row));
+    const row={browser,rate,label,launchMode:browser==='firefox'&&firefoxHeaded?'headed':'headless',runStartedAt,caseStartedAt,caseFinishedAt:new Date().toISOString(),...result};rows.push(row);console.log(JSON.stringify(row));
     if(result.error)throw Error(String(result.error));
-    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
+    writeFileSync(join(out,`${name}.json`),JSON.stringify({root,firefoxHeaded,rendererEvidence,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
    }
   }finally{await page.close();}
  }
  rows.push({browser:'firefox',rate:4,capabilitySkip:'BiDi has no CPU throttling; no substitute labelled 4x.'});
- writeFileSync(join(out,`${name}.json`),JSON.stringify({root,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
+ writeFileSync(join(out,`${name}.json`),JSON.stringify({root,firefoxHeaded,rendererEvidence,profiling,diagnosticBackdropOff,diagnosticPromoteCards,diagnosticPaintProbe,longest,rows},null,2)+'\n');
 }finally{await new Promise<void>(r=>server.httpServer.close(()=>r()));}

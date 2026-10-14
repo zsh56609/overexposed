@@ -8,7 +8,7 @@
 - D 的实际阶段边界、UID 去重、真实抽牌/消息及 D7，E 的历史牌堆、减弱/关闭动效和偏好切换均保持不变。实现与必要偏离详见 [10 月 4 日](2026-10-04-v1b-de.md)、[10 月 5 日](2026-10-05-v1b-acceptance.md)及 [10 月 13 日报告](2026-10-13-v1b-acceptance.md)；A–C 原报告保持原样。
 - 新修复将相同照片的预生成与 PNG 编码移至原生工作线程，解决空闲预热未赶上发布时的同步成本。34 张照片在 Chromium/Firefox 逐像素一致；WebKit 缺少 OffscreenCanvas，保留原路径并通过回退检查。无新增依赖、文案、规则、事件、数值或人格参数。
 - 构建/类型检查、validate 0 错误/27 既定警告、queue 的 690 动作及 13,976 跳过点已通过。Node 24.16.0 未变。300-run preview、601/152 冷却、18 文件相同/14 栏全过/零崩溃及软锁属于本次完成轮前段已复跑证据，没有冒称今日再跑，也没有替换模拟或 press 基线。
-- 修复前游戏源 `2e6a3f8` 的三引擎×三尺寸完整正确性矩阵已完成。`508fb2b` 正在重新检查 clicks、普通/完整 overflow、interactions、full/reduced 真输入；日志 `.npm-cache/v1b-508fb2b-<browser>-<check>.log`。固定 50 回放/42 卡与已打开预览的计数要求不变。
+- 修复前游戏源 `2e6a3f8` 的三引擎×三尺寸完整正确性矩阵已完成。`508fb2b` 的 Chromium 三尺寸五类检查现已全部通过，Firefox/WebKit 仍按顺序执行 clicks、普通/完整 overflow、interactions、full/reduced 真输入；日志 `.npm-cache/v1b-508fb2b-<browser>-<check>.log`。固定 50 回放/42 卡与已打开预览的计数要求不变。
 
 ## 实际性能结果
 
@@ -24,9 +24,13 @@
 
 活动窗口与之后 1,500ms 空闲窗口始终分开。落桌与总 busy 时间分别记录，未缩短阅读或改动跳过合同。完整数据：[新源生产测量](../handoff/v1b-compare/de-worker-final-508fb2b.json)、[Firefox/WebKit 独立重测](../handoff/v1b-compare/de-worker-ff-wk-isolated-508fb2b.json)。
 
+Chromium 正常：响亮落桌/总 busy 为 938/2,113ms，安静 934/3,276ms，固定回放最长安静文案 946/4,029ms；平静月末 busy 3,514ms，多丑闻 10,665ms，Copycat 11,298ms，换季 8,045ms，冬季结局 1,830ms。约 0.95 秒仍只是卡牌落桌，不能用作解锁时刻。
+
 定向试跑未观察到的长任务在完整运行中仍有出现：Chromium 4× frenzy/Copycat 初始动作约 54/56ms，reviewed-frenzy 发布约 53ms。修复确实移走了照片生成成本，但没有把全部剩余工作归因于照片，也没有把定向通过写成全通过。
 
 10 月 14 日只读诊断确认 Firefox `Compositing: WebRender (Software)`，原因代码 `FEATURE_FAILURE_COMP_HEADLESSMODE`。同桌面关闭动效 p95 8.34ms、完整环境动效 33.34ms；通过已有控制停下节拍器后回到 8.34ms。此对照定位软件重绘成本，**不是关闭动画后的验收成绩**。WebKit 停节拍器后仍慢；其 WebGL 返回“Apple GPU”也不能证明这台 Windows 机器的页面合成后端。详见 [渲染诊断](../handoff/v1b-compare/render-environment-detail-20261014.json)。
+
+进一步读取已安装 Playwright 1.63.0 的启动代码，确认原生 Windows WebKit 默认加上 `--disable-accelerated-compositing`，与是否无头无关。本项目使用这条默认路径。该 [启动证据](../handoff/v1b-compare/webkit-windows-launch-20261014.json) 说明它不能替代真实 Safari 的硬件合成验收；不等于所有慢帧都已排除游戏成本。没有移除驱动默认参数来制造更好数字。下一项有意义的性能证据是有界面、确认硬件合成的 Firefox，以及真实 Safari/iPad，而非继续把这两个软件路径当作硬件目标调优。
 
 ## 打包、证据与限制
 
