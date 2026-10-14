@@ -1,5 +1,7 @@
 # Round V1b handoff — final acceptance in progress (2026-10-13)
 
+**October 14 continuation:** current game source/remote main `508fb2b`; no intervening commit. [New report](../reports/2026-10-14-v1b-acceptance.md). Full production data for the worker repair is saved; Firefox/WebKit have a separate isolated rerun. `tools/render-environment.ts --name=<fresh-name>` reads renderer support and tests production resources under `/itch-preview/`; stopping the existing metronome is diagnostic only. Firefox explicitly reports software compositing because headless mode blocks acceleration. WebKit remains unresolved. The new-source nine-configuration correctness matrix is running serially. `tools/motion-record.ts --evidence=<new-folder> --cases=loud` can add fresh continuous pointer evidence without replacing the old gallery. Candidate ZIP is `.npm-cache/overexposed-v1b-508fb2b.zip`. No V1b completion or phase 3 yet; earlier pending lists below are historical.
+
 Read AGENTS.md and docs/status.md first. The author authorised main pulls, code/content/docs, Playwright WebKit, per-part commits/pushes and a committed report. The latest completion prompt supersedes the former permission to stop after C: **finish D/E and acceptance before phase 3; do not mark all V1b done yet.** The A–C report stays intact. The older implementation/remaining-work sections below describe the A–C checkpoint; the completion checkpoint immediately below supersedes them where noted.
 
 ## Current checkpoint — 2026-10-13

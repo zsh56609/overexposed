@@ -1,0 +1,16 @@
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-14T14:55:26.365Z chrome clicks chrome 1280x720 4 runs: {"progress":{"run":1,"guard":49,"states":100,"controls":479,"previews":326,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"49","busy":"0"}
+progress 2026-10-14T14:55:36.382Z chrome clicks chrome 1280x720 4 runs: {"progress":{"run":3,"guard":39,"states":215,"controls":1026,"previews":655,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"39","busy":"0"}
+click-through check, chrome 1280x720: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (21.7s)
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-14T14:55:59.333Z chrome clicks chrome 800x450 4 runs: {"progress":{"run":1,"guard":54,"states":105,"controls":500,"previews":329,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-14T14:56:09.342Z chrome clicks chrome 800x450 4 runs: {"progress":{"run":3,"guard":42,"states":218,"controls":1038,"previews":670,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"42","busy":"0"}
+click-through check, chrome 800x450: 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (21.4s)
+D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
+D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
+progress 2026-10-14T14:56:31.983Z chrome clicks chrome 844x390 (phone) 4 runs: {"progress":{"run":1,"guard":54,"states":105,"controls":500,"previews":329,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-14T14:56:42.003Z chrome clicks chrome 844x390 (phone) 4 runs: {"progress":{"run":3,"guard":40,"states":216,"controls":1031,"previews":661,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"41","busy":"0"}
+click-through check, chrome 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (21.5s)
+PASS: every control for a legal action is on the stage and takes its click, in every browser and size

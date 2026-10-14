@@ -1,0 +1,24 @@
+{"browser":"chrome","startedAt":"2026-10-14T14:47:13.917Z","finishedAt":"2026-10-14T14:47:28.119Z","renderer":{"webgl":true,"vendor":"Google Inc. (Intel)","renderer":"ANGLE (Intel, Intel(R) Arc(TM) 140V GPU (16GB) (0x000064A0) Direct3D11 vs_5_0 ps_5_0, D3D11)"},"graphicsSupport":null,"blank":{"frames":360,"p50":8.300000000000182,"p95":8.5,"max":8.600000000000364},"title":{"frames":361,"p50":8.300000000000182,"p95":8.5,"max":8.5},"off":{"frames":350,"p50":8.300000000000182,"p95":8.5,"max":24.100000000000136},"fullIdle":{"frames":360,"p50":8.300000000000182,"p95":8.5,"max":9},"assets":{"photos":2,"blobs":1,"worker":["http://localhost:4178/itch-preview/assets/photo-worker-BnnTqI8S.js"],"failed":[],"outsidePrefix":[]},"diagnostics":[]}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'http://localhost:4178/favicon.ico'
++ ]
+- []
+
+    at file:///C:/Users/91205/Documents/overexposed/tools/render-environment.ts:48:76
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [ 'http://localhost:4178/favicon.ico' ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

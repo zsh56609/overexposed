@@ -1,0 +1,25 @@
+{
+  "Commit": "508fb2b",
+  "Zip": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\overexposed-v1b-508fb2b.zip",
+  "Bytes": 466173,
+  "Entries": [
+    "index.html",
+    "assets/index-1EaHWXgA.js",
+    "assets/index-Bm7y0prq.css",
+    "assets/LibreFranklin-Dn3QCUQG.woff2",
+    "assets/OFL-ByIEFeV4.txt",
+    "assets/photo-worker-BnnTqI8S.js",
+    "assets/PlayfairDisplay-BN-k0kRT.woff2",
+    "assets/PlayfairDisplay-Italic-xDLc0r-w.woff2"
+  ],
+  "HtmlRefs": [
+    "./assets/index-1EaHWXgA.js",
+    "./assets/index-Bm7y0prq.css"
+  ],
+  "Fonts": [
+    "./PlayfairDisplay-BN-k0kRT.woff2",
+    "./PlayfairDisplay-Italic-xDLc0r-w.woff2",
+    "./LibreFranklin-Dn3QCUQG.woff2"
+  ],
+  "SHA256": "57A4A02EF1EBB2B5FEC19045A1C0EFB25399375636366905233AA22D94F5DB15"
+}

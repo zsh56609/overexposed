@@ -1,0 +1,7420 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": null,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "loud",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:43:30.743Z",
+      "caseFinishedAt": "2026-10-13T07:43:36.222Z",
+      "inputAt": "2026-10-13T07:43:32.567Z",
+      "firstFrameMs": 4.800000023841903,
+      "landingMs": 938.2000000238418,
+      "totalBusyMs": 2113.3000000238417,
+      "active": {
+        "frames": 253,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.599999999999909,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 8.899999999999636,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.800000023841903,
+          "beat": "lift"
+        },
+        {
+          "at": 755.000000023842,
+          "beat": "land"
+        },
+        {
+          "at": 938.2000000238418,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:43:36.222Z",
+      "caseFinishedAt": "2026-10-13T07:43:42.189Z",
+      "inputAt": "2026-10-13T07:43:37.371Z",
+      "firstFrameMs": 0.8999999642371677,
+      "landingMs": 934.1999999642371,
+      "totalBusyMs": 3275.8999999642374,
+      "active": {
+        "frames": 393,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.700000000000273,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.400000000000546,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 0.8999999642371677,
+          "beat": "idle"
+        },
+        {
+          "at": 9.299999964237259,
+          "beat": "lift"
+        },
+        {
+          "at": 750.7999999642373,
+          "beat": "land"
+        },
+        {
+          "at": 934.1999999642371,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:43:42.190Z",
+      "caseFinishedAt": "2026-10-13T07:43:48.190Z",
+      "inputAt": "2026-10-13T07:43:43.125Z",
+      "firstFrameMs": 5.1000000119208835,
+      "landingMs": null,
+      "totalBusyMs": 3513.600000011921,
+      "active": {
+        "frames": 421,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.700000000000273,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 10.199999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 5.1000000119208835,
+          "beat": "endPress"
+        },
+        {
+          "at": 330.000000011921,
+          "beat": "stamp"
+        },
+        {
+          "at": 905.000000011921,
+          "beat": "sweep"
+        },
+        {
+          "at": 1530.0000000119207,
+          "beat": "date"
+        },
+        {
+          "at": 1796.600000011921,
+          "beat": "publish"
+        },
+        {
+          "at": 2238.5000000119207,
+          "beat": "message"
+        },
+        {
+          "at": 3513.600000011921,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:43:48.191Z",
+      "caseFinishedAt": "2026-10-13T07:44:01.620Z",
+      "inputAt": "2026-10-13T07:43:49.416Z",
+      "firstFrameMs": -1.9999999761580511,
+      "landingMs": null,
+      "totalBusyMs": 10665.000000023841,
+      "active": {
+        "frames": 1272,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999909,
+        "max": 25.199999999999818,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.899999999999636,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -1.9999999761580511,
+          "beat": "idle"
+        },
+        {
+          "at": 23.200000023841767,
+          "beat": "endPress"
+        },
+        {
+          "at": 339.70000002384177,
+          "beat": "stamp"
+        },
+        {
+          "at": 906.6000000238419,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1964.8000000238417,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3165.0000000238415,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3782.100000023842,
+          "beat": "impact"
+        },
+        {
+          "at": 3823.100000023842,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4431.600000023842,
+          "beat": "impact"
+        },
+        {
+          "at": 4831.600000023842,
+          "beat": "resources"
+        },
+        {
+          "at": 6181.300000023842,
+          "beat": "sweep"
+        },
+        {
+          "at": 7048.0000000238415,
+          "beat": "date"
+        },
+        {
+          "at": 7298.300000023843,
+          "beat": "publish"
+        },
+        {
+          "at": 7756.5000000238415,
+          "beat": "message"
+        },
+        {
+          "at": 10665.000000023841,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "copycat-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:01.622Z",
+      "caseFinishedAt": "2026-10-13T07:44:16.241Z",
+      "inputAt": "2026-10-13T07:44:03.399Z",
+      "firstFrameMs": -2.000000035762696,
+      "landingMs": null,
+      "totalBusyMs": 11298.199999964238,
+      "active": {
+        "frames": 1349,
+        "p50": 8.300000000001091,
+        "p95": 8.599999999999909,
+        "max": 33.29999999999927,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.799999999999272,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -2.000000035762696,
+          "beat": "idle"
+        },
+        {
+          "at": 22.999999964237304,
+          "beat": "endPress"
+        },
+        {
+          "at": 339.79999996423703,
+          "beat": "stamp"
+        },
+        {
+          "at": 922.9999999642373,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1972.9999999642373,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3164.8999999642374,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3789.599999964237,
+          "beat": "impact"
+        },
+        {
+          "at": 4189.699999964238,
+          "beat": "resources"
+        },
+        {
+          "at": 5540.299999964237,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6581.999999964237,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7789.8999999642365,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8406.599999964237,
+          "beat": "impact"
+        },
+        {
+          "at": 8806.399999964236,
+          "beat": "resources"
+        },
+        {
+          "at": 10164.799999964238,
+          "beat": "sweep"
+        },
+        {
+          "at": 11098.399999964236,
+          "beat": "publish"
+        },
+        {
+          "at": 11298.199999964238,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "season",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:16.243Z",
+      "caseFinishedAt": "2026-10-13T07:44:26.949Z",
+      "inputAt": "2026-10-13T07:44:17.352Z",
+      "firstFrameMs": 3.3000000238419034,
+      "landingMs": null,
+      "totalBusyMs": 8045.100000023842,
+      "active": {
+        "frames": 964,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 3.3000000238419034,
+          "beat": "gate"
+        },
+        {
+          "at": 278.4000000238418,
+          "beat": "resources"
+        },
+        {
+          "at": 1628.6000000238419,
+          "beat": "date"
+        },
+        {
+          "at": 1886.900000023842,
+          "beat": "season"
+        },
+        {
+          "at": 2586.8000000238417,
+          "beat": "publish"
+        },
+        {
+          "at": 4887.0000000238415,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5128.5000000238415,
+          "beat": "message"
+        },
+        {
+          "at": 8045.100000023842,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "winter-ending",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:26.950Z",
+      "caseFinishedAt": "2026-10-13T07:44:32.123Z",
+      "inputAt": "2026-10-13T07:44:28.759Z",
+      "firstFrameMs": 5.099999952316239,
+      "landingMs": null,
+      "totalBusyMs": 1830.1999999523164,
+      "active": {
+        "frames": 216,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999909,
+        "max": 33.70000000000027,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 173,
+        "p50": 8.399999999999636,
+        "p95": 8.899999999999636,
+        "max": 16.599999999999454,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 5.099999952316239,
+          "beat": "gate"
+        },
+        {
+          "at": 280.3999999523162,
+          "beat": "resources"
+        },
+        {
+          "at": 1621.8999999523162,
+          "beat": "publish"
+        },
+        {
+          "at": 1830.1999999523164,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 1655.5999999523165,
+          "beat": "publish",
+          "ms": 33.70000000000027
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:32.125Z",
+      "caseFinishedAt": "2026-10-13T07:44:38.865Z",
+      "inputAt": "2026-10-13T07:44:33.326Z",
+      "firstFrameMs": 4.299999964237259,
+      "landingMs": 946.0999999642372,
+      "totalBusyMs": 4029.499999964237,
+      "active": {
+        "frames": 483,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999909,
+        "max": 9.200000000000045,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.299999964237259,
+          "beat": "lift"
+        },
+        {
+          "at": 754.2999999642373,
+          "beat": "land"
+        },
+        {
+          "at": 946.0999999642372,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:38.866Z",
+      "caseFinishedAt": "2026-10-13T07:44:48.226Z",
+      "inputAt": "2026-10-13T07:44:40.070Z",
+      "firstFrameMs": 1.699999988079071,
+      "landingMs": null,
+      "totalBusyMs": 6618.799999988079,
+      "active": {
+        "frames": 793,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 17,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.800000000001091,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1.699999988079071,
+          "beat": "idle"
+        },
+        {
+          "at": 10.199999988079071,
+          "beat": "endPress"
+        },
+        {
+          "at": 334.999999988079,
+          "beat": "stamp"
+        },
+        {
+          "at": 910.1999999880791,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1968.5999999880792,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3160.2999999880794,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3785.199999988079,
+          "beat": "impact"
+        },
+        {
+          "at": 4185.199999988079,
+          "beat": "resources"
+        },
+        {
+          "at": 5535.299999988079,
+          "beat": "sweep"
+        },
+        {
+          "at": 6160.299999988079,
+          "beat": "date"
+        },
+        {
+          "at": 6418.399999988079,
+          "beat": "publish"
+        },
+        {
+          "at": 6618.799999988079,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:44:48.228Z",
+      "caseFinishedAt": "2026-10-13T07:44:58.790Z",
+      "inputAt": "2026-10-13T07:44:49.987Z",
+      "firstFrameMs": -6.5,
+      "landingMs": null,
+      "totalBusyMs": 7252,
+      "active": {
+        "frames": 869,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999909,
+        "max": 16.700000000000045,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -6.5,
+          "beat": "idle"
+        },
+        {
+          "at": 1.7000000000000455,
+          "beat": "endPress"
+        },
+        {
+          "at": 343.5999999999999,
+          "beat": "stamp"
+        },
+        {
+          "at": 918.5,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1968.8000000000002,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3177.1000000000004,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3793.6000000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 3818.3999999999996,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4443.7,
+          "beat": "impact"
+        },
+        {
+          "at": 4835.2,
+          "beat": "resources"
+        },
+        {
+          "at": 6185.1,
+          "beat": "sweep"
+        },
+        {
+          "at": 7052.1,
+          "beat": "publish"
+        },
+        {
+          "at": 7252,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "loud",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:00.535Z",
+      "caseFinishedAt": "2026-10-13T07:45:07.302Z",
+      "inputAt": "2026-10-13T07:45:03.655Z",
+      "firstFrameMs": -7.699999976158324,
+      "landingMs": 950.7000000238418,
+      "totalBusyMs": 2142.200000023842,
+      "active": {
+        "frames": 249,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 41.69999999999982,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -7.699999976158324,
+          "beat": "idle"
+        },
+        {
+          "at": 8.800000023841676,
+          "beat": "lift"
+        },
+        {
+          "at": 758.900000023842,
+          "beat": "land"
+        },
+        {
+          "at": 950.7000000238418,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 800.6000000238419,
+          "beat": "land",
+          "ms": 41.69999999999982
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:07.303Z",
+      "caseFinishedAt": "2026-10-13T07:45:13.825Z",
+      "inputAt": "2026-10-13T07:45:08.975Z",
+      "firstFrameMs": -2.3000000238419034,
+      "landingMs": 947.6999999761583,
+      "totalBusyMs": 3314.299999976158,
+      "active": {
+        "frames": 391,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 50.09999999999991,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.5,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -2.3000000238419034,
+          "beat": "idle"
+        },
+        {
+          "at": 5.999999976158051,
+          "beat": "lift"
+        },
+        {
+          "at": 755.8999999761581,
+          "beat": "land"
+        },
+        {
+          "at": 947.6999999761583,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 805.999999976158,
+          "beat": "land",
+          "ms": 50.09999999999991
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:13.825Z",
+      "caseFinishedAt": "2026-10-13T07:45:20.007Z",
+      "inputAt": "2026-10-13T07:45:14.945Z",
+      "firstFrameMs": 2.4659999999998945,
+      "landingMs": null,
+      "totalBusyMs": 3519.1000000000004,
+      "active": {
+        "frames": 416,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 33.30000000000018,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 178,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25.099999999999454,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 2.4659999999998945,
+          "beat": "idle"
+        },
+        {
+          "at": 2.5,
+          "beat": "endPress"
+        },
+        {
+          "at": 336,
+          "beat": "stamp"
+        },
+        {
+          "at": 919.0999999999999,
+          "beat": "sweep"
+        },
+        {
+          "at": 1535.9,
+          "beat": "date"
+        },
+        {
+          "at": 1794.1,
+          "beat": "publish"
+        },
+        {
+          "at": 2244.1,
+          "beat": "message"
+        },
+        {
+          "at": 3519.1000000000004,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:20.007Z",
+      "caseFinishedAt": "2026-10-13T07:45:33.915Z",
+      "inputAt": "2026-10-13T07:45:21.677Z",
+      "firstFrameMs": 3.199999988079071,
+      "landingMs": null,
+      "totalBusyMs": 10669.999999988078,
+      "active": {
+        "frames": 1258,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 66.79999999999995,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 16.799999999999272,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 3.199999988079071,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.69999998807907,
+          "beat": "stamp"
+        },
+        {
+          "at": 920.0999999880792,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1961.5999999880792,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3161.5999999880787,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3786.699999988079,
+          "beat": "impact"
+        },
+        {
+          "at": 3811.5999999880787,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4436.599999988079,
+          "beat": "impact"
+        },
+        {
+          "at": 4836.599999988079,
+          "beat": "resources"
+        },
+        {
+          "at": 6186.999999988079,
+          "beat": "sweep"
+        },
+        {
+          "at": 7045.299999988079,
+          "beat": "date"
+        },
+        {
+          "at": 7303.499999988078,
+          "beat": "publish"
+        },
+        {
+          "at": 7753.199999988079,
+          "beat": "message"
+        },
+        {
+          "at": 10669.999999988078,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 69.99999998807903,
+          "beat": "endPress",
+          "ms": 66.79999999999995
+        },
+        {
+          "at": 7369.999999988078,
+          "beat": "publish",
+          "ms": 66.5
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 1.899999976158142,
+          "duration": 54
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "copycat-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:33.916Z",
+      "caseFinishedAt": "2026-10-13T07:45:49.882Z",
+      "inputAt": "2026-10-13T07:45:37.037Z",
+      "firstFrameMs": -6.3340000119210345,
+      "landingMs": null,
+      "totalBusyMs": 11326.999999988078,
+      "active": {
+        "frames": 1345,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 66.69999999999982,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -6.3340000119210345,
+          "beat": "idle"
+        },
+        {
+          "at": 1.999999988079253,
+          "beat": "endPress"
+        },
+        {
+          "at": 360.3999999880789,
+          "beat": "stamp"
+        },
+        {
+          "at": 943.799999988079,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1993.699999988079,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3193.699999988079,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3818.5999999880787,
+          "beat": "impact"
+        },
+        {
+          "at": 4218.799999988079,
+          "beat": "resources"
+        },
+        {
+          "at": 5568.599999988079,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6610.499999988078,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7818.799999988079,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8435.39999998808,
+          "beat": "impact"
+        },
+        {
+          "at": 8835.39999998808,
+          "beat": "resources"
+        },
+        {
+          "at": 10185.39999998808,
+          "beat": "sweep"
+        },
+        {
+          "at": 11118.599999988079,
+          "beat": "publish"
+        },
+        {
+          "at": 11326.999999988078,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 68.69999998807907,
+          "beat": "endPress",
+          "ms": 66.69999999999982
+        },
+        {
+          "at": 11168.699999988079,
+          "beat": "publish",
+          "ms": 50.100000000000364
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 4.399999976158142,
+          "duration": 56
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "season",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:45:49.883Z",
+      "caseFinishedAt": "2026-10-13T07:46:00.903Z",
+      "inputAt": "2026-10-13T07:45:51.293Z",
+      "firstFrameMs": 4.200000023841767,
+      "landingMs": null,
+      "totalBusyMs": 8046.0000000238415,
+      "active": {
+        "frames": 955,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 50.09999999999991,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.200000023841767,
+          "beat": "gate"
+        },
+        {
+          "at": 271.00000002384195,
+          "beat": "resources"
+        },
+        {
+          "at": 1621.000000023842,
+          "beat": "date"
+        },
+        {
+          "at": 1887.7000000238418,
+          "beat": "season"
+        },
+        {
+          "at": 2579.2000000238418,
+          "beat": "publish"
+        },
+        {
+          "at": 4887.700000023842,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5137.700000023842,
+          "beat": "message"
+        },
+        {
+          "at": 8046.0000000238415,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 2629.3000000238417,
+          "beat": "publish",
+          "ms": 50.09999999999991
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "winter-ending",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:00.903Z",
+      "caseFinishedAt": "2026-10-13T07:46:07.374Z",
+      "inputAt": "2026-10-13T07:46:04.006Z",
+      "firstFrameMs": -0.9339999880789946,
+      "landingMs": null,
+      "totalBusyMs": 1849.2000000119206,
+      "active": {
+        "frames": 206,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 91.59999999999945,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 173,
+        "p50": 8.300000000000182,
+        "p95": 8.699999999999818,
+        "max": 16.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -0.9339999880789946,
+          "beat": "idle"
+        },
+        {
+          "at": 7.600000011921111,
+          "beat": "gate"
+        },
+        {
+          "at": 307.6000000119211,
+          "beat": "resources"
+        },
+        {
+          "at": 1657.600000011921,
+          "beat": "publish"
+        },
+        {
+          "at": 1849.2000000119206,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 57.60000001192111,
+          "beat": "gate",
+          "ms": 50
+        },
+        {
+          "at": 1749.2000000119206,
+          "beat": "publish",
+          "ms": 91.59999999999945
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet-longest-recorded",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:07.374Z",
+      "caseFinishedAt": "2026-10-13T07:46:14.287Z",
+      "inputAt": "2026-10-13T07:46:08.680Z",
+      "firstFrameMs": 0.3360000238419616,
+      "landingMs": 942.1000000238419,
+      "totalBusyMs": 4050.3000000238417,
+      "active": {
+        "frames": 483,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 0.3360000238419616,
+          "beat": "idle"
+        },
+        {
+          "at": 0.3360000238419616,
+          "beat": "lift"
+        },
+        {
+          "at": 750.400000023842,
+          "beat": "land"
+        },
+        {
+          "at": 942.1000000238419,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:14.288Z",
+      "caseFinishedAt": "2026-10-13T07:46:23.898Z",
+      "inputAt": "2026-10-13T07:46:15.722Z",
+      "firstFrameMs": -0.6999999523163751,
+      "landingMs": null,
+      "totalBusyMs": 6624.300000047684,
+      "active": {
+        "frames": 790,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 33.400000000000546,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -0.6999999523163751,
+          "beat": "idle"
+        },
+        {
+          "at": 7.600000047683807,
+          "beat": "endPress"
+        },
+        {
+          "at": 340.90000004768376,
+          "beat": "stamp"
+        },
+        {
+          "at": 916.0000000476839,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1966.000000047684,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3165.9000000476835,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3791.000000047684,
+          "beat": "impact"
+        },
+        {
+          "at": 4191.000000047684,
+          "beat": "resources"
+        },
+        {
+          "at": 5541.000000047684,
+          "beat": "sweep"
+        },
+        {
+          "at": 6157.700000047684,
+          "beat": "date"
+        },
+        {
+          "at": 6415.9000000476835,
+          "beat": "publish"
+        },
+        {
+          "at": 6624.300000047684,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 6449.300000047684,
+          "beat": "publish",
+          "ms": 33.400000000000546
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:23.898Z",
+      "caseFinishedAt": "2026-10-13T07:46:35.495Z",
+      "inputAt": "2026-10-13T07:46:26.717Z",
+      "firstFrameMs": -11.500000011920747,
+      "landingMs": null,
+      "totalBusyMs": 7255.099999988079,
+      "active": {
+        "frames": 860,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 58.399999999999636,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -11.500000011920747,
+          "beat": "idle"
+        },
+        {
+          "at": -3.000000011920747,
+          "beat": "endPress"
+        },
+        {
+          "at": 338.59999998807916,
+          "beat": "stamp"
+        },
+        {
+          "at": 921.8999999880789,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1971.7999999880794,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3171.9999999880793,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3788.4999999880793,
+          "beat": "impact"
+        },
+        {
+          "at": 3821.899999988079,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4438.399999988079,
+          "beat": "impact"
+        },
+        {
+          "at": 4846.799999988079,
+          "beat": "resources"
+        },
+        {
+          "at": 6196.799999988079,
+          "beat": "sweep"
+        },
+        {
+          "at": 7046.799999988079,
+          "beat": "publish"
+        },
+        {
+          "at": 7255.099999988079,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 7105.199999988079,
+          "beat": "publish",
+          "ms": 58.399999999999636
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 7045.300000011921,
+          "duration": 53
+        }
+      ],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "loud",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:37.806Z",
+      "caseFinishedAt": "2026-10-13T07:46:44.740Z",
+      "inputAt": "2026-10-13T07:46:41.107Z",
+      "firstFrameMs": 14.679999999999836,
+      "landingMs": 956.3599999999997,
+      "totalBusyMs": 2114.6800000000003,
+      "active": {
+        "frames": 82,
+        "p50": 25,
+        "p95": 50,
+        "max": 116.65999999999985,
+        "over33": 14
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 111,
+        "p50": 16.659999999999854,
+        "p95": 16.68000000000029,
+        "max": 25,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 14.679999999999836,
+          "beat": "lift"
+        },
+        {
+          "at": 756.3600000000001,
+          "beat": "land"
+        },
+        {
+          "at": 956.3599999999997,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 56.340000000000146,
+          "beat": "lift",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 98.01999999999998,
+          "beat": "lift",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 139.67999999999984,
+          "beat": "lift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 264.67999999999984,
+          "beat": "lift",
+          "ms": 116.65999999999985
+        },
+        {
+          "at": 314.67999999999984,
+          "beat": "lift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 389.67999999999984,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 506.3600000000001,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 556.3600000000001,
+          "beat": "lift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 648.02,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 798.0200000000004,
+          "beat": "land",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 864.6999999999998,
+          "beat": "land",
+          "ms": 50
+        },
+        {
+          "at": 1006.3599999999997,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1273,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1381.3400000000001,
+          "beat": "idle",
+          "ms": 41.68000000000029
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "quiet",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:44.741Z",
+      "caseFinishedAt": "2026-10-13T07:46:50.775Z",
+      "inputAt": "2026-10-13T07:46:45.959Z",
+      "firstFrameMs": 30.279999999999973,
+      "landingMs": 938.6199999999999,
+      "totalBusyMs": 3288.6000000000004,
+      "active": {
+        "frames": 219,
+        "p50": 8.340000000000146,
+        "p95": 49.83999999999992,
+        "max": 75,
+        "over33": 15
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 179,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 16.659999999999854,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 30.279999999999973,
+          "beat": "lift"
+        },
+        {
+          "at": 755.28,
+          "beat": "land"
+        },
+        {
+          "at": 938.6199999999999,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 288.6199999999999,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 430.29999999999995,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 546.8,
+          "beat": "lift",
+          "ms": 49.83999999999992
+        },
+        {
+          "at": 721.8,
+          "beat": "lift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 821.96,
+          "beat": "land",
+          "ms": 41.680000000000064
+        },
+        {
+          "at": 938.6199999999999,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1105.3000000000002,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1271.94,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1380.2800000000002,
+          "beat": "idle",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 1488.62,
+          "beat": "idle",
+          "ms": 66.67999999999984
+        },
+        {
+          "at": 1605.2800000000002,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1705.2800000000002,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1855.2800000000002,
+          "beat": "idle",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 1938.6,
+          "beat": "idle",
+          "ms": 75
+        },
+        {
+          "at": 1996.94,
+          "beat": "idle",
+          "ms": 50
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:50.776Z",
+      "caseFinishedAt": "2026-10-13T07:46:56.754Z",
+      "inputAt": "2026-10-13T07:46:51.710Z",
+      "firstFrameMs": -4.100000000000023,
+      "landingMs": null,
+      "totalBusyMs": 3520.84,
+      "active": {
+        "frames": 283,
+        "p50": 8.339999999999918,
+        "p95": 50,
+        "max": 83.33999999999992,
+        "over33": 16
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 8.340000000000146,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -4.100000000000023,
+          "beat": "idle"
+        },
+        {
+          "at": 45.89999999999998,
+          "beat": "endPress"
+        },
+        {
+          "at": 370.8399999999999,
+          "beat": "stamp"
+        },
+        {
+          "at": 920.8599999999999,
+          "beat": "sweep"
+        },
+        {
+          "at": 1537.52,
+          "beat": "date"
+        },
+        {
+          "at": 1795.8600000000001,
+          "beat": "publish"
+        },
+        {
+          "at": 2245.86,
+          "beat": "message"
+        },
+        {
+          "at": 3520.84,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 45.89999999999998,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 112.55999999999995,
+          "beat": "endPress",
+          "ms": 66.65999999999997
+        },
+        {
+          "at": 187.57999999999993,
+          "beat": "endPress",
+          "ms": 66.67999999999984
+        },
+        {
+          "at": 370.8399999999999,
+          "beat": "stamp",
+          "ms": 58.319999999999936
+        },
+        {
+          "at": 462.52,
+          "beat": "stamp",
+          "ms": 83.33999999999992
+        },
+        {
+          "at": 537.52,
+          "beat": "stamp",
+          "ms": 66.66000000000008
+        },
+        {
+          "at": 612.52,
+          "beat": "stamp",
+          "ms": 66.66000000000008
+        },
+        {
+          "at": 1904.1799999999998,
+          "beat": "publish",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 1962.52,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 2079.18,
+          "beat": "publish",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 2137.52,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 2304.2,
+          "beat": "message",
+          "ms": 50
+        },
+        {
+          "at": 2512.54,
+          "beat": "message",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2570.86,
+          "beat": "message",
+          "ms": 50
+        },
+        {
+          "at": 2662.54,
+          "beat": "message",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2712.54,
+          "beat": "message",
+          "ms": 41.679999999999836
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:46:56.757Z",
+      "caseFinishedAt": "2026-10-13T07:47:10.301Z",
+      "inputAt": "2026-10-13T07:46:58.081Z",
+      "firstFrameMs": 49.74000000000001,
+      "landingMs": null,
+      "totalBusyMs": 10674.7,
+      "active": {
+        "frames": 453,
+        "p50": 25,
+        "p95": 50.01999999999998,
+        "max": 91.66000000000167,
+        "over33": 58
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 148,
+        "p50": 8.340000000000146,
+        "p95": 16.660000000001673,
+        "max": 33.340000000000146,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 49.74000000000001,
+          "beat": "endPress"
+        },
+        {
+          "at": 333.0799999999999,
+          "beat": "stamp"
+        },
+        {
+          "at": 916,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1957.6999999999998,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3174.38,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3791.0600000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 3816.0600000000004,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4441.44,
+          "beat": "impact"
+        },
+        {
+          "at": 4833.1,
+          "beat": "resources"
+        },
+        {
+          "at": 6191.42,
+          "beat": "sweep"
+        },
+        {
+          "at": 7041.4400000000005,
+          "beat": "date"
+        },
+        {
+          "at": 7316.4,
+          "beat": "publish"
+        },
+        {
+          "at": 7773.6,
+          "beat": "message"
+        },
+        {
+          "at": 10674.7,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 183.07999999999993,
+          "beat": "endPress",
+          "ms": 58.319999999999936
+        },
+        {
+          "at": 274.76,
+          "beat": "endPress",
+          "ms": 83.33999999999992
+        },
+        {
+          "at": 333.0799999999999,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 483.0999999999999,
+          "beat": "stamp",
+          "ms": 50.01999999999998
+        },
+        {
+          "at": 541.4200000000001,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 599.76,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 657.6600000000001,
+          "beat": "stamp",
+          "ms": 49.56000000000017
+        },
+        {
+          "at": 916,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 982.6799999999998,
+          "beat": "scandalLift",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 1057.6799999999998,
+          "beat": "scandalLift",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 1124.3400000000001,
+          "beat": "scandalLift",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 1207.6799999999998,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1266.02,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1374.3400000000001,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1457.6799999999998,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1524.3600000000001,
+          "beat": "scandalLift",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2091.02,
+          "beat": "scandalFlip",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 2149.36,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2241.04,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2299.36,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2474.36,
+          "beat": "scandalFlip",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 2524.38,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2607.7,
+          "beat": "scandalFlip",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 2824.38,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3032.7200000000003,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 3174.38,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3232.7200000000003,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3282.7200000000003,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3391.0600000000004,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3441.0600000000004,
+          "beat": "scandalCarry",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3874.74,
+          "beat": "scandalCarry",
+          "ms": 33.67999999999938
+        },
+        {
+          "at": 4041.3999999999996,
+          "beat": "scandalCarry",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 4191.4,
+          "beat": "scandalCarry",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 4241.4,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 4583.1,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4666.44,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4749.76,
+          "beat": "impact",
+          "ms": 74.98000000000047
+        },
+        {
+          "at": 4833.1,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 4916.44,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 4966.44,
+          "beat": "resources",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 5308.08,
+          "beat": "resources",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 5958.08,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6191.42,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6291.42,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6358.1,
+          "beat": "sweep",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 6574.76,
+          "beat": "sweep",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6691.44,
+          "beat": "sweep",
+          "ms": 50
+        },
+        {
+          "at": 7366.4,
+          "beat": "publish",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 7424.74,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 7524.74,
+          "beat": "publish",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 7656.9400000000005,
+          "beat": "publish",
+          "ms": 66.68000000000029
+        },
+        {
+          "at": 7715.26,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 7856.9400000000005,
+          "beat": "message",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 7949.719999999999,
+          "beat": "message",
+          "ms": 34.45999999999913
+        },
+        {
+          "at": 8008.040000000001,
+          "beat": "message",
+          "ms": 58.32000000000153
+        },
+        {
+          "at": 8108.040000000001,
+          "beat": "message",
+          "ms": 91.66000000000167
+        },
+        {
+          "at": 8166.379999999999,
+          "beat": "message",
+          "ms": 50
+        },
+        {
+          "at": 9849.7,
+          "beat": "message",
+          "ms": 41.6200000000008
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "copycat-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:10.302Z",
+      "caseFinishedAt": "2026-10-13T07:47:25.245Z",
+      "inputAt": "2026-10-13T07:47:12.417Z",
+      "firstFrameMs": 20.90000000000009,
+      "landingMs": null,
+      "totalBusyMs": 11287.52,
+      "active": {
+        "frames": 706,
+        "p50": 8.340000000000146,
+        "p95": 41.68000000000029,
+        "max": 83.34000000000015,
+        "over33": 52
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 165,
+        "p50": 8.340000000000146,
+        "p95": 14.8799999999992,
+        "max": 66.65999999999985,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 20.90000000000009,
+          "beat": "endPress"
+        },
+        {
+          "at": 370.9000000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 929.2199999999998,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1962.58,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3170.8999999999996,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3787.5600000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 4187.58,
+          "beat": "resources"
+        },
+        {
+          "at": 5554.2,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6587.5599999999995,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7787.540000000001,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8412.54,
+          "beat": "impact"
+        },
+        {
+          "at": 8837.54,
+          "beat": "resources"
+        },
+        {
+          "at": 10154.2,
+          "beat": "sweep"
+        },
+        {
+          "at": 11104.2,
+          "beat": "publish"
+        },
+        {
+          "at": 11287.52,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 187.55999999999995,
+          "beat": "endPress",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 245.9000000000001,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 320.9000000000001,
+          "beat": "endPress",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 370.9000000000001,
+          "beat": "stamp",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 462.5799999999999,
+          "beat": "stamp",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 1062.56,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1120.9,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1287.56,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 1487.56,
+          "beat": "scandalLift",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 2112.58,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2204.24,
+          "beat": "scandalFlip",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 2262.58,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2354.26,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2445.92,
+          "beat": "scandalFlip",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 2504.26,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2595.92,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2687.6000000000004,
+          "beat": "scandalFlip",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 2737.6000000000004,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3462.5600000000004,
+          "beat": "scandalCarry",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 3570.8999999999996,
+          "beat": "scandalCarry",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 3629.24,
+          "beat": "scandalCarry",
+          "ms": 50.01999999999953
+        },
+        {
+          "at": 3695.8999999999996,
+          "beat": "scandalCarry",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 3920.8999999999996,
+          "beat": "impact",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 3979.24,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4129.24,
+          "beat": "impact",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 4187.58,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 4804.26,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 4970.92,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5120.86,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5212.52,
+          "beat": "resources",
+          "ms": 41.660000000000764
+        },
+        {
+          "at": 5304.2,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5420.86,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5845.88,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 6037.54,
+          "beat": "scandalLift",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 6154.219999999999,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 6637.5599999999995,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6687.5599999999995,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 6745.9,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 6804.219999999999,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 6995.9,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7179.200000000001,
+          "beat": "scandalFlip",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7295.860000000001,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 7954.219999999999,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 8529.2,
+          "beat": "impact",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 8587.54,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 8787.54,
+          "beat": "impact",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 8837.54,
+          "beat": "resources",
+          "ms": 41.66000000000167
+        },
+        {
+          "at": 8929.22,
+          "beat": "resources",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 10470.88,
+          "beat": "sweep",
+          "ms": 58.33999999999833
+        },
+        {
+          "at": 10595.88,
+          "beat": "sweep",
+          "ms": 41.67999999999847
+        },
+        {
+          "at": 11162.54,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 11229.2,
+          "beat": "publish",
+          "ms": 58.32000000000153
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "season",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:25.245Z",
+      "caseFinishedAt": "2026-10-13T07:47:36.049Z",
+      "inputAt": "2026-10-13T07:47:26.446Z",
+      "firstFrameMs": -0.31999999999993634,
+      "landingMs": null,
+      "totalBusyMs": 8066.299999999999,
+      "active": {
+        "frames": 539,
+        "p50": 8.340000000000146,
+        "p95": 33.340000000000146,
+        "max": 58.340000000000146,
+        "over33": 15
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 166,
+        "p50": 8.339999999998327,
+        "p95": 16.659999999999854,
+        "max": 25,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -0.31999999999993634,
+          "beat": "idle"
+        },
+        {
+          "at": 8,
+          "beat": "gate"
+        },
+        {
+          "at": 274.6400000000001,
+          "beat": "resources"
+        },
+        {
+          "at": 1624.6599999999999,
+          "beat": "date"
+        },
+        {
+          "at": 1883,
+          "beat": "season"
+        },
+        {
+          "at": 2591.3,
+          "beat": "publish"
+        },
+        {
+          "at": 4891.3,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5141.3,
+          "beat": "message"
+        },
+        {
+          "at": 8066.299999999999,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 2024.6599999999999,
+          "beat": "season",
+          "ms": 58.33999999999969
+        },
+        {
+          "at": 2083,
+          "beat": "season",
+          "ms": 50
+        },
+        {
+          "at": 2199.64,
+          "beat": "season",
+          "ms": 58.29999999999973
+        },
+        {
+          "at": 2249.64,
+          "beat": "season",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2741.3,
+          "beat": "publish",
+          "ms": 58.320000000000164
+        },
+        {
+          "at": 2799.64,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 3007.96,
+          "beat": "publish",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 3057.96,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3216.3,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 3266.3,
+          "beat": "publish",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3374.6400000000003,
+          "beat": "publish",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 3474.6400000000003,
+          "beat": "publish",
+          "ms": 50
+        },
+        {
+          "at": 5632.98,
+          "beat": "message",
+          "ms": 41.67999999999938
+        },
+        {
+          "at": 7041.280000000001,
+          "beat": "message",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 7166.280000000001,
+          "beat": "message",
+          "ms": 41.659999999999854
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "winter-ending",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:36.050Z",
+      "caseFinishedAt": "2026-10-13T07:47:41.494Z",
+      "inputAt": "2026-10-13T07:47:38.128Z",
+      "firstFrameMs": 27.11999999999989,
+      "landingMs": null,
+      "totalBusyMs": 1852.12,
+      "active": {
+        "frames": 179,
+        "p50": 8.340000000000146,
+        "p95": 25,
+        "max": 33.340000000000146,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 8.340000000000146,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 27.11999999999989,
+          "beat": "gate"
+        },
+        {
+          "at": 293.8000000000002,
+          "beat": "resources"
+        },
+        {
+          "at": 1652.12,
+          "beat": "publish"
+        },
+        {
+          "at": 1852.12,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:41.497Z",
+      "caseFinishedAt": "2026-10-13T07:47:48.220Z",
+      "inputAt": "2026-10-13T07:47:42.646Z",
+      "firstFrameMs": 51.83999999999992,
+      "landingMs": 943.48,
+      "totalBusyMs": 4043.5,
+      "active": {
+        "frames": 325,
+        "p50": 8.340000000000146,
+        "p95": 41.66000000000031,
+        "max": 75,
+        "over33": 21
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 8.340000000000146,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 51.83999999999992,
+          "beat": "lift"
+        },
+        {
+          "at": 751.8199999999999,
+          "beat": "land"
+        },
+        {
+          "at": 943.48,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 135.1400000000001,
+          "beat": "lift",
+          "ms": 74.96000000000004
+        },
+        {
+          "at": 218.48000000000002,
+          "beat": "lift",
+          "ms": 75
+        },
+        {
+          "at": 293.48,
+          "beat": "lift",
+          "ms": 66.68000000000006
+        },
+        {
+          "at": 410.1400000000001,
+          "beat": "lift",
+          "ms": 50
+        },
+        {
+          "at": 810.1400000000001,
+          "beat": "land",
+          "ms": 50
+        },
+        {
+          "at": 876.8199999999999,
+          "beat": "land",
+          "ms": 58.33999999999992
+        },
+        {
+          "at": 943.48,
+          "beat": "idle",
+          "ms": 58.33999999999992
+        },
+        {
+          "at": 1010.1599999999999,
+          "beat": "idle",
+          "ms": 58.33999999999969
+        },
+        {
+          "at": 1068.48,
+          "beat": "idle",
+          "ms": 50
+        },
+        {
+          "at": 1135.1399999999999,
+          "beat": "idle",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 1185.1399999999999,
+          "beat": "idle",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1251.7800000000002,
+          "beat": "idle",
+          "ms": 58.30000000000018
+        },
+        {
+          "at": 1318.46,
+          "beat": "idle",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 1385.12,
+          "beat": "idle",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 1485.12,
+          "beat": "idle",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1568.46,
+          "beat": "idle",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1643.44,
+          "beat": "idle",
+          "ms": 66.63999999999987
+        },
+        {
+          "at": 1751.7800000000002,
+          "beat": "idle",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 1885.12,
+          "beat": "idle",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 1935.12,
+          "beat": "idle",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 2126.78,
+          "beat": "idle",
+          "ms": 41.66000000000031
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:48.221Z",
+      "caseFinishedAt": "2026-10-13T07:47:57.678Z",
+      "inputAt": "2026-10-13T07:47:49.471Z",
+      "firstFrameMs": 25.74000000000001,
+      "landingMs": null,
+      "totalBusyMs": 6642.34,
+      "active": {
+        "frames": 386,
+        "p50": 16.659999999999854,
+        "p95": 41.68000000000029,
+        "max": 83.34000000000015,
+        "over33": 24
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 173,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 25,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 25.74000000000001,
+          "beat": "endPress"
+        },
+        {
+          "at": 342.3599999999999,
+          "beat": "stamp"
+        },
+        {
+          "at": 925.6999999999998,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1975.6399999999999,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3175.66,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3792.34,
+          "beat": "impact"
+        },
+        {
+          "at": 4192.34,
+          "beat": "resources"
+        },
+        {
+          "at": 5525.68,
+          "beat": "sweep"
+        },
+        {
+          "at": 6150.68,
+          "beat": "date"
+        },
+        {
+          "at": 6417.36,
+          "beat": "publish"
+        },
+        {
+          "at": 6642.34,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 117.42000000000007,
+          "beat": "endPress",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 175.74,
+          "beat": "endPress",
+          "ms": 50
+        },
+        {
+          "at": 242.3599999999999,
+          "beat": "endPress",
+          "ms": 58.319999999999936
+        },
+        {
+          "at": 325.68000000000006,
+          "beat": "endPress",
+          "ms": 41.6400000000001
+        },
+        {
+          "at": 384.02,
+          "beat": "stamp",
+          "ms": 41.66000000000008
+        },
+        {
+          "at": 475.70000000000005,
+          "beat": "stamp",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 550.7,
+          "beat": "stamp",
+          "ms": 66.68000000000006
+        },
+        {
+          "at": 617.3599999999999,
+          "beat": "stamp",
+          "ms": 58.33999999999992
+        },
+        {
+          "at": 684.02,
+          "beat": "stamp",
+          "ms": 58.319999999999936
+        },
+        {
+          "at": 1200.6599999999999,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1350.6599999999999,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1425.6599999999999,
+          "beat": "scandalLift",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 2067.3,
+          "beat": "scandalFlip",
+          "ms": 41.66000000000031
+        },
+        {
+          "at": 2142.3,
+          "beat": "scandalFlip",
+          "ms": 66.66000000000031
+        },
+        {
+          "at": 2567.32,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2617.32,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 3884,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 3975.6800000000003,
+          "beat": "impact",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 4025.6800000000003,
+          "beat": "impact",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 4109,
+          "beat": "impact",
+          "ms": 50
+        },
+        {
+          "at": 4192.34,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 4275.68,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 6584,
+          "beat": "publish",
+          "ms": 58.31999999999971
+        },
+        {
+          "at": 6642.34,
+          "beat": "idle",
+          "ms": 50
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:47:57.679Z",
+      "caseFinishedAt": "2026-10-13T07:48:08.442Z",
+      "inputAt": "2026-10-13T07:47:59.656Z",
+      "firstFrameMs": 65.29999999999995,
+      "landingMs": null,
+      "totalBusyMs": 7248.5599999999995,
+      "active": {
+        "frames": 293,
+        "p50": 25,
+        "p95": 58.340000000000146,
+        "max": 108.34000000000015,
+        "over33": 41
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 134,
+        "p50": 8.340000000000146,
+        "p95": 25,
+        "max": 66.65999999999985,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": 65.29999999999995,
+          "beat": "endPress"
+        },
+        {
+          "at": 356.96000000000004,
+          "beat": "stamp"
+        },
+        {
+          "at": 923.5999999999999,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1965.2800000000002,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3190.2200000000003,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3798.5600000000004,
+          "beat": "impact"
+        },
+        {
+          "at": 3848.5600000000004,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4431.92,
+          "beat": "impact"
+        },
+        {
+          "at": 4840.26,
+          "beat": "resources"
+        },
+        {
+          "at": 6190.26,
+          "beat": "sweep"
+        },
+        {
+          "at": 7065.219999999999,
+          "beat": "publish"
+        },
+        {
+          "at": 7248.5599999999995,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 181.96000000000004,
+          "beat": "endPress",
+          "ms": 108.34000000000015
+        },
+        {
+          "at": 273.6399999999999,
+          "beat": "endPress",
+          "ms": 83.33999999999969
+        },
+        {
+          "at": 356.96000000000004,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 523.6399999999999,
+          "beat": "stamp",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 598.6399999999999,
+          "beat": "stamp",
+          "ms": 66.65999999999985
+        },
+        {
+          "at": 715.3000000000002,
+          "beat": "stamp",
+          "ms": 50
+        },
+        {
+          "at": 848.6199999999999,
+          "beat": "stamp",
+          "ms": 41.679999999999836
+        },
+        {
+          "at": 965.2800000000002,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1015.2800000000002,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1115.2800000000002,
+          "beat": "scandalLift",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 1181.94,
+          "beat": "scandalLift",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 1231.94,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1340.2800000000002,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1431.94,
+          "beat": "scandalLift",
+          "ms": 83.32000000000016
+        },
+        {
+          "at": 1490.2800000000002,
+          "beat": "scandalLift",
+          "ms": 50
+        },
+        {
+          "at": 1806.94,
+          "beat": "scandalLift",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 1965.2800000000002,
+          "beat": "scandalFlip",
+          "ms": 41.68000000000029
+        },
+        {
+          "at": 2190.2799999999997,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2248.62,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2398.62,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2490.2799999999997,
+          "beat": "scandalFlip",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 2548.54,
+          "beat": "scandalFlip",
+          "ms": 49.92000000000007
+        },
+        {
+          "at": 2640.2200000000003,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 2731.88,
+          "beat": "scandalFlip",
+          "ms": 83.34000000000015
+        },
+        {
+          "at": 2790.2200000000003,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 2856.88,
+          "beat": "scandalFlip",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 3006.88,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 3065.2200000000003,
+          "beat": "scandalFlip",
+          "ms": 50
+        },
+        {
+          "at": 3190.2200000000003,
+          "beat": "scandalCarry",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 3415.2200000000003,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 3481.8999999999996,
+          "beat": "scandalCarry",
+          "ms": 58.339999999999236
+        },
+        {
+          "at": 3556.8999999999996,
+          "beat": "scandalCarry",
+          "ms": 66.67999999999938
+        },
+        {
+          "at": 3898.5600000000004,
+          "beat": "scandalCarry",
+          "ms": 50
+        },
+        {
+          "at": 4040.24,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 4256.92,
+          "beat": "scandalCarry",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 4690.26,
+          "beat": "impact",
+          "ms": 58.340000000000146
+        },
+        {
+          "at": 4781.92,
+          "beat": "impact",
+          "ms": 83.31999999999971
+        },
+        {
+          "at": 4840.26,
+          "beat": "resources",
+          "ms": 50
+        },
+        {
+          "at": 5240.26,
+          "beat": "resources",
+          "ms": 41.659999999999854
+        },
+        {
+          "at": 5373.62,
+          "beat": "resources",
+          "ms": 50.01999999999953
+        },
+        {
+          "at": 6373.58,
+          "beat": "sweep",
+          "ms": 41.68000000000029
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "loud",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:48:09.548Z",
+      "caseFinishedAt": "2026-10-13T07:48:15.578Z",
+      "inputAt": "2026-10-13T07:48:11.754Z",
+      "firstFrameMs": 14,
+      "landingMs": 988,
+      "totalBusyMs": 2172,
+      "active": {
+        "frames": 22,
+        "p50": 93,
+        "p95": 110,
+        "max": 184,
+        "over33": 22
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 109,
+        "p95": 125,
+        "max": 125,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 14,
+          "beat": "lift"
+        },
+        {
+          "at": 794,
+          "beat": "land"
+        },
+        {
+          "at": 988,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 198,
+          "beat": "lift",
+          "ms": 184
+        },
+        {
+          "at": 308,
+          "beat": "lift",
+          "ms": 110
+        },
+        {
+          "at": 404,
+          "beat": "lift",
+          "ms": 96
+        },
+        {
+          "at": 496,
+          "beat": "lift",
+          "ms": 92
+        },
+        {
+          "at": 593,
+          "beat": "lift",
+          "ms": 97
+        },
+        {
+          "at": 689,
+          "beat": "lift",
+          "ms": 96
+        },
+        {
+          "at": 794,
+          "beat": "land",
+          "ms": 105
+        },
+        {
+          "at": 891,
+          "beat": "land",
+          "ms": 97
+        },
+        {
+          "at": 988,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 1081,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 1173,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1272,
+          "beat": "idle",
+          "ms": 99
+        },
+        {
+          "at": 1364,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1456,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1552,
+          "beat": "idle",
+          "ms": 96
+        },
+        {
+          "at": 1641,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 1726,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1812,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1904,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1992,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 2079,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 2172,
+          "beat": "idle",
+          "ms": 93
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:48:15.579Z",
+      "caseFinishedAt": "2026-10-13T07:48:22.739Z",
+      "inputAt": "2026-10-13T07:48:17.851Z",
+      "firstFrameMs": 21,
+      "landingMs": 956,
+      "totalBusyMs": 3299,
+      "active": {
+        "frames": 35,
+        "p50": 90,
+        "p95": 101,
+        "max": 168,
+        "over33": 35
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 108,
+        "p95": 112,
+        "max": 112,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 21,
+          "beat": "lift"
+        },
+        {
+          "at": 762,
+          "beat": "land"
+        },
+        {
+          "at": 956,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 189,
+          "beat": "lift",
+          "ms": 168
+        },
+        {
+          "at": 285,
+          "beat": "lift",
+          "ms": 96
+        },
+        {
+          "at": 385,
+          "beat": "lift",
+          "ms": 100
+        },
+        {
+          "at": 476,
+          "beat": "lift",
+          "ms": 91
+        },
+        {
+          "at": 573,
+          "beat": "lift",
+          "ms": 97
+        },
+        {
+          "at": 661,
+          "beat": "lift",
+          "ms": 88
+        },
+        {
+          "at": 762,
+          "beat": "land",
+          "ms": 101
+        },
+        {
+          "at": 862,
+          "beat": "land",
+          "ms": 100
+        },
+        {
+          "at": 956,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 1041,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1130,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 1215,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1305,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 1395,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 1478,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 1573,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 1661,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 1745,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1840,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 1930,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 2015,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 2103,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 2201,
+          "beat": "idle",
+          "ms": 98
+        },
+        {
+          "at": 2292,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 2389,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 2480,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 2578,
+          "beat": "idle",
+          "ms": 98
+        },
+        {
+          "at": 2667,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 2764,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 2853,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 2951,
+          "beat": "idle",
+          "ms": 98
+        },
+        {
+          "at": 3037,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 3123,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 3209,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 3299,
+          "beat": "idle",
+          "ms": 90
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:48:22.740Z",
+      "caseFinishedAt": "2026-10-13T07:48:29.170Z",
+      "inputAt": "2026-10-13T07:48:23.963Z",
+      "firstFrameMs": 14,
+      "landingMs": null,
+      "totalBusyMs": 3542,
+      "active": {
+        "frames": 47,
+        "p50": 73,
+        "p95": 91,
+        "max": 103,
+        "over33": 47
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 17,
+        "p50": 94,
+        "p95": 100,
+        "max": 100,
+        "over33": 17
+      },
+      "beats": [
+        {
+          "at": 14,
+          "beat": "endPress"
+        },
+        {
+          "at": 371,
+          "beat": "stamp"
+        },
+        {
+          "at": 959,
+          "beat": "sweep"
+        },
+        {
+          "at": 1553,
+          "beat": "date"
+        },
+        {
+          "at": 1854,
+          "beat": "publish"
+        },
+        {
+          "at": 2297,
+          "beat": "message"
+        },
+        {
+          "at": 3542,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 117,
+          "beat": "endPress",
+          "ms": 103
+        },
+        {
+          "at": 202,
+          "beat": "endPress",
+          "ms": 85
+        },
+        {
+          "at": 280,
+          "beat": "endPress",
+          "ms": 78
+        },
+        {
+          "at": 371,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 450,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 524,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 596,
+          "beat": "stamp",
+          "ms": 72
+        },
+        {
+          "at": 670,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 742,
+          "beat": "stamp",
+          "ms": 72
+        },
+        {
+          "at": 812,
+          "beat": "stamp",
+          "ms": 70
+        },
+        {
+          "at": 888,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 959,
+          "beat": "sweep",
+          "ms": 71
+        },
+        {
+          "at": 1031,
+          "beat": "sweep",
+          "ms": 72
+        },
+        {
+          "at": 1105,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 1176,
+          "beat": "sweep",
+          "ms": 71
+        },
+        {
+          "at": 1250,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 1329,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 1400,
+          "beat": "sweep",
+          "ms": 71
+        },
+        {
+          "at": 1468,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1553,
+          "beat": "date",
+          "ms": 85
+        },
+        {
+          "at": 1622,
+          "beat": "date",
+          "ms": 69
+        },
+        {
+          "at": 1689,
+          "beat": "date",
+          "ms": 67
+        },
+        {
+          "at": 1756,
+          "beat": "date",
+          "ms": 67
+        },
+        {
+          "at": 1854,
+          "beat": "publish",
+          "ms": 98
+        },
+        {
+          "at": 1938,
+          "beat": "publish",
+          "ms": 84
+        },
+        {
+          "at": 2008,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 2077,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 2147,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 2224,
+          "beat": "publish",
+          "ms": 77
+        },
+        {
+          "at": 2297,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 2375,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 2446,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 2519,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 2597,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 2672,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 2739,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 2810,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 2880,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 2950,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 3018,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 3102,
+          "beat": "message",
+          "ms": 84
+        },
+        {
+          "at": 3176,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 3247,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 3320,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 3394,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 3464,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 3542,
+          "beat": "idle",
+          "ms": 78
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:48:29.171Z",
+      "caseFinishedAt": "2026-10-13T07:48:43.740Z",
+      "inputAt": "2026-10-13T07:48:31.485Z",
+      "firstFrameMs": 16,
+      "landingMs": null,
+      "totalBusyMs": 10671,
+      "active": {
+        "frames": 122,
+        "p50": 85,
+        "p95": 104,
+        "max": 204,
+        "over33": 122
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 16,
+        "p50": 106,
+        "p95": 110,
+        "max": 110,
+        "over33": 16
+      },
+      "beats": [
+        {
+          "at": 16,
+          "beat": "endPress"
+        },
+        {
+          "at": 373,
+          "beat": "stamp"
+        },
+        {
+          "at": 1033,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1997,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3206,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4488,
+          "beat": "impact"
+        },
+        {
+          "at": 4852,
+          "beat": "resources"
+        },
+        {
+          "at": 6220,
+          "beat": "sweep"
+        },
+        {
+          "at": 7081,
+          "beat": "date"
+        },
+        {
+          "at": 7355,
+          "beat": "publish"
+        },
+        {
+          "at": 7790,
+          "beat": "message"
+        },
+        {
+          "at": 10671,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 188,
+          "beat": "endPress",
+          "ms": 172
+        },
+        {
+          "at": 285,
+          "beat": "endPress",
+          "ms": 97
+        },
+        {
+          "at": 373,
+          "beat": "stamp",
+          "ms": 88
+        },
+        {
+          "at": 451,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 534,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 614,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 693,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 783,
+          "beat": "stamp",
+          "ms": 90
+        },
+        {
+          "at": 875,
+          "beat": "stamp",
+          "ms": 92
+        },
+        {
+          "at": 1033,
+          "beat": "scandalLift",
+          "ms": 158
+        },
+        {
+          "at": 1206,
+          "beat": "scandalLift",
+          "ms": 173
+        },
+        {
+          "at": 1352,
+          "beat": "scandalLift",
+          "ms": 146
+        },
+        {
+          "at": 1446,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1539,
+          "beat": "scandalLift",
+          "ms": 93
+        },
+        {
+          "at": 1624,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1715,
+          "beat": "scandalLift",
+          "ms": 91
+        },
+        {
+          "at": 1801,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1893,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1997,
+          "beat": "scandalFlip",
+          "ms": 104
+        },
+        {
+          "at": 2087,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 2178,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2269,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2359,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 2448,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2546,
+          "beat": "scandalFlip",
+          "ms": 98
+        },
+        {
+          "at": 2641,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 2736,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 2831,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 3035,
+          "beat": "scandalFlip",
+          "ms": 204
+        },
+        {
+          "at": 3116,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 3206,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3298,
+          "beat": "scandalCarry",
+          "ms": 92
+        },
+        {
+          "at": 3384,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3470,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3556,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3648,
+          "beat": "scandalCarry",
+          "ms": 92
+        },
+        {
+          "at": 3733,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 3822,
+          "beat": "scandalCarry",
+          "ms": 89
+        },
+        {
+          "at": 3926,
+          "beat": "scandalCarry",
+          "ms": 104
+        },
+        {
+          "at": 4024,
+          "beat": "scandalCarry",
+          "ms": 98
+        },
+        {
+          "at": 4113,
+          "beat": "scandalCarry",
+          "ms": 89
+        },
+        {
+          "at": 4210,
+          "beat": "scandalCarry",
+          "ms": 97
+        },
+        {
+          "at": 4303,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 4399,
+          "beat": "scandalCarry",
+          "ms": 96
+        },
+        {
+          "at": 4488,
+          "beat": "impact",
+          "ms": 89
+        },
+        {
+          "at": 4585,
+          "beat": "impact",
+          "ms": 97
+        },
+        {
+          "at": 4672,
+          "beat": "impact",
+          "ms": 87
+        },
+        {
+          "at": 4757,
+          "beat": "impact",
+          "ms": 85
+        },
+        {
+          "at": 4852,
+          "beat": "resources",
+          "ms": 95
+        },
+        {
+          "at": 4938,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 5022,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5107,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5192,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5282,
+          "beat": "resources",
+          "ms": 90
+        },
+        {
+          "at": 5373,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 5452,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5533,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5616,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5704,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 5793,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 5888,
+          "beat": "resources",
+          "ms": 95
+        },
+        {
+          "at": 5976,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 6055,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 6137,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 6220,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6306,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 6387,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 6466,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6549,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6638,
+          "beat": "sweep",
+          "ms": 89
+        },
+        {
+          "at": 6716,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6800,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6893,
+          "beat": "sweep",
+          "ms": 93
+        },
+        {
+          "at": 6990,
+          "beat": "sweep",
+          "ms": 97
+        },
+        {
+          "at": 7081,
+          "beat": "date",
+          "ms": 91
+        },
+        {
+          "at": 7163,
+          "beat": "date",
+          "ms": 82
+        },
+        {
+          "at": 7242,
+          "beat": "date",
+          "ms": 79
+        },
+        {
+          "at": 7355,
+          "beat": "publish",
+          "ms": 113
+        },
+        {
+          "at": 7453,
+          "beat": "publish",
+          "ms": 98
+        },
+        {
+          "at": 7541,
+          "beat": "publish",
+          "ms": 88
+        },
+        {
+          "at": 7620,
+          "beat": "publish",
+          "ms": 79
+        },
+        {
+          "at": 7700,
+          "beat": "publish",
+          "ms": 80
+        },
+        {
+          "at": 7790,
+          "beat": "message",
+          "ms": 90
+        },
+        {
+          "at": 7869,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 7942,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 8025,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 8101,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 8173,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 8241,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8310,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 8380,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 8448,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8515,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 8598,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 8672,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 8740,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8810,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 8881,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 8951,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 9022,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 9100,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 9172,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 9243,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 9315,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 9402,
+          "beat": "message",
+          "ms": 87
+        },
+        {
+          "at": 9486,
+          "beat": "message",
+          "ms": 84
+        },
+        {
+          "at": 9559,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9637,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 9710,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9778,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9857,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 9937,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 10014,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 10085,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10156,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10235,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 10311,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 10383,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 10455,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 10526,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10597,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10671,
+          "beat": "idle",
+          "ms": 74
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "copycat-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:48:43.741Z",
+      "caseFinishedAt": "2026-10-13T07:49:00.560Z",
+      "inputAt": "2026-10-13T07:48:47.662Z",
+      "firstFrameMs": 22,
+      "landingMs": null,
+      "totalBusyMs": 11343,
+      "active": {
+        "frames": 109,
+        "p50": 102,
+        "p95": 116,
+        "max": 164,
+        "over33": 109
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 102,
+        "p95": 109,
+        "max": 109,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 22,
+          "beat": "endPress"
+        },
+        {
+          "at": 411,
+          "beat": "stamp"
+        },
+        {
+          "at": 972,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1998,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3228,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3857,
+          "beat": "impact"
+        },
+        {
+          "at": 4282,
+          "beat": "resources"
+        },
+        {
+          "at": 5581,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6648,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7799,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8426,
+          "beat": "impact"
+        },
+        {
+          "at": 8865,
+          "beat": "resources"
+        },
+        {
+          "at": 10188,
+          "beat": "sweep"
+        },
+        {
+          "at": 11131,
+          "beat": "publish"
+        },
+        {
+          "at": 11343,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 155,
+          "beat": "endPress",
+          "ms": 133
+        },
+        {
+          "at": 319,
+          "beat": "endPress",
+          "ms": 164
+        },
+        {
+          "at": 411,
+          "beat": "stamp",
+          "ms": 92
+        },
+        {
+          "at": 508,
+          "beat": "stamp",
+          "ms": 97
+        },
+        {
+          "at": 601,
+          "beat": "stamp",
+          "ms": 93
+        },
+        {
+          "at": 692,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 786,
+          "beat": "stamp",
+          "ms": 94
+        },
+        {
+          "at": 879,
+          "beat": "stamp",
+          "ms": 93
+        },
+        {
+          "at": 972,
+          "beat": "scandalLift",
+          "ms": 93
+        },
+        {
+          "at": 1088,
+          "beat": "scandalLift",
+          "ms": 116
+        },
+        {
+          "at": 1188,
+          "beat": "scandalLift",
+          "ms": 100
+        },
+        {
+          "at": 1288,
+          "beat": "scandalLift",
+          "ms": 100
+        },
+        {
+          "at": 1388,
+          "beat": "scandalLift",
+          "ms": 100
+        },
+        {
+          "at": 1483,
+          "beat": "scandalLift",
+          "ms": 95
+        },
+        {
+          "at": 1590,
+          "beat": "scandalLift",
+          "ms": 107
+        },
+        {
+          "at": 1687,
+          "beat": "scandalLift",
+          "ms": 97
+        },
+        {
+          "at": 1787,
+          "beat": "scandalLift",
+          "ms": 100
+        },
+        {
+          "at": 1887,
+          "beat": "scandalLift",
+          "ms": 100
+        },
+        {
+          "at": 1998,
+          "beat": "scandalFlip",
+          "ms": 111
+        },
+        {
+          "at": 2095,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 2196,
+          "beat": "scandalFlip",
+          "ms": 101
+        },
+        {
+          "at": 2293,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 2402,
+          "beat": "scandalFlip",
+          "ms": 109
+        },
+        {
+          "at": 2501,
+          "beat": "scandalFlip",
+          "ms": 99
+        },
+        {
+          "at": 2603,
+          "beat": "scandalFlip",
+          "ms": 102
+        },
+        {
+          "at": 2716,
+          "beat": "scandalFlip",
+          "ms": 113
+        },
+        {
+          "at": 2824,
+          "beat": "scandalFlip",
+          "ms": 108
+        },
+        {
+          "at": 2931,
+          "beat": "scandalFlip",
+          "ms": 107
+        },
+        {
+          "at": 3031,
+          "beat": "scandalFlip",
+          "ms": 100
+        },
+        {
+          "at": 3128,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 3228,
+          "beat": "scandalCarry",
+          "ms": 100
+        },
+        {
+          "at": 3340,
+          "beat": "scandalCarry",
+          "ms": 112
+        },
+        {
+          "at": 3443,
+          "beat": "scandalCarry",
+          "ms": 103
+        },
+        {
+          "at": 3543,
+          "beat": "scandalCarry",
+          "ms": 100
+        },
+        {
+          "at": 3654,
+          "beat": "scandalCarry",
+          "ms": 111
+        },
+        {
+          "at": 3760,
+          "beat": "scandalCarry",
+          "ms": 106
+        },
+        {
+          "at": 3857,
+          "beat": "impact",
+          "ms": 97
+        },
+        {
+          "at": 3969,
+          "beat": "impact",
+          "ms": 112
+        },
+        {
+          "at": 4071,
+          "beat": "impact",
+          "ms": 102
+        },
+        {
+          "at": 4179,
+          "beat": "impact",
+          "ms": 108
+        },
+        {
+          "at": 4282,
+          "beat": "resources",
+          "ms": 103
+        },
+        {
+          "at": 4384,
+          "beat": "resources",
+          "ms": 102
+        },
+        {
+          "at": 4478,
+          "beat": "resources",
+          "ms": 94
+        },
+        {
+          "at": 4574,
+          "beat": "resources",
+          "ms": 96
+        },
+        {
+          "at": 4672,
+          "beat": "resources",
+          "ms": 98
+        },
+        {
+          "at": 4769,
+          "beat": "resources",
+          "ms": 97
+        },
+        {
+          "at": 4869,
+          "beat": "resources",
+          "ms": 100
+        },
+        {
+          "at": 4970,
+          "beat": "resources",
+          "ms": 101
+        },
+        {
+          "at": 5080,
+          "beat": "resources",
+          "ms": 110
+        },
+        {
+          "at": 5176,
+          "beat": "resources",
+          "ms": 96
+        },
+        {
+          "at": 5281,
+          "beat": "resources",
+          "ms": 105
+        },
+        {
+          "at": 5384,
+          "beat": "resources",
+          "ms": 103
+        },
+        {
+          "at": 5479,
+          "beat": "resources",
+          "ms": 95
+        },
+        {
+          "at": 5581,
+          "beat": "scandalLift",
+          "ms": 102
+        },
+        {
+          "at": 5695,
+          "beat": "scandalLift",
+          "ms": 114
+        },
+        {
+          "at": 5800,
+          "beat": "scandalLift",
+          "ms": 105
+        },
+        {
+          "at": 5914,
+          "beat": "scandalLift",
+          "ms": 114
+        },
+        {
+          "at": 6020,
+          "beat": "scandalLift",
+          "ms": 106
+        },
+        {
+          "at": 6123,
+          "beat": "scandalLift",
+          "ms": 103
+        },
+        {
+          "at": 6228,
+          "beat": "scandalLift",
+          "ms": 105
+        },
+        {
+          "at": 6338,
+          "beat": "scandalLift",
+          "ms": 110
+        },
+        {
+          "at": 6434,
+          "beat": "scandalLift",
+          "ms": 96
+        },
+        {
+          "at": 6543,
+          "beat": "scandalLift",
+          "ms": 109
+        },
+        {
+          "at": 6648,
+          "beat": "scandalFlip",
+          "ms": 105
+        },
+        {
+          "at": 6749,
+          "beat": "scandalFlip",
+          "ms": 101
+        },
+        {
+          "at": 6854,
+          "beat": "scandalFlip",
+          "ms": 105
+        },
+        {
+          "at": 6964,
+          "beat": "scandalFlip",
+          "ms": 110
+        },
+        {
+          "at": 7064,
+          "beat": "scandalFlip",
+          "ms": 100
+        },
+        {
+          "at": 7166,
+          "beat": "scandalFlip",
+          "ms": 102
+        },
+        {
+          "at": 7265,
+          "beat": "scandalFlip",
+          "ms": 99
+        },
+        {
+          "at": 7364,
+          "beat": "scandalFlip",
+          "ms": 99
+        },
+        {
+          "at": 7469,
+          "beat": "scandalFlip",
+          "ms": 105
+        },
+        {
+          "at": 7571,
+          "beat": "scandalFlip",
+          "ms": 102
+        },
+        {
+          "at": 7673,
+          "beat": "scandalFlip",
+          "ms": 102
+        },
+        {
+          "at": 7799,
+          "beat": "scandalCarry",
+          "ms": 126
+        },
+        {
+          "at": 7922,
+          "beat": "scandalCarry",
+          "ms": 123
+        },
+        {
+          "at": 8028,
+          "beat": "scandalCarry",
+          "ms": 106
+        },
+        {
+          "at": 8128,
+          "beat": "scandalCarry",
+          "ms": 100
+        },
+        {
+          "at": 8225,
+          "beat": "scandalCarry",
+          "ms": 97
+        },
+        {
+          "at": 8323,
+          "beat": "scandalCarry",
+          "ms": 98
+        },
+        {
+          "at": 8426,
+          "beat": "impact",
+          "ms": 103
+        },
+        {
+          "at": 8550,
+          "beat": "impact",
+          "ms": 124
+        },
+        {
+          "at": 8661,
+          "beat": "impact",
+          "ms": 111
+        },
+        {
+          "at": 8764,
+          "beat": "impact",
+          "ms": 103
+        },
+        {
+          "at": 8865,
+          "beat": "resources",
+          "ms": 101
+        },
+        {
+          "at": 8973,
+          "beat": "resources",
+          "ms": 108
+        },
+        {
+          "at": 9076,
+          "beat": "resources",
+          "ms": 103
+        },
+        {
+          "at": 9178,
+          "beat": "resources",
+          "ms": 102
+        },
+        {
+          "at": 9281,
+          "beat": "resources",
+          "ms": 103
+        },
+        {
+          "at": 9379,
+          "beat": "resources",
+          "ms": 98
+        },
+        {
+          "at": 9479,
+          "beat": "resources",
+          "ms": 100
+        },
+        {
+          "at": 9580,
+          "beat": "resources",
+          "ms": 101
+        },
+        {
+          "at": 9680,
+          "beat": "resources",
+          "ms": 100
+        },
+        {
+          "at": 9779,
+          "beat": "resources",
+          "ms": 99
+        },
+        {
+          "at": 9882,
+          "beat": "resources",
+          "ms": 103
+        },
+        {
+          "at": 9978,
+          "beat": "resources",
+          "ms": 96
+        },
+        {
+          "at": 10078,
+          "beat": "resources",
+          "ms": 100
+        },
+        {
+          "at": 10188,
+          "beat": "sweep",
+          "ms": 110
+        },
+        {
+          "at": 10293,
+          "beat": "sweep",
+          "ms": 105
+        },
+        {
+          "at": 10407,
+          "beat": "sweep",
+          "ms": 114
+        },
+        {
+          "at": 10518,
+          "beat": "sweep",
+          "ms": 111
+        },
+        {
+          "at": 10628,
+          "beat": "sweep",
+          "ms": 110
+        },
+        {
+          "at": 10728,
+          "beat": "sweep",
+          "ms": 100
+        },
+        {
+          "at": 10829,
+          "beat": "sweep",
+          "ms": 101
+        },
+        {
+          "at": 10932,
+          "beat": "sweep",
+          "ms": 103
+        },
+        {
+          "at": 11026,
+          "beat": "sweep",
+          "ms": 94
+        },
+        {
+          "at": 11131,
+          "beat": "publish",
+          "ms": 105
+        },
+        {
+          "at": 11241,
+          "beat": "publish",
+          "ms": 110
+        },
+        {
+          "at": 11343,
+          "beat": "idle",
+          "ms": 102
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "season",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:49:00.561Z",
+      "caseFinishedAt": "2026-10-13T07:49:12.010Z",
+      "inputAt": "2026-10-13T07:49:02.303Z",
+      "firstFrameMs": 152,
+      "landingMs": null,
+      "totalBusyMs": 8094,
+      "active": {
+        "frames": 106,
+        "p50": 74,
+        "p95": 83,
+        "max": 128,
+        "over33": 106
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 17,
+        "p50": 95,
+        "p95": 110,
+        "max": 110,
+        "over33": 17
+      },
+      "beats": [
+        {
+          "at": 152,
+          "beat": "gate"
+        },
+        {
+          "at": 280,
+          "beat": "resources"
+        },
+        {
+          "at": 1664,
+          "beat": "date"
+        },
+        {
+          "at": 1890,
+          "beat": "season"
+        },
+        {
+          "at": 2674,
+          "beat": "publish"
+        },
+        {
+          "at": 4906,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5188,
+          "beat": "message"
+        },
+        {
+          "at": 8094,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 280,
+          "beat": "resources",
+          "ms": 128
+        },
+        {
+          "at": 356,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 431,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 514,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 583,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 650,
+          "beat": "resources",
+          "ms": 67
+        },
+        {
+          "at": 720,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 793,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 867,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 937,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 1007,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 1082,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 1150,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1219,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 1288,
+          "beat": "resources",
+          "ms": 69
+        },
+        {
+          "at": 1366,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 1439,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 1512,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 1586,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 1664,
+          "beat": "date",
+          "ms": 78
+        },
+        {
+          "at": 1738,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 1813,
+          "beat": "date",
+          "ms": 75
+        },
+        {
+          "at": 1890,
+          "beat": "season",
+          "ms": 77
+        },
+        {
+          "at": 1967,
+          "beat": "season",
+          "ms": 77
+        },
+        {
+          "at": 2043,
+          "beat": "season",
+          "ms": 76
+        },
+        {
+          "at": 2122,
+          "beat": "season",
+          "ms": 79
+        },
+        {
+          "at": 2196,
+          "beat": "season",
+          "ms": 74
+        },
+        {
+          "at": 2268,
+          "beat": "season",
+          "ms": 72
+        },
+        {
+          "at": 2345,
+          "beat": "season",
+          "ms": 77
+        },
+        {
+          "at": 2419,
+          "beat": "season",
+          "ms": 74
+        },
+        {
+          "at": 2494,
+          "beat": "season",
+          "ms": 75
+        },
+        {
+          "at": 2564,
+          "beat": "season",
+          "ms": 70
+        },
+        {
+          "at": 2674,
+          "beat": "publish",
+          "ms": 110
+        },
+        {
+          "at": 2766,
+          "beat": "publish",
+          "ms": 92
+        },
+        {
+          "at": 2850,
+          "beat": "publish",
+          "ms": 84
+        },
+        {
+          "at": 2926,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 2998,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 3070,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 3142,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 3225,
+          "beat": "publish",
+          "ms": 83
+        },
+        {
+          "at": 3296,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 3366,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 3441,
+          "beat": "publish",
+          "ms": 75
+        },
+        {
+          "at": 3514,
+          "beat": "publish",
+          "ms": 73
+        },
+        {
+          "at": 3600,
+          "beat": "publish",
+          "ms": 86
+        },
+        {
+          "at": 3672,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 3746,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3816,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 3886,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 3960,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 4041,
+          "beat": "publish",
+          "ms": 81
+        },
+        {
+          "at": 4115,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 4184,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 4256,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4329,
+          "beat": "publish",
+          "ms": 73
+        },
+        {
+          "at": 4399,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 4471,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4545,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 4616,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 4685,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 4754,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 4830,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 4906,
+          "beat": "seasonEnd",
+          "ms": 76
+        },
+        {
+          "at": 4982,
+          "beat": "seasonEnd",
+          "ms": 76
+        },
+        {
+          "at": 5052,
+          "beat": "seasonEnd",
+          "ms": 70
+        },
+        {
+          "at": 5120,
+          "beat": "seasonEnd",
+          "ms": 68
+        },
+        {
+          "at": 5188,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 5258,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 5325,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 5394,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 5461,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 5533,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5612,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 5688,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 5760,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5832,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5905,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 5988,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 6068,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 6140,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 6213,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 6284,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 6365,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 6439,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 6515,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 6584,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 6653,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 6728,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 6807,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 6884,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 6955,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 7029,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 7101,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 7182,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 7255,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 7332,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 7403,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 7476,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 7549,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 7624,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 7700,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 7780,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 7861,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 7941,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 8019,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 8094,
+          "beat": "idle",
+          "ms": 75
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "winter-ending",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:49:12.011Z",
+      "caseFinishedAt": "2026-10-13T07:49:19.149Z",
+      "inputAt": "2026-10-13T07:49:15.746Z",
+      "firstFrameMs": 13,
+      "landingMs": null,
+      "totalBusyMs": 1837,
+      "active": {
+        "frames": 32,
+        "p50": 72,
+        "p95": 108,
+        "max": 119,
+        "over33": 20
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 92,
+        "p50": 15,
+        "p95": 30,
+        "max": 31,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 13,
+          "beat": "gate"
+        },
+        {
+          "at": 340,
+          "beat": "resources"
+        },
+        {
+          "at": 1639,
+          "beat": "publish"
+        },
+        {
+          "at": 1837,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 132,
+          "beat": "gate",
+          "ms": 119
+        },
+        {
+          "at": 240,
+          "beat": "gate",
+          "ms": 108
+        },
+        {
+          "at": 340,
+          "beat": "resources",
+          "ms": 100
+        },
+        {
+          "at": 416,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 508,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 587,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 664,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 740,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 821,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 897,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 969,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 1046,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 1117,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1197,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 1267,
+          "beat": "resources",
+          "ms": 70
+        },
+        {
+          "at": 1342,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 1418,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 1489,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1557,
+          "beat": "resources",
+          "ms": 68
+        },
+        {
+          "at": 1639,
+          "beat": "publish",
+          "ms": 82
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:49:19.150Z",
+      "caseFinishedAt": "2026-10-13T07:49:26.619Z",
+      "inputAt": "2026-10-13T07:49:20.919Z",
+      "firstFrameMs": 99,
+      "landingMs": 994,
+      "totalBusyMs": 4103,
+      "active": {
+        "frames": 46,
+        "p50": 84,
+        "p95": 96,
+        "max": 135,
+        "over33": 46
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 108,
+        "p95": 112,
+        "max": 112,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 99,
+          "beat": "lift"
+        },
+        {
+          "at": 816,
+          "beat": "land"
+        },
+        {
+          "at": 994,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 234,
+          "beat": "lift",
+          "ms": 135
+        },
+        {
+          "at": 359,
+          "beat": "lift",
+          "ms": 125
+        },
+        {
+          "at": 455,
+          "beat": "lift",
+          "ms": 96
+        },
+        {
+          "at": 550,
+          "beat": "lift",
+          "ms": 95
+        },
+        {
+          "at": 643,
+          "beat": "lift",
+          "ms": 93
+        },
+        {
+          "at": 727,
+          "beat": "lift",
+          "ms": 84
+        },
+        {
+          "at": 816,
+          "beat": "land",
+          "ms": 89
+        },
+        {
+          "at": 910,
+          "beat": "land",
+          "ms": 94
+        },
+        {
+          "at": 994,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1081,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1163,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 1240,
+          "beat": "idle",
+          "ms": 77
+        },
+        {
+          "at": 1329,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 1408,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 1499,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 1580,
+          "beat": "idle",
+          "ms": 81
+        },
+        {
+          "at": 1660,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 1743,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 1830,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1913,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 1996,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2082,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 2164,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 2246,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 2330,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 2414,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 2497,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2580,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2666,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 2749,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2832,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 2919,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 3002,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 3093,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 3175,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 3266,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 3348,
+          "beat": "idle",
+          "ms": 82
+        },
+        {
+          "at": 3426,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 3517,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 3597,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 3676,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 3769,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 3854,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 3932,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 4019,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 4103,
+          "beat": "idle",
+          "ms": 84
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:49:26.620Z",
+      "caseFinishedAt": "2026-10-13T07:49:36.711Z",
+      "inputAt": "2026-10-13T07:49:28.509Z",
+      "firstFrameMs": 167,
+      "landingMs": null,
+      "totalBusyMs": 6667,
+      "active": {
+        "frames": 82,
+        "p50": 78,
+        "p95": 92,
+        "max": 100,
+        "over33": 82
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 16,
+        "p50": 96,
+        "p95": 110,
+        "max": 110,
+        "over33": 16
+      },
+      "beats": [
+        {
+          "at": 167,
+          "beat": "endPress"
+        },
+        {
+          "at": 355,
+          "beat": "stamp"
+        },
+        {
+          "at": 918,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2010,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3218,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3837,
+          "beat": "impact"
+        },
+        {
+          "at": 4230,
+          "beat": "resources"
+        },
+        {
+          "at": 5566,
+          "beat": "sweep"
+        },
+        {
+          "at": 6168,
+          "beat": "date"
+        },
+        {
+          "at": 6503,
+          "beat": "publish"
+        },
+        {
+          "at": 6667,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 263,
+          "beat": "endPress",
+          "ms": 96
+        },
+        {
+          "at": 355,
+          "beat": "stamp",
+          "ms": 92
+        },
+        {
+          "at": 447,
+          "beat": "stamp",
+          "ms": 92
+        },
+        {
+          "at": 530,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 608,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 686,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 762,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 838,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 918,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1010,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1089,
+          "beat": "scandalLift",
+          "ms": 79
+        },
+        {
+          "at": 1166,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1241,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1321,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1397,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1473,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1550,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1631,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 1708,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1783,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1856,
+          "beat": "scandalLift",
+          "ms": 73
+        },
+        {
+          "at": 1931,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 2010,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2089,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2168,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2259,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2342,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 2424,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2510,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 2589,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 2672,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 2749,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 2829,
+          "beat": "scandalFlip",
+          "ms": 80
+        },
+        {
+          "at": 2905,
+          "beat": "scandalFlip",
+          "ms": 76
+        },
+        {
+          "at": 2987,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 3066,
+          "beat": "scandalFlip",
+          "ms": 79
+        },
+        {
+          "at": 3144,
+          "beat": "scandalFlip",
+          "ms": 78
+        },
+        {
+          "at": 3218,
+          "beat": "scandalCarry",
+          "ms": 74
+        },
+        {
+          "at": 3299,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 3375,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3452,
+          "beat": "scandalCarry",
+          "ms": 77
+        },
+        {
+          "at": 3530,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 3606,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3682,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3762,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3837,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 3915,
+          "beat": "impact",
+          "ms": 78
+        },
+        {
+          "at": 3993,
+          "beat": "impact",
+          "ms": 78
+        },
+        {
+          "at": 4073,
+          "beat": "impact",
+          "ms": 80
+        },
+        {
+          "at": 4151,
+          "beat": "impact",
+          "ms": 78
+        },
+        {
+          "at": 4230,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 4314,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 4395,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 4473,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4549,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 4638,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 4716,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4794,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4872,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4951,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5026,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5100,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 5177,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5248,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 5329,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5407,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 5479,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 5566,
+          "beat": "sweep",
+          "ms": 87
+        },
+        {
+          "at": 5645,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 5717,
+          "beat": "sweep",
+          "ms": 72
+        },
+        {
+          "at": 5790,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 5862,
+          "beat": "sweep",
+          "ms": 72
+        },
+        {
+          "at": 5936,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 6011,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 6089,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6168,
+          "beat": "date",
+          "ms": 79
+        },
+        {
+          "at": 6245,
+          "beat": "date",
+          "ms": 77
+        },
+        {
+          "at": 6319,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 6403,
+          "beat": "date",
+          "ms": 84
+        },
+        {
+          "at": 6503,
+          "beat": "publish",
+          "ms": 100
+        },
+        {
+          "at": 6594,
+          "beat": "publish",
+          "ms": 91
+        },
+        {
+          "at": 6667,
+          "beat": "idle",
+          "ms": 73
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "runStartedAt": "2026-10-13T07:43:29.983Z",
+      "caseStartedAt": "2026-10-13T07:49:36.712Z",
+      "caseFinishedAt": "2026-10-13T07:49:49.434Z",
+      "inputAt": "2026-10-13T07:49:40.550Z",
+      "firstFrameMs": 14,
+      "landingMs": null,
+      "totalBusyMs": 7275,
+      "active": {
+        "frames": 80,
+        "p50": 90,
+        "p95": 107,
+        "max": 162,
+        "over33": 80
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 86,
+        "p95": 95,
+        "max": 95,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 14,
+          "beat": "endPress"
+        },
+        {
+          "at": 380,
+          "beat": "stamp"
+        },
+        {
+          "at": 960,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2036,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3227,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4460,
+          "beat": "impact"
+        },
+        {
+          "at": 4905,
+          "beat": "resources"
+        },
+        {
+          "at": 6221,
+          "beat": "sweep"
+        },
+        {
+          "at": 7074,
+          "beat": "publish"
+        },
+        {
+          "at": 7275,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 176,
+          "beat": "endPress",
+          "ms": 162
+        },
+        {
+          "at": 285,
+          "beat": "endPress",
+          "ms": 109
+        },
+        {
+          "at": 380,
+          "beat": "stamp",
+          "ms": 95
+        },
+        {
+          "at": 466,
+          "beat": "stamp",
+          "ms": 86
+        },
+        {
+          "at": 548,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 627,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 709,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 787,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 866,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 960,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1057,
+          "beat": "scandalLift",
+          "ms": 97
+        },
+        {
+          "at": 1148,
+          "beat": "scandalLift",
+          "ms": 91
+        },
+        {
+          "at": 1230,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1317,
+          "beat": "scandalLift",
+          "ms": 87
+        },
+        {
+          "at": 1402,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1490,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1578,
+          "beat": "scandalLift",
+          "ms": 88
+        },
+        {
+          "at": 1672,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1766,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1858,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1949,
+          "beat": "scandalLift",
+          "ms": 91
+        },
+        {
+          "at": 2036,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2130,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2223,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 2317,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2411,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2508,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 2596,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 2683,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2770,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2859,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2948,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 3049,
+          "beat": "scandalFlip",
+          "ms": 101
+        },
+        {
+          "at": 3139,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 3227,
+          "beat": "scandalCarry",
+          "ms": 88
+        },
+        {
+          "at": 3317,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3409,
+          "beat": "scandalCarry",
+          "ms": 92
+        },
+        {
+          "at": 3500,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 3594,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3684,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3783,
+          "beat": "scandalCarry",
+          "ms": 99
+        },
+        {
+          "at": 3878,
+          "beat": "scandalCarry",
+          "ms": 95
+        },
+        {
+          "at": 3971,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 4061,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 4157,
+          "beat": "scandalCarry",
+          "ms": 96
+        },
+        {
+          "at": 4245,
+          "beat": "scandalCarry",
+          "ms": 88
+        },
+        {
+          "at": 4348,
+          "beat": "scandalCarry",
+          "ms": 103
+        },
+        {
+          "at": 4460,
+          "beat": "impact",
+          "ms": 112
+        },
+        {
+          "at": 4553,
+          "beat": "impact",
+          "ms": 93
+        },
+        {
+          "at": 4644,
+          "beat": "impact",
+          "ms": 91
+        },
+        {
+          "at": 4735,
+          "beat": "impact",
+          "ms": 91
+        },
+        {
+          "at": 4823,
+          "beat": "impact",
+          "ms": 88
+        },
+        {
+          "at": 4905,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 4992,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 5076,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5171,
+          "beat": "resources",
+          "ms": 95
+        },
+        {
+          "at": 5264,
+          "beat": "resources",
+          "ms": 93
+        },
+        {
+          "at": 5356,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 5441,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5525,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5610,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5693,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5778,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5866,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 5952,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 6038,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 6129,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 6221,
+          "beat": "sweep",
+          "ms": 92
+        },
+        {
+          "at": 6306,
+          "beat": "sweep",
+          "ms": 85
+        },
+        {
+          "at": 6394,
+          "beat": "sweep",
+          "ms": 88
+        },
+        {
+          "at": 6478,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6562,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6660,
+          "beat": "sweep",
+          "ms": 98
+        },
+        {
+          "at": 6743,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6828,
+          "beat": "sweep",
+          "ms": 85
+        },
+        {
+          "at": 6908,
+          "beat": "sweep",
+          "ms": 80
+        },
+        {
+          "at": 6992,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 7074,
+          "beat": "publish",
+          "ms": 82
+        },
+        {
+          "at": 7181,
+          "beat": "publish",
+          "ms": 107
+        },
+        {
+          "at": 7275,
+          "beat": "idle",
+          "ms": 94
+        }
+      ],
+      "longTasks": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

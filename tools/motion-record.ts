@@ -8,7 +8,8 @@ import { PLAY_STEPS, loadStates, ROOT, type DeskState } from '../check/desk-repl
 const revision=execFileSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).trim();
 try{execFileSync('git',['diff','--quiet','HEAD','--','ui','i18n','core','content']);}catch{throw Error('Commit game source before recording so the video names identify its actual source.');}
 const recordings=resolve(process.argv.find(a=>a.startsWith('--out='))?.slice(6)??`.npm-cache/v1b-recordings-${revision}-${Date.now()}`);
-const evidence=join(ROOT,'docs/handoff/v1b-compare/continuous');mkdirSync(recordings,{recursive:true});mkdirSync(evidence,{recursive:true});
+const evidence=resolve(process.argv.find(a=>a.startsWith('--evidence='))?.slice(11)??join(ROOT,'docs/handoff/v1b-compare/continuous'));mkdirSync(recordings,{recursive:true});mkdirSync(evidence,{recursive:true});
+const selectedCases=process.argv.find(a=>a.startsWith('--cases='))?.slice(8).split(',');
 const ffmpeg=join(ROOT,'.npm-cache/pw-browsers/ffmpeg-1011/ffmpeg-win64.exe');
 const server=await createServer({root:ROOT,logLevel:'error',server:{port:5199,strictPort:false}});await server.listen();
 const url=server.resolvedUrls!.local[0]!,states=loadStates();
@@ -23,7 +24,7 @@ const manifest:unknown[]=[];
 const browser=await webkit.launch({headless:true});
 const encoder=await browser.newPage(); // Native canvas JPEG encoding; the bundled FFmpeg only encodes PNG/VP8.
 try {
- for(const [label,fixture] of Object.entries(fixtures)) for(const source of label==='winter'||label==='calm'?['game']:['reference','game']){
+ for(const [label,fixture] of Object.entries(fixtures).filter(([label])=>!selectedCases||selectedCases.includes(label))) for(const source of label==='winter'||label==='calm'?['game']:['reference','game']){
   const context=await browser.newContext({viewport:{width:1280,height:720},recordVideo:{dir:recordings,size:{width:1280,height:720}}});
   const page=await context.newPage();const diagnostics:string[]=[];page.on('pageerror',e=>diagnostics.push(String(e)));page.on('console',m=>{if(m.type()==='error')diagnostics.push(m.text());});
   let selector=fixture.selector;
