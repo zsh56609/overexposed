@@ -1,0 +1,301 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\profile-2964ef8",
+  "firefoxHeaded": false,
+  "rendererEvidence": [],
+  "profiling": true,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": null,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "winter-ending",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T15:53:43.492Z",
+      "caseStartedAt": "2026-10-15T15:53:44.210Z",
+      "caseFinishedAt": "2026-10-15T15:53:52.090Z",
+      "inputAt": "2026-10-15T15:53:48.619Z",
+      "firstFrameMs": 6.9659999523164515,
+      "landingMs": null,
+      "totalBusyMs": 1890.499999952316,
+      "active": {
+        "frames": 198,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 149.89999999999964,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.5,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 6.9659999523164515,
+          "beat": "gate"
+        },
+        {
+          "at": 339.9999999523161,
+          "beat": "resources"
+        },
+        {
+          "at": 1690.2999999523163,
+          "beat": "publish"
+        },
+        {
+          "at": 1890.499999952316,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 81.79999995231628,
+          "beat": "gate",
+          "ms": 74.83399999999983
+        },
+        {
+          "at": 1840.199999952316,
+          "beat": "publish",
+          "ms": 149.89999999999964
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 13.899999976158142,
+          "duration": 75
+        },
+        {
+          "at": 1685.1999999284744,
+          "duration": 52
+        },
+        {
+          "at": 1738.1000000238419,
+          "duration": 108
+        }
+      ],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T15:53:43.492Z",
+      "caseStartedAt": "2026-10-15T15:53:52.091Z",
+      "caseFinishedAt": "2026-10-15T15:54:05.321Z",
+      "inputAt": "2026-10-15T15:53:56.437Z",
+      "firstFrameMs": -2.799999952316284,
+      "landingMs": null,
+      "totalBusyMs": 7263.900000047684,
+      "active": {
+        "frames": 743,
+        "p50": 8.399999999999636,
+        "p95": 16.799999999999272,
+        "max": 125.10000000000036,
+        "over33": 5
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 163,
+        "p50": 8.300000000001091,
+        "p95": 16.600000000000364,
+        "max": 41.79999999999927,
+        "over33": 1
+      },
+      "beats": [
+        {
+          "at": -2.799999952316284,
+          "beat": "idle"
+        },
+        {
+          "at": 5.600000047683352,
+          "beat": "endPress"
+        },
+        {
+          "at": 364.0000000476839,
+          "beat": "stamp"
+        },
+        {
+          "at": 930.5000000476839,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1989.2000000476837,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3188.9000000476835,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3805.800000047684,
+          "beat": "impact"
+        },
+        {
+          "at": 3839.1000000476834,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4464.100000047683,
+          "beat": "impact"
+        },
+        {
+          "at": 4863.900000047684,
+          "beat": "resources"
+        },
+        {
+          "at": 6214.100000047683,
+          "beat": "sweep"
+        },
+        {
+          "at": 7072.300000047684,
+          "beat": "publish"
+        },
+        {
+          "at": 7263.900000047684,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 63.900000047683534,
+          "beat": "endPress",
+          "ms": 58.30000000000018
+        },
+        {
+          "at": 405.8000000476841,
+          "beat": "stamp",
+          "ms": 41.80000000000018
+        },
+        {
+          "at": 1864.000000047684,
+          "beat": "scandalLift",
+          "ms": 33.400000000000546
+        },
+        {
+          "at": 4280.900000047684,
+          "beat": "scandalCarry",
+          "ms": 33.5
+        },
+        {
+          "at": 7197.400000047684,
+          "beat": "publish",
+          "ms": 125.10000000000036
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 3.600000023841858,
+          "duration": 60
+        },
+        {
+          "at": 7068.700000047684,
+          "duration": 110
+        }
+      ],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

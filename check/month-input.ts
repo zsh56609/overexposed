@@ -97,14 +97,28 @@ export async function checkMonthInput(page:Page,url:string) {
 
 export async function checkPileInput(page:Page,url:string) {
   const states=loadStates();
-  for(const [key,cards] of [['s02',['networking']],['card:self_tape',['self_tape']],['s02',['streaming_role']],['s02',['open_mic','lay_low']],['bigHand',['@recorded']]] as const) {
+  const cases=[['s02',['networking']],['card:self_tape',['self_tape']],['s02',['streaming_role']],['s02',['open_mic','lay_low']],['bigHand',['@recorded']]] as const;
+  const selected=process.argv.find(a=>a.startsWith('--pile-case='))?.slice(12);
+  assert.ok(!selected||cases.some(([,cards])=>cards.join('+')===selected),`unknown pile case: ${selected}`);
+  for(const [key,cards] of cases) {
     if(process.argv.includes('--big-hand-only')&&key!=='bigHand')continue;
+    if(selected&&selected!==cards.join('+'))continue;
     let expected='';
     let staticFixture:DeskState|undefined;
     for(const mode of ['off','full','reduced','skip-early','skip-late','switch-reduced']) {
       const fixture=key==='bigHand'?{...states[key]!,steps:states[key]!.steps.slice(0,-1)}:states[key]!;
       assert.equal(await reach(page,url,fixture,80),'ok');
       await page.evaluate(`document.documentElement.dataset.motion=${JSON.stringify(mode.startsWith('skip')||mode.startsWith('switch')?'full':mode)}`);
+      if(process.argv.includes('--trace-input'))await page.evaluate(`(()=>{
+        window.__pileInput=[];
+        for(const type of ['pointerdown','pointerup','click','keydown','keyup'])window.addEventListener(type,e=>{
+          const d=document.querySelector('.desk');
+          window.__pileInput.push({type,at:performance.now(),key:e.key,x:e.clientX,y:e.clientY,
+            card:e.target.closest?.('[data-card]')?.dataset.card,target:e.target.tagName,
+            path:e.composedPath().slice(0,5).map(n=>({tag:n.tagName,cls:typeof n.className==='string'?n.className:undefined})),
+            step:d?.dataset.step,busy:d?.dataset.busy,beat:d?.dataset.beat});
+        },true);
+      })()`);
       const before=await page.evaluate<number>(`document.querySelectorAll('[data-pile-uid]').length`);
       const played:Step[]=[];
       for(const id of cards) {
@@ -112,7 +126,21 @@ export async function checkPileInput(page:Page,url:string) {
         assert.ok(index>=0,`${key} ${id} is not legal`);
         played.push(['play',index]);
         const point=await cardPoint(page,index);assert.ok(point);await page.click(...point);
-        if(mode.startsWith('skip')){await sleep(mode==='skip-early'?60:1100);assert.ok(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`));if(await page.evaluate<boolean>('document.hasFocus()'))await page.key('Space');else{console.log(`SKIP pile keyboard ${page.name}: headless focus unavailable; separately using real pointer skip`);await page.click(640,350);}await sleep(30);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`),false,'skip not consumed');}
+        if(mode.startsWith('skip')){
+          await sleep(mode==='skip-early'?60:1100);
+          const busy=await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`);
+          if(!busy){
+            const detail=await page.evaluate(`({trace:window.__pileInput??[],desk:{...document.querySelector('.desk').dataset},
+              hand:[...document.querySelectorAll('.hand .card')].map(c=>({card:c.dataset.card,uid:c.dataset.uid,legal:c.getAttribute('aria-disabled')})),
+              hit:document.elementFromPoint(${point[0]},${point[1]})?.closest('[data-card]')?.getAttribute('data-card')})`);
+            mkdirSync('check/out',{recursive:true});const file=`check/out/pile-input-${page.name}-${Date.now()}.json`;
+            writeFileSync(file,JSON.stringify({key,cards,mode,id,index,point,detail},null,2));
+            assert.fail(`${key} ${cards} ${mode}: ${id} did not remain busy; input/state evidence: ${file}`);
+          }
+          if(await page.evaluate<boolean>('document.hasFocus()'))await page.key('Space');
+          else{console.log(`SKIP pile keyboard ${page.name}: headless focus unavailable; separately using real pointer skip`);await page.click(640,350);}
+          await sleep(30);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`),false,'skip not consumed');
+        }
         if(mode==='switch-reduced'){await sleep(100);await page.evaluate(`document.documentElement.dataset.motion='reduced'`);}
         await waitIdle(page); // Keep the actual pointer over the closing fan through completion.
       }

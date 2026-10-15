@@ -1,0 +1,428 @@
+[
+  {
+    "scene": "winter-ending",
+    "profile": ".npm-cache/profiles/de-glow-publication-profile-20261015-chrome-4-winter-ending.cpuprofile",
+    "approximateProfileWindowMs": [
+      1450,
+      2200
+    ],
+    "note": "CPU sampling diagnostic only. Window uses profile start, near pointer time; inclusive entries overlap and must not be added.",
+    "self": [
+      {
+        "frame": "(idle)",
+        "ms": 430.54
+      },
+      {
+        "frame": "(program)",
+        "ms": 229.61
+      },
+      {
+        "frame": "worldStories ../../../../core/press.ts:194",
+        "ms": 14.13
+      },
+      {
+        "frame": "requestAnimationFrame",
+        "ms": 13.63
+      },
+      {
+        "frame": "tick",
+        "ms": 9.29
+      },
+      {
+        "frame": "lanePlays ../../../../core/lanes.ts:15",
+        "ms": 6.32
+      },
+      {
+        "frame": "renderWithHooks ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:4627",
+        "ms": 5.27
+      },
+      {
+        "frame": "(garbage collector)",
+        "ms": 4.73
+      },
+      {
+        "frame": "t ../../../../ui/i18n.ts:13",
+        "ms": 3.15
+      },
+      {
+        "frame": " ../../../../core/press.ts:276",
+        "ms": 3.08
+      },
+      {
+        "frame": "updateSlot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:3786",
+        "ms": 1.73
+      },
+      {
+        "frame": " ../../../../ui/App.tsx:687",
+        "ms": 1.71
+      },
+      {
+        "frame": "cycleOrder ../../../../core/variants.ts:24",
+        "ms": 1.67
+      },
+      {
+        "frame": "scandalCount ../../../../core/conditions.ts:29",
+        "ms": 1.67
+      },
+      {
+        "frame": "setInitialProperties ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:14803",
+        "ms": 1.63
+      },
+      {
+        "frame": "commitRoot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12906",
+        "ms": 1.6
+      },
+      {
+        "frame": "Run ../../../../ui/App.tsx:199",
+        "ms": 1.59
+      },
+      {
+        "frame": "workLoopSync ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12583",
+        "ms": 1.59
+      },
+      {
+        "frame": "establishes ../../../../core/lanes.ts:36",
+        "ms": 1.58
+      },
+      {
+        "frame": "getRootNode",
+        "ms": 1.58
+      },
+      {
+        "frame": "recordEnding ../../../../ui/App.tsx:599",
+        "ms": 1.58
+      },
+      {
+        "frame": " ../../../../ui/desk/model.ts:387",
+        "ms": 1.54
+      },
+      {
+        "frame": "pop ../../../../node_modules/scheduler/cjs/scheduler.production.js:26",
+        "ms": 1.54
+      },
+      {
+        "frame": "removeChild",
+        "ms": 1.51
+      },
+      {
+        "frame": "next ../../../../core/lines.ts:69",
+        "ms": 1.44
+      }
+    ],
+    "inclusive": [
+      {
+        "frame": "(root)",
+        "ms": 749.04
+      },
+      {
+        "frame": "(idle)",
+        "ms": 430.54
+      },
+      {
+        "frame": "(program)",
+        "ms": 229.61
+      },
+      {
+        "frame": "performWorkOnRoot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12069",
+        "ms": 59.71
+      },
+      {
+        "frame": "performSyncWorkOnRoot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13574",
+        "ms": 59.71
+      },
+      {
+        "frame": "flushSyncWorkAcrossRoots_impl ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13408",
+        "ms": 59.71
+      },
+      {
+        "frame": "processRootScheduleInMicrotask ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13456",
+        "ms": 59.71
+      },
+      {
+        "frame": " ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13579",
+        "ms": 59.71
+      },
+      {
+        "frame": "workLoopSync ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12583",
+        "ms": 53.15
+      },
+      {
+        "frame": "renderRootSync ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12522",
+        "ms": 53.15
+      },
+      {
+        "frame": "beginWork ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:7768",
+        "ms": 48.89
+      },
+      {
+        "frame": "updateFunctionComponent ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:6791",
+        "ms": 45.76
+      },
+      {
+        "frame": "renderWithHooks ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:4627",
+        "ms": 44.73
+      },
+      {
+        "frame": "Run ../../../../ui/App.tsx:199",
+        "ms": 33.03
+      },
+      {
+        "frame": "deskModel ../../../../ui/desk/model.ts:274",
+        "ms": 31.44
+      },
+      {
+        "frame": "useMemo ../../../../ui/App.tsx:222",
+        "ms": 31.44
+      },
+      {
+        "frame": "updateMemo ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:5454",
+        "ms": 31.44
+      },
+      {
+        "frame": "e.useMemo ../../../../node_modules/react/cjs/react.production.js:536",
+        "ms": 31.44
+      },
+      {
+        "frame": "tick",
+        "ms": 22.92
+      },
+      {
+        "frame": "managerMessages ../../../../core/manager.ts:78",
+        "ms": 22
+      },
+      {
+        "frame": "thisMonth ../../../../ui/desk/model.ts:515",
+        "ms": 22
+      },
+      {
+        "frame": "composeYear ../../../../core/press.ts:227",
+        "ms": 21.79
+      },
+      {
+        "frame": " ../../../../core/press.ts:276",
+        "ms": 17.21
+      },
+      {
+        "frame": "worldStories ../../../../core/press.ts:194",
+        "ms": 14.13
+      },
+      {
+        "frame": "frontPages ../../../../core/press.ts:212",
+        "ms": 13.9
+      }
+    ]
+  },
+  {
+    "scene": "reviewed-frenzy-end",
+    "profile": ".npm-cache/profiles/de-glow-publication-profile-20261015-chrome-4-reviewed-frenzy-end.cpuprofile",
+    "approximateProfileWindowMs": [
+      6800,
+      7700
+    ],
+    "note": "CPU sampling diagnostic only. Window uses profile start, near pointer time; inclusive entries overlap and must not be added.",
+    "self": [
+      {
+        "frame": "(program)",
+        "ms": 619.91
+      },
+      {
+        "frame": "(idle)",
+        "ms": 112.18
+      },
+      {
+        "frame": "o ../../../../core/press.ts:195",
+        "ms": 17.43
+      },
+      {
+        "frame": "(garbage collector)",
+        "ms": 11.96
+      },
+      {
+        "frame": " ../../../../core/press.ts:200",
+        "ms": 9
+      },
+      {
+        "frame": "s ../../../../core/press.ts:196",
+        "ms": 8.05
+      },
+      {
+        "frame": "t ../../../../ui/desk/DeskItems.tsx:191",
+        "ms": 7.89
+      },
+      {
+        "frame": "requestAnimationFrame",
+        "ms": 6.3
+      },
+      {
+        "frame": " ../../../../core/press.ts:276",
+        "ms": 5.76
+      },
+      {
+        "frame": "lanePlays ../../../../core/lanes.ts:15",
+        "ms": 4.87
+      },
+      {
+        "frame": "managerMessages ../../../../core/manager.ts:78",
+        "ms": 4.74
+      },
+      {
+        "frame": "querySelector",
+        "ms": 4.49
+      },
+      {
+        "frame": " ../../../../core/manager.ts:137",
+        "ms": 3.52
+      },
+      {
+        "frame": "establishes ../../../../core/lanes.ts:36",
+        "ms": 3.32
+      },
+      {
+        "frame": "createElement",
+        "ms": 3.29
+      },
+      {
+        "frame": "setTextContent ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:1420",
+        "ms": 3.15
+      },
+      {
+        "frame": "composeYear ../../../../core/press.ts:227",
+        "ms": 3.13
+      },
+      {
+        "frame": "worldStories ../../../../core/press.ts:194",
+        "ms": 3.12
+      },
+      {
+        "frame": "completeWork ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:8359",
+        "ms": 1.77
+      },
+      {
+        "frame": " ../../../../core/press.ts:267",
+        "ms": 1.73
+      },
+      {
+        "frame": "insertBefore",
+        "ms": 1.72
+      },
+      {
+        "frame": "next ../../../../core/lines.ts:69",
+        "ms": 1.71
+      },
+      {
+        "frame": " ../../../../core/lanes.ts:42",
+        "ms": 1.69
+      },
+      {
+        "frame": " ../../../../core/content.ts:725",
+        "ms": 1.68
+      },
+      {
+        "frame": "removeChild",
+        "ms": 1.67
+      }
+    ],
+    "inclusive": [
+      {
+        "frame": "(root)",
+        "ms": 898.5
+      },
+      {
+        "frame": "(program)",
+        "ms": 619.91
+      },
+      {
+        "frame": "performWorkOnRoot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12069",
+        "ms": 130.97
+      },
+      {
+        "frame": "performSyncWorkOnRoot ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13574",
+        "ms": 130.97
+      },
+      {
+        "frame": "flushSyncWorkAcrossRoots_impl ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13408",
+        "ms": 130.97
+      },
+      {
+        "frame": "processRootScheduleInMicrotask ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13456",
+        "ms": 130.97
+      },
+      {
+        "frame": " ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:13579",
+        "ms": 130.97
+      },
+      {
+        "frame": "workLoopSync ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12583",
+        "ms": 121.81
+      },
+      {
+        "frame": "renderRootSync ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:12522",
+        "ms": 121.81
+      },
+      {
+        "frame": "(idle)",
+        "ms": 112.18
+      },
+      {
+        "frame": "beginWork ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:7768",
+        "ms": 112.01
+      },
+      {
+        "frame": "updateFunctionComponent ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:6791",
+        "ms": 108.82
+      },
+      {
+        "frame": "renderWithHooks ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:4627",
+        "ms": 107.22
+      },
+      {
+        "frame": "Run ../../../../ui/App.tsx:199",
+        "ms": 95.78
+      },
+      {
+        "frame": "updateMemo ../../../../node_modules/react-dom/cjs/react-dom-client.production.js:5454",
+        "ms": 95.73
+      },
+      {
+        "frame": "e.useMemo ../../../../node_modules/react/cjs/react.production.js:536",
+        "ms": 95.73
+      },
+      {
+        "frame": "deskModel ../../../../ui/desk/model.ts:274",
+        "ms": 90.97
+      },
+      {
+        "frame": "useMemo ../../../../ui/App.tsx:222",
+        "ms": 90.97
+      },
+      {
+        "frame": "composeYear ../../../../core/press.ts:227",
+        "ms": 65.83
+      },
+      {
+        "frame": "managerMessages ../../../../core/manager.ts:78",
+        "ms": 60.72
+      },
+      {
+        "frame": "thisMonth ../../../../ui/desk/model.ts:515",
+        "ms": 60.72
+      },
+      {
+        "frame": "compose ../../../../core/press.ts:250",
+        "ms": 59.4
+      },
+      {
+        "frame": " ../../../../core/press.ts:276",
+        "ms": 54.56
+      },
+      {
+        "frame": "worldStories ../../../../core/press.ts:194",
+        "ms": 42.37
+      },
+      {
+        "frame": "frontPages ../../../../core/press.ts:212",
+        "ms": 38.2
+      }
+    ]
+  }
+]

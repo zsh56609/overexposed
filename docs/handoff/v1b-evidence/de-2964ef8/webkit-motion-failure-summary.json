@@ -1,0 +1,12 @@
+{
+  "source": "check/out/motion-webkit-1280-1792048615153-diagnostics.json",
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert.ok(await page.evaluate         (`document.querySelector('.desk').dataset.busy==='1'`))\n",
+  "last": {
+    "url": "http://localhost:5197/?seed=1376368237&auditLoad=31",
+    "step": "21",
+    "busy": "0",
+    "beat": "idle"
+  },
+  "diagnosticCount": 868,
+  "browserErrors": []
+}

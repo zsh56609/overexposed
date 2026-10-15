@@ -1,0 +1,36 @@
+pile input webkit: s02 networking off exact final parity
+pile input webkit: s02 networking full exact final parity
+pile input webkit: s02 networking reduced exact final parity
+pile input webkit: s02 networking skip-early exact final parity
+pile input webkit: s02 networking skip-late exact final parity
+pile input webkit: s02 networking switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: card:self_tape self_tape off exact final parity
+pile input webkit: card:self_tape self_tape full exact final parity
+pile input webkit: card:self_tape self_tape reduced exact final parity
+pile input webkit: card:self_tape self_tape skip-early exact final parity
+pile input webkit: card:self_tape self_tape skip-late exact final parity
+pile input webkit: card:self_tape self_tape switch-reduced exact final parity
+pile input webkit: card:self_tape static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 streaming_role off exact final parity
+pile input webkit: s02 streaming_role full exact final parity
+pile input webkit: s02 streaming_role reduced exact final parity
+pile input webkit: s02 streaming_role skip-early exact final parity
+pile input webkit: s02 streaming_role skip-late exact final parity
+pile input webkit: s02 streaming_role switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: s02 open_mic+lay_low off exact final parity
+pile input webkit: s02 open_mic+lay_low full exact final parity
+pile input webkit: s02 open_mic+lay_low reduced exact final parity
+pile input webkit: s02 open_mic+lay_low skip-early exact final parity
+pile input webkit: s02 open_mic+lay_low skip-late exact final parity
+pile input webkit: s02 open_mic+lay_low switch-reduced exact final parity
+pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
+pile input webkit: bigHand @recorded off exact final parity
+pile input webkit: bigHand @recorded full exact final parity
+pile input webkit: bigHand @recorded reduced exact final parity
+pile input webkit: bigHand @recorded skip-early exact final parity
+pile input webkit: bigHand @recorded skip-late exact final parity
+pile input webkit: bigHand @recorded switch-reduced exact final parity
+pile input webkit: bigHand static replay parity; all settled modes preserve real control hit points
+PASS motion input webkit 1280x720

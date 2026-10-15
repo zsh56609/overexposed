@@ -1,0 +1,1490 @@
+[
+  {
+    "round": 0,
+    "point": [
+      497.6024475097656,
+      591.9341430664062
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1910,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1912,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1912,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 2031,
+          "x": 497,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "456.331543px"
+        },
+        {
+          "type": "pointerup",
+          "at": 2031,
+          "x": 497,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "456.331543px"
+        },
+        {
+          "type": "click",
+          "at": 2032,
+          "x": 497,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "456.331543px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "167.615677px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "317.615692px"
+        },
+        {
+          "card": "lay_low",
+          "left": "488.912262px"
+        },
+        {
+          "card": "networking",
+          "left": "726.384338px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 1,
+    "point": [
+      487,
+      592
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1554,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1555,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1555,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 1672,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1673,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1673,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "147px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "297px"
+        },
+        {
+          "card": "lay_low",
+          "left": "495.048248px"
+        },
+        {
+          "card": "networking",
+          "left": "747px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 2,
+    "point": [
+      531.2799682617188,
+      591.7898559570312
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1796,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1798,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1798,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 1930,
+          "x": 531,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "486.148285px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1931,
+          "x": 531,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "486.148285px"
+        },
+        {
+          "type": "click",
+          "at": 1932,
+          "x": 531,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "486.148285px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "194.766296px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "344.766296px"
+        },
+        {
+          "card": "lay_low",
+          "left": "494.766296px"
+        },
+        {
+          "card": "networking",
+          "left": "699.233704px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 3,
+    "point": [
+      495.3592529296875,
+      591.947509765625
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1870,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1871,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1871,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 2013,
+          "x": 495,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "469.414337px"
+        },
+        {
+          "type": "pointerup",
+          "at": 2013,
+          "x": 495,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "469.414337px"
+        },
+        {
+          "type": "click",
+          "at": 2014,
+          "x": 495,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "469.414337px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "169.414352px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "319.414337px"
+        },
+        {
+          "card": "lay_low",
+          "left": "492.18219px"
+        },
+        {
+          "card": "networking",
+          "left": "724.585632px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 4,
+    "point": [
+      487,
+      592
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1712,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1713,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1713,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 1832,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1833,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1834,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "147px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "297px"
+        },
+        {
+          "card": "lay_low",
+          "left": "495.048248px"
+        },
+        {
+          "card": "networking",
+          "left": "747px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 5,
+    "point": [
+      530.2398681640625,
+      591.7926025390625
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 2016,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 2018,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 2018,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 2139,
+          "x": 530,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "485.209625px"
+        },
+        {
+          "type": "pointerup",
+          "at": 2140,
+          "x": 530,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "485.209625px"
+        },
+        {
+          "type": "click",
+          "at": 2140,
+          "x": 530,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "485.209625px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "185.209625px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "335.209625px"
+        },
+        {
+          "card": "lay_low",
+          "left": "507.48642px"
+        },
+        {
+          "card": "networking",
+          "left": "708.790344px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 6,
+    "point": [
+      487,
+      592
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1836,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1837,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1837,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 1957,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1958,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1959,
+          "x": 487,
+          "y": 592,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "lay_low",
+          "left": "447px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "147px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "297px"
+        },
+        {
+          "card": "lay_low",
+          "left": "490.710846px"
+        },
+        {
+          "card": "networking",
+          "left": "747px"
+        }
+      ]
+    }
+  },
+  {
+    "round": 7,
+    "point": [
+      491.2357177734375,
+      591.9730224609375
+    ],
+    "state": {
+      "busy": "1",
+      "trace": [
+        {
+          "type": "pointerdown",
+          "at": 1780,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1781,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "click",
+          "at": 1781,
+          "x": 649,
+          "y": 593,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "fl"
+            },
+            {
+              "tag": "DIV",
+              "cls": "body"
+            },
+            {
+              "tag": "DIV",
+              "cls": "card f-flyer"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            }
+          ],
+          "card": "open_mic",
+          "left": "447px"
+        },
+        {
+          "type": "pointerdown",
+          "at": 1904,
+          "x": 491,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "465.059113px"
+        },
+        {
+          "type": "pointerup",
+          "at": 1906,
+          "x": 491,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "465.059113px"
+        },
+        {
+          "type": "click",
+          "at": 1906,
+          "x": 491,
+          "y": 591,
+          "path": [
+            {
+              "tag": "DIV",
+              "cls": "card f-notebook"
+            },
+            {
+              "tag": "DIV",
+              "cls": "hand"
+            },
+            {
+              "tag": "DIV",
+              "cls": "desk summer lane-music marks"
+            },
+            {
+              "tag": "DIV",
+              "cls": "stage"
+            }
+          ],
+          "card": "lay_low",
+          "left": "465.059113px"
+        }
+      ],
+      "hand": [
+        {
+          "card": "streaming_role",
+          "left": "165.809158px"
+        },
+        {
+          "card": "viral_stunt",
+          "left": "315.809143px"
+        },
+        {
+          "card": "lay_low",
+          "left": "488.912262px"
+        },
+        {
+          "card": "networking",
+          "left": "728.190796px"
+        }
+      ]
+    }
+  }
+]

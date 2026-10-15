@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-15T15:53:43.0187910Z",
+  "finishedAt": "2026-10-15T15:54:06.3507213Z",
+  "sourceRoot": ".npm-cache/profile-2964ef8",
+  "initialEvent": {
+    "id": 507,
+    "at": "2026-10-15T15:49:29.8720264Z"
+  },
+  "events": [],
+  "continuouslyAwake": true,
+  "exitCode": 0,
+  "wakeRequestUsed": false
+}
