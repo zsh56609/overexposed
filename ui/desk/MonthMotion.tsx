@@ -99,7 +99,14 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         animate(bubble??null,[{opacity:0,transform:'translateY(14px) scale(.8)'},{opacity:1,transform:'none'}],450);
         if(beat.bubble!%2===0) {
           const phone=root.querySelector('.phone');
-          if(phone){const own=getComputedStyle(phone).transform;animate(phone,[{transform:own,filter:'brightness(1)'},{transform:`${own} translateX(3px)`,filter:'brightness(1.6)',offset:.2},{transform:`${own} translateX(-2px)`,offset:.4},{transform:own,filter:'brightness(1)'}],450);}
+          if(phone){
+            const own=getComputedStyle(phone).transform;
+            animate(phone,[{transform:own},{transform:`${own} translateX(3px)`,offset:.2},{transform:`${own} translateX(-2px)`,offset:.4},{transform:own}],450);
+            // v18 lights the screen itself. The whole-phone filter introduced a
+            // measured arrival stall in hardware-composited Firefox.
+            const screen=phone.querySelector('.scr');
+            if(screen){const shadow=getComputedStyle(screen).boxShadow;animate(screen,[{boxShadow:shadow},{boxShadow:root.classList.contains('crisis')?'inset 0 0 24px rgba(255,120,100,.5)':'inset 0 0 22px rgba(170,205,255,.35)',offset:.2},{boxShadow:shadow}],450);}
+          }
         }
       }
       for(const e of beat.resourceEvents??[]) {

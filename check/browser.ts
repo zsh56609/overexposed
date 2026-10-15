@@ -383,6 +383,14 @@ async function startFirefox({ width, height }: { width: number; height: number }
     throw new Error('its first tab never loaded');
   };
   let context = await settledTab().catch(fail);
+  if(process.env.OVEREXPOSED_FIREFOX_HEADED==='1'){
+    // The headed startup tab can be replaced after it first reports ready.
+    // Own a dedicated tab instead of retrying scripts against a stale startup context.
+    const created=await send('browsingContext.create',{type:'tab'},10000).catch(fail);
+    context=String(created.context);
+    await send('browsingContext.activate',{context},10000).catch(fail);
+    diagnostics.push(`headed dedicated context: ${context}`);
+  }
   await send('browsingContext.setViewport', { context, viewport: { width, height } }).catch(fail);
   const pointer = (actions: object[], pointerType = 'mouse') => send('input.performActions', { context, actions: [{ type: 'pointer', id: pointerType, parameters: { pointerType }, actions }] });
   const at = (x: number, y: number) => ({ type: 'pointerMove', x: Math.round(x), y: Math.round(y), duration: 0 });

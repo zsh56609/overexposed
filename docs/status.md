@@ -2,7 +2,9 @@
 
 **Current — 2026-10-15: V1b is incomplete; no phase 3/V2.** D/E and A–C carry-over repairs are implemented. Game source `508fb2b` is committed/pushed. Later audit changes do not change the game. The new-source Chromium/Firefox/WebKit matrix is complete: all five checks at all three sizes pass their executable assertions, with explicit capability skips. [Current Chinese report](reports/2026-10-15-v1b-acceptance.md).
 
-Production measurements and exact photo-worker pixel/fallback checks are complete. Chromium 4× retains some long tasks; Firefox headless explicitly uses software compositing, and native Windows Playwright WebKit disables accelerated compositing by default. A headed Firefox hardware diagnostic and new-source pointer recording remain pending until correctness checks finish. Real Safari/iPad is unverified. No power or thermal-protection settings changed.
+**Later phone repair:** headed Firefox confirms hardware WebRender and 8.34ms active p95, but exposes a cold arrival stall (158.32ms once, ~58.32ms in two repeats). A whole-phone brightness-filter contrast localizes the cost. Replace it with v18-style screen glow, preserving vibration and the existing 450ms beat. Targeted production and three-engine arrival/skip assertions pass; final affected motion/interactions and production/recording acceptance are pending. The completed 45-configuration matrix above belongs to `508fb2b`.
+
+Production measurements and exact photo-worker pixel/fallback checks for `508fb2b` are complete. Chromium 4× retains some long tasks; Firefox headless explicitly uses software compositing, and native Windows Playwright WebKit disables accelerated compositing by default. Hardware Firefox now has measured evidence; the new screen-glow repair still needs its final production run and pointer recording. Real Safari/iPad is unverified. No power or thermal-protection settings changed.
 
 Audit commit `c02cef1` is pushed. Its first normal push timed out connecting to GitHub after 300s; a normal retry succeeded. No force-push or pull. The old reviewed 1200s overflow timeout has not reproduced in isolated checks; its original cause remains unknown.
 

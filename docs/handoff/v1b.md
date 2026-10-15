@@ -2,6 +2,8 @@
 
 Read AGENTS.md and docs/status.md first. D/E and A–C carry-over repairs are implemented; **V1b is incomplete and phase 3/V2 must not start**. Game source is `508fb2b`; audit-only commits through `c02cef1` are pushed. No change in core, content numbers, persona parameters or existing GameEvents. The author authorised normal pulls from a clean checkout, coherent commits/pushes, and Playwright/WebKit; no other dependency is approved.
 
+**Phone follow-up:** actual headed Firefox hardware timing exposed a message-arrival stall. The whole-phone filter contrast reduced it; prebuilding its layer did not. The current repair uses the existing v18 blue/red screen glow, keeps the 450ms response and notification model, and passes targeted three-engine arrival/skip assertions. Revalidate affected full/reduced motion and interactions at all nine configurations, then record new production timing/continuous evidence and a ZIP for the new game commit. Earlier static/click/overflow evidence stays attributed to `508fb2b`; those paths are unchanged. Headed Firefox now owns a dedicated activated tab to avoid referencing its replaceable startup tab.
+
 ## Current acceptance and remaining work
 
 1. New-source Chromium/Firefox/WebKit clicks, ordinary/full overflow, interactions and full/reduced real-input motion pass all executable assertions at all three sizes. Capability skips remain explicit. All 15 browser/check logs are archived in [de-508fb2b](v1b-evidence/de-508fb2b/), covering 45 browser/size/check configurations. Correctness audits are now stopped.

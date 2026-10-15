@@ -19,6 +19,8 @@ const diagnosticBackdropOff=process.argv.includes('--without-backdrop');
 const diagnosticPromoteCards=process.argv.includes('--promote-cards');
 // Controlled CSS probes only; never count these altered presentations as acceptance.
 const paintProbes:Record<string,string>={
+ 'phone-no-filter':'.desk .phone{filter:none!important}',
+ 'phone-layer':'.desk .phone{will-change:transform,filter}',
  'compact-planes':'.desk .scene3d .plane{width:0!important;height:0!important}',
  'ambient-layer':'.desk .up,.desk .bulb.flicker{will-change:transform}',
  'no-blend':'.desk .lightpool{mix-blend-mode:normal!important}',

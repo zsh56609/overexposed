@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-15T03:07:47.7631402Z",
+  "finishedAt": "2026-10-15T03:08:17.1196163Z",
+  "sourceRoot": ".",
+  "initialEvent": {
+    "at": "2026-10-15T02:51:53.4854416Z",
+    "id": 507
+  },
+  "events": [],
+  "continuouslyAwake": true,
+  "exitCode": 0,
+  "wakeRequestUsed": false
+}

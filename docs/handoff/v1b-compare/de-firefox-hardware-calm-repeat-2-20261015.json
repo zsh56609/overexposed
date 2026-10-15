@@ -1,0 +1,177 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "firefoxHeaded": true,
+  "rendererEvidence": [
+    {
+      "browser": "firefox",
+      "at": "2026-10-15T02:59:17.289Z",
+      "compositing": "Compositing\tWebRender",
+      "decisions": "Decision Log\nHW_COMPOSITING\t\ndefault\tavailable\t\t\n\nD3D11_COMPOSITING\t\ndefault\tavailable\t\t\n\nDIRECT2D\t\ndefault\tdisabled\tDisabled by default\tBlocklisted; failure code FEATURE_FAILURE_DISABLED\n\nD3D11_HW_ANGLE\t\ndefault\tavailable\t\t\n\nGPU_PROCESS\t\ndefault\tavailable\t\t\n\nWEBRENDER\t\ndefault\tavailable\t\t\n\nWEBRENDER_COMPOSITOR\t\ndefault\tavailable\t\t\n\nWEBRENDER_PARTIAL\t\ndefault\tavailable\t\t\n\nWEBRENDER_SHADER_CACHE\t\ndefault\tavailable\t\t\n\nWEBRENDER_OPTIMIZED_SHADERS\t\ndefault\tavailable\t\t\n\nWEBRENDER_ANGLE\t\ndefault\tavailable\t\t\n\nWEBRENDER_DCOMP_PRESENT\t\ndefault\tavailable\t\t\n\nWEBRENDER_SCISSORED_CACHE_CLEARS\t\ndefault\tavailable\t\t\nenv\tblocklisted\tBlocklisted by gfxInfo\tBlocklisted due to known issues: bug 1603515\n\nWEBGPU\t\ndefault\tavailable\t\t\n\nWINDOW_OCCLUSION\t\ndefault\tavailable\t\t\nuser\tdisabled\tUser disabled via pref\tBlocklisted; failure code FEATURE_FAILURE_PREF_DISABLED\n\nHARDWARE_VIDEO_DECODING\t\ndefault\tavailable\t\t\n\nHARDWARE_VIDEO_ENCODING\t\ndefault\tavailable\t\t\n\nVIDEO_HARDWARE_OVERLAY\t\ndefault\tavailable\t\t\n\nVIDEO_SOFTWARE_OVERLAY\t\ndefault\tavailable\t\t\n\nHW_DECODED_VIDEO_ZERO_COPY\t\ndefault\tavailable\t\t\n\nVP8_HW_DECODE\t\ndefault\tavailable\t\t\n\nVP9_HW_DECODE\t\ndefault\tavailable\t\t\n\nREUSE_DECODER_DEVICE\t\ndefault\tavailable\t\t\n\nBACKDROP_FILTER\t\ndefault\tavailable\t\t\n\nCANVAS_RENDERER_THREAD\t\ndefault\tavailable\t\t\n\nACCELERATED_CANVAS2D\t\ndefault\tavailable\t\t\n\nAV1_HW_DECODE\t\ndefault\tavailable\t\t\n\nREMOTE_CANVAS\t\ndefault\tavailable\t\t\nruntime\tblocked\tDisabled without Direct2D\tBlocklisted; failure code FEATURE_REMOTE_CANVAS_NO_DIRECT2D\n\nVP8_HW_ENCODE\t\ndefault\tavailable\t\t\n\nVP9_HW_ENCODE\t\ndefault\tavailable\t\t\n\nAV1_HW_ENCODE\t\ndefault\tavailable\t\t\n\nWMF_HW_DRM\t\ndefault\tavailable\t\t\nuser\tdisabled\tForce disabled by 'media.wmf.media-engine.enabled'\tBlocklisted; failure code FEATURE_FAILURE_USER_FORCE_DISABLED\n\nGL_NORM16_TEXTURES\t\ndefault\tavailable\t\t"
+    }
+  ],
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": null,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "firefox",
+      "rate": 1,
+      "label": "calm-end",
+      "launchMode": "headed",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T02:59:13.600Z",
+      "caseStartedAt": "2026-10-15T02:59:17.290Z",
+      "caseFinishedAt": "2026-10-15T02:59:25.723Z",
+      "inputAt": "2026-10-15T02:59:20.691Z",
+      "firstFrameMs": 2.839999999999918,
+      "landingMs": null,
+      "totalBusyMs": 3510.8199999999997,
+      "active": {
+        "frames": 415,
+        "p50": 8.33999999999969,
+        "p95": 8.340000000000146,
+        "max": 58.31999999999971,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.340000000000146,
+        "p95": 8.340000000000146,
+        "max": 8.340000000000146,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 2.839999999999918,
+          "beat": "idle"
+        },
+        {
+          "at": 11.180000000000064,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.1400000000001,
+          "beat": "stamp"
+        },
+        {
+          "at": 927.7399999999998,
+          "beat": "sweep"
+        },
+        {
+          "at": 1536.02,
+          "beat": "date"
+        },
+        {
+          "at": 1802.6599999999999,
+          "beat": "publish"
+        },
+        {
+          "at": 2252.62,
+          "beat": "message"
+        },
+        {
+          "at": 3510.8199999999997,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 2327.6,
+          "beat": "message",
+          "ms": 58.31999999999971
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}

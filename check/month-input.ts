@@ -157,8 +157,14 @@ export async function checkBoundaryInput(page:Page,url:string) {
       while(!await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.beat===${JSON.stringify(beat)}`)){
         assert.ok(Date.now()-start<45000,`${name}: did not observe ${beat}`);await sleep(15);
       }
+      if(name==='arrival'){
+        const phone=await page.evaluate<{filter:string;screenPulse:boolean}>(`({filter:getComputedStyle(document.querySelector('.phone')).filter,screenPulse:document.querySelector('.phone .scr').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))})`);
+        assert.equal(phone.filter,'none','arrival must not filter the whole transformed phone');
+        assert.equal(phone.screenPulse,true,'arrival must retain the screen light response');
+      }
       if(input==='click')await page.click(...(name==='winter-publication'?(await centre(page,'.play-again'))!:[640,350] as [number,number]));else await page.key(input as 'Enter'|'Space');
       await sleep(40);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'`),false,`${name}: input failed to skip`);
+      if(name==='arrival')assert.equal(await page.evaluate(`document.querySelector('.phone .scr').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))`),false,'skip cancels the screen pulse');
       await page.move(10,100);await sleep(180);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: skip also chose/played`);
       await sleep(1600);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: stale callback`);
       console.log(`boundary input ${page.name}: ${name} ${input} exact final parity, no stale callbacks`);
