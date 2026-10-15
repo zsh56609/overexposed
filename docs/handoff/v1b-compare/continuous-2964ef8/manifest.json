@@ -1,0 +1,302 @@
+[
+  {
+    "label": "loud",
+    "source": "reference",
+    "revision": "2964ef8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2964ef8-1792034465400\\loud-reference.webm",
+    "elapsedAfterPointerMs": 3768,
+    "selected": [
+      {
+        "file": "loud-reference-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "loud-reference-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "loud-reference-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "loud-reference-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "loud-reference-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "loud-reference-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "loud-reference-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "loud-reference-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "loud-reference-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "loud-reference-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "loud-reference-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "loud-reference-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "loud-reference-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "loud-reference-frame-0029.jpg",
+        "videoPtsSeconds": 7
+      },
+      {
+        "file": "loud-reference-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "loud-reference-frame-0032.jpg",
+        "videoPtsSeconds": 7.75
+      }
+    ],
+    "diagnostics": [
+      "Failed to load resource: Could not connect to server"
+    ]
+  },
+  {
+    "label": "loud",
+    "source": "game",
+    "revision": "2964ef8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2964ef8-1792034465400\\loud-game.webm",
+    "elapsedAfterPointerMs": 3799,
+    "selected": [
+      {
+        "file": "loud-game-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "loud-game-frame-0014.jpg",
+        "videoPtsSeconds": 3.25
+      },
+      {
+        "file": "loud-game-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "loud-game-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "loud-game-frame-0018.jpg",
+        "videoPtsSeconds": 4.25
+      },
+      {
+        "file": "loud-game-frame-0019.jpg",
+        "videoPtsSeconds": 4.5
+      },
+      {
+        "file": "loud-game-frame-0021.jpg",
+        "videoPtsSeconds": 5
+      },
+      {
+        "file": "loud-game-frame-0022.jpg",
+        "videoPtsSeconds": 5.25
+      },
+      {
+        "file": "loud-game-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "loud-game-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "loud-game-frame-0026.jpg",
+        "videoPtsSeconds": 6.25
+      },
+      {
+        "file": "loud-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "loud-game-frame-0028.jpg",
+        "videoPtsSeconds": 6.75
+      },
+      {
+        "file": "loud-game-frame-0029.jpg",
+        "videoPtsSeconds": 7
+      },
+      {
+        "file": "loud-game-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "loud-game-frame-0032.jpg",
+        "videoPtsSeconds": 7.75
+      }
+    ],
+    "diagnostics": []
+  },
+  {
+    "label": "frenzy",
+    "source": "reference",
+    "revision": "2964ef8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2964ef8-1792034465400\\frenzy-reference.webm",
+    "elapsedAfterPointerMs": 12492,
+    "selected": [
+      {
+        "file": "frenzy-reference-frame-0006.jpg",
+        "videoPtsSeconds": 1.25
+      },
+      {
+        "file": "frenzy-reference-frame-0010.jpg",
+        "videoPtsSeconds": 2.25
+      },
+      {
+        "file": "frenzy-reference-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "frenzy-reference-frame-0017.jpg",
+        "videoPtsSeconds": 4
+      },
+      {
+        "file": "frenzy-reference-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "frenzy-reference-frame-0024.jpg",
+        "videoPtsSeconds": 5.75
+      },
+      {
+        "file": "frenzy-reference-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "frenzy-reference-frame-0031.jpg",
+        "videoPtsSeconds": 7.5
+      },
+      {
+        "file": "frenzy-reference-frame-0034.jpg",
+        "videoPtsSeconds": 8.25
+      },
+      {
+        "file": "frenzy-reference-frame-0038.jpg",
+        "videoPtsSeconds": 9.25
+      },
+      {
+        "file": "frenzy-reference-frame-0041.jpg",
+        "videoPtsSeconds": 10
+      },
+      {
+        "file": "frenzy-reference-frame-0045.jpg",
+        "videoPtsSeconds": 11
+      },
+      {
+        "file": "frenzy-reference-frame-0048.jpg",
+        "videoPtsSeconds": 11.75
+      },
+      {
+        "file": "frenzy-reference-frame-0052.jpg",
+        "videoPtsSeconds": 12.75
+      },
+      {
+        "file": "frenzy-reference-frame-0055.jpg",
+        "videoPtsSeconds": 13.5
+      },
+      {
+        "file": "frenzy-reference-frame-0059.jpg",
+        "videoPtsSeconds": 14.5
+      }
+    ],
+    "diagnostics": [
+      "Failed to load resource: Could not connect to server"
+    ]
+  },
+  {
+    "label": "frenzy",
+    "source": "game",
+    "revision": "2964ef8",
+    "videoPath": "C:\\Users\\91205\\Documents\\overexposed\\.npm-cache\\v1b-recordings-2964ef8-1792034465400\\frenzy-game.webm",
+    "elapsedAfterPointerMs": 12257,
+    "selected": [
+      {
+        "file": "frenzy-game-frame-0009.jpg",
+        "videoPtsSeconds": 2
+      },
+      {
+        "file": "frenzy-game-frame-0013.jpg",
+        "videoPtsSeconds": 3
+      },
+      {
+        "file": "frenzy-game-frame-0016.jpg",
+        "videoPtsSeconds": 3.75
+      },
+      {
+        "file": "frenzy-game-frame-0020.jpg",
+        "videoPtsSeconds": 4.75
+      },
+      {
+        "file": "frenzy-game-frame-0023.jpg",
+        "videoPtsSeconds": 5.5
+      },
+      {
+        "file": "frenzy-game-frame-0027.jpg",
+        "videoPtsSeconds": 6.5
+      },
+      {
+        "file": "frenzy-game-frame-0030.jpg",
+        "videoPtsSeconds": 7.25
+      },
+      {
+        "file": "frenzy-game-frame-0034.jpg",
+        "videoPtsSeconds": 8.25
+      },
+      {
+        "file": "frenzy-game-frame-0037.jpg",
+        "videoPtsSeconds": 9
+      },
+      {
+        "file": "frenzy-game-frame-0041.jpg",
+        "videoPtsSeconds": 10
+      },
+      {
+        "file": "frenzy-game-frame-0044.jpg",
+        "videoPtsSeconds": 10.75
+      },
+      {
+        "file": "frenzy-game-frame-0048.jpg",
+        "videoPtsSeconds": 11.75
+      },
+      {
+        "file": "frenzy-game-frame-0051.jpg",
+        "videoPtsSeconds": 12.5
+      },
+      {
+        "file": "frenzy-game-frame-0055.jpg",
+        "videoPtsSeconds": 13.5
+      },
+      {
+        "file": "frenzy-game-frame-0058.jpg",
+        "videoPtsSeconds": 14.25
+      },
+      {
+        "file": "frenzy-game-frame-0062.jpg",
+        "videoPtsSeconds": 15.25
+      }
+    ],
+    "diagnostics": []
+  }
+]

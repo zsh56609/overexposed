@@ -1,0 +1,5825 @@
+{
+  "root": "C:\\Users\\91205\\Documents\\overexposed",
+  "firefoxHeaded": false,
+  "rendererEvidence": [],
+  "profiling": false,
+  "diagnosticBackdropOff": false,
+  "diagnosticPromoteCards": false,
+  "diagnosticPaintProbe": null,
+  "longest": {
+    "fixture": {
+      "seed": 1410001945,
+      "persona": "minmaxer",
+      "manager": "veteran",
+      "steps": [
+        [
+          "manager",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          0
+        ],
+        [
+          "end",
+          0
+        ],
+        [
+          "extra",
+          0
+        ],
+        [
+          "draft",
+          3
+        ],
+        [
+          "draft",
+          2
+        ],
+        [
+          "play",
+          2
+        ],
+        [
+          "play",
+          3
+        ],
+        [
+          "play",
+          1
+        ],
+        [
+          "end",
+          0
+        ]
+      ],
+      "note": "turn 4, early, fame 1, summer, crisis false, hand 5",
+      "hand": [
+        "side_gig",
+        "film_cameo",
+        "cover_single",
+        "viral_stunt",
+        "press_junket"
+      ]
+    },
+    "selector": ".hand .card[data-uid=\"13\"]",
+    "text": "A casting director watches you read three lines, then asks for them again.",
+    "writingMs": 3270,
+    "key": "card.screen_test.headline.1",
+    "corpus": "card:film_cameo"
+  },
+  "rows": [
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "loud",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:14:17.751Z",
+      "caseFinishedAt": "2026-10-15T03:14:23.527Z",
+      "inputAt": "2026-10-15T03:14:19.897Z",
+      "firstFrameMs": -6.09999997615796,
+      "landingMs": 944.000000023842,
+      "totalBusyMs": 2119.200000023842,
+      "active": {
+        "frames": 255,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -6.09999997615796,
+          "beat": "idle"
+        },
+        {
+          "at": 10.700000023841767,
+          "beat": "lift"
+        },
+        {
+          "at": 760.7000000238418,
+          "beat": "land"
+        },
+        {
+          "at": 944.000000023842,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:14:23.528Z",
+      "caseFinishedAt": "2026-10-15T03:14:29.469Z",
+      "inputAt": "2026-10-15T03:14:24.663Z",
+      "firstFrameMs": 2.6000000476838068,
+      "landingMs": 944.4000000476835,
+      "totalBusyMs": 3286.1000000476834,
+      "active": {
+        "frames": 394,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.699999999999818,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 2.6000000476838068,
+          "beat": "idle"
+        },
+        {
+          "at": 10.900000047683761,
+          "beat": "lift"
+        },
+        {
+          "at": 752.7000000476837,
+          "beat": "land"
+        },
+        {
+          "at": 944.4000000476835,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:14:29.499Z",
+      "caseFinishedAt": "2026-10-15T03:14:35.476Z",
+      "inputAt": "2026-10-15T03:14:30.448Z",
+      "firstFrameMs": 0.8000000476837386,
+      "landingMs": null,
+      "totalBusyMs": 3509.300000047684,
+      "active": {
+        "frames": 418,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 8.700000000000728,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 0.8000000476837386,
+          "beat": "idle"
+        },
+        {
+          "at": 9.200000047683716,
+          "beat": "endPress"
+        },
+        {
+          "at": 334.50000004768367,
+          "beat": "stamp"
+        },
+        {
+          "at": 917.8000000476836,
+          "beat": "sweep"
+        },
+        {
+          "at": 1534.2000000476837,
+          "beat": "date"
+        },
+        {
+          "at": 1792.500000047684,
+          "beat": "publish"
+        },
+        {
+          "at": 2242.600000047684,
+          "beat": "message"
+        },
+        {
+          "at": 3509.300000047684,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:14:35.477Z",
+      "caseFinishedAt": "2026-10-15T03:14:48.831Z",
+      "inputAt": "2026-10-15T03:14:36.656Z",
+      "firstFrameMs": 1.200000023841767,
+      "landingMs": null,
+      "totalBusyMs": 10660.100000023842,
+      "active": {
+        "frames": 1275,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999998545,
+        "max": 24.90000000000009,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.699999999998909,
+        "max": 8.899999999999636,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 1.200000023841767,
+          "beat": "idle"
+        },
+        {
+          "at": 26.100000023841858,
+          "beat": "endPress"
+        },
+        {
+          "at": 334.60000002384186,
+          "beat": "stamp"
+        },
+        {
+          "at": 917.900000023842,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1959.500000023842,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3159.5000000238415,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3784.5000000238415,
+          "beat": "impact"
+        },
+        {
+          "at": 3809.5000000238415,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4434.5000000238415,
+          "beat": "impact"
+        },
+        {
+          "at": 4842.800000023842,
+          "beat": "resources"
+        },
+        {
+          "at": 6184.5000000238415,
+          "beat": "sweep"
+        },
+        {
+          "at": 7051.300000023843,
+          "beat": "date"
+        },
+        {
+          "at": 7301.200000023842,
+          "beat": "publish"
+        },
+        {
+          "at": 7751.400000023841,
+          "beat": "message"
+        },
+        {
+          "at": 10660.100000023842,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "copycat-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:14:48.834Z",
+      "caseFinishedAt": "2026-10-15T03:15:03.544Z",
+      "inputAt": "2026-10-15T03:14:50.689Z",
+      "firstFrameMs": 10.065999976158082,
+      "landingMs": null,
+      "totalBusyMs": 11301.899999976158,
+      "active": {
+        "frames": 1356,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.699999999998909,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 10.065999976158082,
+          "beat": "endPress"
+        },
+        {
+          "at": 335.1999999761583,
+          "beat": "stamp"
+        },
+        {
+          "at": 918.599999976158,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1968.599999976158,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3168.599999976158,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3785.1999999761583,
+          "beat": "impact"
+        },
+        {
+          "at": 4185.199999976158,
+          "beat": "resources"
+        },
+        {
+          "at": 5535.399999976158,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6585.4999999761585,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7785.199999976157,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8401.899999976158,
+          "beat": "impact"
+        },
+        {
+          "at": 8801.799999976158,
+          "beat": "resources"
+        },
+        {
+          "at": 10151.799999976158,
+          "beat": "sweep"
+        },
+        {
+          "at": 11093.599999976159,
+          "beat": "publish"
+        },
+        {
+          "at": 11301.899999976158,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "season",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:03.544Z",
+      "caseFinishedAt": "2026-10-15T03:15:14.271Z",
+      "inputAt": "2026-10-15T03:15:04.684Z",
+      "firstFrameMs": 6.300000095367523,
+      "landingMs": null,
+      "totalBusyMs": 8039.400000095367,
+      "active": {
+        "frames": 963,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.600000000000364,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 6.300000095367523,
+          "beat": "gate"
+        },
+        {
+          "at": 272.8000000953675,
+          "beat": "resources"
+        },
+        {
+          "at": 1622.9000000953674,
+          "beat": "date"
+        },
+        {
+          "at": 1881.2000000953676,
+          "beat": "season"
+        },
+        {
+          "at": 2581.1000000953672,
+          "beat": "publish"
+        },
+        {
+          "at": 4881.100000095367,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5131.300000095367,
+          "beat": "message"
+        },
+        {
+          "at": 8039.400000095367,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "winter-ending",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:14.272Z",
+      "caseFinishedAt": "2026-10-15T03:15:19.390Z",
+      "inputAt": "2026-10-15T03:15:16.020Z",
+      "firstFrameMs": 3.499999976158051,
+      "landingMs": null,
+      "totalBusyMs": 1820.3999999761581,
+      "active": {
+        "frames": 214,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 175,
+        "p50": 8.300000000000182,
+        "p95": 8.600000000000364,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 3.499999976158051,
+          "beat": "gate"
+        },
+        {
+          "at": 278.5999999761582,
+          "beat": "resources"
+        },
+        {
+          "at": 1620.1999999761583,
+          "beat": "publish"
+        },
+        {
+          "at": 1820.3999999761581,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:19.391Z",
+      "caseFinishedAt": "2026-10-15T03:15:25.983Z",
+      "inputAt": "2026-10-15T03:15:20.444Z",
+      "firstFrameMs": 4.7000000000000455,
+      "landingMs": 938.0999999999999,
+      "totalBusyMs": 4029.8,
+      "active": {
+        "frames": 483,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.7000000000000455,
+          "beat": "lift"
+        },
+        {
+          "at": 754.9000000000001,
+          "beat": "land"
+        },
+        {
+          "at": 938.0999999999999,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:25.983Z",
+      "caseFinishedAt": "2026-10-15T03:15:35.275Z",
+      "inputAt": "2026-10-15T03:15:27.119Z",
+      "firstFrameMs": 4.799999976158233,
+      "landingMs": null,
+      "totalBusyMs": 6604.899999976158,
+      "active": {
+        "frames": 792,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 4.799999976158233,
+          "beat": "endPress"
+        },
+        {
+          "at": 329.6999999761581,
+          "beat": "stamp"
+        },
+        {
+          "at": 913.2999999761582,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1954.8999999761581,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3163.299999976158,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3788.299999976158,
+          "beat": "impact"
+        },
+        {
+          "at": 4179.9999999761585,
+          "beat": "resources"
+        },
+        {
+          "at": 5529.899999976158,
+          "beat": "sweep"
+        },
+        {
+          "at": 6146.699999976158,
+          "beat": "date"
+        },
+        {
+          "at": 6413.099999976158,
+          "beat": "publish"
+        },
+        {
+          "at": 6604.899999976158,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:35.276Z",
+      "caseFinishedAt": "2026-10-15T03:15:45.737Z",
+      "inputAt": "2026-10-15T03:15:36.963Z",
+      "firstFrameMs": 2.600000023841858,
+      "landingMs": null,
+      "totalBusyMs": 7236.200000023842,
+      "active": {
+        "frames": 867,
+        "p50": 8.300000000000182,
+        "p95": 8.599999999999454,
+        "max": 16.600000000000364,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.800000000001091,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 2.600000023841858,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.10000002384186,
+          "beat": "stamp"
+        },
+        {
+          "at": 919.400000023842,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1961.2000000238418,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3160.900000023842,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3786.200000023842,
+          "beat": "impact"
+        },
+        {
+          "at": 3811.0000000238415,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4427.700000023842,
+          "beat": "impact"
+        },
+        {
+          "at": 4827.800000023842,
+          "beat": "resources"
+        },
+        {
+          "at": 6177.900000023842,
+          "beat": "sweep"
+        },
+        {
+          "at": 7036.200000023842,
+          "beat": "publish"
+        },
+        {
+          "at": 7236.200000023842,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "loud",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:47.465Z",
+      "caseFinishedAt": "2026-10-15T03:15:53.855Z",
+      "inputAt": "2026-10-15T03:15:50.183Z",
+      "firstFrameMs": -8.90000002384204,
+      "landingMs": 949.3999999761581,
+      "totalBusyMs": 2149.399999976158,
+      "active": {
+        "frames": 251,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 33.30000000000018,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.800000000000182,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -8.90000002384204,
+          "beat": "idle"
+        },
+        {
+          "at": 7.699999976158324,
+          "beat": "lift"
+        },
+        {
+          "at": 766.099999976158,
+          "beat": "land"
+        },
+        {
+          "at": 949.3999999761581,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:15:53.856Z",
+      "caseFinishedAt": "2026-10-15T03:16:00.218Z",
+      "inputAt": "2026-10-15T03:15:55.390Z",
+      "firstFrameMs": -24.700000000000045,
+      "landingMs": 942,
+      "totalBusyMs": 3283.6000000000004,
+      "active": {
+        "frames": 393,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -24.700000000000045,
+          "beat": "idle"
+        },
+        {
+          "at": 0.2999999999999545,
+          "beat": "lift"
+        },
+        {
+          "at": 750.3000000000002,
+          "beat": "land"
+        },
+        {
+          "at": 942,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:00.218Z",
+      "caseFinishedAt": "2026-10-15T03:16:06.342Z",
+      "inputAt": "2026-10-15T03:16:01.279Z",
+      "firstFrameMs": 3,
+      "landingMs": null,
+      "totalBusyMs": 3519.6000000000004,
+      "active": {
+        "frames": 422,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.599999999999909,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 179,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 3,
+          "beat": "idle"
+        },
+        {
+          "at": 11.299999999999955,
+          "beat": "endPress"
+        },
+        {
+          "at": 336.29999999999995,
+          "beat": "stamp"
+        },
+        {
+          "at": 919.7,
+          "beat": "sweep"
+        },
+        {
+          "at": 1544.6999999999998,
+          "beat": "date"
+        },
+        {
+          "at": 1803,
+          "beat": "publish"
+        },
+        {
+          "at": 2253.1,
+          "beat": "message"
+        },
+        {
+          "at": 3519.6000000000004,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:06.343Z",
+      "caseFinishedAt": "2026-10-15T03:16:20.071Z",
+      "inputAt": "2026-10-15T03:16:07.867Z",
+      "firstFrameMs": -1.599999999999909,
+      "landingMs": null,
+      "totalBusyMs": 10673.5,
+      "active": {
+        "frames": 1268,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 50,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.600000000000364,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -1.599999999999909,
+          "beat": "idle"
+        },
+        {
+          "at": 6.900000000000091,
+          "beat": "endPress"
+        },
+        {
+          "at": 340.20000000000005,
+          "beat": "stamp"
+        },
+        {
+          "at": 923.4000000000001,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1973.5,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3173.5,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3790.2,
+          "beat": "impact"
+        },
+        {
+          "at": 3823.3999999999996,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4440.2,
+          "beat": "impact"
+        },
+        {
+          "at": 4840.2,
+          "beat": "resources"
+        },
+        {
+          "at": 6198.4,
+          "beat": "sweep"
+        },
+        {
+          "at": 7056.799999999999,
+          "beat": "date"
+        },
+        {
+          "at": 7315.1,
+          "beat": "publish"
+        },
+        {
+          "at": 7765.1,
+          "beat": "message"
+        },
+        {
+          "at": 10673.5,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 7365.1,
+          "beat": "publish",
+          "ms": 50
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "copycat-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:20.071Z",
+      "caseFinishedAt": "2026-10-15T03:16:35.769Z",
+      "inputAt": "2026-10-15T03:16:22.935Z",
+      "firstFrameMs": 38.39800000000014,
+      "landingMs": null,
+      "totalBusyMs": 11313.9,
+      "active": {
+        "frames": 1348,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 33.399999999999636,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 178,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 25,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 38.39800000000014,
+          "beat": "endPress"
+        },
+        {
+          "at": 355.6999999999998,
+          "beat": "stamp"
+        },
+        {
+          "at": 939.0999999999999,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1989,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3189,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3797.2,
+          "beat": "impact"
+        },
+        {
+          "at": 4205.7,
+          "beat": "resources"
+        },
+        {
+          "at": 5555.799999999999,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6605.700000000001,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7805.6,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8422.3,
+          "beat": "impact"
+        },
+        {
+          "at": 8822.3,
+          "beat": "resources"
+        },
+        {
+          "at": 10180.6,
+          "beat": "sweep"
+        },
+        {
+          "at": 11113.9,
+          "beat": "publish"
+        },
+        {
+          "at": 11313.9,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [
+        {
+          "at": 3.0999999046325684,
+          "duration": 51
+        }
+      ],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "season",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:35.769Z",
+      "caseFinishedAt": "2026-10-15T03:16:46.773Z",
+      "inputAt": "2026-10-15T03:16:37.177Z",
+      "firstFrameMs": -3.199999952316375,
+      "landingMs": null,
+      "totalBusyMs": 8055.000000047683,
+      "active": {
+        "frames": 958,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 41.59999999999991,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.600000000000364,
+        "max": 8.899999999999636,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -3.199999952316375,
+          "beat": "idle"
+        },
+        {
+          "at": 5.100000047683807,
+          "beat": "gate"
+        },
+        {
+          "at": 288.6000000476838,
+          "beat": "resources"
+        },
+        {
+          "at": 1638.4000000476835,
+          "beat": "date"
+        },
+        {
+          "at": 1896.9000000476835,
+          "beat": "season"
+        },
+        {
+          "at": 2596.8000000476836,
+          "beat": "publish"
+        },
+        {
+          "at": 4888.4000000476835,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5146.700000047684,
+          "beat": "message"
+        },
+        {
+          "at": 8055.000000047683,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 2638.4000000476835,
+          "beat": "publish",
+          "ms": 41.59999999999991
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "winter-ending",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:46.774Z",
+      "caseFinishedAt": "2026-10-15T03:16:53.625Z",
+      "inputAt": "2026-10-15T03:16:50.162Z",
+      "firstFrameMs": 3.099999999999909,
+      "landingMs": null,
+      "totalBusyMs": 1844.8999999999996,
+      "active": {
+        "frames": 207,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 100,
+        "over33": 1
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 174,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.699999999999818,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 3.099999999999909,
+          "beat": "idle"
+        },
+        {
+          "at": 11.5,
+          "beat": "gate"
+        },
+        {
+          "at": 303.1999999999998,
+          "beat": "resources"
+        },
+        {
+          "at": 1653.3000000000002,
+          "beat": "publish"
+        },
+        {
+          "at": 1844.8999999999996,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 1753.3000000000002,
+          "beat": "publish",
+          "ms": 100
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 1689.3999999761581,
+          "duration": 72
+        }
+      ],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "quiet-longest-recorded",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:16:53.626Z",
+      "caseFinishedAt": "2026-10-15T03:17:00.460Z",
+      "inputAt": "2026-10-15T03:16:54.858Z",
+      "firstFrameMs": -0.599999999999909,
+      "landingMs": 941.1999999999998,
+      "totalBusyMs": 4049.3999999999996,
+      "active": {
+        "frames": 483,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 16.800000000000182,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 8.5,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -0.599999999999909,
+          "beat": "idle"
+        },
+        {
+          "at": 7.7999999999999545,
+          "beat": "lift"
+        },
+        {
+          "at": 757.8,
+          "beat": "land"
+        },
+        {
+          "at": 941.1999999999998,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:00.461Z",
+      "caseFinishedAt": "2026-10-15T03:17:10.024Z",
+      "inputAt": "2026-10-15T03:17:01.802Z",
+      "firstFrameMs": -3.7999999999999545,
+      "landingMs": null,
+      "totalBusyMs": 6621.3,
+      "active": {
+        "frames": 787,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 25.299999999999272,
+        "over33": 0
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 181,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 9,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -3.7999999999999545,
+          "beat": "idle"
+        },
+        {
+          "at": 4.5,
+          "beat": "endPress"
+        },
+        {
+          "at": 346.29999999999995,
+          "beat": "stamp"
+        },
+        {
+          "at": 921.3000000000002,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1971.3000000000002,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3171.3,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3787.8999999999996,
+          "beat": "impact"
+        },
+        {
+          "at": 4196.2,
+          "beat": "resources"
+        },
+        {
+          "at": 5546.2,
+          "beat": "sweep"
+        },
+        {
+          "at": 6162.9,
+          "beat": "date"
+        },
+        {
+          "at": 6421.1,
+          "beat": "publish"
+        },
+        {
+          "at": 6621.3,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "chrome",
+      "rate": 4,
+      "label": "reviewed-frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:10.024Z",
+      "caseFinishedAt": "2026-10-15T03:17:21.582Z",
+      "inputAt": "2026-10-15T03:17:12.777Z",
+      "firstFrameMs": -4.100000047683807,
+      "landingMs": null,
+      "totalBusyMs": 7262.499999952317,
+      "active": {
+        "frames": 857,
+        "p50": 8.300000000000182,
+        "p95": 8.5,
+        "max": 91.60000000000036,
+        "over33": 2
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 180,
+        "p50": 8.300000000001091,
+        "p95": 8.5,
+        "max": 8.699999999998909,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": -4.100000047683807,
+          "beat": "idle"
+        },
+        {
+          "at": 4.299999952316284,
+          "beat": "endPress"
+        },
+        {
+          "at": 354.2999999523163,
+          "beat": "stamp"
+        },
+        {
+          "at": 929.1999999523164,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1979.2999999523163,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3179.2999999523163,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3804.2999999523163,
+          "beat": "impact"
+        },
+        {
+          "at": 3829.2999999523163,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4454.399999952317,
+          "beat": "impact"
+        },
+        {
+          "at": 4854.199999952316,
+          "beat": "resources"
+        },
+        {
+          "at": 6204.299999952316,
+          "beat": "sweep"
+        },
+        {
+          "at": 7062.599999952316,
+          "beat": "publish"
+        },
+        {
+          "at": 7262.499999952317,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 37.699999952316375,
+          "beat": "endPress",
+          "ms": 33.40000000000009
+        },
+        {
+          "at": 7154.199999952316,
+          "beat": "publish",
+          "ms": 91.60000000000036
+        }
+      ],
+      "longTasks": [
+        {
+          "at": 7062.600000023842,
+          "duration": 67
+        }
+      ],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "loud",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:23.517Z",
+      "caseFinishedAt": "2026-10-15T03:17:29.712Z",
+      "inputAt": "2026-10-15T03:17:25.906Z",
+      "firstFrameMs": 107,
+      "landingMs": 998,
+      "totalBusyMs": 2189,
+      "active": {
+        "frames": 21,
+        "p50": 92,
+        "p95": 132,
+        "max": 170,
+        "over33": 21
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 109,
+        "p95": 112,
+        "max": 112,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 107,
+          "beat": "lift"
+        },
+        {
+          "at": 810,
+          "beat": "land"
+        },
+        {
+          "at": 998,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 277,
+          "beat": "lift",
+          "ms": 170
+        },
+        {
+          "at": 385,
+          "beat": "lift",
+          "ms": 108
+        },
+        {
+          "at": 489,
+          "beat": "lift",
+          "ms": 104
+        },
+        {
+          "at": 588,
+          "beat": "lift",
+          "ms": 99
+        },
+        {
+          "at": 678,
+          "beat": "lift",
+          "ms": 90
+        },
+        {
+          "at": 810,
+          "beat": "land",
+          "ms": 132
+        },
+        {
+          "at": 901,
+          "beat": "land",
+          "ms": 91
+        },
+        {
+          "at": 998,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 1085,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1173,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 1265,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1352,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1444,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1538,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 1627,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 1724,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 1814,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 1904,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 2001,
+          "beat": "idle",
+          "ms": 97
+        },
+        {
+          "at": 2091,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 2189,
+          "beat": "idle",
+          "ms": 98
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:29.712Z",
+      "caseFinishedAt": "2026-10-15T03:17:36.648Z",
+      "inputAt": "2026-10-15T03:17:31.634Z",
+      "firstFrameMs": 118,
+      "landingMs": 995,
+      "totalBusyMs": 3345,
+      "active": {
+        "frames": 35,
+        "p50": 91,
+        "p95": 105,
+        "max": 134,
+        "over33": 35
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 11,
+        "p50": 140,
+        "p95": 190,
+        "max": 190,
+        "over33": 11
+      },
+      "beats": [
+        {
+          "at": 118,
+          "beat": "lift"
+        },
+        {
+          "at": 808,
+          "beat": "land"
+        },
+        {
+          "at": 995,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 252,
+          "beat": "lift",
+          "ms": 134
+        },
+        {
+          "at": 349,
+          "beat": "lift",
+          "ms": 97
+        },
+        {
+          "at": 444,
+          "beat": "lift",
+          "ms": 95
+        },
+        {
+          "at": 534,
+          "beat": "lift",
+          "ms": 90
+        },
+        {
+          "at": 632,
+          "beat": "lift",
+          "ms": 98
+        },
+        {
+          "at": 722,
+          "beat": "lift",
+          "ms": 90
+        },
+        {
+          "at": 808,
+          "beat": "land",
+          "ms": 86
+        },
+        {
+          "at": 901,
+          "beat": "land",
+          "ms": 93
+        },
+        {
+          "at": 995,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 1081,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1168,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 1260,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1345,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1431,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 1516,
+          "beat": "idle",
+          "ms": 85
+        },
+        {
+          "at": 1600,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 1693,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 1783,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 1878,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 1966,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 2059,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 2151,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 2244,
+          "beat": "idle",
+          "ms": 93
+        },
+        {
+          "at": 2330,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 2416,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 2510,
+          "beat": "idle",
+          "ms": 94
+        },
+        {
+          "at": 2597,
+          "beat": "idle",
+          "ms": 87
+        },
+        {
+          "at": 2686,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 2776,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 2868,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 2973,
+          "beat": "idle",
+          "ms": 105
+        },
+        {
+          "at": 3064,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 3153,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 3248,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 3345,
+          "beat": "idle",
+          "ms": 97
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:36.649Z",
+      "caseFinishedAt": "2026-10-15T03:17:43.059Z",
+      "inputAt": "2026-10-15T03:17:37.852Z",
+      "firstFrameMs": 6,
+      "landingMs": null,
+      "totalBusyMs": 3518,
+      "active": {
+        "frames": 42,
+        "p50": 78,
+        "p95": 120,
+        "max": 148,
+        "over33": 42
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 16,
+        "p50": 94,
+        "p95": 156,
+        "max": 156,
+        "over33": 16
+      },
+      "beats": [
+        {
+          "at": 6,
+          "beat": "endPress"
+        },
+        {
+          "at": 364,
+          "beat": "stamp"
+        },
+        {
+          "at": 987,
+          "beat": "sweep"
+        },
+        {
+          "at": 1546,
+          "beat": "date"
+        },
+        {
+          "at": 1915,
+          "beat": "publish"
+        },
+        {
+          "at": 2302,
+          "beat": "message"
+        },
+        {
+          "at": 3518,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 126,
+          "beat": "endPress",
+          "ms": 120
+        },
+        {
+          "at": 208,
+          "beat": "endPress",
+          "ms": 82
+        },
+        {
+          "at": 286,
+          "beat": "endPress",
+          "ms": 78
+        },
+        {
+          "at": 364,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 441,
+          "beat": "stamp",
+          "ms": 77
+        },
+        {
+          "at": 526,
+          "beat": "stamp",
+          "ms": 85
+        },
+        {
+          "at": 614,
+          "beat": "stamp",
+          "ms": 88
+        },
+        {
+          "at": 692,
+          "beat": "stamp",
+          "ms": 78
+        },
+        {
+          "at": 764,
+          "beat": "stamp",
+          "ms": 72
+        },
+        {
+          "at": 832,
+          "beat": "stamp",
+          "ms": 68
+        },
+        {
+          "at": 913,
+          "beat": "stamp",
+          "ms": 81
+        },
+        {
+          "at": 987,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 1056,
+          "beat": "sweep",
+          "ms": 69
+        },
+        {
+          "at": 1131,
+          "beat": "sweep",
+          "ms": 75
+        },
+        {
+          "at": 1201,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 1269,
+          "beat": "sweep",
+          "ms": 68
+        },
+        {
+          "at": 1353,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 1450,
+          "beat": "sweep",
+          "ms": 97
+        },
+        {
+          "at": 1546,
+          "beat": "date",
+          "ms": 96
+        },
+        {
+          "at": 1665,
+          "beat": "date",
+          "ms": 119
+        },
+        {
+          "at": 1767,
+          "beat": "date",
+          "ms": 102
+        },
+        {
+          "at": 1915,
+          "beat": "publish",
+          "ms": 148
+        },
+        {
+          "at": 2049,
+          "beat": "publish",
+          "ms": 134
+        },
+        {
+          "at": 2134,
+          "beat": "publish",
+          "ms": 85
+        },
+        {
+          "at": 2210,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 2302,
+          "beat": "message",
+          "ms": 92
+        },
+        {
+          "at": 2379,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 2450,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 2525,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 2605,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 2679,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 2755,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 2840,
+          "beat": "message",
+          "ms": 85
+        },
+        {
+          "at": 2920,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 2993,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 3075,
+          "beat": "message",
+          "ms": 82
+        },
+        {
+          "at": 3147,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 3216,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 3296,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 3364,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 3436,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 3518,
+          "beat": "idle",
+          "ms": 82
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:43.060Z",
+      "caseFinishedAt": "2026-10-15T03:17:57.652Z",
+      "inputAt": "2026-10-15T03:17:45.256Z",
+      "firstFrameMs": 161,
+      "landingMs": null,
+      "totalBusyMs": 10722,
+      "active": {
+        "frames": 127,
+        "p50": 82,
+        "p95": 96,
+        "max": 109,
+        "over33": 127
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 106,
+        "p95": 142,
+        "max": 142,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 161,
+          "beat": "endPress"
+        },
+        {
+          "at": 365,
+          "beat": "stamp"
+        },
+        {
+          "at": 958,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2009,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3205,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4459,
+          "beat": "impact"
+        },
+        {
+          "at": 4898,
+          "beat": "resources"
+        },
+        {
+          "at": 6218,
+          "beat": "sweep"
+        },
+        {
+          "at": 7048,
+          "beat": "date"
+        },
+        {
+          "at": 7382,
+          "beat": "publish"
+        },
+        {
+          "at": 7786,
+          "beat": "message"
+        },
+        {
+          "at": 10722,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 269,
+          "beat": "endPress",
+          "ms": 108
+        },
+        {
+          "at": 365,
+          "beat": "stamp",
+          "ms": 96
+        },
+        {
+          "at": 457,
+          "beat": "stamp",
+          "ms": 92
+        },
+        {
+          "at": 548,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 628,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 708,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 789,
+          "beat": "stamp",
+          "ms": 81
+        },
+        {
+          "at": 868,
+          "beat": "stamp",
+          "ms": 79
+        },
+        {
+          "at": 958,
+          "beat": "scandalLift",
+          "ms": 90
+        },
+        {
+          "at": 1044,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1126,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1209,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1291,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1383,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1465,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1557,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1639,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1729,
+          "beat": "scandalLift",
+          "ms": 90
+        },
+        {
+          "at": 1823,
+          "beat": "scandalLift",
+          "ms": 94
+        },
+        {
+          "at": 1912,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 2009,
+          "beat": "scandalFlip",
+          "ms": 97
+        },
+        {
+          "at": 2101,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 2195,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2286,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2375,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2466,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2559,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 2652,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 2743,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 2842,
+          "beat": "scandalFlip",
+          "ms": 99
+        },
+        {
+          "at": 2930,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 3022,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 3108,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 3205,
+          "beat": "scandalCarry",
+          "ms": 97
+        },
+        {
+          "at": 3299,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3383,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 3472,
+          "beat": "scandalCarry",
+          "ms": 89
+        },
+        {
+          "at": 3554,
+          "beat": "scandalCarry",
+          "ms": 82
+        },
+        {
+          "at": 3644,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3728,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 3820,
+          "beat": "scandalCarry",
+          "ms": 92
+        },
+        {
+          "at": 3928,
+          "beat": "scandalCarry",
+          "ms": 108
+        },
+        {
+          "at": 4021,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 4105,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4196,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 4279,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 4363,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4459,
+          "beat": "impact",
+          "ms": 96
+        },
+        {
+          "at": 4546,
+          "beat": "impact",
+          "ms": 87
+        },
+        {
+          "at": 4632,
+          "beat": "impact",
+          "ms": 86
+        },
+        {
+          "at": 4726,
+          "beat": "impact",
+          "ms": 94
+        },
+        {
+          "at": 4806,
+          "beat": "impact",
+          "ms": 80
+        },
+        {
+          "at": 4898,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 4986,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 5063,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5144,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5229,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5312,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5392,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 5479,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 5560,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5639,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5717,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 5800,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5885,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 5965,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 6046,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 6125,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 6218,
+          "beat": "sweep",
+          "ms": 93
+        },
+        {
+          "at": 6302,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6389,
+          "beat": "sweep",
+          "ms": 87
+        },
+        {
+          "at": 6473,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6556,
+          "beat": "sweep",
+          "ms": 83
+        },
+        {
+          "at": 6640,
+          "beat": "sweep",
+          "ms": 84
+        },
+        {
+          "at": 6733,
+          "beat": "sweep",
+          "ms": 93
+        },
+        {
+          "at": 6810,
+          "beat": "sweep",
+          "ms": 77
+        },
+        {
+          "at": 6890,
+          "beat": "sweep",
+          "ms": 80
+        },
+        {
+          "at": 6966,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 7048,
+          "beat": "date",
+          "ms": 82
+        },
+        {
+          "at": 7125,
+          "beat": "date",
+          "ms": 77
+        },
+        {
+          "at": 7200,
+          "beat": "date",
+          "ms": 75
+        },
+        {
+          "at": 7273,
+          "beat": "date",
+          "ms": 73
+        },
+        {
+          "at": 7382,
+          "beat": "publish",
+          "ms": 109
+        },
+        {
+          "at": 7473,
+          "beat": "publish",
+          "ms": 91
+        },
+        {
+          "at": 7552,
+          "beat": "publish",
+          "ms": 79
+        },
+        {
+          "at": 7629,
+          "beat": "publish",
+          "ms": 77
+        },
+        {
+          "at": 7707,
+          "beat": "publish",
+          "ms": 78
+        },
+        {
+          "at": 7786,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 7878,
+          "beat": "message",
+          "ms": 92
+        },
+        {
+          "at": 7961,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 8037,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 8111,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 8183,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 8254,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 8329,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 8400,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 8471,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 8539,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 8613,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 8691,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 8768,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 8842,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 8925,
+          "beat": "message",
+          "ms": 83
+        },
+        {
+          "at": 9005,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 9073,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9146,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9213,
+          "beat": "message",
+          "ms": 67
+        },
+        {
+          "at": 9286,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9357,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 9425,
+          "beat": "message",
+          "ms": 68
+        },
+        {
+          "at": 9501,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 9571,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 9644,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 9715,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 9784,
+          "beat": "message",
+          "ms": 69
+        },
+        {
+          "at": 9860,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 9939,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 10011,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 10082,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 10152,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 10237,
+          "beat": "message",
+          "ms": 85
+        },
+        {
+          "at": 10316,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 10391,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 10473,
+          "beat": "message",
+          "ms": 82
+        },
+        {
+          "at": 10564,
+          "beat": "message",
+          "ms": 91
+        },
+        {
+          "at": 10646,
+          "beat": "message",
+          "ms": 82
+        },
+        {
+          "at": 10722,
+          "beat": "idle",
+          "ms": 76
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "copycat-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:17:57.653Z",
+      "caseFinishedAt": "2026-10-15T03:18:14.756Z",
+      "inputAt": "2026-10-15T03:18:01.883Z",
+      "firstFrameMs": 19,
+      "landingMs": null,
+      "totalBusyMs": 11307,
+      "active": {
+        "frames": 125,
+        "p50": 87,
+        "p95": 111,
+        "max": 167,
+        "over33": 125
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 17,
+        "p50": 88,
+        "p95": 98,
+        "max": 98,
+        "over33": 17
+      },
+      "beats": [
+        {
+          "at": 19,
+          "beat": "endPress"
+        },
+        {
+          "at": 401,
+          "beat": "stamp"
+        },
+        {
+          "at": 984,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2015,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3180,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3807,
+          "beat": "impact"
+        },
+        {
+          "at": 4227,
+          "beat": "resources"
+        },
+        {
+          "at": 5605,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 6596,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 7847,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 8451,
+          "beat": "impact"
+        },
+        {
+          "at": 8819,
+          "beat": "resources"
+        },
+        {
+          "at": 10181,
+          "beat": "sweep"
+        },
+        {
+          "at": 11122,
+          "beat": "publish"
+        },
+        {
+          "at": 11307,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 186,
+          "beat": "endPress",
+          "ms": 167
+        },
+        {
+          "at": 300,
+          "beat": "endPress",
+          "ms": 114
+        },
+        {
+          "at": 401,
+          "beat": "stamp",
+          "ms": 101
+        },
+        {
+          "at": 512,
+          "beat": "stamp",
+          "ms": 111
+        },
+        {
+          "at": 595,
+          "beat": "stamp",
+          "ms": 83
+        },
+        {
+          "at": 677,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 779,
+          "beat": "stamp",
+          "ms": 102
+        },
+        {
+          "at": 861,
+          "beat": "stamp",
+          "ms": 82
+        },
+        {
+          "at": 984,
+          "beat": "scandalLift",
+          "ms": 123
+        },
+        {
+          "at": 1094,
+          "beat": "scandalLift",
+          "ms": 110
+        },
+        {
+          "at": 1178,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1268,
+          "beat": "scandalLift",
+          "ms": 90
+        },
+        {
+          "at": 1369,
+          "beat": "scandalLift",
+          "ms": 101
+        },
+        {
+          "at": 1476,
+          "beat": "scandalLift",
+          "ms": 107
+        },
+        {
+          "at": 1577,
+          "beat": "scandalLift",
+          "ms": 101
+        },
+        {
+          "at": 1667,
+          "beat": "scandalLift",
+          "ms": 90
+        },
+        {
+          "at": 1769,
+          "beat": "scandalLift",
+          "ms": 102
+        },
+        {
+          "at": 1854,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1935,
+          "beat": "scandalLift",
+          "ms": 81
+        },
+        {
+          "at": 2015,
+          "beat": "scandalFlip",
+          "ms": 80
+        },
+        {
+          "at": 2105,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 2187,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2279,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 2394,
+          "beat": "scandalFlip",
+          "ms": 115
+        },
+        {
+          "at": 2484,
+          "beat": "scandalFlip",
+          "ms": 90
+        },
+        {
+          "at": 2585,
+          "beat": "scandalFlip",
+          "ms": 101
+        },
+        {
+          "at": 2681,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 2787,
+          "beat": "scandalFlip",
+          "ms": 106
+        },
+        {
+          "at": 2870,
+          "beat": "scandalFlip",
+          "ms": 83
+        },
+        {
+          "at": 2966,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 3060,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 3180,
+          "beat": "scandalCarry",
+          "ms": 120
+        },
+        {
+          "at": 3271,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 3370,
+          "beat": "scandalCarry",
+          "ms": 99
+        },
+        {
+          "at": 3460,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 3556,
+          "beat": "scandalCarry",
+          "ms": 96
+        },
+        {
+          "at": 3637,
+          "beat": "scandalCarry",
+          "ms": 81
+        },
+        {
+          "at": 3720,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 3807,
+          "beat": "impact",
+          "ms": 87
+        },
+        {
+          "at": 3886,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 3965,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 4056,
+          "beat": "impact",
+          "ms": 91
+        },
+        {
+          "at": 4138,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 4227,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 4348,
+          "beat": "resources",
+          "ms": 121
+        },
+        {
+          "at": 4434,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 4516,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 4599,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 4686,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 4764,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 4850,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 4937,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 5016,
+          "beat": "resources",
+          "ms": 79
+        },
+        {
+          "at": 5098,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5178,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 5267,
+          "beat": "resources",
+          "ms": 89
+        },
+        {
+          "at": 5353,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 5440,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 5522,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5605,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 5689,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 5791,
+          "beat": "scandalLift",
+          "ms": 102
+        },
+        {
+          "at": 5876,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 5965,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 6063,
+          "beat": "scandalLift",
+          "ms": 98
+        },
+        {
+          "at": 6150,
+          "beat": "scandalLift",
+          "ms": 87
+        },
+        {
+          "at": 6236,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 6320,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 6405,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 6500,
+          "beat": "scandalLift",
+          "ms": 95
+        },
+        {
+          "at": 6596,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 6687,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 6778,
+          "beat": "scandalFlip",
+          "ms": 91
+        },
+        {
+          "at": 6871,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 6959,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 7055,
+          "beat": "scandalFlip",
+          "ms": 96
+        },
+        {
+          "at": 7147,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 7229,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 7323,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 7411,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 7497,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 7582,
+          "beat": "scandalFlip",
+          "ms": 85
+        },
+        {
+          "at": 7677,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 7763,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 7847,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 7942,
+          "beat": "scandalCarry",
+          "ms": 95
+        },
+        {
+          "at": 8026,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 8113,
+          "beat": "scandalCarry",
+          "ms": 87
+        },
+        {
+          "at": 8201,
+          "beat": "scandalCarry",
+          "ms": 88
+        },
+        {
+          "at": 8286,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 8369,
+          "beat": "scandalCarry",
+          "ms": 83
+        },
+        {
+          "at": 8451,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 8539,
+          "beat": "impact",
+          "ms": 88
+        },
+        {
+          "at": 8630,
+          "beat": "impact",
+          "ms": 91
+        },
+        {
+          "at": 8726,
+          "beat": "impact",
+          "ms": 96
+        },
+        {
+          "at": 8819,
+          "beat": "resources",
+          "ms": 93
+        },
+        {
+          "at": 8906,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 8990,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 9075,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9160,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9244,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 9329,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9414,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9496,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 9580,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 9665,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 9753,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 9837,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 9929,
+          "beat": "resources",
+          "ms": 92
+        },
+        {
+          "at": 10012,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 10095,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 10181,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 10269,
+          "beat": "sweep",
+          "ms": 88
+        },
+        {
+          "at": 10356,
+          "beat": "sweep",
+          "ms": 87
+        },
+        {
+          "at": 10446,
+          "beat": "sweep",
+          "ms": 90
+        },
+        {
+          "at": 10539,
+          "beat": "sweep",
+          "ms": 93
+        },
+        {
+          "at": 10619,
+          "beat": "sweep",
+          "ms": 80
+        },
+        {
+          "at": 10705,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 10787,
+          "beat": "sweep",
+          "ms": 82
+        },
+        {
+          "at": 10868,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 10950,
+          "beat": "sweep",
+          "ms": 82
+        },
+        {
+          "at": 11031,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 11122,
+          "beat": "publish",
+          "ms": 91
+        },
+        {
+          "at": 11213,
+          "beat": "publish",
+          "ms": 91
+        },
+        {
+          "at": 11307,
+          "beat": "idle",
+          "ms": 94
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "season",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:18:14.757Z",
+      "caseFinishedAt": "2026-10-15T03:18:26.314Z",
+      "inputAt": "2026-10-15T03:18:16.641Z",
+      "firstFrameMs": 149,
+      "landingMs": null,
+      "totalBusyMs": 8104,
+      "active": {
+        "frames": 104,
+        "p50": 75,
+        "p95": 86,
+        "max": 120,
+        "over33": 104
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 15,
+        "p50": 105,
+        "p95": 123,
+        "max": 123,
+        "over33": 15
+      },
+      "beats": [
+        {
+          "at": 149,
+          "beat": "gate"
+        },
+        {
+          "at": 302,
+          "beat": "resources"
+        },
+        {
+          "at": 1645,
+          "beat": "date"
+        },
+        {
+          "at": 1955,
+          "beat": "season"
+        },
+        {
+          "at": 2629,
+          "beat": "publish"
+        },
+        {
+          "at": 4915,
+          "beat": "seasonEnd"
+        },
+        {
+          "at": 5133,
+          "beat": "message"
+        },
+        {
+          "at": 8104,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 222,
+          "beat": "gate",
+          "ms": 73
+        },
+        {
+          "at": 302,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 379,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 453,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 529,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 601,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 672,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 746,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 824,
+          "beat": "resources",
+          "ms": 78
+        },
+        {
+          "at": 899,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 975,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 1047,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 1120,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 1191,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1267,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 1339,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 1415,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 1489,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 1562,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 1645,
+          "beat": "date",
+          "ms": 83
+        },
+        {
+          "at": 1718,
+          "beat": "date",
+          "ms": 73
+        },
+        {
+          "at": 1792,
+          "beat": "date",
+          "ms": 74
+        },
+        {
+          "at": 1869,
+          "beat": "date",
+          "ms": 77
+        },
+        {
+          "at": 1955,
+          "beat": "season",
+          "ms": 86
+        },
+        {
+          "at": 2033,
+          "beat": "season",
+          "ms": 78
+        },
+        {
+          "at": 2124,
+          "beat": "season",
+          "ms": 91
+        },
+        {
+          "at": 2206,
+          "beat": "season",
+          "ms": 82
+        },
+        {
+          "at": 2282,
+          "beat": "season",
+          "ms": 76
+        },
+        {
+          "at": 2353,
+          "beat": "season",
+          "ms": 71
+        },
+        {
+          "at": 2430,
+          "beat": "season",
+          "ms": 77
+        },
+        {
+          "at": 2509,
+          "beat": "season",
+          "ms": 79
+        },
+        {
+          "at": 2629,
+          "beat": "publish",
+          "ms": 120
+        },
+        {
+          "at": 2723,
+          "beat": "publish",
+          "ms": 94
+        },
+        {
+          "at": 2795,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 2870,
+          "beat": "publish",
+          "ms": 75
+        },
+        {
+          "at": 2946,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 3020,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3104,
+          "beat": "publish",
+          "ms": 84
+        },
+        {
+          "at": 3173,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 3244,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 3318,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3392,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3466,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3537,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 3608,
+          "beat": "publish",
+          "ms": 71
+        },
+        {
+          "at": 3683,
+          "beat": "publish",
+          "ms": 75
+        },
+        {
+          "at": 3752,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 3826,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 3896,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 3968,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4040,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4112,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4184,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4261,
+          "beat": "publish",
+          "ms": 77
+        },
+        {
+          "at": 4339,
+          "beat": "publish",
+          "ms": 78
+        },
+        {
+          "at": 4408,
+          "beat": "publish",
+          "ms": 69
+        },
+        {
+          "at": 4478,
+          "beat": "publish",
+          "ms": 70
+        },
+        {
+          "at": 4546,
+          "beat": "publish",
+          "ms": 68
+        },
+        {
+          "at": 4622,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 4696,
+          "beat": "publish",
+          "ms": 74
+        },
+        {
+          "at": 4768,
+          "beat": "publish",
+          "ms": 72
+        },
+        {
+          "at": 4844,
+          "beat": "publish",
+          "ms": 76
+        },
+        {
+          "at": 4915,
+          "beat": "seasonEnd",
+          "ms": 71
+        },
+        {
+          "at": 4986,
+          "beat": "seasonEnd",
+          "ms": 71
+        },
+        {
+          "at": 5057,
+          "beat": "seasonEnd",
+          "ms": 71
+        },
+        {
+          "at": 5133,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 5206,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 5276,
+          "beat": "message",
+          "ms": 70
+        },
+        {
+          "at": 5348,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5420,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5492,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 5563,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 5640,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 5719,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 5796,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 5867,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 5942,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 6014,
+          "beat": "message",
+          "ms": 72
+        },
+        {
+          "at": 6123,
+          "beat": "message",
+          "ms": 109
+        },
+        {
+          "at": 6200,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 6274,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 6355,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 6426,
+          "beat": "message",
+          "ms": 71
+        },
+        {
+          "at": 6502,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 6581,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 6665,
+          "beat": "message",
+          "ms": 84
+        },
+        {
+          "at": 6776,
+          "beat": "message",
+          "ms": 111
+        },
+        {
+          "at": 6853,
+          "beat": "message",
+          "ms": 77
+        },
+        {
+          "at": 6933,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 7008,
+          "beat": "message",
+          "ms": 75
+        },
+        {
+          "at": 7082,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 7161,
+          "beat": "message",
+          "ms": 79
+        },
+        {
+          "at": 7246,
+          "beat": "message",
+          "ms": 85
+        },
+        {
+          "at": 7327,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 7407,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 7487,
+          "beat": "message",
+          "ms": 80
+        },
+        {
+          "at": 7561,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 7637,
+          "beat": "message",
+          "ms": 76
+        },
+        {
+          "at": 7719,
+          "beat": "message",
+          "ms": 82
+        },
+        {
+          "at": 7800,
+          "beat": "message",
+          "ms": 81
+        },
+        {
+          "at": 7874,
+          "beat": "message",
+          "ms": 74
+        },
+        {
+          "at": 7947,
+          "beat": "message",
+          "ms": 73
+        },
+        {
+          "at": 8025,
+          "beat": "message",
+          "ms": 78
+        },
+        {
+          "at": 8104,
+          "beat": "idle",
+          "ms": 79
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "winter-ending",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:18:26.316Z",
+      "caseFinishedAt": "2026-10-15T03:18:33.794Z",
+      "inputAt": "2026-10-15T03:18:30.406Z",
+      "firstFrameMs": 13,
+      "landingMs": null,
+      "totalBusyMs": 1821,
+      "active": {
+        "frames": 31,
+        "p50": 73,
+        "p95": 109,
+        "max": 112,
+        "over33": 20
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 93,
+        "p50": 15,
+        "p95": 30,
+        "max": 31,
+        "over33": 0
+      },
+      "beats": [
+        {
+          "at": 13,
+          "beat": "gate"
+        },
+        {
+          "at": 321,
+          "beat": "resources"
+        },
+        {
+          "at": 1642,
+          "beat": "publish"
+        },
+        {
+          "at": 1821,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 122,
+          "beat": "gate",
+          "ms": 109
+        },
+        {
+          "at": 234,
+          "beat": "gate",
+          "ms": 112
+        },
+        {
+          "at": 321,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 396,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 469,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 543,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 630,
+          "beat": "resources",
+          "ms": 87
+        },
+        {
+          "at": 713,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 786,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 860,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 940,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 1012,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 1087,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 1160,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 1251,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 1328,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 1399,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1470,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 1546,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 1642,
+          "beat": "publish",
+          "ms": 96
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "quiet-longest-recorded",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:18:33.795Z",
+      "caseFinishedAt": "2026-10-15T03:18:41.336Z",
+      "inputAt": "2026-10-15T03:18:35.647Z",
+      "firstFrameMs": 72,
+      "landingMs": 998,
+      "totalBusyMs": 4065,
+      "active": {
+        "frames": 44,
+        "p50": 91,
+        "p95": 111,
+        "max": 129,
+        "over33": 44
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 16,
+        "p50": 96,
+        "p95": 109,
+        "max": 109,
+        "over33": 16
+      },
+      "beats": [
+        {
+          "at": 72,
+          "beat": "lift"
+        },
+        {
+          "at": 812,
+          "beat": "land"
+        },
+        {
+          "at": 998,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 183,
+          "beat": "lift",
+          "ms": 111
+        },
+        {
+          "at": 274,
+          "beat": "lift",
+          "ms": 91
+        },
+        {
+          "at": 367,
+          "beat": "lift",
+          "ms": 93
+        },
+        {
+          "at": 451,
+          "beat": "lift",
+          "ms": 84
+        },
+        {
+          "at": 542,
+          "beat": "lift",
+          "ms": 91
+        },
+        {
+          "at": 634,
+          "beat": "lift",
+          "ms": 92
+        },
+        {
+          "at": 719,
+          "beat": "lift",
+          "ms": 85
+        },
+        {
+          "at": 812,
+          "beat": "land",
+          "ms": 93
+        },
+        {
+          "at": 903,
+          "beat": "land",
+          "ms": 91
+        },
+        {
+          "at": 998,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 1090,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1219,
+          "beat": "idle",
+          "ms": 129
+        },
+        {
+          "at": 1310,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 1410,
+          "beat": "idle",
+          "ms": 100
+        },
+        {
+          "at": 1498,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 1578,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 1658,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 1761,
+          "beat": "idle",
+          "ms": 103
+        },
+        {
+          "at": 1853,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 1942,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 2037,
+          "beat": "idle",
+          "ms": 95
+        },
+        {
+          "at": 2165,
+          "beat": "idle",
+          "ms": 128
+        },
+        {
+          "at": 2256,
+          "beat": "idle",
+          "ms": 91
+        },
+        {
+          "at": 2334,
+          "beat": "idle",
+          "ms": 78
+        },
+        {
+          "at": 2418,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 2519,
+          "beat": "idle",
+          "ms": 101
+        },
+        {
+          "at": 2605,
+          "beat": "idle",
+          "ms": 86
+        },
+        {
+          "at": 2703,
+          "beat": "idle",
+          "ms": 98
+        },
+        {
+          "at": 2795,
+          "beat": "idle",
+          "ms": 92
+        },
+        {
+          "at": 2902,
+          "beat": "idle",
+          "ms": 107
+        },
+        {
+          "at": 2986,
+          "beat": "idle",
+          "ms": 84
+        },
+        {
+          "at": 3075,
+          "beat": "idle",
+          "ms": 89
+        },
+        {
+          "at": 3155,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 3238,
+          "beat": "idle",
+          "ms": 83
+        },
+        {
+          "at": 3328,
+          "beat": "idle",
+          "ms": 90
+        },
+        {
+          "at": 3408,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 3488,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 3576,
+          "beat": "idle",
+          "ms": 88
+        },
+        {
+          "at": 3655,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 3732,
+          "beat": "idle",
+          "ms": 77
+        },
+        {
+          "at": 3811,
+          "beat": "idle",
+          "ms": 79
+        },
+        {
+          "at": 3907,
+          "beat": "idle",
+          "ms": 96
+        },
+        {
+          "at": 3987,
+          "beat": "idle",
+          "ms": 80
+        },
+        {
+          "at": 4065,
+          "beat": "idle",
+          "ms": 78
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-calm-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:18:41.336Z",
+      "caseFinishedAt": "2026-10-15T03:18:51.644Z",
+      "inputAt": "2026-10-15T03:18:43.408Z",
+      "firstFrameMs": 107,
+      "landingMs": null,
+      "totalBusyMs": 6655,
+      "active": {
+        "frames": 85,
+        "p50": 76,
+        "p95": 88,
+        "max": 99,
+        "over33": 85
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 90,
+        "p95": 100,
+        "max": 100,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 107,
+          "beat": "endPress"
+        },
+        {
+          "at": 365,
+          "beat": "stamp"
+        },
+        {
+          "at": 961,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 1972,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3193,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 3821,
+          "beat": "impact"
+        },
+        {
+          "at": 4201,
+          "beat": "resources"
+        },
+        {
+          "at": 5553,
+          "beat": "sweep"
+        },
+        {
+          "at": 6178,
+          "beat": "date"
+        },
+        {
+          "at": 6496,
+          "beat": "publish"
+        },
+        {
+          "at": 6655,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 195,
+          "beat": "endPress",
+          "ms": 88
+        },
+        {
+          "at": 274,
+          "beat": "endPress",
+          "ms": 79
+        },
+        {
+          "at": 365,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 441,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 517,
+          "beat": "stamp",
+          "ms": 76
+        },
+        {
+          "at": 591,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 665,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 739,
+          "beat": "stamp",
+          "ms": 74
+        },
+        {
+          "at": 816,
+          "beat": "stamp",
+          "ms": 77
+        },
+        {
+          "at": 888,
+          "beat": "stamp",
+          "ms": 72
+        },
+        {
+          "at": 961,
+          "beat": "scandalLift",
+          "ms": 73
+        },
+        {
+          "at": 1037,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1114,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1194,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1268,
+          "beat": "scandalLift",
+          "ms": 74
+        },
+        {
+          "at": 1343,
+          "beat": "scandalLift",
+          "ms": 75
+        },
+        {
+          "at": 1420,
+          "beat": "scandalLift",
+          "ms": 77
+        },
+        {
+          "at": 1503,
+          "beat": "scandalLift",
+          "ms": 83
+        },
+        {
+          "at": 1579,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1655,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1729,
+          "beat": "scandalLift",
+          "ms": 74
+        },
+        {
+          "at": 1814,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1890,
+          "beat": "scandalLift",
+          "ms": 76
+        },
+        {
+          "at": 1972,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2045,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 2127,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2211,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 2287,
+          "beat": "scandalFlip",
+          "ms": 76
+        },
+        {
+          "at": 2359,
+          "beat": "scandalFlip",
+          "ms": 72
+        },
+        {
+          "at": 2441,
+          "beat": "scandalFlip",
+          "ms": 82
+        },
+        {
+          "at": 2514,
+          "beat": "scandalFlip",
+          "ms": 73
+        },
+        {
+          "at": 2590,
+          "beat": "scandalFlip",
+          "ms": 76
+        },
+        {
+          "at": 2665,
+          "beat": "scandalFlip",
+          "ms": 75
+        },
+        {
+          "at": 2737,
+          "beat": "scandalFlip",
+          "ms": 72
+        },
+        {
+          "at": 2818,
+          "beat": "scandalFlip",
+          "ms": 81
+        },
+        {
+          "at": 2892,
+          "beat": "scandalFlip",
+          "ms": 74
+        },
+        {
+          "at": 2969,
+          "beat": "scandalFlip",
+          "ms": 77
+        },
+        {
+          "at": 3043,
+          "beat": "scandalFlip",
+          "ms": 74
+        },
+        {
+          "at": 3117,
+          "beat": "scandalFlip",
+          "ms": 74
+        },
+        {
+          "at": 3193,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3273,
+          "beat": "scandalCarry",
+          "ms": 80
+        },
+        {
+          "at": 3349,
+          "beat": "scandalCarry",
+          "ms": 76
+        },
+        {
+          "at": 3426,
+          "beat": "scandalCarry",
+          "ms": 77
+        },
+        {
+          "at": 3505,
+          "beat": "scandalCarry",
+          "ms": 79
+        },
+        {
+          "at": 3583,
+          "beat": "scandalCarry",
+          "ms": 78
+        },
+        {
+          "at": 3658,
+          "beat": "scandalCarry",
+          "ms": 75
+        },
+        {
+          "at": 3742,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 3821,
+          "beat": "impact",
+          "ms": 79
+        },
+        {
+          "at": 3895,
+          "beat": "impact",
+          "ms": 74
+        },
+        {
+          "at": 3966,
+          "beat": "impact",
+          "ms": 71
+        },
+        {
+          "at": 4041,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4116,
+          "beat": "impact",
+          "ms": 75
+        },
+        {
+          "at": 4201,
+          "beat": "resources",
+          "ms": 85
+        },
+        {
+          "at": 4278,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 4351,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 4425,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 4497,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 4577,
+          "beat": "resources",
+          "ms": 80
+        },
+        {
+          "at": 4651,
+          "beat": "resources",
+          "ms": 74
+        },
+        {
+          "at": 4724,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 4797,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 4872,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 4947,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5022,
+          "beat": "resources",
+          "ms": 75
+        },
+        {
+          "at": 5094,
+          "beat": "resources",
+          "ms": 72
+        },
+        {
+          "at": 5170,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5243,
+          "beat": "resources",
+          "ms": 73
+        },
+        {
+          "at": 5319,
+          "beat": "resources",
+          "ms": 76
+        },
+        {
+          "at": 5396,
+          "beat": "resources",
+          "ms": 77
+        },
+        {
+          "at": 5467,
+          "beat": "resources",
+          "ms": 71
+        },
+        {
+          "at": 5553,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 5646,
+          "beat": "sweep",
+          "ms": 93
+        },
+        {
+          "at": 5718,
+          "beat": "sweep",
+          "ms": 72
+        },
+        {
+          "at": 5798,
+          "beat": "sweep",
+          "ms": 80
+        },
+        {
+          "at": 5868,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 5941,
+          "beat": "sweep",
+          "ms": 73
+        },
+        {
+          "at": 6011,
+          "beat": "sweep",
+          "ms": 70
+        },
+        {
+          "at": 6085,
+          "beat": "sweep",
+          "ms": 74
+        },
+        {
+          "at": 6178,
+          "beat": "date",
+          "ms": 93
+        },
+        {
+          "at": 6249,
+          "beat": "date",
+          "ms": 71
+        },
+        {
+          "at": 6320,
+          "beat": "date",
+          "ms": 71
+        },
+        {
+          "at": 6397,
+          "beat": "date",
+          "ms": 77
+        },
+        {
+          "at": 6496,
+          "beat": "publish",
+          "ms": 99
+        },
+        {
+          "at": 6584,
+          "beat": "publish",
+          "ms": 88
+        },
+        {
+          "at": 6655,
+          "beat": "idle",
+          "ms": 71
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "webkit",
+      "rate": 1,
+      "label": "reviewed-frenzy-end",
+      "launchMode": "headless",
+      "visibilityBefore": {
+        "state": "visible",
+        "focused": true
+      },
+      "visibilityAfter": {
+        "state": "visible",
+        "focused": true
+      },
+      "runStartedAt": "2026-10-15T03:14:17.076Z",
+      "caseStartedAt": "2026-10-15T03:18:51.645Z",
+      "caseFinishedAt": "2026-10-15T03:19:04.114Z",
+      "inputAt": "2026-10-15T03:18:55.241Z",
+      "firstFrameMs": 14,
+      "landingMs": null,
+      "totalBusyMs": 7255,
+      "active": {
+        "frames": 82,
+        "p50": 86,
+        "p95": 101,
+        "max": 167,
+        "over33": 82
+      },
+      "idleObservationMs": 1500,
+      "idle": {
+        "frames": 18,
+        "p50": 84,
+        "p95": 110,
+        "max": 110,
+        "over33": 18
+      },
+      "beats": [
+        {
+          "at": 14,
+          "beat": "endPress"
+        },
+        {
+          "at": 383,
+          "beat": "stamp"
+        },
+        {
+          "at": 966,
+          "beat": "scandalLift"
+        },
+        {
+          "at": 2019,
+          "beat": "scandalFlip"
+        },
+        {
+          "at": 3224,
+          "beat": "scandalCarry"
+        },
+        {
+          "at": 4466,
+          "beat": "impact"
+        },
+        {
+          "at": 4885,
+          "beat": "resources"
+        },
+        {
+          "at": 6250,
+          "beat": "sweep"
+        },
+        {
+          "at": 7056,
+          "beat": "publish"
+        },
+        {
+          "at": 7255,
+          "beat": "idle"
+        }
+      ],
+      "slowFrames": [
+        {
+          "at": 181,
+          "beat": "endPress",
+          "ms": 167
+        },
+        {
+          "at": 292,
+          "beat": "endPress",
+          "ms": 111
+        },
+        {
+          "at": 383,
+          "beat": "stamp",
+          "ms": 91
+        },
+        {
+          "at": 467,
+          "beat": "stamp",
+          "ms": 84
+        },
+        {
+          "at": 547,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 627,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 714,
+          "beat": "stamp",
+          "ms": 87
+        },
+        {
+          "at": 794,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 874,
+          "beat": "stamp",
+          "ms": 80
+        },
+        {
+          "at": 966,
+          "beat": "scandalLift",
+          "ms": 92
+        },
+        {
+          "at": 1052,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1132,
+          "beat": "scandalLift",
+          "ms": 80
+        },
+        {
+          "at": 1218,
+          "beat": "scandalLift",
+          "ms": 86
+        },
+        {
+          "at": 1302,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1384,
+          "beat": "scandalLift",
+          "ms": 82
+        },
+        {
+          "at": 1469,
+          "beat": "scandalLift",
+          "ms": 85
+        },
+        {
+          "at": 1556,
+          "beat": "scandalLift",
+          "ms": 87
+        },
+        {
+          "at": 1640,
+          "beat": "scandalLift",
+          "ms": 84
+        },
+        {
+          "at": 1753,
+          "beat": "scandalLift",
+          "ms": 113
+        },
+        {
+          "at": 1842,
+          "beat": "scandalLift",
+          "ms": 89
+        },
+        {
+          "at": 1933,
+          "beat": "scandalLift",
+          "ms": 91
+        },
+        {
+          "at": 2019,
+          "beat": "scandalFlip",
+          "ms": 86
+        },
+        {
+          "at": 2108,
+          "beat": "scandalFlip",
+          "ms": 89
+        },
+        {
+          "at": 2219,
+          "beat": "scandalFlip",
+          "ms": 111
+        },
+        {
+          "at": 2306,
+          "beat": "scandalFlip",
+          "ms": 87
+        },
+        {
+          "at": 2406,
+          "beat": "scandalFlip",
+          "ms": 100
+        },
+        {
+          "at": 2499,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 2594,
+          "beat": "scandalFlip",
+          "ms": 95
+        },
+        {
+          "at": 2687,
+          "beat": "scandalFlip",
+          "ms": 93
+        },
+        {
+          "at": 2781,
+          "beat": "scandalFlip",
+          "ms": 94
+        },
+        {
+          "at": 2865,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 2953,
+          "beat": "scandalFlip",
+          "ms": 88
+        },
+        {
+          "at": 3037,
+          "beat": "scandalFlip",
+          "ms": 84
+        },
+        {
+          "at": 3129,
+          "beat": "scandalFlip",
+          "ms": 92
+        },
+        {
+          "at": 3224,
+          "beat": "scandalCarry",
+          "ms": 95
+        },
+        {
+          "at": 3317,
+          "beat": "scandalCarry",
+          "ms": 93
+        },
+        {
+          "at": 3411,
+          "beat": "scandalCarry",
+          "ms": 94
+        },
+        {
+          "at": 3498,
+          "beat": "scandalCarry",
+          "ms": 87
+        },
+        {
+          "at": 3584,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3669,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 3755,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3841,
+          "beat": "scandalCarry",
+          "ms": 86
+        },
+        {
+          "at": 3931,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 4018,
+          "beat": "scandalCarry",
+          "ms": 87
+        },
+        {
+          "at": 4109,
+          "beat": "scandalCarry",
+          "ms": 91
+        },
+        {
+          "at": 4194,
+          "beat": "scandalCarry",
+          "ms": 85
+        },
+        {
+          "at": 4278,
+          "beat": "scandalCarry",
+          "ms": 84
+        },
+        {
+          "at": 4368,
+          "beat": "scandalCarry",
+          "ms": 90
+        },
+        {
+          "at": 4466,
+          "beat": "impact",
+          "ms": 98
+        },
+        {
+          "at": 4549,
+          "beat": "impact",
+          "ms": 83
+        },
+        {
+          "at": 4634,
+          "beat": "impact",
+          "ms": 85
+        },
+        {
+          "at": 4716,
+          "beat": "impact",
+          "ms": 82
+        },
+        {
+          "at": 4803,
+          "beat": "impact",
+          "ms": 87
+        },
+        {
+          "at": 4885,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 4982,
+          "beat": "resources",
+          "ms": 97
+        },
+        {
+          "at": 5063,
+          "beat": "resources",
+          "ms": 81
+        },
+        {
+          "at": 5146,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5229,
+          "beat": "resources",
+          "ms": 83
+        },
+        {
+          "at": 5320,
+          "beat": "resources",
+          "ms": 91
+        },
+        {
+          "at": 5413,
+          "beat": "resources",
+          "ms": 93
+        },
+        {
+          "at": 5499,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 5581,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5665,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 5747,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5829,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 5915,
+          "beat": "resources",
+          "ms": 86
+        },
+        {
+          "at": 6003,
+          "beat": "resources",
+          "ms": 88
+        },
+        {
+          "at": 6087,
+          "beat": "resources",
+          "ms": 84
+        },
+        {
+          "at": 6169,
+          "beat": "resources",
+          "ms": 82
+        },
+        {
+          "at": 6250,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 6331,
+          "beat": "sweep",
+          "ms": 81
+        },
+        {
+          "at": 6417,
+          "beat": "sweep",
+          "ms": 86
+        },
+        {
+          "at": 6496,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6575,
+          "beat": "sweep",
+          "ms": 79
+        },
+        {
+          "at": 6653,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6730,
+          "beat": "sweep",
+          "ms": 77
+        },
+        {
+          "at": 6808,
+          "beat": "sweep",
+          "ms": 78
+        },
+        {
+          "at": 6884,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 6960,
+          "beat": "sweep",
+          "ms": 76
+        },
+        {
+          "at": 7056,
+          "beat": "publish",
+          "ms": 96
+        },
+        {
+          "at": 7157,
+          "beat": "publish",
+          "ms": 101
+        },
+        {
+          "at": 7255,
+          "beat": "idle",
+          "ms": 98
+        }
+      ],
+      "longTasks": [],
+      "visibilityChanges": [],
+      "error": null
+    },
+    {
+      "browser": "firefox",
+      "rate": 4,
+      "capabilitySkip": "BiDi has no CPU throttling; no substitute labelled 4x."
+    }
+  ]
+}
