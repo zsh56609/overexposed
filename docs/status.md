@@ -1,10 +1,10 @@
 # Status
 
-**Current — 2026-10-15: V1b is incomplete; no phase 3/V2.** D/E and A–C carry-over repairs are implemented. Game source `508fb2b` is committed/pushed. Later audit changes do not change the game. The new-source Chromium three-size correctness/motion matrix passes; Firefox also passes all five checks at all three sizes, with explicit keyboard-focus/OS-media capability skips. WebKit is running serially. [Current Chinese report](reports/2026-10-14-v1b-acceptance.md).
+**Current — 2026-10-15: V1b is incomplete; no phase 3/V2.** D/E and A–C carry-over repairs are implemented. Game source `508fb2b` is committed/pushed. Later audit changes do not change the game. The new-source Chromium/Firefox/WebKit matrix is complete: all five checks at all three sizes pass their executable assertions, with explicit capability skips. [Current Chinese report](reports/2026-10-15-v1b-acceptance.md).
 
 Production measurements and exact photo-worker pixel/fallback checks are complete. Chromium 4× retains some long tasks; Firefox headless explicitly uses software compositing, and native Windows Playwright WebKit disables accelerated compositing by default. A headed Firefox hardware diagnostic and new-source pointer recording remain pending until correctness checks finish. Real Safari/iPad is unverified. No power or thermal-protection settings changed.
 
-Audit commit `a47a21c` is pushed. Its first normal push timed out connecting to GitHub after 300s; a normal retry succeeded. No force-push or pull. The old reviewed 1200s overflow timeout has not reproduced in isolated checks; its original cause remains unknown.
+Audit commit `c02cef1` is pushed. Its first normal push timed out connecting to GitHub after 300s; a normal retry succeeded. No force-push or pull. The old reviewed 1200s overflow timeout has not reproduced in isolated checks; its original cause remains unknown.
 
 Earlier checkpoints are historical: [A–C](reports/2026-10-03-v1b.md), [D/E implementation](reports/2026-10-04-v1b-de.md), [October 5 acceptance](reports/2026-10-05-v1b-acceptance.md), [October 13 performance repair](reports/2026-10-13-v1b-acceptance.md). Their pending lists and older performance numbers are not the current state.
 

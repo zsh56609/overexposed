@@ -1,0 +1,16 @@
+  metronome webkit: motion samples ["rotate(0deg)","rotate(2.22deg)","rotate(6.51deg)","rotate(8.5deg)"]
+  metronome webkit: stable centre after 2741ms
+  metronome webkit: motion samples ["rotate(2.45deg)","rotate(2.94deg)","rotate(2.94deg)","rotate(3.42deg)","rotate(3.86deg)","rotate(3.86deg)"]
+interactions, webkit 1280x720: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright 
+  metronome webkit: motion samples ["rotate(0deg)","rotate(2.22deg)","rotate(6.51deg)","rotate(8.5deg)"]
+  metronome webkit: stable centre after 2311ms
+  metronome webkit: motion samples ["rotate(2.45deg)","rotate(2.94deg)","rotate(3.42deg)","rotate(3.86deg)","rotate(4.25deg)","rotate(4.25deg)"]
+interactions, webkit 800x450: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright 
+  metronome webkit: motion samples ["rotate(3.62deg)","rotate(7.68deg)","rotate(11.24deg)","rotate(14.9deg)"]
+  metronome webkit: stable centre after 1645ms
+  metronome webkit: motion samples ["rotate(4.71deg)","rotate(4.9deg)","rotate(4.9deg)","rotate(4.68deg)","rotate(4.25deg)","rotate(3.58deg)"]
+interactions, webkit 844x390: 21 of 21 pass, 1 skipped
+  skipped  touch: WebKit driver: trusted long-press unsupported by Playwright 
+PASS: every interaction behaves, in every browser

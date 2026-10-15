@@ -1,0 +1,244 @@
+starting overflow webkit 1280x720
+progress 2026-10-14T16:16:27.908Z webkit webkit 1280x720 10 runs: {"progress":{"run":0,"guard":14,"phase":"play","states":14,"previews":43,"tips":70},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"14","busy":"0"}
+progress 2026-10-14T16:16:37.927Z webkit webkit 1280x720 10 runs: {"progress":{"run":0,"guard":36,"phase":"play","states":36,"previews":92,"tips":161},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"36","busy":"0"}
+progress 2026-10-14T16:16:47.930Z webkit webkit 1280x720 10 runs: {"progress":{"run":0,"guard":56,"phase":"play","states":56,"previews":140,"tips":252},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"56","busy":"0"}
+progress 2026-10-14T16:16:57.935Z webkit webkit 1280x720 10 runs: {"progress":{"run":1,"guard":14,"phase":"play","states":74,"previews":185,"tips":336},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"14","busy":"0"}
+progress 2026-10-14T16:17:07.944Z webkit webkit 1280x720 10 runs: {"progress":{"run":1,"guard":33,"phase":"play","states":93,"previews":233,"tips":427},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"33","busy":"0"}
+progress 2026-10-14T16:17:17.956Z webkit webkit 1280x720 10 runs: {"progress":{"run":1,"guard":52,"phase":"play","states":112,"previews":285,"tips":518},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"52","busy":"0"}
+progress 2026-10-14T16:17:27.966Z webkit webkit 1280x720 10 runs: {"progress":{"run":2,"guard":12,"phase":"play","states":129,"previews":336,"tips":609},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"12","busy":"0"}
+progress 2026-10-14T16:17:37.980Z webkit webkit 1280x720 10 runs: {"progress":{"run":2,"guard":35,"phase":"play","states":152,"previews":384,"tips":693},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"35","busy":"0"}
+progress 2026-10-14T16:17:47.987Z webkit webkit 1280x720 10 runs: {"progress":{"run":2,"guard":53,"phase":"play","states":170,"previews":434,"tips":784},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"53","busy":"0"}
+progress 2026-10-14T16:17:57.998Z webkit webkit 1280x720 10 runs: {"progress":{"run":3,"guard":22,"phase":"play","states":194,"previews":488,"tips":875},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"22","busy":"0"}
+progress 2026-10-14T16:18:08.010Z webkit webkit 1280x720 10 runs: {"progress":{"run":3,"guard":39,"phase":"play","states":211,"previews":539,"tips":959},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"39","busy":"0"}
+progress 2026-10-14T16:18:18.019Z webkit webkit 1280x720 10 runs: {"progress":{"run":4,"guard":22,"phase":"play","states":235,"previews":589,"tips":1057},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"22","busy":"0"}
+progress 2026-10-14T16:18:28.029Z webkit webkit 1280x720 10 runs: {"progress":{"run":4,"guard":40,"phase":"play","states":253,"previews":639,"tips":1148},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"40","busy":"0"}
+progress 2026-10-14T16:18:38.037Z webkit webkit 1280x720 10 runs: {"progress":{"run":5,"guard":5,"phase":"play","states":273,"previews":690,"tips":1239},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"5","busy":"0"}
+progress 2026-10-14T16:18:48.043Z webkit webkit 1280x720 10 runs: {"progress":{"run":5,"guard":23,"phase":"play","states":291,"previews":741,"tips":1330},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"23","busy":"0"}
+progress 2026-10-14T16:18:58.059Z webkit webkit 1280x720 10 runs: {"progress":{"run":5,"guard":42,"phase":"play","states":310,"previews":794,"tips":1421},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"42","busy":"0"}
+progress 2026-10-14T16:19:08.069Z webkit webkit 1280x720 10 runs: {"progress":{"run":6,"guard":4,"phase":"play","states":330,"previews":841,"tips":1512},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"4","busy":"0"}
+progress 2026-10-14T16:19:18.084Z webkit webkit 1280x720 10 runs: {"progress":{"run":6,"guard":21,"phase":"play","states":347,"previews":892,"tips":1603},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"21","busy":"0"}
+progress 2026-10-14T16:19:28.100Z webkit webkit 1280x720 10 runs: {"progress":{"run":6,"guard":42,"phase":"play","states":368,"previews":948,"tips":1694},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"42","busy":"0"}
+progress 2026-10-14T16:19:38.113Z webkit webkit 1280x720 10 runs: {"progress":{"run":7,"guard":7,"phase":"play","states":388,"previews":999,"tips":1778},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"7","busy":"0"}
+progress 2026-10-14T16:19:48.115Z webkit webkit 1280x720 10 runs: {"progress":{"run":7,"guard":24,"phase":"play","states":405,"previews":1048,"tips":1869},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-14T16:19:58.136Z webkit webkit 1280x720 10 runs: {"progress":{"run":7,"guard":46,"phase":"play","states":427,"previews":1099,"tips":1960},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"46","busy":"0"}
+progress 2026-10-14T16:20:08.148Z webkit webkit 1280x720 10 runs: {"progress":{"run":8,"guard":11,"phase":"play","states":447,"previews":1152,"tips":2051},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"11","busy":"0"}
+progress 2026-10-14T16:20:18.160Z webkit webkit 1280x720 10 runs: {"progress":{"run":8,"guard":27,"phase":"play","states":463,"previews":1202,"tips":2142},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"27","busy":"0"}
+progress 2026-10-14T16:20:28.166Z webkit webkit 1280x720 10 runs: {"progress":{"run":8,"guard":49,"phase":"play","states":485,"previews":1255,"tips":2233},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"49","busy":"0"}
+progress 2026-10-14T16:20:38.181Z webkit webkit 1280x720 10 runs: {"progress":{"run":9,"guard":7,"phase":"play","states":504,"previews":1303,"tips":2324},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"7","busy":"0"}
+progress 2026-10-14T16:20:48.195Z webkit webkit 1280x720 10 runs: {"progress":{"run":9,"guard":28,"phase":"play","states":525,"previews":1350,"tips":2408},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"28","busy":"0"}
+progress 2026-10-14T16:20:58.199Z webkit webkit 1280x720 10 runs: {"progress":{"run":9,"guard":45,"phase":"play","states":542,"previews":1397,"tips":2499},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"45","busy":"0"}
+overflow check, webkit 1280x720: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (284.9s)
+replay webkit 1280x720 early: 0 issues
+replay webkit 1280x720 cdCalm: 0 issues
+replay webkit 1280x720 cdRed: 0 issues
+replay webkit 1280x720 cdCrossed: 0 issues
+replay webkit 1280x720 cdAmber: 0 issues
+replay webkit 1280x720 screenCrisis: 0 issues
+replay webkit 1280x720 s01b: 0 issues
+replay webkit 1280x720 s02: 0 issues
+replay webkit 1280x720 s07b: 0 issues
+replay webkit 1280x720 celebFamous: 0 issues
+replay webkit 1280x720 celebCrisis: 0 issues
+replay webkit 1280x720 s10: 0 issues
+replay webkit 1280x720 s05: 0 issues
+replay webkit 1280x720 s03b: 0 issues
+replay webkit 1280x720 s09: 0 issues
+replay webkit 1280x720 s07c: 0 issues
+replay webkit 1280x720 s04: 0 issues
+replay webkit 1280x720 s07: 0 issues
+replay webkit 1280x720 bigHand: 0 issues
+replay webkit 1280x720 card:screen_test: 0 issues
+replay webkit 1280x720 card:film_cameo: 0 issues
+replay webkit 1280x720 card:demo_tape: 0 issues
+replay webkit 1280x720 card:mentorship: 0 issues
+replay webkit 1280x720 card:ghostwriter: 0 issues
+replay webkit 1280x720 card:acting_class: 0 issues
+replay webkit 1280x720 card:public_feud: 0 issues
+replay webkit 1280x720 card:self_tape: 0 issues
+replay webkit 1280x720 card:indie_label: 0 issues
+replay webkit 1280x720 card:award_campaign: 0 issues
+replay webkit 1280x720 card:voice_over: 0 issues
+replay webkit 1280x720 card:sellout_ad: 0 issues
+replay webkit 1280x720 card:brand_deal: 0 issues
+replay webkit 1280x720 card:world_tour: 0 issues
+replay webkit 1280x720 card:reinvent_image: 0 issues
+replay webkit 1280x720 card:legal_team: 0 issues
+replay webkit 1280x720 card:meditation_retreat: 0 issues
+replay webkit 1280x720 ending:leading_role: 0 issues
+replay webkit 1280x720 ending:craftsman: 0 issues
+replay webkit 1280x720 ending:meltdown: 0 issues
+replay webkit 1280x720 ending:household_name: 0 issues
+replay webkit 1280x720 ending:character_actor: 0 issues
+replay webkit 1280x720 ending:tabloid_royalty: 0 issues
+replay webkit 1280x720 ending:nobody: 0 issues
+replay webkit 1280x720 ending:flash_in_the_pan: 0 issues
+replay webkit 1280x720 ending:the_independent: 0 issues
+replay webkit 1280x720 ending:the_one_to_watch: 0 issues
+replay webkit 1280x720 ending:star: 0 issues
+replay webkit 1280x720 ending:running_on_empty: 0 issues
+replay webkit 1280x720 ending:starting_over: 0 issues
+replay webkit 1280x720 ending:redemption_arc: 0 issues
+overflow check, webkit 1280x720: 50 recorded states replayed, 42 cards in their hands — 0 issues
+starting overflow webkit 800x450
+progress 2026-10-14T16:23:38.907Z webkit webkit 800x450 10 runs: {"progress":{"run":0,"guard":15,"phase":"play","states":15,"previews":48,"tips":77},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"15","busy":"0"}
+progress 2026-10-14T16:23:48.910Z webkit webkit 800x450 10 runs: {"progress":{"run":0,"guard":39,"phase":"play","states":39,"previews":94,"tips":168},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"39","busy":"0"}
+progress 2026-10-14T16:23:58.917Z webkit webkit 800x450 10 runs: {"progress":{"run":0,"guard":57,"phase":"play","states":57,"previews":145,"tips":259},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"57","busy":"0"}
+progress 2026-10-14T16:24:08.940Z webkit webkit 800x450 10 runs: {"progress":{"run":1,"guard":17,"phase":"play","states":77,"previews":190,"tips":343},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"18","busy":"0"}
+progress 2026-10-14T16:24:18.948Z webkit webkit 800x450 10 runs: {"progress":{"run":1,"guard":35,"phase":"play","states":95,"previews":242,"tips":441},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"35","busy":"0"}
+progress 2026-10-14T16:24:28.957Z webkit webkit 800x450 10 runs: {"progress":{"run":1,"guard":53,"phase":"play","states":113,"previews":290,"tips":525},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"53","busy":"0"}
+progress 2026-10-14T16:24:38.963Z webkit webkit 800x450 10 runs: {"progress":{"run":2,"guard":18,"phase":"play","states":135,"previews":338,"tips":616},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"18","busy":"0"}
+progress 2026-10-14T16:24:48.980Z webkit webkit 800x450 10 runs: {"progress":{"run":2,"guard":37,"phase":"play","states":154,"previews":394,"tips":707},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"37","busy":"0"}
+progress 2026-10-14T16:24:58.996Z webkit webkit 800x450 10 runs: {"progress":{"run":3,"guard":2,"phase":"draft","states":174,"previews":441,"tips":798},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"draft","step":"2","busy":"0"}
+progress 2026-10-14T16:25:09.003Z webkit webkit 800x450 10 runs: {"progress":{"run":3,"guard":24,"phase":"play","states":196,"previews":493,"tips":882},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-14T16:25:19.010Z webkit webkit 800x450 10 runs: {"progress":{"run":4,"guard":3,"phase":"play","states":216,"previews":544,"tips":973},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"3","busy":"0"}
+progress 2026-10-14T16:25:29.013Z webkit webkit 800x450 10 runs: {"progress":{"run":4,"guard":25,"phase":"play","states":238,"previews":591,"tips":1064},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"25","busy":"0"}
+progress 2026-10-14T16:25:39.021Z webkit webkit 800x450 10 runs: {"progress":{"run":4,"guard":41,"phase":"play","states":254,"previews":644,"tips":1155},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"41","busy":"0"}
+progress 2026-10-14T16:25:49.034Z webkit webkit 800x450 10 runs: {"progress":{"run":5,"guard":6,"phase":"play","states":274,"previews":693,"tips":1246},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"6","busy":"0"}
+progress 2026-10-14T16:25:59.049Z webkit webkit 800x450 10 runs: {"progress":{"run":5,"guard":24,"phase":"play","states":292,"previews":746,"tips":1337},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-14T16:26:09.061Z webkit webkit 800x450 10 runs: {"progress":{"run":5,"guard":43,"phase":"play","states":311,"previews":799,"tips":1428},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"43","busy":"0"}
+progress 2026-10-14T16:26:19.067Z webkit webkit 800x450 10 runs: {"progress":{"run":6,"guard":5,"phase":"play","states":331,"previews":846,"tips":1519},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"5","busy":"0"}
+progress 2026-10-14T16:26:29.083Z webkit webkit 800x450 10 runs: {"progress":{"run":6,"guard":22,"phase":"play","states":348,"previews":895,"tips":1610},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"22","busy":"0"}
+progress 2026-10-14T16:26:39.090Z webkit webkit 800x450 10 runs: {"progress":{"run":6,"guard":42,"phase":"play","states":368,"previews":948,"tips":1694},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"42","busy":"0"}
+progress 2026-10-14T16:26:49.093Z webkit webkit 800x450 10 runs: {"progress":{"run":7,"guard":9,"phase":"play","states":390,"previews":1001,"tips":1785},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"9","busy":"0"}
+progress 2026-10-14T16:26:59.099Z webkit webkit 800x450 10 runs: {"progress":{"run":7,"guard":25,"phase":"play","states":406,"previews":1050,"tips":1876},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"25","busy":"0"}
+progress 2026-10-14T16:27:09.110Z webkit webkit 800x450 10 runs: {"progress":{"run":7,"guard":46,"phase":"play","states":427,"previews":1099,"tips":1960},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"46","busy":"0"}
+progress 2026-10-14T16:27:19.118Z webkit webkit 800x450 10 runs: {"progress":{"run":8,"guard":11,"phase":"play","states":447,"previews":1152,"tips":2051},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"11","busy":"0"}
+progress 2026-10-14T16:27:29.131Z webkit webkit 800x450 10 runs: {"progress":{"run":8,"guard":27,"phase":"play","states":463,"previews":1202,"tips":2142},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"27","busy":"0"}
+progress 2026-10-14T16:27:39.148Z webkit webkit 800x450 10 runs: {"progress":{"run":8,"guard":49,"phase":"play","states":485,"previews":1255,"tips":2233},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"49","busy":"0"}
+progress 2026-10-14T16:27:49.152Z webkit webkit 800x450 10 runs: {"progress":{"run":9,"guard":7,"phase":"play","states":504,"previews":1303,"tips":2324},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"7","busy":"0"}
+progress 2026-10-14T16:27:59.159Z webkit webkit 800x450 10 runs: {"progress":{"run":9,"guard":28,"phase":"play","states":525,"previews":1350,"tips":2408},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"28","busy":"0"}
+progress 2026-10-14T16:28:09.168Z webkit webkit 800x450 10 runs: {"progress":{"run":9,"guard":45,"phase":"play","states":542,"previews":1397,"tips":2499},"url":"http://localhost:5191/?seed=20260929&auditLoad=52","ready":"complete","phase":"hand","step":"45","busy":"0"}
+overflow check, webkit 800x450: 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (284.8s)
+replay webkit 800x450 early: 0 issues
+replay webkit 800x450 cdCalm: 0 issues
+replay webkit 800x450 cdRed: 0 issues
+replay webkit 800x450 cdCrossed: 0 issues
+replay webkit 800x450 cdAmber: 0 issues
+replay webkit 800x450 screenCrisis: 0 issues
+replay webkit 800x450 s01b: 0 issues
+replay webkit 800x450 s02: 0 issues
+replay webkit 800x450 s07b: 0 issues
+replay webkit 800x450 celebFamous: 0 issues
+replay webkit 800x450 celebCrisis: 0 issues
+replay webkit 800x450 s10: 0 issues
+replay webkit 800x450 s05: 0 issues
+replay webkit 800x450 s03b: 0 issues
+replay webkit 800x450 s09: 0 issues
+replay webkit 800x450 s07c: 0 issues
+replay webkit 800x450 s04: 0 issues
+replay webkit 800x450 s07: 0 issues
+replay webkit 800x450 bigHand: 0 issues
+replay webkit 800x450 card:screen_test: 0 issues
+replay webkit 800x450 card:film_cameo: 0 issues
+replay webkit 800x450 card:demo_tape: 0 issues
+replay webkit 800x450 card:mentorship: 0 issues
+replay webkit 800x450 card:ghostwriter: 0 issues
+replay webkit 800x450 card:acting_class: 0 issues
+replay webkit 800x450 card:public_feud: 0 issues
+replay webkit 800x450 card:self_tape: 0 issues
+replay webkit 800x450 card:indie_label: 0 issues
+replay webkit 800x450 card:award_campaign: 0 issues
+replay webkit 800x450 card:voice_over: 0 issues
+replay webkit 800x450 card:sellout_ad: 0 issues
+replay webkit 800x450 card:brand_deal: 0 issues
+replay webkit 800x450 card:world_tour: 0 issues
+replay webkit 800x450 card:reinvent_image: 0 issues
+replay webkit 800x450 card:legal_team: 0 issues
+replay webkit 800x450 card:meditation_retreat: 0 issues
+replay webkit 800x450 ending:leading_role: 0 issues
+replay webkit 800x450 ending:craftsman: 0 issues
+replay webkit 800x450 ending:meltdown: 0 issues
+replay webkit 800x450 ending:household_name: 0 issues
+replay webkit 800x450 ending:character_actor: 0 issues
+replay webkit 800x450 ending:tabloid_royalty: 0 issues
+replay webkit 800x450 ending:nobody: 0 issues
+replay webkit 800x450 ending:flash_in_the_pan: 0 issues
+replay webkit 800x450 ending:the_independent: 0 issues
+replay webkit 800x450 ending:the_one_to_watch: 0 issues
+replay webkit 800x450 ending:star: 0 issues
+replay webkit 800x450 ending:running_on_empty: 0 issues
+replay webkit 800x450 ending:starting_over: 0 issues
+replay webkit 800x450 ending:redemption_arc: 0 issues
+overflow check, webkit 800x450: 50 recorded states replayed, 42 cards in their hands — 0 issues
+starting overflow webkit 844x390 (phone)
+progress 2026-10-14T16:30:27.847Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":0,"guard":14,"phase":"play","states":14,"previews":43,"tips":70},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"14","busy":"0"}
+progress 2026-10-14T16:30:37.853Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":0,"guard":38,"phase":"draft","states":38,"previews":94,"tips":168},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"39","busy":"0"}
+progress 2026-10-14T16:30:47.870Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":0,"guard":56,"phase":"play","states":56,"previews":140,"tips":252},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"56","busy":"0"}
+progress 2026-10-14T16:30:57.877Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":17,"phase":"play","states":77,"previews":190,"tips":343},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"17","busy":"0"}
+progress 2026-10-14T16:31:07.892Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":34,"phase":"play","states":94,"previews":238,"tips":434},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"34","busy":"0"}
+progress 2026-10-14T16:31:17.905Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":1,"guard":52,"phase":"play","states":112,"previews":285,"tips":518},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"52","busy":"0"}
+progress 2026-10-14T16:31:27.924Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":12,"phase":"play","states":129,"previews":336,"tips":609},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"12","busy":"0"}
+progress 2026-10-14T16:31:37.940Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":36,"phase":"play","states":153,"previews":389,"tips":700},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"36","busy":"0"}
+progress 2026-10-14T16:31:47.946Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":2,"guard":54,"phase":"play","states":171,"previews":438,"tips":791},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"54","busy":"0"}
+progress 2026-10-14T16:31:57.963Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":3,"guard":22,"phase":"play","states":194,"previews":488,"tips":875},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"22","busy":"0"}
+progress 2026-10-14T16:32:07.971Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":3,"guard":40,"phase":"play","states":212,"previews":542,"tips":966},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"40","busy":"0"}
+progress 2026-10-14T16:32:17.987Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":22,"phase":"play","states":235,"previews":589,"tips":1057},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"22","busy":"0"}
+progress 2026-10-14T16:32:28.001Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":4,"guard":40,"phase":"play","states":253,"previews":639,"tips":1148},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"40","busy":"0"}
+progress 2026-10-14T16:32:38.017Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":5,"phase":"play","states":273,"previews":690,"tips":1239},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"5","busy":"0"}
+progress 2026-10-14T16:32:48.027Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":23,"phase":"play","states":291,"previews":741,"tips":1330},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"23","busy":"0"}
+progress 2026-10-14T16:32:58.033Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":5,"guard":42,"phase":"play","states":310,"previews":794,"tips":1421},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"42","busy":"0"}
+progress 2026-10-14T16:33:08.074Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":2,"phase":"draft","states":328,"previews":841,"tips":1512},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"draft","step":"3","busy":"0"}
+progress 2026-10-14T16:33:18.082Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":21,"phase":"play","states":347,"previews":892,"tips":1603},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"21","busy":"0"}
+progress 2026-10-14T16:33:28.098Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":6,"guard":41,"phase":"play","states":367,"previews":944,"tips":1687},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"41","busy":"0"}
+progress 2026-10-14T16:33:38.110Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":7,"phase":"play","states":388,"previews":999,"tips":1778},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"7","busy":"0"}
+progress 2026-10-14T16:33:48.124Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":24,"phase":"play","states":405,"previews":1048,"tips":1869},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"24","busy":"0"}
+progress 2026-10-14T16:33:58.154Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":7,"guard":45,"phase":"draft","states":426,"previews":1099,"tips":1960},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"46","busy":"0"}
+progress 2026-10-14T16:34:08.169Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":10,"phase":"play","states":446,"previews":1148,"tips":2044},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"10","busy":"0"}
+progress 2026-10-14T16:34:18.181Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":26,"phase":"play","states":462,"previews":1198,"tips":2135},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"26","busy":"0"}
+progress 2026-10-14T16:34:28.199Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":8,"guard":48,"phase":"play","states":484,"previews":1251,"tips":2226},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"48","busy":"0"}
+progress 2026-10-14T16:34:38.217Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":5,"phase":"play","states":502,"previews":1298,"tips":2317},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"5","busy":"0"}
+progress 2026-10-14T16:34:48.220Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":28,"phase":"play","states":525,"previews":1350,"tips":2408},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"28","busy":"0"}
+progress 2026-10-14T16:34:58.225Z webkit webkit 844x390 (phone) 10 runs: {"progress":{"run":9,"guard":45,"phase":"play","states":542,"previews":1397,"tips":2499},"url":"http://localhost:5191/?seed=20260929&auditLoad=103","ready":"complete","phase":"hand","step":"45","busy":"0"}
+overflow check, webkit 844x390 (phone): 549 states — 1422 previews, 2548 tooltips, 248 papers pulled forward, 86 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 10, draft 135, doors 40, deck 43, ending 10 (9 extra picks, 37 rerolls); 38 cards and 10 faces seen (285.6s)
+replay webkit 844x390 (phone) early: 0 issues
+replay webkit 844x390 (phone) cdCalm: 0 issues
+replay webkit 844x390 (phone) cdRed: 0 issues
+replay webkit 844x390 (phone) cdCrossed: 0 issues
+replay webkit 844x390 (phone) cdAmber: 0 issues
+replay webkit 844x390 (phone) screenCrisis: 0 issues
+replay webkit 844x390 (phone) s01b: 0 issues
+replay webkit 844x390 (phone) s02: 0 issues
+replay webkit 844x390 (phone) s07b: 0 issues
+replay webkit 844x390 (phone) celebFamous: 0 issues
+replay webkit 844x390 (phone) celebCrisis: 0 issues
+replay webkit 844x390 (phone) s10: 0 issues
+replay webkit 844x390 (phone) s05: 0 issues
+replay webkit 844x390 (phone) s03b: 0 issues
+replay webkit 844x390 (phone) s09: 0 issues
+replay webkit 844x390 (phone) s07c: 0 issues
+replay webkit 844x390 (phone) s04: 0 issues
+replay webkit 844x390 (phone) s07: 0 issues
+replay webkit 844x390 (phone) bigHand: 0 issues
+replay webkit 844x390 (phone) card:screen_test: 0 issues
+replay webkit 844x390 (phone) card:film_cameo: 0 issues
+replay webkit 844x390 (phone) card:demo_tape: 0 issues
+replay webkit 844x390 (phone) card:mentorship: 0 issues
+replay webkit 844x390 (phone) card:ghostwriter: 0 issues
+replay webkit 844x390 (phone) card:acting_class: 0 issues
+replay webkit 844x390 (phone) card:public_feud: 0 issues
+replay webkit 844x390 (phone) card:self_tape: 0 issues
+replay webkit 844x390 (phone) card:indie_label: 0 issues
+replay webkit 844x390 (phone) card:award_campaign: 0 issues
+replay webkit 844x390 (phone) card:voice_over: 0 issues
+replay webkit 844x390 (phone) card:sellout_ad: 0 issues
+replay webkit 844x390 (phone) card:brand_deal: 0 issues
+replay webkit 844x390 (phone) card:world_tour: 0 issues
+replay webkit 844x390 (phone) card:reinvent_image: 0 issues
+replay webkit 844x390 (phone) card:legal_team: 0 issues
+replay webkit 844x390 (phone) card:meditation_retreat: 0 issues
+replay webkit 844x390 (phone) ending:leading_role: 0 issues
+replay webkit 844x390 (phone) ending:craftsman: 0 issues
+replay webkit 844x390 (phone) ending:meltdown: 0 issues
+replay webkit 844x390 (phone) ending:household_name: 0 issues
+replay webkit 844x390 (phone) ending:character_actor: 0 issues
+replay webkit 844x390 (phone) ending:tabloid_royalty: 0 issues
+replay webkit 844x390 (phone) ending:nobody: 0 issues
+replay webkit 844x390 (phone) ending:flash_in_the_pan: 0 issues
+replay webkit 844x390 (phone) ending:the_independent: 0 issues
+replay webkit 844x390 (phone) ending:the_one_to_watch: 0 issues
+replay webkit 844x390 (phone) ending:star: 0 issues
+replay webkit 844x390 (phone) ending:running_on_empty: 0 issues
+replay webkit 844x390 (phone) ending:starting_over: 0 issues
+replay webkit 844x390 (phone) ending:redemption_arc: 0 issues
+overflow check, webkit 844x390 (phone): 50 recorded states replayed, 42 cards in their hands — 0 issues
+PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size
