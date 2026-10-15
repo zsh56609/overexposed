@@ -1,4 +1,4 @@
-# Round V1b handoff — ready to hand back; acceptance incomplete (2026-10-15)
+# Round V1b handoff — ready to hand back; acceptance incomplete (2026-10-16)
 
 Read AGENTS.md and docs/status.md first. D/E and A–C carry-over repairs are implemented; **V1b is incomplete and phase 3/V2 must not start**. Current game source `2964ef8` is pushed. No change in core, content numbers, persona parameters or existing GameEvents. The author authorised normal pulls from a clean checkout, coherent commits/pushes, and Playwright/WebKit; no other dependency is approved.
 
