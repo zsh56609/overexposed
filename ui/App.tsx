@@ -4,20 +4,15 @@
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 
-import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
   createInitialState,
   establishedLanes,
   getCard,
   getManager,
-  lastWord,
-  majorOf,
   readLines,
   reduce,
-  rivalArc,
   RESOURCE_KEYS,
-  scandalCount,
-  yearAwards,
   type Action,
   type CardInstance,
   type ContentIndex,
@@ -30,28 +25,22 @@ import { deskModel } from './desk/model.ts';
 import licenceUrl from './fonts/OFL.txt?url';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewPlay, type EndTurnPreview, type Outcome, type PlayPreview } from './preview.ts';
-import { EventQueue, type PlayedStep } from './queue.ts';
-import { readFound, recordEnding } from './collection.ts';
+import { EventQueue } from './queue.ts';
+import { readFound } from './collection.ts';
 import { useFontsReady } from './screens/common.tsx';
 import { ManagerScreen, TitleScreen, type TitleLink } from './screens/Opening.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
+import { AwardsNight } from './screens/Awards.tsx';
 import {
-  awardCitation,
-  awardName,
   blockerText,
   cardName,
   cardRuleLines,
   cardText,
-  majorName,
-  minorName,
-  minorText,
   flagName,
   heatText,
   isPlaceholder,
   lineText,
-  managerName,
   mastheadName,
-  money,
   resourceName,
   signedAmount,
   zoneName,
@@ -226,7 +215,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     [act, queue],
   );
 
-  if (s.phase === 'ended') return <div className="plain full" data-presentation="ending" data-busy={snap.busy?'1':'0'} data-beat={snap.active?.beat??'idle'} data-step={snap.steps.length}><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
+  if (s.phase === 'ended')
+    return <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={null} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />;
   if (s.phase === 'manager')
     return (
       <>
@@ -456,104 +446,3 @@ function DeckViewer({ s, onClose }: { s: GameState; onClose: () => void }) {
 
 // ---------------------------------------------------------------------------
 // Ending
-
-/** Endings found, grouped by major; the rest undiscovered. */
-function EndingsCollection({ c, found }: { c: ContentIndex; found: ReadonlySet<string> }) {
-  const known = c.minors.filter((m) => found.has(m.id)).length;
-  return (
-    <div className="collection">
-      <h2>{t('ui.collection.title', { n: known, total: c.minors.length })}</h2>
-      <ul>
-        {c.majors.map((major) => (
-          <li key={major.id}>
-            <strong>{majorName(c, major.id)}</strong>
-            <div className="minors">
-              {(c.minorsByMajor[major.id] ?? []).map((m, i) => (
-                <Fragment key={m.id}>
-                  {i > 0 && ' · '}
-                  <span className={found.has(m.id) ? 'found' : 'muted'}>{found.has(m.id) ? minorName(c, m.id) : t('ui.collection.undiscovered')}</span>
-                </Fragment>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-/**
- * The year's end: the major as the night's category, the minor as the ending with its text, then every
- * award won (decision 16: a plain list, no reveal, no ceremony), the run summary and the collection.
- */
-function Ending({ s, steps, onRestart }: { s: GameState; steps: readonly PlayedStep[]; onRestart: () => void }) {
-  const c = s.content;
-  const id = s.endingId ?? '';
-  const majorId = majorOf(c, id) ?? '';
-  const [found] = useState(() => recordEnding(id));
-  const events = steps.flatMap((step) => step.events);
-  const peakHype = Math.max(s.resources.hype, ...events.flatMap((e) => (e.type === 'turnEnd' ? [e.resources.hype] : [])));
-  const played = events.filter((e) => e.type === 'play').length;
-  const passed = s.gateHistory.filter((g) => g.passed).length;
-  const flags = Object.keys(s.flags);
-  const category = majorName(c, majorId);
-  const name = minorName(c, id);
-  const text = minorText(c, s.seed, id);
-  const awards = yearAwards(s);
-  // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
-  const rival = rivalArc(c, s.seed);
-  const last = lastWord(s);
-  return (
-    <div className="ending">
-      <div className="ending-body">
-        <div className="ending-story">
-          <p className="muted">{t('ui.ending.title')}</p>
-          <p className={prose(category, 'category')}>{category}</p>
-          <h1 className={prose(name)}>{name}</h1>
-          <p className={prose(text, 'ending-text')}>{text}</p>
-          <h2>{t('ui.ending.awards')}</h2>
-          <ul className="awards">
-            {awards.map((award) => {
-              const awardTitle = awardName(c, award);
-              const citation = awardCitation(c, award);
-              return (
-                <li key={award}>
-                  <strong className={prose(awardTitle)}>{awardTitle}</strong> <em className={prose(citation)}>{citation}</em>
-                </li>
-              );
-            })}
-          </ul>
-          {rival && <p className={prose(t(rival.endingKey), 'rival-line')}>{t(rival.endingKey)}</p>}
-          {/* The manager's last word (round 2c, C3): two bubbles for the year's major, under their name. */}
-          {last && (
-            <div className="last-word">
-              <span className="speaker-label">{managerName(c, last.manager)}</span>
-              {last.bubbles.map((key) => (
-                <span key={key} className={prose(t(key), 'bubble')}>
-                  {t(key)}
-                </span>
-              ))}
-            </div>
-          )}
-          {/* Below the ending the player has just read (round 2b), and still the largest thing on the page. */}
-          <button className="play-again" onClick={onRestart}>
-            {t('ui.ending.playAgain')}
-          </button>
-        </div>
-        <div className="ending-facts">
-          <h2>{t('ui.ending.summary')}</h2>
-          <ul>
-            <li>{t('ui.ending.peakHype', { n: peakHype })}</li>
-            <li>{t('ui.ending.final', { ...s.resources, capital: money(s.resources.capital) })}</li>
-            <li>{t('ui.ending.scandals', { n: scandalCount(s) })}</li>
-            <li>{flags.length ? t('ui.ending.flags', { flags: flags.map(flagName).join(', ') }) : t('ui.ending.noFlags')}</li>
-            <li>{t('ui.ending.gates', { passed, total: s.gateHistory.length })}</li>
-            <li>{t('ui.ending.played', { n: played })}</li>
-          </ul>
-          <EndingsCollection c={c} found={found} />
-          <p className="muted">{t('ui.ending.seed', { seed: s.seed })}</p>
-        </div>
-      </div>
-    </div>
-  );
-}

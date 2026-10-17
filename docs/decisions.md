@@ -6,6 +6,31 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Parts E and F: the awards night and the year in front pages
+
+- **The awards night** as mockups/screens.html sets it: the curtains and
+  the spotlight, "One year later.", the major as kicker, the minor as
+  title, the ending's prose; the year's awards as winner cards (name and
+  citation from content; no "Nominated": /core gives winners only); then
+  PLAY AGAIN and "Endings found N / 14" with dots. The mockup's reveal
+  sequence plays once; a click during it shows the night at once and
+  plays nothing (decision 7).
+- **Added to the mockup's layout**, as the prompt asks: Juno Vale's
+  closing line under the prose; the manager's last word as two bubbles
+  under "<first name> · Manager" (the desk's own label); the run summary
+  folded under a small "The numbers" toggle. The mockup's "Replay the
+  night" gives way to the scrapbook link (with Part G).
+- **The plaques are 124 px tall** (the mockup's 114): the overflow audit
+  found a two-line award name with a three-line citation spilling out.
+- **The year in front pages** (Part F): /core's new read-only
+  `seasonPages(history)` picks, for each season, the month whose front
+  paper's lead is about the player (the player's line, fame filler or a
+  frenzy's spillover), ranked by the line's prominence, ties to the later
+  month; with no player lead, the season's last front page — the world
+  went on. Each shows the paper, the season, the headline exactly as
+  printed (the tabloid's in its capitals, a scandal's in red) and the
+  lead's photograph by its scene tag.
+
 ## 2026-10-17 — Round R1, Parts C and D: the offers and the doors
 
 - **The offers** (README §9, shot 15): "<Month Year> · offers" / "Take
