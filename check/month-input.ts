@@ -10,6 +10,20 @@ async function waitIdle(page:Page) {
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
 }
+/** The fan has settled: no hand card is still moving (a hover lift, the gap closing). Points are sampled only then. */
+async function waitFan(page:Page) {
+  const start=Date.now();
+  while(await page.evaluate<boolean>(`[...document.querySelectorAll('.hand .card')].some(c=>c.getAnimations().some(a=>a.playState==='running'))`)){
+    assert.ok(Date.now()-start<5000,'the fan never settled');await sleep(20);
+  }
+}
+/** A landed card's tails (the printed story, the handwriting, the signed figures) play on without holding input (round R1, Part A). */
+async function waitTails(page:Page) {
+  const start=Date.now();
+  while(await page.evaluate<number>(`document.querySelectorAll('.motion-flight .plane,.motion-writing,.motion-delta').length`)){
+    assert.ok(Date.now()-start<8000,'the tails never finished');await sleep(30);
+  }
+}
 async function settledHits(page:Page) {
   const failures=await page.evaluate<string[]>(`(()=>{
     const issues=[];
@@ -122,12 +136,17 @@ export async function checkPileInput(page:Page,url:string) {
       const before=await page.evaluate<number>(`document.querySelectorAll('[data-pile-uid]').length`);
       const played:Step[]=[];
       for(const id of cards) {
+        await waitFan(page);
         const index=id==='@recorded'?states.bigHand!.steps.at(-1)![1]:await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].findIndex(c=>c.dataset.card===${JSON.stringify(id)}&&c.getAttribute('aria-disabled')==='false')`);
         assert.ok(index>=0,`${key} ${id} is not legal`);
         played.push(['play',index]);
         const point=await cardPoint(page,index);assert.ok(point);await page.click(...point);
-        if(mode.startsWith('skip')){
-          await sleep(mode==='skip-early'?60:1100);
+        if(mode==='skip-late'){
+          // Round R1, Part A: once the card is down its tails hold no input: nothing to skip, the next action acts.
+          await sleep(1100);
+          assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`),false,`${key} ${cards} skip-late: ${id} still holds input after it was set down`);
+        } else if(mode==='skip-early'){
+          await sleep(60);
           const busy=await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'`);
           if(!busy){
             const detail=await page.evaluate(`({trace:window.__pileInput??[],desk:{...document.querySelector('.desk').dataset},
@@ -144,7 +163,7 @@ export async function checkPileInput(page:Page,url:string) {
         if(mode==='switch-reduced'){await sleep(100);await page.evaluate(`document.documentElement.dataset.motion='reduced'`);}
         await waitIdle(page); // Keep the actual pointer over the closing fan through completion.
       }
-      await page.move(10,100);await sleep(500);
+      await page.move(10,100);await waitTails(page);await sleep(500);
       const actual=await page.evaluate<string>(settled);
       await settledHits(page);
       if(mode==='off')staticFixture={...fixture,steps:[...fixture.steps,...played]};
