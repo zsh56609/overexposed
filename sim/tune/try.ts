@@ -1,7 +1,7 @@
 // npm run tune:try -- --patch='<js>' [--seeds=20260929,1,424242] [--runs=1000] [--manager=<id>]
 // A content change tried before it is made. The patch — a JS function body run on a copy of the content
-// (sim/tune/common.ts patchContent: cards, gates, endings, awards, rules, press, managers, scripts, and card(id),
-// gate(id), major(id), minor(id), award(id), axis(id)) — is validated, then the sim's batch plays it in memory on each
+// (sim/tune/common.ts patchContent: cards, gates, endings, awards, rules, press, managers, scripts, events, and card(id),
+// gate(id), major(id), minor(id), award(id), axis(id), event(id)) — is validated, then the sim's batch plays it in memory on each
 // seed, under each manager unless --manager names one, and prints the bands that fail, with the majors and minors
 // pooled over the player-like personas. Nothing is written: content/ stays as it is. Without --patch, the content as
 // it stands, for the comparison. When the change is made, npm run sim is the record.

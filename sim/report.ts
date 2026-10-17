@@ -2,7 +2,7 @@
 // Ids and numbers only; no content display strings.
 
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
-import { COMEBACK_SWITCH_AT, ignoredAxes, isProbe, PERSONA_IDS, seeksLane, type PersonaId, type ProbeAxis } from './personas.ts';
+import { COMEBACK_SWITCH_AT, ignoredAxes, isGreedy, isProbe, PERSONA_IDS, seeksLane, type PersonaId, type ProbeAxis } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
 
 /**
@@ -57,6 +57,14 @@ export const BANDS = {
    * are dead this turn, so "the spiral lands in winter" is measured as clogging, not crystallisation.
    */
   clogging: 'rising',
+  /** Events (round R2, E3): every player-like persona meets at least this many a run, on average. */
+  eventsPerRunMin: 5,
+  /**
+   * Events: pooled over the greedy player-like personas, at the appearances where every reply was affordable,
+   * no reply taken in more than this share of its event's appearances — a choice, not a formality. A reply
+   * with no effect is exempt, here and from "every reply taken somewhere in the batch".
+   */
+  eventChoiceMax: 0.9,
 } as const;
 
 const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised', 'scandalsDrawn'] as const;
@@ -177,6 +185,30 @@ export interface Report {
   >;
   readonly curves: Readonly<Record<string, readonly ({ turn: number } & Record<Metric, Dist>)[]>>;
   readonly skill: { chi2: number; df: number; p: number; tvd: number } | null;
+  /** Events (round R2, E2). */
+  readonly events: {
+    /** Per group: events met per run on average, and how many runs met each count (index = events met). */
+    readonly perRun: Readonly<Record<Group, { readonly mean: number; readonly counts: readonly number[] }>>;
+    /** Per event: the share of runs it came in, per group. */
+    readonly appearance: readonly { readonly id: string; readonly share: Readonly<Record<Group, number>> }[];
+    /**
+     * Per reply: the share of its event's appearances that took it — per group; pooled over the greedy
+     * player-like personas ('greedy'); and that pool where every reply was affordable ('open', the band's,
+     * over `openN` appearances). `taken`: times taken in the whole batch, every persona.
+     */
+    readonly choices: readonly {
+      readonly id: string;
+      readonly choice: number;
+      readonly noEffect: boolean;
+      readonly share: Readonly<Record<Group | 'greedy' | 'open', number | null>>;
+      readonly openN: number;
+      readonly taken: number;
+    }[];
+    /** Per group: chains opened per run, and the share of those whose follow-up came. */
+    readonly chains: Readonly<Record<Group, { readonly opened: number; readonly finished: number | null }>>;
+    /** Per group: scandal cards answers added, per run. */
+    readonly scandals: Readonly<Record<Group, number>>;
+  };
   readonly bands: readonly BandCheck[];
   /** Reported for context, not pass/fail: they measure the persona mix as much as the game. */
   readonly diagnostics: readonly { readonly label: string; readonly value: string }[];
@@ -566,6 +598,77 @@ export function buildReport(batch: BatchResult): Report {
     pass: skill === null ? null : skill.p < BANDS.skillP && skill.tvd >= BANDS.skillTvd,
     actual: skill === null ? 'needs both personas' : `${fmtP(skill.p)}, TVD = ${skill.tvd.toFixed(2)}`,
   });
+  // Events (round R2, E2-E3): how many come, how often each, which replies are taken.
+  const eventDefs = content.events?.events ?? [];
+  const greedyPlayers = players.filter(isGreedy);
+  const metIn = (rs: readonly RunRecord[]) => rs.flatMap((r) => r.events);
+  const healthyGroups = groups.map(([g, rs]): [Group, RunRecord[]] => [g, rs.filter((r) => r.crash === null && r.softLock === null)]);
+  const byGroup = <T,>(f: (rs: readonly RunRecord[]) => T): Record<Group, T> => Object.fromEntries(healthyGroups.map(([g, rs]) => [g, f(rs)])) as Record<Group, T>;
+  const mostEvents = Math.max(0, ...healthy.map((r) => r.events.length));
+  const chainOf = (id: string) => eventDefs.find((e) => e.id === id)?.chain;
+  const greedyMet = metIn(healthy.filter((r) => greedyPlayers.includes(r.persona)));
+  const events: Report['events'] = {
+    perRun: byGroup((rs) => ({ mean: rs.length ? mean(rs.map((r) => r.events.length)) : 0, counts: Array.from({ length: mostEvents + 1 }, (_, n) => rs.filter((r) => r.events.length === n).length) })),
+    appearance: eventDefs.map((ev) => ({
+      id: ev.id,
+      share: byGroup((rs) => rs.filter((r) => r.events.some((e) => e.eventId === ev.id)).length / Math.max(1, rs.length)),
+    })),
+    choices: eventDefs.flatMap((ev) =>
+      ev.choices.map((ch, i) => {
+        const shareIn = (met: readonly { eventId: string; choice: number }[]) => {
+          const here = met.filter((e) => e.eventId === ev.id);
+          return here.length === 0 ? null : here.filter((e) => e.choice === i).length / here.length;
+        };
+        const open = greedyMet.filter((e) => e.eventId === ev.id && e.affordable.length === ev.choices.length);
+        return {
+          id: ev.id,
+          choice: i,
+          noEffect: ch.effects.length === 0,
+          share: { ...byGroup((rs) => shareIn(metIn(rs))), greedy: shareIn(greedyMet), open: shareIn(open) },
+          openN: open.length,
+          taken: metIn(healthy).filter((e) => e.eventId === ev.id && e.choice === i).length,
+        };
+      }),
+    ),
+    chains: byGroup((rs) => {
+      let opened = 0;
+      let finished = 0;
+      for (const r of rs) {
+        const ids = new Set(r.events.flatMap((e) => (chainOf(e.eventId)?.role === 'opener' ? [chainOf(e.eventId)?.id as string] : [])));
+        opened += ids.size;
+        finished += [...ids].filter((id) => r.events.some((e) => chainOf(e.eventId)?.role === 'followUp' && chainOf(e.eventId)?.id === id)).length;
+      }
+      return { opened: opened / Math.max(1, rs.length), finished: ratio(finished, opened) };
+    }),
+    scandals: byGroup((rs) => (rs.length ? mean(rs.map((r) => sum(r.events.map((e) => e.scandals)))) : 0)),
+  };
+  if (eventDefs.length > 0) {
+    const letter = (i: number) => String.fromCharCode(97 + i);
+    const few = players.filter((p) => (events.perRun[p]?.mean ?? 0) < BANDS.eventsPerRunMin);
+    bands.push({
+      target: `events: >= ${BANDS.eventsPerRunMin} a run on average, for every player-like persona`,
+      pass: players.length === 0 ? null : few.length === 0,
+      actual: players.map((p) => `${p} ${(events.perRun[p]?.mean ?? 0).toFixed(2)}`).join(', ') + (few.length ? ` (below: ${few.join(', ')})` : ''),
+    });
+    const judged = events.choices.filter((c) => !c.noEffect);
+    const over = judged.filter((c) => c.share.open !== null && c.share.open > BANDS.eventChoiceMax);
+    const topOpen = [...judged].filter((c) => c.share.open !== null).sort((a, b) => (b.share.open ?? 0) - (a.share.open ?? 0)).slice(0, 3);
+    bands.push({
+      target: `events: no reply taken in > ${pct(BANDS.eventChoiceMax)} of its event's appearances (greedy player-like personas, pooled, where every reply was affordable; a reply with no effect exempt)`,
+      pass: greedyPlayers.length === 0 ? null : over.length === 0,
+      actual:
+        over.length === 0
+          ? `highest ${topOpen.map((c) => `${c.id}/${letter(c.choice)} ${pct(c.share.open)} of ${c.openN}`).join(', ')}`
+          : `over: ${over.map((c) => `${c.id}/${letter(c.choice)} ${pct(c.share.open)} of ${c.openN}`).join(', ')}`,
+    });
+    const never = judged.filter((c) => c.taken === 0);
+    const fewest = [...judged].sort((a, b) => a.taken - b.taken).slice(0, 3);
+    bands.push({
+      target: 'events: every reply taken somewhere in the batch (a reply with no effect exempt)',
+      pass: never.length === 0,
+      actual: never.length === 0 ? `fewest ${fewest.map((c) => `${c.id}/${letter(c.choice)} ${c.taken}`).join(', ')}` : `never taken: ${never.map((c) => `${c.id}/${letter(c.choice)}`).join(', ')}`,
+    });
+  }
   bands.push({ target: 'soft-locks: 0', pass: softLocks.length === 0, actual: String(softLocks.length) });
   bands.push({ target: 'crashes: 0', pass: crashes.length === 0, actual: String(crashes.length) });
 
@@ -626,6 +729,7 @@ export function buildReport(batch: BatchResult): Report {
     runLength,
     curves,
     skill,
+    events,
     bands,
     diagnostics,
   };
@@ -864,6 +968,34 @@ export function formatReport(r: Report): string {
         '    ',
       ),
     );
+  }
+
+  if (r.events.appearance.length > 0) {
+    const ev = r.events;
+    const letter = (i: number) => String.fromCharCode(97 + i);
+    const most = Math.max(0, ...G.map((g) => ev.perRun[g].counts.length - 1));
+    h('EVENTS PER RUN  (round R2: mean, and the share of runs meeting each number of events)');
+    out.push(
+      table(
+        ['group', 'mean', ...Array.from({ length: most + 1 }, (_, n) => String(n))],
+        G.map((g) => {
+          const x = ev.perRun[g];
+          const runs = x.counts.reduce((a, b) => a + b, 0);
+          return [g, x.mean.toFixed(2), ...Array.from({ length: most + 1 }, (_, n) => pc((x.counts[n] ?? 0) / Math.max(1, runs)))];
+        }),
+      ),
+    );
+    h('EVENT APPEARANCES  (share of runs each event came in)');
+    out.push(table(['event', ...P, 'players'], ev.appearance.map((a) => [a.id, ...G.map((g) => pc(a.share[g] ?? 0))])));
+    h(`EVENT REPLIES  (share of the event's appearances taking each reply; 'greedy' pools the greedy player-like personas, 'open' the same where every reply was affordable — band: <= ${pc(BANDS.eventChoiceMax)}; * no effect, exempt)`);
+    out.push(
+      table(
+        ['reply', ...P, 'players', 'greedy', 'open', 'open n', 'taken'],
+        ev.choices.map((c) => [`${c.id}/${letter(c.choice)}${c.noEffect ? ' *' : ''}`, ...G.map((g) => pc(c.share[g] ?? null)), pc(c.share.greedy), pc(c.share.open), String(c.openN), String(c.taken)]),
+      ),
+    );
+    h('EVENT CHAINS AND SCANDALS  (chains opened per run; share of those whose follow-up came; scandal cards answers added per run)');
+    out.push(table(['group', 'chains opened', 'finished', 'scandals added'], G.map((g) => [g, ev.chains[g].opened.toFixed(2), pc(ev.chains[g].finished), ev.scandals[g].toFixed(2)])));
   }
 
   if (r.skill) {

@@ -67,8 +67,7 @@ function describe(e: GameEvent): string {
     case 'gate': return `GATE ${e.gateId} ${e.passed ? 'PASS' : 'FAIL'}`;
     case 'ending': return `ENDING ${e.endingId ?? 'none'}`;
     case 'warning': return `WARNING ${e.code} ${e.ref}`;
-    case 'eventOffered': return `
-EVENT ${e.eventId}`;
+    case 'eventOffered': return `\nEVENT ${e.eventId}`;
     case 'eventChosen': return `EVENT ${e.eventId} -> choice ${e.choice}`;
   }
 }
@@ -135,6 +134,7 @@ function simulate(runs: number, seed: number, content: ReturnType<typeof loadCon
         actions: r.actions,
         cardsPlayed: r.cardsPlayed,
         gates: r.gates.map((g) => [g.gateId, g.passed]),
+        events: r.events.map((e) => [e.eventId, e.turn, e.choice]),
         final: r.final,
         softLock: r.softLock,
         crash: r.crash,

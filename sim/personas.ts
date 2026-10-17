@@ -527,6 +527,11 @@ export function seeksLane(id: PersonaId): string | null {
   return lane !== undefined && modes.every((w) => w.lane === lane && (w.lanePull ?? 0) > 0) ? lane : null;
 }
 
+/** A persona that weighs its choices — the greedy player, every persona but random (round R2's event bands). */
+export function isGreedy(id: PersonaId): boolean {
+  return (PERSONAS[id].weights ?? []).length > 0;
+}
+
 export function isProbe(id: PersonaId): boolean {
   return ignoredAxes(id).length > 0 || seeksLane(id) !== null;
 }

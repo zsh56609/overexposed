@@ -113,7 +113,7 @@
         },
         {
           "replyKey": "event.sam_interview.c.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 4 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 2 }, { "op": "resource", "target": "heat", "value": 4 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.sam_interview.c.press.1"] },
           "outcomeKey": "event.sam_interview.c.outcome"
         }
@@ -131,7 +131,7 @@
         {
           "replyKey": "event.ex_feature.a.reply",
           "effects": [
-            { "op": "resource", "target": "hype", "value": 6 },
+            { "op": "resource", "target": "hype", "value": 4 },
             { "op": "resource", "target": "heat", "value": 4 },
             { "op": "setFlag", "flag": "told_all" }
           ],
@@ -175,7 +175,7 @@
         },
         {
           "replyKey": "event.ex_reply.c.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 8 }, { "op": "resource", "target": "heat", "value": 5 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 6 }, { "op": "resource", "target": "heat", "value": 5 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.ex_reply.c.press.1"] },
           "outcomeKey": "event.ex_reply.c.outcome"
         }
@@ -195,8 +195,8 @@
           "replyKey": "event.juno_hello.a.reply",
           "effects": [
             { "op": "slots", "value": -1 },
-            { "op": "resource", "target": "craft", "value": 4 },
-            { "op": "resource", "target": "hype", "value": 4 },
+            { "op": "resource", "target": "craft", "value": 3 },
+            { "op": "resource", "target": "hype", "value": 2 },
             { "op": "setFlag", "flag": "juno_cowrite" }
           ],
           "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_hello.a.press.1"] },
@@ -204,7 +204,7 @@
         },
         {
           "replyKey": "event.juno_hello.b.reply",
-          "effects": [{ "op": "resource", "target": "craft", "value": 2 }, { "op": "setFlag", "flag": "juno_declined" }],
+          "effects": [{ "op": "resource", "target": "craft", "value": 4 }, { "op": "setFlag", "flag": "juno_declined" }],
           "outcomeKey": "event.juno_hello.b.outcome"
         }
       ]
@@ -226,7 +226,7 @@
         },
         {
           "replyKey": "event.juno_credit.b.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 6 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 2 }],
           "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_credit.b.press.1"] },
           "outcomeKey": "event.juno_credit.b.outcome"
         }
@@ -288,7 +288,7 @@
       "choices": [
         {
           "replyKey": "event.producer_room.a.reply",
-          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 6 }],
+          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }],
           "outcomeKey": "event.producer_room.a.outcome"
         },
         { "replyKey": "event.producer_room.b.reply", "effects": [], "outcomeKey": "event.producer_room.b.outcome" }
@@ -306,8 +306,8 @@
           "replyKey": "event.casting_arc.a.reply",
           "effects": [
             { "op": "slots", "value": -1 },
-            { "op": "resource", "target": "craft", "value": 3 },
-            { "op": "resource", "target": "hype", "value": 4 }
+            { "op": "resource", "target": "craft", "value": 2 },
+            { "op": "resource", "target": "hype", "value": 2 }
           ],
           "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.casting_arc.a.press.1"] },
           "outcomeKey": "event.casting_arc.a.outcome"
@@ -326,7 +326,7 @@
       "choices": [
         {
           "replyKey": "event.photographer.a.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 6 }, { "op": "resource", "target": "heat", "value": 3 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 3 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.photographer.a.press.1"] },
           "outcomeKey": "event.photographer.a.outcome"
         },
@@ -346,15 +346,15 @@
           "effects": [
             { "op": "slots", "value": -1 },
             { "op": "resource", "target": "heat", "value": -3 },
-            { "op": "resource", "target": "hype", "value": 2 }
+            { "op": "resource", "target": "hype", "value": 1 }
           ],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.charity_song.a.press.1"] },
           "outcomeKey": "event.charity_song.a.outcome"
         },
         {
           "replyKey": "event.charity_song.b.reply",
-          "requires": { "capital": { "min": 2 } },
-          "effects": [{ "op": "resource", "target": "capital", "value": -2 }, { "op": "resource", "target": "heat", "value": -2 }],
+          "requires": { "capital": { "min": 1 } },
+          "effects": [{ "op": "resource", "target": "capital", "value": -1 }, { "op": "resource", "target": "heat", "value": -4 }],
           "outcomeKey": "event.charity_song.b.outcome"
         },
         { "replyKey": "event.charity_song.c.reply", "effects": [], "outcomeKey": "event.charity_song.c.outcome" }
@@ -371,12 +371,12 @@
       "choices": [
         {
           "replyKey": "event.panel_show.a.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 3 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 2 }],
           "outcomeKey": "event.panel_show.a.outcome"
         },
         {
           "replyKey": "event.panel_show.b.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 6 }, { "op": "resource", "target": "heat", "value": 4 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 4 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.panel_show.b.press.1"] },
           "outcomeKey": "event.panel_show.b.outcome"
         },

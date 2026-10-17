@@ -6,6 +6,75 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R2, Part E: the events in the sim, and their numbers
+
+- **E1** (sim/personas.ts): at an event the greedy personas simulate each
+  reply they can afford and score it as a card play is scored — the state
+  it leaves against the one before, an action it spends at the persona's
+  `slots` weight; `random` takes a random reply it can afford. A flag only
+  an event reads is worth nothing to them (flag values count endings,
+  gates and cards; the personas are not changed).
+- **E2** (`npm run sim`): events per run (the mean, and the share of runs
+  meeting each number), each event's appearances, each reply's share per
+  persona, pooled over the player-like personas, over the greedy ones
+  ('greedy') and over the greedy ones where every reply was affordable
+  ('open'), the times each reply was taken, chains opened and finished,
+  and the scandal cards answers added. Each run's JSON lists its events.
+- **E3** (docs/sim.md): at least 5 events a run for every player-like
+  persona; no reply taken in more than 90% of its event's appearances,
+  pooled over the greedy player-like personas where every reply was
+  affordable; every reply taken somewhere in the batch; a reply with no
+  effect exempt from the last two.
+- **E4, why**: with draft-v9's numbers every existing band still passed
+  without the events, on the three seeds, and four failed with them. The
+  answers the greedy players take added about 14 hype by the year's end
+  (minmaxer 89 → 104, dealseeker 104 → 117) and craft before the doors:
+  The Breakthrough rose over 70% for minmaxer (up to 70.8%) and
+  dealseeker (up to 74.8%), and under Mags gate_session_work and
+  gate_award_show rose to 65.1–66.2% met. Event numbers only (no card or
+  gate changed), each within 2 of the draft and £1,000:
+
+  | reply | draft-v9 | now |
+  |---|---|---|
+  | producer_room/a | craft +6 | craft +4 |
+  | casting_arc/a | craft +3, hype +4 | craft +2, hype +2 |
+  | juno_hello/a | craft +4, hype +4 | craft +3, hype +2 |
+  | juno_hello/b | craft +2 | craft +4 |
+  | photographer/a | hype +6 | hype +4 |
+  | juno_credit/b | hype +6 | hype +4 |
+  | ex_reply/c | hype +8 | hype +6 |
+  | panel_show/a | hype +3 | hype +2 |
+  | panel_show/b | hype +6 | hype +4 |
+  | ex_feature/a | hype +6 | hype +4 |
+  | sam_interview/c | hype +4 | hype +2 |
+  | charity_song/a | hype +2 | hype +1 |
+  | charity_song/b | −£2,000 (needs £2,000), heat −2 | −£1,000 (needs £1,000), heat −4 |
+
+  The cuts fall on the replies the greedy players take; the replies they
+  never reach (sam_band, sam_payback, juno_soundalike, ex_reply/b) keep
+  the draft's numbers, and so do the amounts the prose names (Sam's
+  £2,000, half of it, the money sent back). juno_hello/b and
+  charity_song/b were raised so that each is a real alternative: "Thanks,
+  but I'm writing my own." and "Send a donation instead." are now taken by
+  the craft-led and the cautious players.
+- **E4, after**: every existing band passes under both managers on all
+  three seeds — The Breakthrough at most 68.7% (dealseeker) and 62.1%
+  (minmaxer), the two doors at most 63.7% met — and sim:awards, sim:tiers
+  and sim:managers pass on all three. Events per run 5.5–5.9 for every
+  player-like persona; every reply is taken somewhere.
+- **One new band fails, on every seed and manager**: three replies are
+  taken in every appearance by the greedy players. "I can't right now.
+  Sorry." (sam_rent/c): the other two replies cost £2,000 and £1,000 now
+  and pay back later, in a follow-up the greedy players do not value, and
+  the prose fixes both amounts. "On my way." (producer_room/a) and "I'll be
+  there at nine." (casting_arc/a): an action for craft and hype, against a
+  reply that does nothing; the greedy players value an action at their
+  `slots` weight (1.5–2), below what either brings even at 2 under the
+  draft — only a cost of two actions turns one of them down, which would
+  change both events. For the author: accept them as the take-it-or-leave-
+  it offers they are, let them cost two actions, or have the personas
+  value the flags events read (an instrument change).
+
 ## 2026-10-17 — Round R2, Part C: the events on the desk
 
 - **A text** (README §9; mockups/vanity.html, "Event · text"): the desk

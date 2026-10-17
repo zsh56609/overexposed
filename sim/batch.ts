@@ -55,6 +55,15 @@ export interface TurnSnapshot {
   readonly scandalsDrawn: number;
 }
 
+/** An event met (round R2): its month, the replies the player could afford, the one taken, the scandal cards it added. */
+export interface EventMet {
+  readonly eventId: string;
+  readonly turn: number;
+  readonly affordable: readonly number[];
+  readonly choice: number;
+  readonly scandals: number;
+}
+
 export interface RunRecord {
   readonly seed: number;
   readonly persona: PersonaId;
@@ -103,6 +112,8 @@ export interface RunRecord {
   readonly final: Resources | null;
   /** Flags held when the run ended. */
   readonly flags: readonly string[];
+  /** Every event met, in order (round R2). */
+  readonly events: readonly EventMet[];
   /** What set each flag: the card whose effect set it, or the gate chosen. */
   readonly flagSources: Readonly<Record<string, string>>;
   readonly softLock: string | null;
@@ -215,6 +226,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   const flagSources: Record<string, string> = {};
   const crystallisedById: Record<string, number> = {};
   const blamedOn: Record<string, number> = {};
+  const eventsMet: EventMet[] = [];
 
   const tally = (s: GameState, action: Action | null) => {
     const played = s.events.find((e) => e.type === 'play');
@@ -297,7 +309,15 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
           ? (legal.find((a) => a.type === 'CHOOSE_MANAGER' && a.managerId === options.manager) ?? (legal[0] as Action))
           : policy.choose(state, legal, decisions);
       if (action.type === 'DRAFT_PICK' && state.draft?.extras.includes(action.cardId)) managerCardPicks++;
+      const before = state;
       state = reduce(state, action);
+      if (action.type === 'CHOOSE_EVENT' && before.event !== null) {
+        // The answer's own scandal cards: those added before the month opens.
+        const from = state.events.findIndex((e) => e.type === 'eventChosen');
+        const open = state.events.findIndex((e, i) => i > from && (e.type === 'draftOffer' || e.type === 'turnStart'));
+        const scandals = state.events.slice(from, open < 0 ? undefined : open).filter((e) => e.type === 'addCard' && scandalIds.has(e.cardId)).length;
+        eventsMet.push({ eventId: before.event, turn: before.turn, affordable: legal.flatMap((a) => (a.type === 'CHOOSE_EVENT' ? [a.choice] : [])), choice: action.choice, scandals });
+      }
       actions++;
       tally(state, action);
       checkInvariants(state);
@@ -343,6 +363,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
     final: state?.resources ?? null,
     flags: state ? Object.keys(state.flags) : [],
     flagSources,
+    events: eventsMet,
     softLock,
     crash,
   };
@@ -350,7 +371,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
 
 /** Everything that must be identical when a seed is replayed. */
 function fingerprint(r: RunRecord): string {
-  return JSON.stringify([r.endingId, r.scandalsAtEnd, r.actions, r.final, r.curve, r.gates, r.plays, r.draws, r.drafted, r.crash]);
+  return JSON.stringify([r.endingId, r.scandalsAtEnd, r.actions, r.final, r.curve, r.gates, r.plays, r.draws, r.drafted, r.events, r.crash]);
 }
 
 /** Run seeds for a batch: the same list for every persona, so personas are compared on identical deals. */

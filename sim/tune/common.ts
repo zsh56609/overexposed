@@ -76,7 +76,7 @@ export function patchContent<T extends object>(raw: T, body: string): T {
     if (!x) throw new Error(`patch: no ${kind} ${id}`);
     return x;
   };
-  const parts = ['cards', 'gates', 'endings', 'awards', 'rules', 'press', 'managers', 'scripts'] as const;
+  const parts = ['cards', 'gates', 'endings', 'awards', 'rules', 'press', 'managers', 'scripts', 'events'] as const;
   const finders = {
     card: find(list(c.cards), 'card'),
     gate: find(list(c.gates), 'gate'),
@@ -84,6 +84,7 @@ export function patchContent<T extends object>(raw: T, body: string): T {
     minor: find(list(endings.minors), 'minor'),
     award: find(list(c.awards), 'award'),
     axis: find(list(endings.axes), 'axis'),
+    event: find(list(((c.events ?? {}) as Record<string, unknown>).events), 'event'),
   };
   new Function(...parts, ...Object.keys(finders), body)(...parts.map((p) => c[p]), ...Object.values(finders));
   return c as unknown as T;
