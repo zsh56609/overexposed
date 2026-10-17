@@ -20,6 +20,12 @@ rules).
   viewer's button, so the deck stayed open and END TURN's click fell on
   the dimmed scene. It now opens and closes the deck and House rules
   from the stat bar by real clicks.
+- **check:motion follows the stamped choices**: a door or an offer wears
+  its stamp before its action goes (Parts B–D), so the month input check
+  now waits until the action is dispatched (the queue busy, or the step
+  counted) before it skips or reads the settled desk. It had not run
+  since Part A; with these three fixes it passes in Chromium and Firefox
+  at all three sizes and in WebKit at 1280×720.
 
 ## 2026-10-17 — Round R1 acceptance: a preview under a resting pointer
 

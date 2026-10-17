@@ -1,4 +1,4 @@
-// npm run check:overflow — every text at its longest, on the desk and on the plain screens (round V1a).
+// npm run check:overflow — every text at its longest, on the desk and on the screens around it (round V1a; R1).
 //
 // Every line group's variants are made to read as its longest variant, and every press subject as the longest
 // noun; then seeded runs are played through the real UI at each size — 1280x720, 800x450 and a phone held
@@ -327,7 +327,7 @@ try {
           .join(', ');
         console.log(
           `overflow check, ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
-            `hands of up to ${out.maxHand}; plain screens ${screens} (${out.extraPicks} extra picks, ${out.rerolls} rerolls); ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+            `hands of up to ${out.maxHand}; screens ${screens} (${out.extraPicks} extra picks, ${out.rerolls} rerolls); ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
         );
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
         if (out.issues.length > 0) failed = true;
@@ -370,7 +370,7 @@ try {
       }
     }
   }
-  console.log(failed ? 'FAIL: some text does not fit, or a screen is cut off' : 'PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size');
+  console.log(failed ? 'FAIL: some text does not fit, or a screen is cut off' : 'PASS: every text fits, at its longest, on the desk and the screens around it, in every browser and size');
 } catch (err) {
   failed = true;
   console.error(`overflow check: ${err instanceof Error ? err.message : String(err)}`);

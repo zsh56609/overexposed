@@ -10,6 +10,14 @@ async function waitIdle(page:Page) {
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
 }
+/** A choice wears its stamp before it is made (round R1: SIGNED, TAKEN, ACCEPTED): wait until its action is dispatched. */
+async function waitDispatched(page:Page,before:string) {
+  const start=Date.now();
+  // Dispatched: the queue holds it (busy), or it already played (with motion off the step counts at once).
+  while(await page.evaluate<boolean>(`(()=>{const d=document.querySelector('.desk,[data-presentation]');return !!d&&d.dataset.busy!=='1'&&(d.dataset.step??'')===${JSON.stringify(before)}})()`)){
+    assert.ok(Date.now()-start<3000,'a stamped choice was never made');await sleep(20);
+  }
+}
 /** The fan has settled: no hand card is still moving (a hover lift, the gap closing). Points are sampled only then. */
 async function waitFan(page:Page) {
   const start=Date.now();
@@ -96,7 +104,9 @@ export async function checkMonthInput(page:Page,url:string) {
     for(const mode of ['off','full','reduced','skip-early','skip-late']) {
       assert.equal(await reach(page,url,fixture,80),'ok',name);
       await page.evaluate(`document.documentElement.dataset.motion=${JSON.stringify(mode.startsWith('skip')?'full':mode)}`);
+      const step=await page.evaluate<string>(`document.querySelector('.desk,[data-presentation]')?.dataset.step??''`);
       const point=await centre(page,selector);assert.ok(point,`${name} missing action`);await page.click(...point);
+      if(selector!=='.endbtn')await waitDispatched(page,step);
       if(mode.startsWith('skip')) {await sleep(mode==='skip-early'?80:1200);if(await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy==='1'`))await page.click(640,350);}
       await waitIdle(page);await page.move(10,100);await sleep(200);
       const actual=await page.evaluate<string>(settled);
