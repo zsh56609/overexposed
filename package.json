@@ -33,7 +33,7 @@
     "tune:lanes": "node sim/tune/lanes.ts",
     "tune:try": "node sim/tune/try.ts",
     "typecheck": "tsc -b",
-    "check:queue": "node check/queue.ts && node check/timeline.ts",
+    "check:queue": "node check/queue.ts && node check/timeline.ts && node check/pace.ts --runs=12",
     "check:motion": "node check/motion-run.ts"
   },
   "dependencies": {

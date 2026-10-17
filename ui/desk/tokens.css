@@ -21,6 +21,8 @@
   --val-heat: #c2410c;
   --val-gain: #1d7a33;
   --val-cost: #b3261e;
+  /* The action bulb's light (round R2), on a cream ground: the stat bar's lit bulb, a shade deeper. */
+  --val-bulb: #d39417;
   /* …lighter on the dark faces (headshot, all-access pass)… */
   --val-dark-hype: #ffd84a;
   --val-dark-craft: #9fd0ff;

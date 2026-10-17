@@ -35,6 +35,7 @@ import {
   type GameEvent,
   type GameState,
   type CardInstance,
+  type ClauseReport,
   type MajorClause,
   type MonthPress,
   type NoteColour,
@@ -43,7 +44,7 @@ import {
   type SeasonId,
 } from '../../core/index.ts';
 import { has, t, tp } from '../i18n.ts';
-import { legalOf, outcomeOf, previewEndTurn, type EndTurnPreview, type LinesSoFar } from '../preview.ts';
+import { legalOf, outcomeOf, previewEndTurn, type EndTurnPreview, type LinesSoFar, type Outcome } from '../preview.ts';
 import type { PlayedStep } from '../queue.ts';
 import { statCells } from '../stats.ts';
 import {
@@ -78,7 +79,7 @@ import {
 export const PHOTO_VARIANTS = 3;
 
 export type LaneClass = 'music' | 'screen' | 'celebrity' | 'early';
-export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'cards' | 'gear';
+export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'cards' | 'gear' | 'bulb';
 
 export interface StatCellModel {
   readonly id: 'hype' | 'craft' | 'heat' | 'next' | 'money';
@@ -194,7 +195,7 @@ export interface DeskLabels {
 
 export interface ValueChip {
   /** `flag`: what the card marks the player as ("Went viral"), in the flag's own words. */
-  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'scandal' | 'text';
+  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'scandal' | 'action' | 'text';
   readonly icon: IconId | null;
   readonly text: string;
 }
@@ -720,6 +721,43 @@ export function faceLines(c: ContentIndex, cardId: string, lane: string | null):
 /** A door's outcomes (round R1): each effect as value chips, as on a card. */
 export function effectChips(c: ContentIndex, effects: readonly Effect[], lane: string | null): ValueChip[] {
   return effects.flatMap((e) => effectChip(c, e, lane));
+}
+
+/** Actions spent or gained (round R2): the action bulb and a signed number, as the events and previews show them. */
+export const actionChip = (delta: number): ValueChip => ({ kind: 'action', icon: 'bulb', text: signed(delta) });
+
+/** Scandal cards added (or removed): the countdown's newspaper and a signed number, in scandal red (round R2). */
+export const scandalChip = (delta: number): ValueChip => ({ kind: 'scandal', icon: 'paper', text: signed(delta) });
+
+/**
+ * An outcome as the card faces show it (round R2, 0.3): each resource that moved as its chip — heat apart, for
+ * the preview's own heat line — actions as the bulb, cards drawn as "Draw N", scandal cards added or removed as
+ * the newspaper; what involves no number stays in words (a card added, a card removed, a flag set).
+ */
+export function outcomeChips(c: ContentIndex, o: Outcome, lane: string | null, opts: { readonly heat?: boolean; readonly slots?: number } = {}): { readonly chips: ValueChip[]; readonly words: string[] } {
+  const chips: ValueChip[] = [];
+  const words: string[] = [];
+  for (const target of ['hype', 'craft', 'capital', 'heat'] as const) {
+    if (o.deltas[target] === 0 || (target === 'heat' && !opts.heat)) continue;
+    chips.push(...effectChip(c, { op: 'resource', target, value: o.deltas[target] }, lane));
+  }
+  if (opts.slots) chips.push(actionChip(opts.slots));
+  if (o.drawn) chips.push(...effectChip(c, { op: 'draw', count: o.drawn }, lane));
+  const scandal = (id: string) => getCard(c, id)?.kind === 'scandal';
+  const added = o.added.filter((a) => scandal(a.cardId)).length;
+  const removed = o.exhausted.filter(scandal).length;
+  if (added) chips.push(scandalChip(added));
+  if (removed) chips.push(scandalChip(-removed));
+  for (const a of o.added) if (!scandal(a.cardId)) words.push(tp('ui.face.add', 1, { count: 1, card: cardName(c, a.cardId), zone: zoneName(a.to) }));
+  for (const id of o.exhausted) if (!scandal(id)) words.push(t('ui.preview.exhausted', { card: cardName(c, id) }));
+  for (const f of o.flags) words.push(t('ui.preview.flag', { flag: flagName(f) }));
+  return { chips, words };
+}
+
+/** A requirement's threshold in icons ("★ 25+", "📰 1+"), as a face's "Needs" line shows it; null for one with no number. */
+export function clauseChip(clause: ClauseReport, lane: string | null): ValueChip | null {
+  if (clause.key === 'hype' || clause.key === 'craft' || clause.key === 'heat' || clause.key === 'capital' || clause.key === 'scandalCount') return thresholdChip(clause.key, clause.range, lane);
+  return null;
 }
 
 /** A card on an offer or in the deck viewer (round R1): the hand's face, nothing about playing it now. */

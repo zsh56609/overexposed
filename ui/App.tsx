@@ -5,23 +5,14 @@
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import {
-  createInitialState,
-  establishedLanes,
-  getCard,
-  getManager,
-  readLines,
-  reduce,
-  RESOURCE_KEYS,
-  type Action,
-  type ContentIndex,
-} from '../core/index.ts';
+import { createInitialState, establishedLanes, readLines, reduce, type Action } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { motionMode, subscribeMotion } from './motion.ts';
 import { Desk } from './desk/Desk.tsx';
+import { EndTurnPreviewView, PlayPreviewView } from './desk/Preview.tsx';
 import { deskModel } from './desk/model.ts';
-import { t, tp } from './i18n.ts';
-import { legalOf, previewPlay, type EndTurnPreview, type Outcome, type PlayPreview } from './preview.ts';
+import { t } from './i18n.ts';
+import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readFound } from './collection.ts';
 import { useFontsReady } from './screens/common.tsx';
@@ -29,23 +20,6 @@ import { ManagerScreen, TitleScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
-import {
-  blockerText,
-  cardName,
-  cardRuleLines,
-  cardText,
-  flagName,
-  heatText,
-  isPlaceholder,
-  lineText,
-  mastheadName,
-  resourceName,
-  signedAmount,
-  zoneName,
-} from './text.ts';
-
-/** Prose the author hasn't written yet is shown as a placeholder, never hidden (decision 15). */
-const prose = (text: string, base = ''): string => `${base}${isPlaceholder(text) ? ' placeholder' : ''}`.trim();
 
 // ---------------------------------------------------------------------------
 // Seeds: every run replays from its seed; ?seed=123 in the URL replays one.
@@ -262,7 +236,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       <Desk model={model} on={on} snap={snap} onTails={queue.onTails}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
-          {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} /> : null}
+          {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} lane={lines.lane} slots={s.slots} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} lane={lines.lane} /> : null}
         </Popover>
       </Desk>
       {/* The screens around the desk (round R1), over the dimmed scene — beside the desk, never inside it, so none
@@ -284,128 +258,5 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
       {panel === 'settings' && <SettingsPanel overDesk onClose={close} />}
     </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Previews
-
-/** An outcome's resource changes on one line: "Heat −1". */
-const outcomeDeltas = (o: Outcome): string =>
-  RESOURCE_KEYS.filter((k) => o.deltas[k] !== 0)
-    .map((k) => t('ui.effect.resource', { delta: signedAmount(k, o.deltas[k]), resource: resourceName(k) }))
-    .join(' · ');
-
-function OutcomeLines({ c, o, skipScandals = false }: { c: ContentIndex; o: Outcome; skipScandals?: boolean }) {
-  const lines: string[] = [];
-  for (const k of RESOURCE_KEYS) if (o.deltas[k] !== 0) lines.push(t('ui.effect.resource', { delta: signedAmount(k, o.deltas[k]), resource: resourceName(k) }));
-  if (o.drawn) lines.push(tp('ui.preview.drawn', o.drawn, { n: o.drawn }));
-  for (const a of o.added) {
-    if (skipScandals && getCard(c, a.cardId)?.kind === 'scandal') continue; // listed with their causes above
-    lines.push(t('ui.preview.added', { card: cardName(c, a.cardId), zone: zoneName(a.to) }));
-  }
-  for (const id of o.exhausted) lines.push(t('ui.preview.exhausted', { card: cardName(c, id) }));
-  for (const f of o.flags) lines.push(t('ui.preview.flag', { flag: flagName(f) }));
-  if (!lines.length) lines.push(t('ui.preview.noChange'));
-  return (
-    <ul>
-      {lines.map((line, i) => (
-        <li key={i}>{line}</li>
-      ))}
-    </ul>
-  );
-}
-
-/** The headline a card would print, in its register: the preview's first line (decision 21). */
-function PreviewHeadline({ c, p }: { c: ContentIndex; p: PlayPreview }) {
-  const text = lineText(c, p.headline, p.cardId, p.press?.subjectKey ?? null);
-  return (
-    <p className={prose(text, `preview-headline${p.register ? ` reg-${p.register}` : ''}`)}>
-      {p.press?.paper && <span className="paper-label">{mastheadName(c, p.press.paper)}</span>}
-      {text}
-    </p>
-  );
-}
-
-function PlayPreviewView({ c, p }: { c: ContentIndex; p: PlayPreview }) {
-  if (!p.ok || !p.outcome || !p.lineAfter) {
-    const scandal = getCard(c, p.cardId)?.kind === 'scandal';
-    const text = scandal ? lineText(c, p.inHand, p.cardId) : cardText(c, p.cardId);
-    return (
-      <div className="preview blocked">
-        {/* A scandal prints nothing when held: its in-hand line and rules. Any other card: the story it would print. */}
-        {scandal ? <p className={prose(text, 'preview-headline in-hand')}>{text}</p> : <PreviewHeadline c={c} p={p} />}
-        <p className="muted">{t('ui.preview.unplayable', { card: cardName(c, p.cardId) })}</p>
-        <ul>
-          {p.blockers.map((b, i) => (
-            <li key={i}>{blockerText(b)}</li>
-          ))}
-        </ul>
-        {cardRuleLines(c, p.cardId).map((line, i) => (
-          <p key={i}>{line}</p>
-        ))}
-      </div>
-    );
-  }
-  // Story first, then the numbers, then any line crossing: a light warning only (decision 3).
-  const crossing = Math.sign(p.linesCrossed);
-  return (
-    <div className="preview">
-      <PreviewHeadline c={c} p={p} />
-      <OutcomeLines c={c} o={p.outcome} />
-      <p>{t('ui.preview.heat', { before: p.heatBefore, after: p.heatAfter ?? '', line: heatText(p.lineAfter) })}</p>
-      {crossing !== 0 && <p className="warn">{t(crossing === 1 ? 'ui.preview.crosses' : 'ui.preview.cools')}</p>}
-      <p className="muted">{t('ui.preview.slots', { n: p.slotsAfter ?? '' })}</p>
-    </div>
-  );
-}
-
-function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
-  // Every scandal card month end adds, from any cause, each with its cause (decision 2).
-  return (
-    <div className={`preview${p.scandalCards.length ? ' danger' : ''}`}>
-      <h3>{t('ui.preview.endTitle')}</h3>
-      {p.scandalCards.length === 0 ? (
-        <p>{t('ui.preview.endNone')}</p>
-      ) : (
-        <>
-          <p className="alarm">{t('ui.preview.endList')}</p>
-          {/* Each scandal by the headline it would print (decision 21), then the card and its cause. */}
-          <ul className="scandal-list">
-            {p.scandalCards.map((sc, i) => {
-              const card = cardName(c, sc.cardId);
-              const headline = lineText(c, sc.line, sc.cardId, sc.press.subjectKey);
-              const line =
-                sc.cause.kind === 'crystallised'
-                  ? sc.cause.cardId === null
-                    ? t('ui.preview.endUnblamed', { card })
-                    : t('ui.preview.endBlamed', { card, cause: cardName(c, sc.cause.cardId) })
-                  : sc.cause.byCardId === null
-                    ? t('ui.preview.endAddedUnknown', { card })
-                    : sc.cause.byCardId === sc.cardId
-                      ? t('ui.preview.endCopySelf', { card })
-                      : t('ui.preview.endAdded', { card, source: cardName(c, sc.cause.byCardId) });
-              return (
-                <li key={i}>
-                  <span className={prose(headline, 'lead')}>
-                    {sc.press.paper && <span className="paper-label">{mastheadName(c, sc.press.paper)}</span>}
-                    {headline}
-                  </span>
-                  <span className="muted cause">{line}</span>
-                </li>
-              );
-            })}
-          </ul>
-        </>
-      )}
-      <OutcomeLines c={c} o={p.outcome} skipScandals />
-      {/* The manager's month-end relief, after the check (round 2b): named by the perk. */}
-      {p.perk && (
-        <p className="muted perk">
-          {t('ui.preview.endPerk', { perk: t(getManager(c, p.perk.manager)?.perk.nameKey ?? `manager.${p.perk.manager}.perk.name`), deltas: outcomeDeltas(p.perk.outcome) })}
-        </p>
-      )}
-      {p.carries && <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>}
-    </div>
   );
 }

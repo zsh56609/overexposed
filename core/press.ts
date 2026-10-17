@@ -214,16 +214,17 @@ export interface SeasonPage {
   readonly turn: number;
   readonly paper: string;
   readonly item: PageItem;
-  /** The lead is about the player; otherwise the world went on and this is the season's last front page. */
+  /** The story is the player's; otherwise the player printed nothing that season and this is its last front page's lead. */
   readonly player: boolean;
 }
 
 const aboutPlayer = (item: PageItem): boolean => item.kind === 'player' || item.kind === 'filler' || item.kind === 'spillover';
 
 /**
- * The year in front pages, one a season (round R1): of the season's printed months, the one whose front paper's
- * lead story is about the player with the highest prominence — a scandal's too; ties to the later month. With no
- * player lead in the season, its last month's front paper and lead. Read-only, derived from history.
+ * The year in front pages, one a season (round R1; revised in R2, 0.1): the player's most prominent story printed
+ * in the season's three months, on any paper, whether or not it led its page — a lead, then a secondary story,
+ * then a brief, a scandal's too; ties to the later month, and within a month to the paper on the desk. Only a
+ * season in which the player printed nothing shows the world's lead of its last month. Read-only, from history.
  */
 export function seasonPages(history: readonly HistoryStep[]): SeasonPage[] {
   const c = history[0]?.after.content;
@@ -234,14 +235,17 @@ export function seasonPages(history: readonly HistoryStep[]): SeasonPage[] {
     .sort((a, b) => a - b)
     .flatMap((act): SeasonPage[] => {
       const season = months.filter((m) => m.act === act).sort((a, b) => a.turn - b.turn);
-      let best: { readonly month: MonthPress; readonly item: PageItem; readonly rank: number } | null = null;
+      let best: { readonly month: MonthPress; readonly paper: string; readonly item: PageItem; readonly rank: number } | null = null;
       for (const month of season) {
-        const item = leadOf(month);
-        if (!item || !aboutPlayer(item)) continue;
-        const rank = LEVEL[(item.line ? prominenceOf(c, item.line) : null) ?? item.slot];
-        if (!best || rank <= best.rank) best = { month, item, rank };
+        const pages = [...month.pages].sort((a, b) => Number(b.paper === month.lead) - Number(a.paper === month.lead));
+        for (const page of pages)
+          for (const item of page.items) {
+            if (!aboutPlayer(item)) continue;
+            const rank = LEVEL[item.slot];
+            if (!best || rank < best.rank || (rank === best.rank && month.turn > best.month.turn)) best = { month, paper: page.paper, item, rank };
+          }
       }
-      if (best) return [{ act, turn: best.month.turn, paper: best.month.lead, item: best.item, player: true }];
+      if (best) return [{ act, turn: best.month.turn, paper: best.paper, item: best.item, player: true }];
       const last = season.at(-1);
       const item = last && leadOf(last);
       return last && item ? [{ act, turn: last.turn, paper: last.lead, item, player: false }] : [];

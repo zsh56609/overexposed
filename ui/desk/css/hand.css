@@ -167,6 +167,24 @@
 .desk .floating .scandal-list li { margin-top: 5px; }
 .desk .floating .scandal-list .lead { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 700; color: #b81f15; }
 .desk .floating .scandal-list .cause { display: block; font-size: 11px; }
+/* Results as the card faces show them (round R2, 0.3): an icon and a number in the resource's colour; the action
+   bulb; the newspaper for scandal cards. Words only where no number is involved. */
+.desk .floating .vals { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 11px; margin-top: 6px; font-weight: 800; font-size: 13px; line-height: 1.2; }
+.desk .floating .vals span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.desk .floating .vals svg, .desk .floating .rules svg { width: 13px; height: 13px; flex: none; }
+.desk .floating .vals .lb { font-size: 10.5px; font-weight: 700; }
+.desk .floating .vals .n { font-size: 11px; font-weight: 600; color: #6b6152; }
+.desk .floating .rules { margin-top: 5px; }
+.desk .floating .rules .ln { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-weight: 800; font-size: 13px; }
+.desk .floating .rules .ln span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.desk .floating .rules .lb { font-size: 10.5px; font-weight: 700; }
+.desk .floating .r-hype { color: var(--val-hype); }
+.desk .floating .r-craft { color: var(--val-craft); }
+.desk .floating .r-heat { color: var(--val-heat); }
+.desk .floating .r-gain { color: var(--val-gain); }
+.desk .floating :is(.r-cost, .r-scandal) { color: var(--val-cost); }
+.desk .floating .r-action svg { color: var(--val-bulb); }
+.desk .floating .r-flag { font-style: italic; font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
   :is(.desk :is(.hand, .motion-face), .faces) .card.nope { animation: none; }

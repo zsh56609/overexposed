@@ -41,6 +41,11 @@ export function IconDefs() {
             <rect key={a} x="10.3" y="1.8" width="3.4" height="4.6" rx=".5" fill="currentColor" transform={`rotate(${a} 12 12)`} />
           ))}
         </symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24">
+          <circle cx="12" cy="10" r="6.6" fill="currentColor" />
+          <rect x="8.8" y="17.4" width="6.4" height="2.1" rx=".9" fill="currentColor" />
+          <rect x="9.6" y="20.3" width="4.8" height="1.9" rx=".9" fill="currentColor" />
+        </symbol>
         <symbol id="i-flame" viewBox="0 0 24 24">
           <path fill="currentColor" d="M12 2c1.2 3.6 5.5 5.3 5.5 10.6A5.5 5.5 0 0 1 6.5 12.6c0-2.8 1.6-4.3 2.4-6.2.9 2 1.6 3 2.9 3.4C12.2 7 11 5.2 12 2z" />
         </symbol>

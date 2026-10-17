@@ -919,6 +919,8 @@
   "ui.preview.endAddedUnknown": "{card} — added at month end",
   "ui.preview.endPerk": "{perk}: {deltas}",
   "ui.preview.endCarry": "Heat after month end: {n}, carried into next month",
+  "ui.preview.heatShort": "{before} → {after} · {line}",
+  "ui.preview.endCarryShort": "carried into next month",
   "ui.reason.notPlayPhase": "Not now",
   "ui.reason.notInHand": "Not in your hand",
   "ui.reason.unplayable": "A scandal is a dead card: it only takes up room in your hand.",

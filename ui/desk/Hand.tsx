@@ -10,7 +10,7 @@ import type { SeasonId } from '../../core/index.ts';
 import { isPlaceholder } from '../text.ts';
 import { photoUrl } from './halftone.ts';
 import { Icon, keyboardFocus } from './Icons.tsx';
-import type { EndTurnModel, HandCardModel, HandWords, ValueChip } from './model.ts';
+import type { EndTurnModel, FaceLine, HandCardModel, HandWords, ValueChip } from './model.ts';
 
 /** Where a preview attaches: an element's box on the stage (App's Floating reads it). */
 export interface DeskAnchor {
@@ -195,7 +195,7 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
 });
 
 /** A value on a face: icon and number in the resource's colour, or its words. */
-function Value({ v }: { v: ValueChip }) {
+export function Value({ v }: { v: ValueChip }) {
   return (
     <span className={`r-${v.kind}`}>
       {v.icon && <Icon id={v.icon} />}
@@ -228,31 +228,40 @@ export function CardInk({card,words}: {card:HandCardModel;words:HandWords}) { re
       {/* One order on every face (round R1, H1): name, the body's lines, then the flavour, last. */}
       <div className="body">
         <div className="fx">
-          {card.lines.map((line, i) => (
-            <div key={i} className={`ln${line.arrow ? ' br' : ''}${line.label ? ' lbl' : ''}`}>
-              {/* The head — words, the condition in icons, the arrow — then what the line gives, wrapping beside it. */}
-              {(line.label || line.cond.length > 0 || line.arrow) && (
-                <span className="hd">
-                  {line.label && <span className="lb">{line.label}</span>}
-                  {line.cond.map((v, k) => (
-                    <Value key={k} v={v} />
-                  ))}
-                  {line.arrow && <span className="ar">→</span>}
-                </span>
-              )}
-              {line.chips.length > 0 && (
-                <span className="ch">
-                  {line.chips.map((v, k) => (
-                    <Value key={k} v={v} />
-                  ))}
-                </span>
-              )}
-            </div>
-          ))}
+          <FaceLines lines={card.lines} />
         </div>
         {card.flavour && <div className={ph(card.flavour, 'fl')}>{card.flavour}</div>}
       </div>
   </>; }
+
+/** A face's body lines (round R1, H1–H2), the same wherever they are shown: a card, a preview, an event's reply. */
+export function FaceLines({ lines }: { lines: readonly FaceLine[] }) {
+  return (
+    <>
+      {lines.map((line, i) => (
+        <div key={i} className={`ln${line.arrow ? ' br' : ''}${line.label ? ' lbl' : ''}`}>
+          {/* The head — words, the condition in icons, the arrow — then what the line gives, wrapping beside it. */}
+          {(line.label || line.cond.length > 0 || line.arrow) && (
+            <span className="hd">
+              {line.label && <span className="lb">{line.label}</span>}
+              {line.cond.map((v, k) => (
+                <Value key={k} v={v} />
+              ))}
+              {line.arrow && <span className="ar">→</span>}
+            </span>
+          )}
+          {line.chips.length > 0 && (
+            <span className="ch">
+              {line.chips.map((v, k) => (
+                <Value key={k} v={v} />
+              ))}
+            </span>
+          )}
+        </div>
+      ))}
+    </>
+  );
+}
 export function CardPicture({card,words,season}: {card:HandCardModel;words:HandWords;season:SeasonId}) {
   return <div className={`card ${FACE[card.face]}`} data-card={card.cardId} style={{left:0,top:0,transform:'none',['--strip' as string]:'150px',...(card.face==='headshot'?{backgroundImage:`url(${photoUrl('headshot',season,0)})`}:{})}}><CardInk card={card} words={words}/></div>;
 }

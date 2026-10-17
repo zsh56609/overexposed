@@ -6,6 +6,46 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R2, Part 0: the author's decisions on R1's questions
+
+- **The year in front pages** (0.1; core/press.ts `seasonPages`): for each
+  season, the player's most prominent story printed in its three months
+  on any paper — a lead, then a secondary story, then a brief; ties to the
+  later month, and within a month to the paper on the desk — whether or
+  not it led its page. Only a season in which the player printed nothing
+  shows the world's lead of its last month. In the 15 recorded endings,
+  59 of 60 seasons now show the player (13 under R1's rule).
+- **The pace of a month end** (0.2; ui/timeline.ts `PACE`): every beat and
+  its order kept; the holds shortened and the beats overlapping — the
+  stat bar's numbers roll while the next beat starts, the next scandal
+  lifts 0.54 s after the last one even across the resources between
+  them, the sweep runs into the date, the manager's bubbles arrive while
+  the hand is dealt, the season's card holds 2.2 s. Measured over real
+  reducer steps (check/pace.ts, now the last step of check:queue: five
+  personas, both managers), unskipped, from END TURN (or the door's
+  click, with its stamp) to the next decision:
+
+  | Month end | Before (median / max) | After (median / max) | Target |
+  |---|---|---|---|
+  | Calm | 3.23 / 7.46 s | 1.40 / 3.04 s | 4 s |
+  | 1 scandal | 7.99 / 12.30 s | 4.61 / 5.71 s | 6 s |
+  | 2 scandals | 9.90 / 15.57 s | 5.27 / 6.30 s | 6.6 s |
+  | 3 scandals | 10.55 / 16.16 s | 5.86 / 6.77 s | 7.2 s |
+  | 4 scandals | 10.55 / 15.17 s | 6.45 / 7.36 s | 7.8 s |
+  | Season change | 8.59 / 8.73 s | 5.05 / 5.17 s | 5.5 s |
+
+  The awards night's reveal is unchanged.
+- **Previews show results as the card faces do** (0.3; ui/desk/Preview.tsx):
+  the story first, then each resource as its chip ("★ +3", "+£1,000"),
+  actions as the action bulb with a signed number, scandal cards as the
+  newspaper in scandal red, heat as "🔥 2 → 6 · 1 TO GO"; a requirement as
+  the face's "Needs ♪ 15+ (you have 6)"; a scandal's rules as its face's
+  lines. Words only where no number is involved: the story, a card added
+  or removed, a flag, a line crossed, the month end's scandals and their
+  causes. The bulb is drawn in code (`i-bulb`).
+- **A favicon** (0.4): the tabloid-red square with a cream ring, an inline
+  SVG in index.html — no image file, nothing new in the zip.
+
 ## 2026-10-17 — Round R1 acceptance: one name for one thing
 
 - **The desk's phone screen is `.phone-screen`**: the screens around the
