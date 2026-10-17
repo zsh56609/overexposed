@@ -1,5 +1,5 @@
 // The manager choice (round R1, Part B; README §8, mockups/screens.html "Choose your manager", shot 13), dealt onto
-// the desk since round R3: the title became the desk itself (ui/desk/Title.tsx). Every label is the mockup's,
+// the desk as it comes up since round R3 (B2: ui/screens/title.css, ui/desk/css/scenes.css). Every label is the mockup's,
 // approved; every manager line comes from content.
 
 import { useLayoutEffect, useRef } from 'react';

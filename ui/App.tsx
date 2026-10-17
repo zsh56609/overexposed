@@ -4,18 +4,17 @@
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 //
-// Round R3: one desk from the title to the year's end. The run to come is made at once, so the title is the desk
-// the night before it; BEGIN brings spring's card (the opening), "Into spring" the manager choice on the desk.
-// Every season card waits for its button.
+// Round R3 (amended): the title is one photograph, the whole screen (ui/screens/Title.tsx); BEGIN's flash brings
+// spring's card (the opening) over it, dimmed; "Into spring" takes it to dark and brings the desk up, the manager
+// choice dealt onto it. Every season card waits for its button.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createInitialState, establishedLanes, readLines, reduce, type Action, type GameState } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { finishTransitions, motionMode, subscribeMotion } from './motion.ts';
-import { Desk, type DeskIntro, type DeskMode } from './desk/Desk.tsx';
+import { Desk, type DeskMode } from './desk/Desk.tsx';
 import { EndTurnPreviewView, PlayPreviewView } from './desk/Preview.tsx';
-import { cardModel, deskModel } from './desk/model.ts';
-import { TITLE_FAN } from './desk/Title.tsx';
+import { deskModel } from './desk/model.ts';
 import { t } from './i18n.ts';
 import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
@@ -27,6 +26,7 @@ import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
 import { SeasonCard } from './screens/Season.tsx';
+import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
 
 // ---------------------------------------------------------------------------
@@ -60,11 +60,11 @@ function makeRun(seed: number, id: number): RunHandle | string {
 }
 
 export function App() {
-  // The run to come is made now (decision 15, revised): the title is its desk, and the opening its variant.
+  // The run to come is made now (decision 15, revised): the opening card is its own.
   const [made] = useState(() => makeRun(seedFromUrl() ?? freshSeed(), 1));
   const [run, setRun] = useState<RunHandle | null>(typeof made === 'string' ? null : made);
   const [error, setError] = useState<string | null>(typeof made === 'string' ? made : null);
-  // PLAY AGAIN (round R3, B6): a fade through ink; the next run's title comes up under it, its bulbs coming on.
+  // PLAY AGAIN (round R3, B6): a fade through ink, then the next run's title arrives as on first load.
   const [ink, setInk] = useState<'in' | 'out' | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
@@ -93,7 +93,7 @@ export function App() {
       window.setTimeout(() => {
         next();
         setInk('out');
-        timers.current.push(window.setTimeout(() => setInk(null), mode === 'reduced' ? 100 : 500));
+        timers.current.push(window.setTimeout(() => setInk(null), mode === 'reduced' ? 100 : 300));
       }, step),
     );
   }, [next]);
@@ -115,7 +115,7 @@ export function App() {
   if (!run) return <p className="plain error-layer">{error}</p>;
   return (
     <>
-      <Run key={run.id} run={run} onRestart={restart} fresh={run.id > 1} />
+      <Run key={run.id} run={run} onRestart={restart} />
       {ink && <div className={`ink ${ink}`} aria-hidden="true" />}
     </>
   );
@@ -212,11 +212,15 @@ function seasonOf(s: GameState, answered: number): { readonly act: number; reado
   return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(c, s.seed, s.act)] };
 }
 
-/** A change of scene before the year (round R3, B1–B2), and how long it runs, in ms. */
+/**
+ * A change of scene before the year (round R3, amended), and how long it runs, in ms: B1, BEGIN's flash and the
+ * opening card developing out of it (ui/screens/title.css); B2, the photograph to dark, the desk coming up and the
+ * manager cards dealt — clickable within the 1.5 s a season card's button allows (A3).
+ */
 type Scene = 'begin' | 'into';
-const SCENE_MS: Record<Scene, number> = { begin: 520, into: 820 };
+const SCENE_MS: Record<Scene, number> = { begin: 750, into: 1200 };
 
-function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void; fresh: boolean }) {
+function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const { queue } = run;
   const snap = useSyncExternalStore(queue.subscribe, queue.getSnapshot);
   const [error, setError] = useState<string | null>(null);
@@ -224,7 +228,7 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
   // The deck, House rules, the credits or the scrapbook (round R1, Part G), over the desk or the awards night.
   const [panel, setPanel] = useState<PanelId | null>(null);
   const close = useCallback(() => setPanel(null), []);
-  // Before the year (round R3): the title, then the opening card; then the manager choice, played on the desk.
+  // Before the year (round R3): the title, then the opening card over it; then the manager choice, on the desk.
   const [intro, setIntro] = useState<'title' | 'opening' | null>('title');
   // The last season whose card was answered: spring's is the opening.
   const [answered, setAnswered] = useState(1);
@@ -303,26 +307,16 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
     }),
     [act, queue],
   );
-  // The title's own: the endings found, the fan of five faces (the scandal in the middle), BEGIN and its links.
-  const introProps = useMemo<DeskIntro>(() => {
-    const first = snap.steps[0]?.after ?? s;
-    const inHand = new Map(lines.inHand);
-    const fan = TITLE_FAN.map((cardId, i) => {
-      const uid = -1 - i;
-      if (c.cards[cardId]?.kind === 'scandal') inHand.set(uid, lines.counter.fork().inHand(cardId));
-      return cardModel(first, { uid, cardId }, { ...lines, inHand }, true);
-    });
-    return {
-      c,
-      found,
-      fan,
+  // The title's controls: BEGIN and its three links.
+  const titleOn = useMemo(
+    () => ({
       begin: () => play('begin', () => setIntro('opening')),
+      scrapbook: () => setPanel('scrapbook'),
       settings: () => setPanel('settings'),
       credits: () => setPanel('credits'),
-      scrapbook: () => setPanel('scrapbook'),
-    };
-    // The title is drawn once per run, from its first state.
-  }, [run.id, found]);
+    }),
+    [play],
+  );
 
   if (s.phase === 'ended')
     return (
@@ -335,29 +329,39 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
   // The title waits for the game's faces (round R1): a font that never comes is waited for 3 s.
   if (intro === 'title' && !fonts) return <div className="scr title-wait" />;
 
-  const mode: DeskMode = intro ?? (s.phase === 'manager' ? 'manager' : 'game');
+  const mode: DeskMode = s.phase === 'manager' ? 'manager' : 'game';
+  // The desk from "Into spring" on (B2); the title until the desk has come up out of its dark.
+  const desk = intro === null;
+  const titled = intro !== null || scene === 'into';
+  const game = desk && mode === 'game';
   const endPreview = model.endPreview;
   // The answer to an event, while its step plays and before it is published (round R2, Part C).
   const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' && !snap.active.published ? snap.active : null;
   const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
   // A season's card (round R3, A3): from the month end's 'season' beat, its entrance, until its button is clicked.
   const reached = snap.active?.plan ? snap.active.plan.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') : false;
-  const season = mode !== 'game' ? null : snap.active ? (reached ? seasonOf(snap.active.step.after, answered) : null) : seasonOf(s, answered);
+  const season = !game ? null : snap.active ? (reached ? seasonOf(snap.active.step.after, answered) : null) : seasonOf(s, answered);
   const clear = season === null;
   // Signing (round R3, B3): the step that takes the manager, and its beats so far.
   const signing = snap.active?.step.action?.type === 'CHOOSE_MANAGER' ? snap.active : null;
   const signBeats = signing?.plan ? signing.plan.beats.slice(0, (signing.index ?? 0) + 1).map((b) => b.kind) : [];
-  const offers = clear && mode === 'game' && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan;
-  const eventShown = clear && s.phase === 'event' && (!snap.active || answering !== null);
+  const offers = clear && game && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan;
+  const eventShown = clear && game && s.phase === 'event' && (!snap.active || answering !== null);
 
   return (
     <>
-      <Desk model={model} on={on} snap={snap} onTails={queue.onTails} mode={mode} intro={introProps} scene={scene} busy={scene !== null} arriving={signing !== null} fresh={fresh}>
-        {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
-        <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
-          {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} lane={lines.lane} slots={s.slots} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} lane={lines.lane} /> : null}
-        </Popover>
-      </Desk>
+      {desk && (
+        <Desk model={model} on={on} snap={snap} onTails={queue.onTails} mode={mode} busy={scene !== null} rising={scene === 'into'} arriving={signing !== null}>
+          {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
+          <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
+            {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} lane={lines.lane} slots={s.slots} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} lane={lines.lane} /> : null}
+          </Popover>
+        </Desk>
+      )}
+      {/* The title (round R3, amended): over the desk while it goes to dark (B2); under the opening card, dimmed (B1). */}
+      {titled && <TitleScreen c={c} found={found} dim={intro !== 'title'} out={scene === 'into'} busy={scene !== null} {...titleOn} />}
+      {/* B1: BEGIN's one big flash, the screen gone white like an overexposed photograph. */}
+      {scene === 'begin' && motionMode() === 'full' && <div className="whiteout" aria-hidden="true" />}
       {/* The screens around the desk (round R1), over the dimmed scene — beside the desk, never inside it, so none
           of the desk's styles reach them. */}
       {error && (
@@ -366,11 +370,11 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
         </p>
       )}
       {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name. */}
-      <Over show={mode === 'opening'} full>
+      <Over show={intro === 'opening'} full enter="develop">
         <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(c, s.seed).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
       </Over>
-      {/* The manager choice, dealt onto the desk (round R3, B2); signing plays out on it (B3). */}
-      <Over show={mode === 'manager'} full>
+      {/* The manager choice, dealt onto the desk as it comes up (round R3, B2); signing plays out on it (B3). */}
+      <Over show={desk && mode === 'manager'} full enter="deal">
         <ManagerScreen s={s} legal={legal} act={act} beats={signBeats} chosen={signing?.step.action?.type === 'CHOOSE_MANAGER' ? signing.step.action.managerId : null} />
       </Over>
       <Over show={season !== null}>
@@ -398,7 +402,7 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
         )}
       </Over>
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
-      {panel === 'settings' && <SettingsPanel overDesk={mode === 'game'} onClose={close} />}
+      {panel === 'settings' && <SettingsPanel overDesk={game} onClose={close} />}
       {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}
       {panel === 'scrapbook' && <ScrapbookPanel found={found} overDesk={false} onClose={close} />}
     </>

@@ -1,0 +1,83 @@
+/* The title (round R3, amended; docs/design/visual/ref/r3-title-v2.png and r3-title-v2.html): one photograph, light on
+   ink, the whole stage; over it the name glowing as if overexposed, a short red rule and the slogan; BEGIN bottom
+   right; the endings found and the links bottom left; a dark fade at the top and the bottom keeps them clear. Not a
+   .scr: its own motion rules (a .scr's reduced motion would set its endless flashes flickering).
+   Arrival: the spotlight comes up (0.6 s) and the name develops, white-hot with a wide bloom, settling to cream
+   (0.8 s); then the photographers' flashes pop near the edges, in a fixed, irregular 13.7 s cycle. Reduced motion
+   or off: no develop, no flashes — the photograph and the name are simply there. */
+
+.title-screen { position: absolute; inset: 0; z-index: 148; overflow: hidden; background: #15120E; color: #EDE6D6; font-family: 'Libre Franklin', system-ui, sans-serif; }
+.title-screen * { box-sizing: border-box; }
+.title-screen .tphoto { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; }
+.title-screen.lit .tphoto { opacity: 1; animation: tr-spot .6s ease-out both; }
+@keyframes tr-spot { from { opacity: 0; } }
+.title-screen .topfade { position: absolute; left: 0; right: 0; top: 0; height: 300px; background: linear-gradient(rgba(21, 18, 14, .88), rgba(21, 18, 14, .55) 60%, transparent); }
+.title-screen .vign { position: absolute; inset: 0; background: radial-gradient(120% 95% at 50% 58%, transparent 45%, rgba(10, 8, 6, .55) 75%, rgba(10, 8, 6, .92) 100%); }
+.title-screen .botfade { position: absolute; left: 0; right: 0; bottom: 0; height: 190px; background: linear-gradient(transparent, rgba(21, 18, 14, .78) 45%, rgba(21, 18, 14, .96)); }
+
+/* The photographers' flashes: a white burst of 0.1 s and a 0.3 s fade, once a cycle each, at its own moment
+   (ui/screens/Title.tsx FLASHES). Never tr-…: it never ends, so no click completes it. */
+.title-screen .flashes { position: absolute; inset: 0; pointer-events: none; }
+.title-screen .flashes i { position: absolute; border-radius: 50%; opacity: 0; mix-blend-mode: screen; background: radial-gradient(circle, rgba(255, 255, 255, .95), rgba(255, 250, 235, .5) 18%, rgba(255, 245, 225, 0) 60%); animation: title-flash 13.7s linear infinite both; }
+@keyframes title-flash { 0% { opacity: 0; } .25% { opacity: 1; } .73% { opacity: 1; } 2.92% { opacity: 0; } 100% { opacity: 0; } }
+.title-screen:not(.lit) .flashes, .title-screen.dim .flashes, .title-screen.out .flashes { display: none; }
+
+.title-screen .words { position: absolute; inset: 0; }
+.title-screen .tname {
+  position: absolute; left: 0; right: 0; top: 46px; margin: 0; text-align: center; white-space: nowrap;
+  font: 900 132px/1 'Playfair Display', Georgia, serif; letter-spacing: -1px; color: #F7F1E3;
+  text-shadow: 0 0 18px rgba(255, 248, 232, .55), 0 0 46px rgba(255, 236, 200, .35), 0 0 110px rgba(255, 226, 180, .25);
+  animation: tr-develop .8s ease-out both;
+}
+@keyframes tr-develop { from { color: #FFFFFF; text-shadow: 0 0 26px #FFFFFF, 0 0 80px rgba(255, 252, 240, .95), 0 0 190px rgba(255, 244, 222, .8); } }
+.title-screen .trule { position: absolute; left: 50%; top: 198px; width: 120px; height: 4px; margin-left: -60px; background: #D92B1F; }
+/* As the masthead's: the padding holds the italic's ascent and descent (33 px on a 31 px line). */
+.title-screen .slogan { position: absolute; left: 0; right: 0; top: 214px; padding: 2px 0; margin: 0; text-align: center; font: italic 500 24px/1.3 'Playfair Display', Georgia, serif; color: #E9E1CF; }
+.title-screen .found { position: absolute; left: 56px; bottom: 84px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: #E9E1CF; white-space: nowrap; }
+.title-screen .dots { display: flex; gap: 5px; }
+.title-screen .dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.4px solid #E9E1CF; flex: none; }
+.title-screen .dots i.f { background: #E9E1CF; }
+.title-screen .tlinks { position: absolute; left: 56px; bottom: 46px; display: flex; gap: 22px; }
+.title-screen .link {
+  padding: 4px 0; border: 0; background: none; cursor: pointer; font: 600 13px 'Libre Franklin', system-ui, sans-serif; color: #CFC6B4;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(207, 198, 180, .45); transition: color .15s;
+}
+.title-screen .link:hover, .title-screen .link:focus-visible { color: #FFCF85; outline: none; }
+/* BEGIN: bottom right, in END TURN's corner; tabloid red. */
+.title-screen .begin {
+  position: absolute; right: 56px; bottom: 52px; width: 250px; height: 56px; padding: 0 0 0 .3em; border: 0; cursor: pointer;
+  background: #D92B1F; color: #FBF6EA; font: 800 19px/56px 'Libre Franklin', system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .5); transition: background-color .15s, box-shadow .15s;
+}
+.title-screen .begin:hover, .title-screen .begin:focus-visible { background: #E8392C; box-shadow: 0 8px 22px rgba(0, 0, 0, .55), 0 0 0 2px #FBF6EA; outline: none; }
+
+/* B1, BEGIN: one big flash — the screen goes white like an overexposed photograph — and the opening card develops
+   out of it over the dimmed photograph, which keeps only itself. */
+/* Under the opening card the photograph dims itself — the card brings no dim of its own — so B2 takes it on to dark
+   from there; the words go. */
+.title-screen.dim .tphoto { opacity: .26; }
+.title-screen .words { transition: opacity .2s, visibility 0s; }
+.title-screen.dim .words { opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
+.whiteout { position: absolute; inset: 0; z-index: 390; background: #FFFDF6; pointer-events: none; animation: tr-whiteout .75s ease-out both; }
+@keyframes tr-whiteout { 0% { opacity: 0; } 16% { opacity: 1; } 30% { opacity: 1; } 100% { opacity: 0; } }
+.screen-over.develop > .screen-scrim { display: none; }
+.screen-over.develop > .scr { animation: tr-develop-card .6s .15s ease-out both; }
+@keyframes tr-develop-card { from { filter: brightness(2.3) contrast(.45) saturate(.2); } }
+/* B2, "Into spring": the card fades, the photograph fades to dark, the desk comes up (ui/desk/css/scenes.css) and
+   the two manager cards are dealt onto it. */
+.title-screen.out { animation: tr-out .12s .3s ease-in both; pointer-events: none; }
+.title-screen.lit.out .tphoto, .title-screen.out .words { animation: tr-out .3s ease-in both; }
+.screen-over.deal > .screen-scrim { animation: tr-dim .35s .35s ease-out both; }
+.screen-over.deal > .scr { animation: none; }
+.screen-over.deal .manager-choice .mgHead, .screen-over.deal .manager-choice .mgFoot { animation-delay: .6s; }
+.screen-over.deal .manager-choice .biz:nth-child(1) { animation-delay: .55s; }
+.screen-over.deal .manager-choice .biz:nth-child(2) { animation-delay: .67s; }
+
+/* Reduced motion: no develop and no flashes; each change of scene a crossfade of at most 0.2 s. Off: nothing moves. */
+:root[data-motion-resolved='reduced'] .title-screen .tphoto, :root[data-motion-resolved='reduced'] .title-screen .tname { animation: none; }
+:root[data-motion-resolved='reduced'] .title-screen .tphoto { transition: opacity .2s; }
+:root[data-motion-resolved='reduced'] .title-screen .flashes, :root[data-motion='off'] .title-screen .flashes, :root[data-motion-resolved='off'] .title-screen .flashes { display: none; }
+:root[data-motion-resolved='reduced'] .title-screen.out, :root[data-motion-resolved='reduced'] .title-screen.out .tphoto, :root[data-motion-resolved='reduced'] .title-screen.out .words { animation: tr-out .2s ease-out both; }
+:root[data-motion-resolved='reduced'] .screen-over:is(.develop, .deal) > * { animation-delay: 0s !important; animation-duration: .2s !important; }
+:root[data-motion-resolved='reduced'] .screen-over.deal .manager-choice :is(.mgHead, .mgFoot, .biz) { animation-delay: 0s !important; }
+:root[data-motion='off'] :is(.title-screen, .title-screen *, .whiteout), :root[data-motion-resolved='off'] :is(.title-screen, .title-screen *, .whiteout) { animation: none !important; transition: none !important; }

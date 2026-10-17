@@ -82,10 +82,10 @@ const DRIVE = (runs: number) => `(async () => {
   };
   // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
   // A panel (round R1, Part G) is the screen while it is open: the deck, the scrapbook, House rules, the credits.
-  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.season-card') ? 'season' : document.querySelector('.desk[data-mode="title"]') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.season-card') ? 'season' : document.querySelector('.title-screen:not(.dim)') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
-    // The title is the desk (round R3): BEGIN, its two links, the mirror's five notes (each opens the scrapbook).
-    title: ['.desk .begin', '.desk .title-links .link', '.desk [data-hook="scrapbook-note"]', '.desk .title-note'],
+    // The title (round R3, amended): BEGIN and its three links.
+    title: ['.title-screen .begin', '.title-screen .tlinks .link'],
     // A season's card, the opening's included (round R3): its button.
     season: ['.season-card .into'],
     credits: ['.p-credits .closeb', '.p-credits a'],
@@ -163,9 +163,9 @@ const DRIVE = (runs: number) => `(async () => {
   document.head.appendChild(still);
   // The title and its three panels: the scrapbook, House rules, the credits.
   reachable();
-  const TITLE_OPENS = { scrapbook: '.desk [data-hook="scrapbook-note"]', settings: '.desk .settings-open', credits: '.desk .credits-open' };
+  const TITLE_OPENS = { scrapbook: '.title-screen .scrapbook-open', settings: '.title-screen .settings-open', credits: '.title-screen .credits-open' };
   for (const id of ['scrapbook', 'settings', 'credits']) if (await visit(TITLE_OPENS[id], id)) await close(id);
-  document.querySelector('.desk .begin').click();
+  document.querySelector('.title-screen .begin').click();
   await sleep(40);
   // The opening card (round R3): spring's, before the manager.
   stats.states++;
@@ -179,9 +179,9 @@ const DRIVE = (runs: number) => `(async () => {
       window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.event-screen,.hand')?.className};
       stats.states++;
       reachable();
-      if (document.querySelector('.desk[data-mode="title"]')) {
+      if (document.querySelector('.title-screen:not(.dim)')) {
         // PLAY AGAIN leads back to the title (round R3, B6): BEGIN starts the next run.
-        document.querySelector('.desk .begin').click();
+        document.querySelector('.title-screen .begin').click();
       } else if (document.querySelector('.season-card')) {
         // A season's card waits for its button (round R3).
         stats.seasonCards++;

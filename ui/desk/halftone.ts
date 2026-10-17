@@ -756,6 +756,133 @@ function halftone(draw: (g: G, w: number, h: number) => void, w: number, h: numb
   return out;
 }
 
+/**
+ * The title's stage (round R3, amended; docs/design/visual/ref/r3-title-v2.html `titleScene`): the singer at the mic
+ * in a spotlight, the photographers' flashes around, their cameras and the crowd's heads dark in front. Drawn on the
+ * reference's own 1280×720 frame.
+ */
+function titleScene(g: G, w: number, h: number) {
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, w, h);
+  // The spotlight's cone and its pool.
+  g.fillStyle = 'rgba(255,255,255,.16)';
+  g.beginPath();
+  g.moveTo(w * 0.47, 0);
+  g.lineTo(w * 0.53, 0);
+  g.lineTo(w * 0.66, h * 0.88);
+  g.lineTo(w * 0.34, h * 0.88);
+  g.closePath();
+  g.fill();
+  glow(g, w * 0.5, h * 0.6, h * 0.42, 0.75);
+  glow(g, w * 0.5, h * 0.66, h * 0.22, 0.6);
+  g.fillStyle = '#262626';
+  g.fillRect(0, h * 0.84, w, h * 0.16);
+  g.fillStyle = 'rgba(255,255,255,.75)';
+  g.beginPath();
+  g.ellipse(w * 0.5, h * 0.865, w * 0.15, h * 0.035, 0, 0, 6.2832);
+  g.fill();
+  // The singer at the mic.
+  fig(g, w * 0.5, h * 0.865, h * 0.5, { pose: 'mic', fill: '#000' });
+  g.strokeStyle = '#000';
+  g.lineWidth = 4;
+  g.beginPath();
+  g.moveTo(w * 0.508, h * 0.865 - h * 0.5 * 0.84);
+  g.lineTo(w * 0.522, h * 0.865);
+  g.stroke();
+  // The photographers' flashes, and their cameras in the foreground.
+  for (const [x, y, r] of [
+    [0.07, 0.44, 0.22],
+    [0.93, 0.38, 0.2],
+    [0.81, 0.76, 0.12],
+    [0.19, 0.79, 0.13],
+  ] as const)
+    glow(g, w * x, h * y, h * r, 1);
+  g.fillStyle = '#000';
+  for (const [cx, cy] of [
+    [0.05, 0.97],
+    [0.95, 0.98],
+    [0.22, 1.03],
+    [0.79, 1.04],
+  ] as const) {
+    g.fillRect(w * cx - h * 0.11, h * cy - h * 0.09, h * 0.22, h * 0.18);
+    g.beginPath();
+    g.arc(w * cx, h * cy, h * 0.07, 0, 6.2832);
+    g.fill();
+    g.fillStyle = '#fff';
+    g.beginPath();
+    g.arc(w * cx, h * cy, h * 0.022, 0, 6.2832);
+    g.fill();
+    g.fillStyle = '#000';
+  }
+  for (let i = 0; i < 26; i++) {
+    const x = w * (i / 25) + ((i * 37) % 13) - 6;
+    const s = h * (0.075 + ((i * 13) % 7) * 0.006);
+    const y = h + s * 0.25;
+    g.fillStyle = '#000';
+    g.beginPath();
+    g.ellipse(x, y - s * 0.55, s * 0.3, s * 0.36, 0, 0, 6.2832);
+    g.fill();
+    g.fillRect(x - s * 0.55, y - s * 0.28, s * 1.1, s);
+  }
+}
+
+/**
+ * Light on ink (round R3, amended; the reference's `halftoneLight`): the drawing is screened the other way round —
+ * bright areas print as large cream dots on ink, so the picture reads as a positive on a dark page.
+ */
+function halftoneLight(draw: (g: G, w: number, h: number) => void, w: number, h: number, o: { dot: string; bg: string; cell: number }, offscreen: boolean): HTMLCanvasElement | OffscreenCanvas {
+  const src = drawingCanvas(w, h, offscreen);
+  const g = src.getContext('2d') as G;
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, w, h);
+  draw(g, w, h);
+  const lum = soften(g.getImageData(0, 0, w, h).data, w, h);
+  const L = (x: number, y: number): number => lum[Math.max(0, Math.min(h - 1, y | 0)) * w + Math.max(0, Math.min(w - 1, x | 0))] as number;
+  const out = drawingCanvas(w, h, offscreen);
+  const c = out.getContext('2d') as G;
+  c.fillStyle = o.bg;
+  c.fillRect(0, 0, w, h);
+  c.fillStyle = o.dot;
+  const an = Math.PI / 4;
+  const ca = Math.cos(an);
+  const sa = Math.sin(an);
+  const D = Math.hypot(w, h);
+  const least = (o.cell / 7) * 0.4;
+  for (let v = -D; v < D; v += o.cell)
+    for (let u = -D; u < D; u += o.cell) {
+      const x = u * ca - v * sa + w / 2;
+      const y = u * sa + v * ca + h / 2;
+      if (x < -2 || y < -2 || x > w + 2 || y > h + 2) continue;
+      const r = Math.sqrt(Math.pow(L(x, y), 1.1)) * o.cell * 0.6;
+      if (r > least) {
+        c.beginPath();
+        c.arc(x, y, r, 0, 6.2832);
+        c.fill();
+      }
+    }
+  return out;
+}
+
+/** The title photograph's frame: the reference's, whose 7 px dot cell scales with the pixels it is drawn at. */
+const TITLE = { w: 1280, h: 720, cell: 7, dot: '#CFC6B2', bg: '#15120E' } as const;
+
+/** The title's photograph at `w`×`h` pixels (the screen's own size): the reference's frame, scaled to fill them. */
+export function renderTitleCanvas(w: number, h: number, offscreen: false): HTMLCanvasElement;
+export function renderTitleCanvas(w: number, h: number, offscreen: true): OffscreenCanvas;
+export function renderTitleCanvas(w: number, h: number, offscreen: boolean): HTMLCanvasElement | OffscreenCanvas {
+  const k = w / TITLE.w;
+  return halftoneLight(
+    (g) => {
+      g.scale(k, h / TITLE.h);
+      titleScene(g, TITLE.w, TITLE.h);
+    },
+    w,
+    h,
+    { dot: TITLE.dot, bg: TITLE.bg, cell: TITLE.cell * k },
+    offscreen,
+  );
+}
+
 const cache = new Map<string, string>();
 
 export type PhotoJob=readonly [scene:SceneId|'headshot',season:SeasonId,variant:number];

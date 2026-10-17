@@ -93,12 +93,12 @@ async function bubblesStay(page: Page, url: string): Promise<Result[]> {
   for (const [index, manager] of ['Dex', 'Mags'].entries()) {
     await page.navigate(`${url}?seed=20261017`, 1500);
     await page.evaluate(`delete document.documentElement.dataset.motion`);
-    for (let i = 0; i < 100 && !(await centre(page, '.desk[data-mode="title"] .begin')); i++) await sleep(50);
+    for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
     await sleep(400);
-    await press('.desk .begin');
+    await press('.title-screen .begin');
     await sleep(900);
     await press('.season-card .into');
-    await sleep(1300);
+    await sleep(1500);
     await press('.manager-choice .choose', index);
     await sleep(700);
     await idle();

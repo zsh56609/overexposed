@@ -6,6 +6,56 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, amended: the title is one photograph
+
+The author, looking at the title mock: the desk is the game's busiest screen, so
+the title should not be the desk. This replaces Part A's A1 and Part B's B1,
+B2, B3 and B6 below (reference docs/design/visual/ref/r3-title-v2.png, drawn by
+r3-title-v2.html; r3-title.png is deleted).
+
+- **A1, the title** (ui/screens/Title.tsx, ui/screens/title.css): one photograph,
+  the whole stage, no desk and no stat bar. The photo worker draws the
+  reference's `titleScene` — the singer at the mic in a spotlight, the
+  photographers' flashes, their cameras and the crowd dark in front — in a new
+  light-on-ink mode (ui/desk/halftone.ts `renderTitleCanvas`): bright areas
+  print as large cream dots (#CFC6B2) on ink, a positive on a dark page. It is
+  drawn once, at the stage's pixel size (device pixels, at most 3840 wide; the
+  reference's 7 px dot cell scaled with it), in the worker where there is one,
+  and kept for the page's life. Over it, as the reference lays them out:
+  OVEREXPOSED in Playfair Display 900, cream, glowing; a short red rule; the
+  slogan in Playfair italic (`ui.title.slogan`); BEGIN bottom right, tabloid
+  red, in END TURN's corner at the reference's place (56 px in from the edges,
+  not END TURN's own 22); "Endings found {n} / {total}" with the dots and the
+  three links bottom left; a dark fade at the top and the bottom.
+  - Arrival: the spotlight comes up (the photograph fades in, 0.6 s; it waits
+    for the photograph on a first load) and the name develops, white-hot with a
+    wide bloom, settling to cream (0.8 s). Then six flashes pop near the edges,
+    each once in a 13.7 s cycle at its own moment (2.1, 4.6, 6.2, 9.1, 10.5 and
+    12.8 s): a white burst of 0.1 s and a 0.3 s fade, a fixed pattern, never
+    random. Their keyframes are not `tr-…`: they never end, so no click
+    completes them. Reduced motion or off: no develop and no flashes.
+  - The title paper, the mirror's five notes, the fan of five faces and their
+    CSS are gone, with the six keys only they used (`ui.title.ear`, `.line1`,
+    `.line2`, `.endingsFound`, `.foundOf`, `.tagline`).
+- **B1**, BEGIN: one big flash — the screen goes white (0.12 s), holds, and
+  clears (to 0.75 s) — and the opening card develops out of it, from
+  overexposed to itself (0.6 s), over the photograph, which dims itself (the
+  card brings no dim of its own), its words gone.
+- **B2**, "Into spring": the card fades; the photograph goes to dark (0.3 s);
+  the desk comes up out of the dark (0.3–0.7 s), the mirror's bulbs lighting
+  one by one (25 ms apart); the two manager cards are dealt onto it (from 0.55
+  s). The manager choice is clickable at 1.2 s, inside the 1.5 s a season
+  card's button allows (A3). Before the manager is signed the desk has no
+  papers, no notes and no stat bar.
+- **B3**, signing: as before, the other card slides away and the signed one
+  flies to the phone and fades into it; the month's three papers now drop onto
+  the desk (from 70 px above, 0.4 s, 60 ms apart), the stat bar and the
+  mirror's notes coming in with them; then the offers.
+- **B6**, PLAY AGAIN: the fade through ink (0.35 s in, 0.3 s out), then the
+  title arrives as on first load, its photograph already drawn.
+- Reduced motion: each a crossfade of at most 0.2 s; D7: a click during B1 or
+  B2 completes it at once and does nothing else.
+
 ## 2026-10-17 — Round R3, Part E: small things
 
 - **E1, the mug** (docs/design/visual/ref/mug.svg): the neutral desk's mug is
@@ -60,7 +110,9 @@ rules).
   0.38 s apart, the phone buzzing with each message, each bubble rising in
   as it did on its beat. They are the desk's own tails now
   (ui/desk/DeskItems.tsx `Bubbles`), not beats of a step: they hold no
-  input, and the next action brings the rest at once. No step waits for
+  input, and the next action brings the rest at once, the phone's buzz
+  finished with them (the acceptance's check:motion: a skip leaves nothing
+  moving). No step waits for
   them any more, so the month ends got shorter: unskipped, a calm one at
   most 2.40 s (was 2.99), one with scandals at most 4.76–6.97 s by count
   (was 5.59–7.75).

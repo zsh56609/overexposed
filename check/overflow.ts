@@ -120,10 +120,6 @@ const AUDIT = `window.__deskAudit = (where) => {
     sc.replaceChildren(...was);
   }
   const clk = desk.querySelector('.lock .clk'); if (clk) holds(clk, 'phone clock');
-  // The title (round R3): the title paper holds its masthead, ears, dateline and lines; its links on the stage.
-  const tp = desk.querySelector('.titlepaper');
-  if (tp) { holds(tp, 'title paper'); for (const x of tp.querySelectorAll('.mh, .dl, .ear, .tlines i')) holds(x, 'title paper line'); within(tp, STAGE, 'title paper'); }
-  for (const x of desk.querySelectorAll('.title-links .link')) within(x, STAGE, 'title link');
   // The bubbles stay below the stat bar and on the stage, the reaction row too.
   const bub = desk.querySelector('.bubbles'); if (bub && bub.children.length) { const b = S(bub.getBoundingClientRect()); if (b.t < 50) add('bubbles reach the stat bar: top ' + Math.round(b.t)); }
   for (const x of desk.querySelectorAll('.bub, .rx-bar')) within(x, { l: 0, t: 46, r: 1280, b: 720 }, 'bubble');
@@ -174,6 +170,38 @@ const PLAIN = `window.__plainAudit = (where) => {
         if (r.left < ar.left - 1 || r.top < ar.top - 1 || r.right > ar.right + 1 || r.bottom > ar.bottom + 1) { add('cut off by ' + name(a) + ': ' + name(el) + text(el)); break; }
       }
     }
+  }
+  return out;
+};`;
+
+/**
+ * Runs in the page: the title (round R3, amended) — one photograph, the whole stage. The name on one line across the
+ * stage; the slogan, the endings found, the links and BEGIN each hold their text, on the stage, clear of each other.
+ */
+const TITLE_AUDIT = `window.__titleAudit = (where) => {
+  const out = [];
+  const add = (m) => out.push(where + ': ' + m);
+  const t = document.querySelector('.title-screen');
+  if (!t) return out;
+  const stage = document.querySelector('.stage').getBoundingClientRect();
+  const k = stage.width / 1280;
+  const S = (r) => ({ l: (r.left - stage.left) / k, t: (r.top - stage.top) / k, r: (r.right - stage.left) / k, b: (r.bottom - stage.top) / k });
+  const name = (el) => el.tagName.toLowerCase() + '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.');
+  const holds = (el, what) => { if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1) add(what + ' ' + name(el) + ' holds ' + el.scrollWidth + 'x' + el.scrollHeight + ' in ' + el.clientWidth + 'x' + el.clientHeight + ' "' + el.textContent.slice(0, 50) + '"'); };
+  const within = (el, what) => { const a = S(el.getBoundingClientRect()); if (a.l < -0.5 || a.t < -0.5 || a.r > 1280.5 || a.b > 720.5) add(what + ' off the stage at ' + [a.l, a.t, a.r, a.b].map(Math.round) + ' "' + el.textContent.slice(0, 40) + '"'); };
+  const tname = t.querySelector('.tname');
+  if (tname) {
+    if (tname.scrollWidth > tname.clientWidth + 1) add('the name is wider than the stage: ' + tname.scrollWidth);
+    const r = document.createRange(); r.selectNodeContents(tname); const g = S(r.getBoundingClientRect());
+    if (g.l < 0 || g.r > 1280 || g.t < 0) add('the name runs off the stage at ' + [g.l, g.t, g.r, g.b].map(Math.round));
+  } else add('no name');
+  const parts = [['slogan', '.slogan'], ['endings found', '.found'], ['links', '.tlinks'], ['BEGIN', '.begin']].map(([w, sel]) => [w, t.querySelector(sel)]);
+  for (const [w, el] of parts) { if (!el) { add('no ' + w); continue; } holds(el, w); within(el, w); }
+  for (const l of t.querySelectorAll('.tlinks .link')) { holds(l, 'link'); within(l, 'link'); }
+  const boxes = parts.filter(([, el]) => el).map(([w, el]) => [w, S(el.getBoundingClientRect())]);
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const a = boxes[i][1], b = boxes[j][1];
+    if (a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b) add(boxes[i][0] + ' runs into ' + boxes[j][0]);
   }
   return out;
 };`;
@@ -311,11 +339,11 @@ const DRIVE = (runs: number) => `(async () => {
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
   document.head.appendChild(still);
-  // The title is the desk (round R3): audited as the desk, its panels from the mirror's note and its links.
-  note(__deskAudit('title'));
+  // The title (round R3, amended): one photograph; audited as itself, its three panels from its links.
+  note(__titleAudit('title'));
   seen.screens.title = 1;
-  for (const [id, opener] of [['scrapbook', '.desk [data-hook="scrapbook-note"]'], ['settings', '.desk .settings-open'], ['credits', '.desk .credits-open']]) await panel(opener, id);
-  document.querySelector('.desk .begin').click();
+  for (const [id, opener] of [['scrapbook', '.title-screen .scrapbook-open'], ['settings', '.title-screen .settings-open'], ['credits', '.title-screen .credits-open']]) await panel(opener, id);
+  document.querySelector('.title-screen .begin').click();
   await sleep(40);
   plain('opening card');
   document.querySelector('.season-card .into').click();
@@ -324,10 +352,10 @@ const DRIVE = (runs: number) => `(async () => {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
-      const phase = document.querySelector('.desk[data-mode="title"]') ? 'title' : document.querySelector('.season-card') ? 'season' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
+      const phase = document.querySelector('.title-screen:not(.dim)') ? 'title' : document.querySelector('.season-card') ? 'season' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
       window.__auditProgress = { run, guard, phase, states:seen.states, previews:seen.previews, tips:seen.tips };
       // PLAY AGAIN leads back to the title (round R3, B6): audited, then BEGIN starts the next run.
-      if (phase === 'title') { note(__deskAudit('title')); document.querySelector('.desk .begin').click(); await sleep(8); continue; }
+      if (phase === 'title') { seen.screens.title++; note(__titleAudit('title')); document.querySelector('.title-screen .begin').click(); await sleep(8); continue; }
       if (phase === 'season') { plain('season card'); note(__deskAudit('season card')); document.querySelector('.season-card .into').click(); await sleep(8); continue; }
       if (phase === 'manager') { plain('manager'); note(__deskAudit('manager')); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));
@@ -416,6 +444,7 @@ try {
         await page.evaluate(AUDIT);
         await page.evaluate(PLAIN);
         await page.evaluate(EVENTS);
+        await page.evaluate(TITLE_AUDIT);
         const out = await auditStep<Out>(page, `${tag} ${RUNS} runs`, DRIVE(RUNS), 600_000);
         const screens = Object.entries(out.screens)
           .map(([k, n]) => `${k} ${n}`)

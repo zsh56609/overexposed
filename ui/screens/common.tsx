@@ -64,9 +64,11 @@ export function useStampedChoice<T>(act: (choice: T) => void): readonly [T | nul
 /**
  * What opens over the desk (round R3, B4): the dim fades in (0.2 s) and the content rises and fades in (0.25 s) —
  * ui/style.css — and the content is there to be used at once: an entrance holds no input. When it closes it fades
- * out (0.15 s), its last content kept, inert, that long; with motion off it goes at once.
+ * out (0.15 s), its last content kept, inert, that long; with motion off it goes at once. `enter` names another
+ * entrance (round R3, amended): the opening card developing out of BEGIN's flash, the manager cards dealt as the desk
+ * comes up (ui/screens/title.css).
  */
-export function Over({ show, full = false, children }: { show: boolean; full?: boolean; children?: ReactNode }) {
+export function Over({ show, full = false, enter, children }: { show: boolean; full?: boolean; enter?: 'develop' | 'deal'; children?: ReactNode }) {
   const last = useRef<ReactNode>(null);
   const [gone, setGone] = useState(!show);
   if (show) last.current = children;
@@ -86,7 +88,7 @@ export function Over({ show, full = false, children }: { show: boolean; full?: b
     }, 150);
     return () => window.clearTimeout(timer);
   }, [show]);
-  const cls = `screen-over${full ? ' full' : ''}`;
+  const cls = `screen-over${full ? ' full' : ''}${enter ? ` ${enter}` : ''}`;
   if (show)
     return (
       <div className={cls}>

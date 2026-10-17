@@ -1,6 +1,61 @@
 import { SCENE_IDS, SEASON_IDS } from '../../core/index.ts';
 import { t } from '../i18n.ts';
-import { cachePhotoBlob, photoUrl, type PhotoJob } from './halftone.ts';
+import { cachePhotoBlob, photoUrl, renderTitleCanvas, type PhotoJob } from './halftone.ts';
+
+let title: Promise<string> | null = null;
+let titleReady: string | null = null;
+/**
+ * The title's photograph (round R3, amended): drawn once, at the screen's pixel size, in the worker where there is
+ * one (else on the page when it is idle), and kept for the page's life — PLAY AGAIN finds it ready.
+ */
+export function titlePhoto(w: number, h: number): Promise<string> {
+  return (title ??= new Promise<string>((resolve) => {
+    const keep = (url: string) => {
+      titleReady = url;
+      resolve(url);
+    };
+    const draw = () => keep(renderTitleCanvas(w, h, false).toDataURL());
+    const later = () => {
+      if ('requestIdleCallback' in window) window.requestIdleCallback(draw, { timeout: 500 });
+      else setTimeout(draw, 40);
+    };
+    if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') {
+      later();
+      return;
+    }
+    try {
+      const worker = new Worker(new URL('./photo-worker.ts', import.meta.url), { type: 'module' });
+      let settled = false;
+      const fall = () => {
+        if (settled) return;
+        settled = true;
+        worker.terminate();
+        later();
+      };
+      worker.onmessage = (event: MessageEvent<{ blob?: Blob; error?: string }>) => {
+        if (settled) return;
+        if (!event.data.blob) {
+          fall();
+          return;
+        }
+        settled = true;
+        worker.terminate();
+        keep(URL.createObjectURL(event.data.blob));
+      };
+      worker.onerror = (event) => {
+        event.preventDefault();
+        fall();
+      };
+      worker.onmessageerror = fall;
+      window.setTimeout(fall, 15000);
+      worker.postMessage({ title: { w, h } });
+    } catch {
+      later();
+    }
+  }));
+}
+/** The title's photograph if it is drawn already: the title after PLAY AGAIN starts with it. */
+export const titlePhotoNow = (): string | null => titleReady;
 
 export interface PhotoWarmResult { readonly method:'worker'|'idle';readonly count:number;readonly reason?:string }
 let warming:Promise<PhotoWarmResult>|null=null;

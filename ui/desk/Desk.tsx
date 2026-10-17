@@ -17,9 +17,6 @@ import { Papers, type IncomingPaper } from './Papers.tsx';
 import { eventPress } from '../../core/index.ts';
 import { paperForPlay, type DeskModel } from './model.ts';
 import { StatBar } from './StatBar.tsx';
-import { TitleControls, TitleFan, TitleNotes, TitlePaper } from './Title.tsx';
-import type { HandCardModel } from './model.ts';
-import type { ContentIndex } from '../../core/index.ts';
 import { useSettings } from '../settings.ts';
 import './tokens.css';
 import './fonts.css';
@@ -30,7 +27,7 @@ import './css/papers.css';
 import './css/desk-items.css';
 import './css/hand.css';
 import './css/motion.css';
-import './css/title.css';
+import './css/scenes.css';
 
 /** "Mark my stories" (README §2): a House rules setting, on by default; round V2 gives it its switch. */
 /** What the player can do on the desk: each is a dispatch or a UI toggle in App, never a rule. */
@@ -46,21 +43,11 @@ export interface DeskActions {
 }
 
 /**
- * Which desk this is (round R3, Part A): the title, the night before the year (its paper, the mirror's five notes,
- * the fan and BEGIN); the opening card over it; the manager choice on it; or the year being played.
+ * Which desk this is (round R3, amended): the manager choice dealt onto it, the night before the year — no papers,
+ * no notes, no stat bar — or the year being played. The title and the opening card are not the desk
+ * (ui/screens/Title.tsx).
  */
-export type DeskMode = 'title' | 'opening' | 'manager' | 'game';
-
-/** What the title needs that the year's model does not: the endings found, the fan's faces, its three controls. */
-export interface DeskIntro {
-  readonly c: ContentIndex;
-  readonly found: ReadonlySet<string>;
-  readonly fan: readonly HandCardModel[];
-  readonly begin: () => void;
-  readonly settings: () => void;
-  readonly credits: () => void;
-  readonly scrapbook: () => void;
-}
+export type DeskMode = 'manager' | 'game';
 
 /** The phone on the night before the year: its lock screen and the time, nothing yet. */
 const QUIET_PHONE = { notes: [] } as const;
@@ -79,11 +66,11 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
 }
 
 /**
- * The desk. Round R3: `mode` (which desk), `scene` (a change of scene before the year: the fan leaving, the title
- * paper sliding off), `arriving` (signing: the month's papers, the stat bar and the mirror's notes coming in), `fresh`
- * (the title after PLAY AGAIN: the mirror's bulbs coming on).
+ * The desk. Round R3 (amended): `mode` (which desk), `busy` (a change of scene runs), `rising` (B2: the desk coming up
+ * out of the dark, its bulbs lighting one by one), `arriving` (B3, signing: the month's papers dropping onto it, the
+ * stat bar and the mirror's notes coming in).
  */
-export function Desk({ model, on, children, snap, onTails, mode = 'game', intro = null, busy = false, scene = null, arriving = false, fresh = false }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void; mode?: DeskMode; intro?: DeskIntro | null; busy?: boolean; scene?: 'begin' | 'into' | null; arriving?: boolean; fresh?: boolean }) {
+export function Desk({ model, on, children, snap, onTails, mode = 'game', busy = false, rising = false, arriving = false }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void; mode?: DeskMode; busy?: boolean; rising?: boolean; arriving?: boolean }) {
   const [toast, showToast] = useToast();
   const view=presentation(snap,model);
   // Mark my stories (House rules, round R1 G3): the red margin rule on the player's stories.
@@ -103,19 +90,13 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', intro 
   );
   const game = mode === 'game';
   return (
-    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${arriving ? ' arriving' : ''}${fresh && mode === 'title' ? ' lights-on' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${rising ? ' rising' : ''}${arriving ? ' arriving' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
-      {/* The night before the year (round R3): the title paper where the month's papers stand, until the manager is chosen. */}
-      {game ? <Papers papers={model.papers} incoming={incoming} /> : intro && (mode !== 'manager' || scene === 'into') && <TitlePaper c={intro.c} season={model.season} off={mode === 'manager'} />}
-      {game || !intro ? (
-        <Mirror mirror={model.mirror} crisis={model.crisis} />
-      ) : (
-        <Mirror mirror={null} crisis={false}>
-          <TitleNotes c={intro.c} found={intro.found} open={intro.scrapbook} />
-        </Mirror>
-      )}
+      {/* The night before the year (round R3): no papers and no notes until the manager is signed. */}
+      {game && <Papers papers={model.papers} incoming={incoming} />}
+      <Mirror mirror={game ? model.mirror : null} crisis={game && model.crisis} />
       <div className="floor" />
       <div className="deskscene">
         <div className="desktop">
@@ -131,8 +112,6 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', intro 
       {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} onTails={onTails} />}
       <div className="dim" />
       {game && model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
-      {intro && (mode === 'title' || (mode === 'opening' && scene === 'begin')) && <TitleFan cards={intro.fan} words={model.handWords} leaving={mode === 'opening'} />}
-      {mode === 'title' && intro && <TitleControls onBegin={intro.begin} onSettings={intro.settings} onCredits={intro.credits} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">
         {toast.text}
       </div>
