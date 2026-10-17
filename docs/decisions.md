@@ -6,6 +6,16 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1 acceptance: a preview under a resting pointer
+
+- **Found in the run by real input**: a card that comes under a resting
+  pointer while a play holds input (the fan closing) gets its pointer
+  enter during the hold, when every preview is cleared, and none after:
+  moving within it showed nothing until the pointer left and came back.
+  A card and END TURN now take focus on the pointer's next move over
+  them too; the same card at the same place is the same focus, so a
+  pointer moving within a card renders nothing again.
+
 ## 2026-10-17 — Round R1, Part I: the checks, leaner
 
 - **What a round runs**: build, typecheck, validate, `check:queue`,

@@ -157,6 +157,10 @@ interface Anchor {
 /** What floats beside the player's pointer: a card's preview, the end of the month's, or nothing. */
 type Focus = { readonly kind: 'card'; readonly uid: number; readonly anchor: Anchor } | { readonly kind: 'end'; readonly anchor: Anchor } | null;
 
+const sameFocus = (a: Focus, b: Focus): boolean =>
+  a === b ||
+  (a !== null && b !== null && a.kind === b.kind && (a.kind === 'end' || (b.kind === 'card' && a.uid === b.uid)) && a.anchor.left === b.anchor.left && a.anchor.top === b.anchor.top);
+
 const FLOAT_WIDTH = 400;
 const FLOAT_GAP = 8;
 
@@ -229,7 +233,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       settings: () => setPanel('settings'),
       play: (uid: number) => act({ type: 'PLAY_CARD', uid }),
       end: () => act({ type: 'END_TURN' }),
-      focus: (next: Focus) => setFocus(queue.busy ? null : next),
+      // The same card at the same place is the same focus: a pointer moving within it renders nothing again.
+      focus: (next: Focus) => setFocus((prev) => (queue.busy ? null : sameFocus(prev, next) ? prev : next)),
     }),
     [act, queue],
   );

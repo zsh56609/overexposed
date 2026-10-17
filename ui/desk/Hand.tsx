@@ -126,6 +126,10 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
       onPointerLeave={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType === 'mouse') focus(null);
       }}
+      // A card that came under a resting pointer during a hold previews at the pointer's next move (round R1).
+      onPointerMove={(e: PointerEvent<HTMLDivElement>) => {
+        if (e.pointerType === 'mouse' && !busy) focus({ kind: 'card', uid: card.uid, anchor });
+      }}
       onPointerDown={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType === 'mouse' || busy) return;
         longPressed.current = false;
@@ -173,6 +177,9 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
         }}
         onPointerLeave={(e) => {
           if (e.pointerType === 'mouse') focus(null);
+        }}
+        onPointerMove={(e) => {
+          if (e.pointerType === 'mouse' && !busy) focus({ kind: 'end', anchor: END_ANCHOR });
         }}
         onFocus={(e) => {
           if (keyboardFocus(e.currentTarget)) focus({ kind: 'end', anchor: END_ANCHOR });
