@@ -54,6 +54,7 @@ export const CHECKS = {
   structure: 'run structure (gates per act, scandal pool, flags)',
   budget: 'content budget (ceilings)',
   boundaries: 'code boundaries (CLAUDE.md §0)',
+  sound: "the sound module: the author's, copied unchanged",
 } as const;
 export type CheckId = keyof typeof CHECKS;
 
@@ -1816,6 +1817,21 @@ const STATE_READ = String.raw`(?:\.resources\s*(?:\.\s*\w+|\[[^\]]*\])|\.slots\b
 const COMPARE = String.raw`(?:<=|>=|<(?![/=>\w])|(?<![=\-])>(?!=))`;
 const UI_RULE = [new RegExp(`${STATE_READ}\\s*${COMPARE}`), new RegExp(`${COMPARE}\\s*[\\w.]*?${STATE_READ}`)];
 const UI_HEAT_MATHS = /\b(?:effectiveHeatThreshold|heatThreshold|thresholdFloor|degradePerScandal)\b|\.vent\b/;
+
+/**
+ * The sound module (round R4, B1): ui/sound/oxsound.js is docs/design/sound/overexposed-sound.js unchanged but for one
+ * added last line, `export { OXSound };`. It is never edited: a new version from the author replaces the reference
+ * and is copied again. Line endings aside, the two must agree.
+ */
+export function checkSoundModule(reference: string | null, copy: string | null): Issue[] {
+  const where = 'ui/sound/oxsound.js';
+  const err = (message: string): Issue[] => [{ level: 'error', check: 'sound', where, message }];
+  if (reference === null) return err('docs/design/sound/overexposed-sound.js, the reference, is missing');
+  if (copy === null) return err('missing: copy the reference here and add `export { OXSound };` as its last line');
+  const norm = (text: string) => text.replace(/\r\n/g, '\n').replace(/\n*$/, '\n');
+  if (norm(copy) !== `${norm(reference)}export { OXSound };\n`) return err('differs from docs/design/sound/overexposed-sound.js beyond its added last line: copy the reference again');
+  return [];
+}
 
 export function checkBoundaries(files: readonly { readonly path: string; readonly text: string }[]): Issue[] {
   const issues: Issue[] = [];

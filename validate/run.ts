@@ -1,9 +1,9 @@
 // npm run validate — content schema, i18n keys and code boundaries. Exit code 1 on any error.
 
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
-import { CHECKS, checkBoundaries, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { CHECKS, checkBoundaries, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -18,6 +18,8 @@ try {
   issues.push({ level: 'error', check: 'schema', where: 'load', message: (err as Error).message });
 }
 issues.push(...checkBoundaries(readSources(SOURCE_DIRS)));
+const text = (path: string) => (existsSync(join(ROOT, path)) ? readFileSync(join(ROOT, path), 'utf8') : null);
+issues.push(...checkSoundModule(text('docs/design/sound/overexposed-sound.js'), text('ui/sound/oxsound.js')));
 
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');

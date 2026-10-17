@@ -1,16 +1,21 @@
-// "House rules" (README §9, settings; round R1): Mark my stories, on by default, and Reduce motion, off. UI state
-// only — no rule reads it. Kept in this browser (guarded like the endings collection). Reduce motion drives the
-// existing reduced mode (ui/motion.ts) through the same switch the OS preference and the audits use.
+// "House rules" (README §9, settings; round R1): Mark my stories, on by default, and Reduce motion, off; since round
+// R4, Sound effects and Music, both on. UI state only — no rule reads it. Kept in this browser (guarded like the
+// endings collection). Reduce motion drives the existing reduced mode (ui/motion.ts) through the same switch the OS
+// preference and the audits use; the two sound switches drive ui/sound/sound.ts.
 
 import { useSyncExternalStore } from 'react';
 
 export interface Settings {
   readonly markStories: boolean;
+  /** The effects and the room's ambience (round R4, B5). */
+  readonly soundEffects: boolean;
+  /** The six tracks (round R4, B5). */
+  readonly music: boolean;
   readonly reduceMotion: boolean;
 }
 
 const KEY = 'overexposed.settings';
-const DEFAULTS: Settings = { markStories: true, reduceMotion: false };
+const DEFAULTS: Settings = { markStories: true, soundEffects: true, music: true, reduceMotion: false };
 const listeners = new Set<() => void>();
 
 function load(): Settings {
@@ -20,6 +25,8 @@ function load(): Settings {
       const p = parsed as Partial<Record<keyof Settings, unknown>>;
       return {
         markStories: typeof p.markStories === 'boolean' ? p.markStories : DEFAULTS.markStories,
+        soundEffects: typeof p.soundEffects === 'boolean' ? p.soundEffects : DEFAULTS.soundEffects,
+        music: typeof p.music === 'boolean' ? p.music : DEFAULTS.music,
         reduceMotion: typeof p.reduceMotion === 'boolean' ? p.reduceMotion : DEFAULTS.reduceMotion,
       };
     }
@@ -53,9 +60,11 @@ export function setSetting<K extends keyof Settings>(key: K, value: Settings[K])
   for (const fn of listeners) fn();
 }
 
-const subscribe = (fn: () => void): (() => void) => {
+/** Told whenever a setting changes (the sound layer listens, round R4). */
+export const subscribeSettings = (fn: () => void): (() => void) => {
   listeners.add(fn);
   return () => listeners.delete(fn);
 };
+const subscribe = subscribeSettings;
 
 export const useSettings = (): Settings => useSyncExternalStore(subscribe, settings);

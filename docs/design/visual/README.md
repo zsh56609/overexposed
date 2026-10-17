@@ -185,8 +185,43 @@ italic line.
 - **Endings.** A scrapbook: four columns for the majors with their goal lines; found
   minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
   "Endings found · N of 14".
-- **Settings — "House rules".** Mark my stories (on), Sound (on), Reduce motion (off).
-  Sound stays hidden until the game has sound (round R1). Credits share this panel's style.
+- **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
+  (off). Sound effects carries the effects and the room around the desk; Music the six tracks — switched
+  back on, the game's current track comes back (round R4). Credits share this panel's style: the fonts,
+  the music (Holizna, CC0 1.0, linked to Holizna's OpenGameArt page) and how the sound is made.
+
+### 10. Sound (round R4)
+
+Every effect and the room are the author's module (`docs/design/sound/overexposed-sound.js`, copied to
+`ui/sound/oxsound.js` with one added export line; validate holds the two equal): synthesized in code from a
+fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `public/audio/music/`.
+
+- **Effects play with their beat.** The queue's beats are heard by `ui/sound/director.ts`, so a D7
+  fast-forward plays none of the skipped beats' sounds. A card: pick as it leaves the hand, land as it lands,
+  its paper as it comes forward, print as its headline sets or a pencil as it goes into the notebook, clear
+  when it exhausts a scandal. A number: a tick per step it rolls (at most every 50 ms); cash or spend for
+  money, heat as heat rises, a low line when the heat tier rises into Breaking or Frenzy. The month end: a
+  button at END TURN, a stamp for PRINTED, paper and scandal for a scandal's headline and its card, one deal
+  as the pile flies to Deck & Discard, the month as the date turns, the season as its card arrives, paper as
+  the papers drop, a deal for each card dealt (a shuffle first after the deck is shuffled). Signing: two
+  picks, the cards leaving. An answer: send and a bubble on the phone; a letter's SENT stamp.
+- **The screens' own sounds.** A hand card under the mouse (mouse only, at most every 60 ms); the stamps
+  (TAKEN, SIGNED, ACCEPTED); the offers rising (three deals, 70 ms apart) and the offer taken flying to the
+  deck (a deal); the doors laid out; a panel opening and closing; the phone's buzz and each bubble; a letter
+  landing; BEGIN's flash; Continue, the tickets and PLAY AGAIN (a button); on the awards night an ovation
+  as it names The Breakthrough or Overexposed, and applause for each plaque, 0.3 s apart.
+- **The room.** Whenever the desk is on stage, under its overlays too, with the season's weather from the
+  Flash's ear: rain in spring, wind in autumn and winter, the room alone in summer. It changes with the
+  season card. None on the title or the awards night.
+- **Music.** One track at a time, at one gain (`MUSIC_GAIN`). BEGIN fades spring in (2 s). The scandal
+  track comes at the first impact (2.5 s), plays through the next month, and the season's track comes back
+  at the date of the next month end that prints none — never at months 3, 6 and 9, whose season card
+  brings the new season's track (3 s) unless that month end printed a scandal. The last door fades the
+  music as the lights go out (1.2 s); the night has its own track (1.5 s); PLAY AGAIN fades out with the
+  ink, and the title is silent. Tracks load only when needed or soon to be: the next season's in a season's
+  last month, the scandal track once a scandal is held, the awards track in winter.
+- Nothing sounds before the first BEGIN click; a play the browser refuses leaves the game silent. A hidden
+  page suspends the sound and pauses the music. `?cues` logs every cue for the checks.
 
 ## Porting notes
 
@@ -219,3 +254,4 @@ object for manager messages) with the real `/core` queries and `/i18n` keys.
 - **Round 2c (content and information display):** tooltips; card flavour lines; cost only above one; lane-weighted draft; new screen cards; craft icon by lane; month names and calendar; season marks; countdown icon and colours; stat bar order; the card face field; desk scripts; two-bubble manager messages and a quiet-month trigger; tier words on the goals board; scene tags.
 - **Visual phase:** everything else in this README — V1a the desk, static (§1–§7); V1b its motion (§9's "Playing a card" and "Month end"); V2 the screens around it (§8–§9).
 - **Phase 3:** the event presentations in §9 are the target look for events.
+- **Round R4:** the sound (§10) and its two House rules switches.

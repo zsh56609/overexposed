@@ -8,6 +8,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { isPlaceholder } from '../text.ts';
 import { motionMode, useMotionMode } from '../motion.ts';
+import { cue } from '../sound/sound.ts';
 import { crumple, sheetA, sheetB } from './drawings.ts';
 import type { DeskLabels, LaneClass, MessagesModel, PhoneModel, ScriptModel } from './model.ts';
 
@@ -401,6 +402,7 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
   useEffect(() => {
     if (shown.month !== month) {
       setShown({ month, n: motionMode() === 'full' ? 0 : allowed });
+      if (motionMode() === 'reduced' && allowed > 0) cue('buzz'); // all at once: the buzz alone (round R4, B2)
       return;
     }
     if (n >= allowed) return;
@@ -411,6 +413,9 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
     if (busy) return; // the deal first: they come once the desk is still
     const id = window.setTimeout(() => {
       setShown({ month, n: n + 1 });
+      // A month's messages begin with a buzz, and each bubble pops (round R4, B2); a click that shows them all, none.
+      if (n === 0) cue('buzz');
+      cue('bubble');
       if (n % 2 === 0) buzzing.current = buzz(box.current?.closest('.desk') ?? null);
     }, n === 0 ? REVEAL.first : REVEAL.next);
     const untail = onTails?.(() => {

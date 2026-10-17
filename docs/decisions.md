@@ -6,6 +6,72 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R4, Part B: sound and music
+
+- **B1, the module.** The author's `docs/design/sound/overexposed-sound.js`
+  is copied to `ui/sound/oxsound.js` with one added last line,
+  `export { OXSound };`, and typed by `oxsound.d.ts`; validate holds the two
+  equal but for that line. `init()` comes from the first BEGIN click,
+  `prepare()` once the opening card has settled; a hidden page suspends the
+  graph and pauses the music, a shown one resumes both. A play the browser
+  refuses, or a browser without Web Audio, leaves the game silent with no
+  console error.
+- **B2, effects with their beat.** `ui/sound/director.ts` listens to the
+  queue beside React and plays each beat's sound as the beat is emitted; a
+  D7 skip emits none of the beats it skips, so none of their sounds play.
+  The screens play their own (a hover, a stamp, a panel, the phone, the
+  night). Where the table left room:
+  - the first deal after a shuffle plays shuffle, then its deal;
+  - a play that draws plays one deal on its land beat (a shuffle first if it
+    shuffled): a play has no beat per card;
+  - the pile's flight plays one deal, and only when something lies on it;
+  - the papers drop on the publish beat of a step that turns the month, and
+    of signing (the first papers arrive); never on the night;
+  - a letter's tick is silent, its SENT stamp at the reply beat is the stamp;
+    a text's reply sends at the answer's first beat, their answer bubbles at
+    the reply beat;
+  - an extra pick or a new offer has no beat: its spend plays as its number
+    rolls (not with motion off, not after a skip);
+  - the manager cards dealt as the desk comes up play two deals at their
+    landings (0.55 s, 0.67 s); a click that completes the scene drops them;
+  - a text's messages bubble one by one in full motion; with reduced motion
+    they come at once, with the buzz alone; the month's bubbles likewise;
+  - the ovation is for the majors on the upper side of the fame axis — the
+    axis on hype, read from content: The Breakthrough and Overexposed — as
+    the night names the major (0.6 s); applause per plaque from 2.45 s,
+    0.3 s apart; shown at once by a click, what has not sounded starts then,
+    still 0.3 s apart;
+  - a paper the player pulls forward is silent: the table names the play's;
+  - a hand card's hover sounds only while the desk is idle; a sound for
+    something arriving plays once, development's StrictMode included.
+- **B3, the room** under the desk from the opening card's Continue to the
+  awards night, with the weather of the season shown (`WEATHER`), changing
+  with the season card. Sound effects off mutes the effects' and the room's
+  buses; on again restores the module's own levels.
+- **B4, music.** Two `<audio>` elements, each through its own gain into the
+  music bus, at `MUSIC_GAIN` 0.25. The director keeps where the music is: the
+  scandal track at a step's first impact; at a month end that printed none,
+  the season's track back at its date beat (2.5 s, the fade the scandal
+  track came in with; the prompt gave none) unless the season changes in
+  that step; a season card brings its season's track (3 s) unless the month
+  end before it printed a scandal; the lights going out fade it (1.2 s). A
+  step whose beats are skipped, or that has none (motion off), still moves
+  the music, its last move at once: the music follows the year, heard or
+  not. A track that comes back starts from its beginning. Tracks warm by a
+  fetch into the HTTP cache, only with Music on.
+- **B5–B6.** House rules: Mark my stories, Sound effects, Music, Reduce
+  motion; both new switches on by default. The credits gain Music (with
+  Holizna's OpenGameArt page) and Sound rows; CREDITS.md a Sound section.
+- **B7, the checks.** `?cues` logs every cue (`window.__cues`), a beat's
+  tagged step:index:kind. check:interactions asserts a month's cues and a
+  D7 click's silence; check:clicks runs with the sound on — the check
+  browsers now let media start without a gesture (Chrome's autoplay flag,
+  Firefox's two prefs) — and reads the dev server's track log: before May
+  the first run asks for spring's track only, and the scandal track's once
+  a scandal is held. Playwright's WebKit on Windows has no Web Audio: the
+  game is silent there, without error. check:pace reports the event step
+  (no bound).
+
 ## 2026-10-18 — Round R4, Part A: what the author found in v0.3
 
 - **A1, hovers ease.** An entrance animation that kept filling its last

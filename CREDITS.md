@@ -26,7 +26,28 @@ and no public-domain or other third-party images.
 
 ## Sound
 
-None yet.
+### Music
+
+Six tracks by Holizna, dedicated to the public domain (CC0 1.0), from Holizna's
+page on OpenGameArt: https://opengameart.org/user/120037 (added 2026-10-18).
+They ship as given, never re-encoded, in `public/audio/music/`.
+
+| File | Title | Author | Licence |
+|---|---|---|---|
+| `spring.mp3` | Poor but Happy | Holizna | CC0 1.0 |
+| `summer.mp3` | Make Money | Holizna | CC0 1.0 |
+| `autumn.mp3` | Autumn | Holizna | CC0 1.0 |
+| `winter.mp3` | Everything You Ever Dreamed | Holizna | CC0 1.0 |
+| `scandal.mp3` | All the Way Sad | Holizna | CC0 1.0 |
+| `awards.mp3` | Lost in Your Eyes | Holizna | CC0 1.0 |
+
+CC0 asks for no credit; the game gives it anyway, in its credits.
+
+### Sound effects
+
+None third-party. Every sound effect and the room's ambience is synthesized in
+code, with AI assistance (`docs/design/sound/overexposed-sound.js`, copied to
+`ui/sound/oxsound.js`): no recordings and no audio-generation models.
 
 ## Development-only browser checks
 

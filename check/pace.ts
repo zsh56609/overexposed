@@ -5,6 +5,7 @@
 //
 // The targets: a calm month end at most 4 s; a month with scandals at most 6 s plus 0.6 s for each scandal after
 // the first; a season change (the door's choice to the next offers) at most 5.5 s. Exit code 1 when one is missed.
+// An event's answer (round R4, B7) is reported too, with the reading hold A3a gave it, and has no bound.
 //
 // Usage: node check/pace.ts [--runs=40]
 
@@ -24,7 +25,7 @@ const personas: PersonaId[] = ['random', 'minmaxer', 'dealseeker', 'comeback', '
 type Kind = string;
 const samples = new Map<Kind, number[]>();
 const add = (kind: Kind, ms: number) => samples.set(kind, [...(samples.get(kind) ?? []), ms]);
-const limit = (kind: Kind): number => (kind === 'calm' ? 4000 : kind === 'season' ? 5500 : 6000 + 600 * (Number(kind.split(':')[1]) - 1));
+const limit = (kind: Kind): number => (kind === 'event' ? Infinity : kind === 'calm' ? 4000 : kind === 'season' ? 5500 : 6000 + 600 * (Number(kind.split(':')[1]) - 1));
 
 for (const manager of managers)
   for (const persona of personas)
@@ -42,6 +43,11 @@ for (const manager of managers)
             const scandals = step.events.filter((e) => e.type === 'addCard' && getCard(after.content, e.cardId)?.kind === 'scandal').length;
             if (plan) add(action.type === 'CHOOSE_GATE' ? 'season' : scandals === 0 ? 'calm' : `scandals:${scandals}`, plan.duration + (action.type === 'CHOOSE_GATE' ? STAMP : 0));
           }
+          // An event's answer: from the click to the month going on, the reading hold included (round R4, A3a).
+          if (action?.type === 'CHOOSE_EVENT') {
+            const plan = timeline(step, history, 'full');
+            if (plan) add('event', plan.duration);
+          }
           history.push(step);
           before = after;
         },
@@ -51,13 +57,15 @@ for (const manager of managers)
 
 const q = (xs: number[], p: number) => [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(p * xs.length))] ?? 0;
 let failed = false;
-const kinds = [...samples.keys()].sort((a, b) => (a === 'calm' ? -1 : b === 'calm' ? 1 : a === 'season' ? 1 : b === 'season' ? -1 : a.localeCompare(b, 'en', { numeric: true })));
+const rank = (k: Kind) => (k === 'calm' ? 0 : k === 'season' ? 2 : k === 'event' ? 3 : 1);
+const kinds = [...samples.keys()].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b, 'en', { numeric: true }));
 for (const kind of kinds) {
   const xs = samples.get(kind) ?? [];
   const max = Math.max(...xs);
   const ok = max <= limit(kind);
   if (!ok) failed = true;
-  console.log(`${kind.padEnd(12)} n=${String(xs.length).padStart(5)}  median ${(q(xs, 0.5) / 1000).toFixed(2)} s  p90 ${(q(xs, 0.9) / 1000).toFixed(2)} s  max ${(max / 1000).toFixed(2)} s  target ${(limit(kind) / 1000).toFixed(1)} s  ${ok ? 'PASS' : 'FAIL'}`);
+  const target = Number.isFinite(limit(kind)) ? `target ${(limit(kind) / 1000).toFixed(1)} s  ${ok ? 'PASS' : 'FAIL'}` : 'no bound';
+  console.log(`${kind.padEnd(12)} n=${String(xs.length).padStart(5)}  median ${(q(xs, 0.5) / 1000).toFixed(2)} s  p90 ${(q(xs, 0.9) / 1000).toFixed(2)} s  max ${(max / 1000).toFixed(2)} s  ${target}`);
 }
 console.log(failed ? 'FAIL: a month end keeps the next decision waiting too long' : 'PASS: every month end and season change within its target');
 process.exit(failed ? 1 : 0);

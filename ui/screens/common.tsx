@@ -5,6 +5,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import { motionMode } from '../motion.ts';
 import { t } from '../i18n.ts';
 import { isPlaceholder } from '../text.ts';
+import { cue } from '../sound/sound.ts';
 import './screens.css';
 
 /** Prose the author hasn't written yet is shown as a placeholder, never hidden (decision 15). */
@@ -69,6 +70,7 @@ export function useStampedChoice<T>(act: (choice: T) => void): readonly [T | nul
         return;
       }
       setChosen(choice);
+      cue('stamp');
       timer.current = window.setTimeout(() => act(choice), mode === 'reduced' ? 150 : 560);
     },
     [chosen, act],
@@ -82,6 +84,7 @@ export function useStampedChoice<T>(act: (choice: T) => void): readonly [T | nul
  * Full motion only: reduced motion has no travel, and the face leaves with the screen.
  */
 export function flyToDeck(lift: Element | null): void {
+  if (motionMode() !== 'off') cue('deal'); // its sound with reduced motion too: the card still goes
   const face = lift?.querySelector<HTMLElement>('.card');
   const stage = document.querySelector('.stage');
   const deck = document.querySelector('.desk .stats .deckbtn');

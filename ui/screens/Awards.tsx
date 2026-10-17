@@ -4,18 +4,66 @@
 // Juno Vale's closing line; the manager's last word; the endings found and PLAY AGAIN. The run's numbers stay,
 // folded away. Everything comes from content and /core; no rule is computed here.
 
-import { useEffect, useMemo, useState } from 'react';
-import { lastWord, majorOf, rivalArc, seasonPages, yearAwards, type GameState } from '../../core/index.ts';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { getMajor, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
 import { recordAwards, recordEnding } from '../collection.ts';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
 import { awardCitation, awardName, majorName, managerName, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
+import { cue, music } from '../sound/sound.ts';
 import { AwardDots, FoundDots, prose } from './common.tsx';
 
 /** How long the night's reveal runs (the mockup's sequence); a click during it shows everything at once. */
 const REVEAL_MS = 5200;
+
+/** When the night names the major, and when the first plaque comes (the reveal's delays below), in ms; then 0.3 s apart. */
+const NAMED_AT = 600;
+const PLAQUES_AT = 2450;
+const PLAQUE_GAP = 300;
+
+/** The Breakthrough and Overexposed: the majors on the upper side of the fame axis (the one on hype), cheered. */
+function cheered(c: ContentIndex, majorId: string): boolean {
+  const fame = c.axes.find((a) => a.key === 'hype');
+  return !!fame && getMajor(c, majorId)?.on[fame.id] === fame.sides[1];
+}
+
+/**
+ * The night's sounds (round R4, B2 and B4): its track, fading in over 1.5 s; an ovation as it names The Breakthrough
+ * or Overexposed; applause for each award plaque, 0.3 s apart even when the night is shown at once.
+ */
+function useNightSounds(ovation: boolean, plaques: number, revealed: boolean): void {
+  useEffect(() => music('awards', 1500), []);
+  const heard = useRef({ named: false, plaques: 0 });
+  useEffect(() => {
+    if (motionMode() === 'off') return;
+    const timers: number[] = [];
+    const name = () => {
+      if (heard.current.named) return;
+      heard.current.named = true;
+      if (ovation) cue('ovation');
+    };
+    const applause = (from: number) => {
+      const first = heard.current.plaques;
+      for (let i = first; i < plaques; i++)
+        timers.push(
+          window.setTimeout(() => {
+            heard.current.plaques++;
+            cue('applause');
+          }, from + (i - first) * PLAQUE_GAP),
+        );
+    };
+    if (revealed) {
+      name();
+      applause(0);
+    } else {
+      timers.push(window.setTimeout(name, NAMED_AT));
+      applause(PLAQUES_AT);
+    }
+    return () => timers.forEach((id) => window.clearTimeout(id));
+  }, [ovation, plaques, revealed]);
+}
 
 interface AwardsProps {
   readonly s: GameState;
@@ -45,6 +93,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
   const pages = useMemo(() => seasonPages(steps), [steps]);
   const text = minorText(c, s.seed, id);
   const awards = yearAwards(s);
+  useNightSounds(cheered(c, majorId), awards.length, revealed);
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
   const rival = rivalArc(c, s.seed);
   const last = lastWord(s);

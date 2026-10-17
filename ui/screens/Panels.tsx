@@ -14,6 +14,8 @@ import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import { setSetting, useSettings, type Settings } from '../settings.ts';
 import type { PlayedStep } from '../queue.ts';
+import { useArrivalSound } from '../sound/arrival.ts';
+import { cue } from '../sound/sound.ts';
 import { awardCitation, awardHow, awardName, cardName, flagName, money } from '../text.ts';
 
 export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits' | 'numbers';
@@ -26,7 +28,12 @@ function Overlay({ id, label, overDesk, onClose, children }: { id: PanelId; labe
   const [leaving, setLeaving] = useState(false);
   const timer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  // Its sounds (round R4, B2): a sheet drawn out as it opens, put back as it closes — once.
+  const closing = useRef(false);
+  useArrivalSound(() => cue('open'));
   const close = useCallback(() => {
+    if (!closing.current) cue('close');
+    closing.current = true;
     if (motionMode() === 'off') {
       onClose();
       return;
@@ -228,13 +235,15 @@ function Switch({ id, label, line }: { id: keyof Settings; label: string; line: 
   );
 }
 
-/** Sound stays hidden until the game has sound (round R1, G3). */
+/** House rules (round R1, G3): since round R4 (B5), the game's sound too — the effects with the room, and the music. */
 export function SettingsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
   return (
     <Overlay id="settings" label={t('ui.settings.title')} overDesk={overDesk} onClose={onClose}>
       <div className="set">
         <Head kicker={t('ui.settings.kicker')} title={t('ui.settings.title')} close={t('ui.settings.done')} onClose={onClose} />
         <Switch id="markStories" label={t('ui.settings.mark')} line={t('ui.settings.markLine')} />
+        <Switch id="soundEffects" label={t('ui.settings.sound')} line={t('ui.settings.soundLine')} />
+        <Switch id="music" label={t('ui.settings.music')} line={t('ui.settings.musicLine')} />
         <Switch id="reduceMotion" label={t('ui.settings.motion')} line={t('ui.settings.motionLine')} />
       </div>
     </Overlay>
@@ -243,10 +252,6 @@ export function SettingsPanel({ overDesk, onClose }: { overDesk: boolean; onClos
 
 // ---------------------------------------------------------------------------------------------------- Credits
 
-/**
- * The credits, in House rules' style: every third-party asset the game ships, as the jam requires — the two font
- * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts).
- */
 /**
  * The year's numbers (round R3, D2): over the awards night, centred, in the panels' style, closed by its button, Escape
  * or a click outside. Every number is a stat bar chip in its colour; the words are the ending's own keys.
@@ -297,6 +302,14 @@ export function NumbersPanel({ s, steps, onClose }: { s: GameState; steps: reado
   );
 }
 
+/** Holizna's page on OpenGameArt, where the six tracks are published (CREDITS.md). */
+const HOLIZNA_URL = 'https://opengameart.org/user/120037';
+
+/**
+ * The credits, in House rules' style: every third-party asset the game ships, as the jam requires — the two font
+ * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts); since round R4
+ * (B6), the music, Holizna's six tracks (CC0 1.0), and how the sound effects are made.
+ */
 export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
   return (
     <Overlay id="credits" label={t('ui.credits.title')} overDesk={overDesk} onClose={onClose}>
@@ -312,6 +325,19 @@ export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose
               {t('ui.credits.read')}
             </a>
           </span>
+        </div>
+        <div className="crow">
+          <b>{t('ui.credits.music')}</b>
+          <span>{t('credits.music.holizna')}</span>
+          <span>
+            <a href={HOLIZNA_URL} target="_blank" rel="noreferrer">
+              {t('ui.credits.musicLink')}
+            </a>
+          </span>
+        </div>
+        <div className="crow">
+          <b>{t('ui.credits.sound')}</b>
+          <span>{t('credits.sound')}</span>
         </div>
         {/* The build's version, small at the foot (round R3): major and minor, as the itch page names builds. */}
         <div className="ver">{t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })}</div>

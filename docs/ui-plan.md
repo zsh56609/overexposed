@@ -353,8 +353,11 @@ playtest are listed in docs/status.md.
 
 ## 12. Not in scope yet
 
-Onboarding · sound · illustration · save (a run is 10–15 minutes) ·
+Onboarding · illustration · save (a run is 10–15 minutes) ·
 portrait layout · anything above the current layer
+
+Sound came in round R4: the author's synthesized effects and Holizna's six tracks, with their two House rules
+switches, Sound effects and Music (docs/design/visual/README.md §10).
 
 Target run length is 10–15 minutes. Do not lengthen it.
 
@@ -704,7 +707,8 @@ stage (decision 17) and keeps everything inside it.
   different shape each ball; the contact shadow shows only at the base.
 - **The manager's phone** (round 2b, C4): a phone lies on the desk; as
   each month opens, the manager's messages rise from it as bubbles, one
-  at a time, with an optional sound. A two-bubble message rises as two.
+  at a time, the phone buzzing as they begin and each bubble with its sound (round R4).
+  A two-bubble message rises as two.
   In the unstyled build they are the feed's labelled lines (decision 29).
 - **Stat bar**: five 114px cells from x=16 to x=586; the actions cell is
   fixed at x=586–694, centred on x=640. Tier words have at most 10 characters. Action slots

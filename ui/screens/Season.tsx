@@ -4,6 +4,7 @@
 // (D7); once the button shows, the button is the next decision.
 
 import { t } from '../i18n.ts';
+import { cue } from '../sound/sound.ts';
 import { prose } from './common.tsx';
 
 export interface SeasonCardProps {
@@ -25,7 +26,14 @@ export function SeasonCard({ date, season, paragraphs, go }: SeasonCardProps) {
           {p}
         </p>
       ))}
-      <button className="go into" data-hook="into" onClick={go}>
+      <button
+        className="go into"
+        data-hook="into"
+        onClick={() => {
+          cue('button');
+          go();
+        }}
+      >
         {t('ui.season.go')}
       </button>
     </div>

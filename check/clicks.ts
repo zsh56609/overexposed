@@ -20,13 +20,16 @@
 // stage, hit at its centre and sends itself; one it can't afford sends nothing.
 // The managers alternate run by run, so any two runs cover both. Transitions are switched off: the check
 // measures where things settle.
+// With the sound on (round R4, B7) — the browsers let it start without a gesture (check/browser.ts) — the runs log no
+// console error, and the first run asks the server for no track before May but spring's, and the scandal track's
+// once a scandal is held.
 //
 // Runs the Vite dev server in-process. Usage:
 //   node check/clicks.ts [--runs=4] [--sizes=1280x720,800x450,844x390m] [--browsers=chrome,firefox]
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createServer } from 'vite';
+import { createServer, type Plugin } from 'vite';
 import { auditStep } from './audit-progress.ts';
 import { browsersFromArgs, launch, sizesFromArgs } from './browser.ts';
 import { checkD7 } from './motion.ts';
@@ -173,9 +176,13 @@ const DRIVE = (runs: number) => `(async () => {
   stats.seasonCards++;
   document.querySelector('.season-card .into').click();
   await sleep(20);
+  // The month and the scandals held as each state comes (round R4, B7), on the clock the server's track log keeps.
+  const months = [];
+  const month = (run) => months.push({ at: performance.timeOrigin + performance.now(), run, turn: Number(document.querySelector('.desk')?.dataset.turn ?? 0), held: Number(document.querySelector('[data-hook="held-n"]')?.dataset.final ?? 0) });
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
+      month(run);
       window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.event-screen,.hand')?.className};
       stats.states++;
       reachable();
@@ -259,10 +266,12 @@ const DRIVE = (runs: number) => `(async () => {
     // The year's numbers, in their own panel (round R3, D2).
     if (await visit('.awards-night .numbers-toggle', 'numbers')) await close('numbers');
     stats.runs++;
+    month(run);
     document.querySelector('button.play-again')?.click();
     await sleep(20);
   }
-  return { ...stats, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
+  month(${runs});
+  return { ...stats, months, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /**
@@ -311,9 +320,47 @@ const EVENT_PAGE = `(async () => {
   return { events: n, states, replies, disabled, blocked };
 })()`;
 
-type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; seasonCards: number; blocked: [string, number][] };
+type Month = { at: number; run: number; turn: number; held: number };
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; seasonCards: number; months: Month[]; blocked: [string, number][] };
 
-const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false } });
+/** Every request for a track the server answers (round R4, B7): which, and when. */
+const tracks: { at: number; file: string }[] = [];
+const trackLog: Plugin = {
+  name: 'track-log',
+  configureServer(s) {
+    s.middlewares.use((req, _res, next) => {
+      const m = /\/audio\/music\/([\w-]+)\.mp3/.exec(req.url ?? '');
+      if (m) tracks.push({ at: Date.now(), file: `${m[1]}.mp3` });
+      next();
+    });
+  },
+};
+
+/**
+ * The first run's tracks before May (round R4, B4 and B7): each request is the state's that follows it — the action
+ * that asked for it, done — and before May (months 1 and 2, or no month yet) only spring's may be asked for, and the
+ * scandal track's once a scandal is held. What it asked for, and what it should not have.
+ */
+function earlyTracks(months: readonly Month[]): { asked: string[]; wrong: string[] } {
+  const asked = new Set<string>();
+  const wrong = new Set<string>();
+  // May: the first run's first state in its third month; the awards night after it has no desk, and no month.
+  const may = months.findIndex((m) => m.run === 0 && m.turn > 2);
+  for (const r of tracks) {
+    const found = months.findIndex((m) => m.at >= r.at);
+    const at = found < 0 ? months.length - 1 : found;
+    const state = months[at];
+    if (!state || state.run !== 0 || (may >= 0 && at >= may)) continue;
+    asked.add(r.file);
+    if (r.file !== 'spring.mp3' && !(r.file === 'scandal.mp3' && state.held !== 0)) wrong.add(`${r.file} in month ${state.turn || 'none'}`);
+  }
+  return { asked: [...asked], wrong: [...wrong] };
+}
+
+/** A console error or an uncaught one, from what a browser reported (warnings are not). */
+const isError = (line: string): boolean => /"type":"error"|exceptionThrown|"level":"error"|^pageerror|^error:/.test(line);
+
+const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false }, plugins: [trackLog] });
 await server.listen();
 const url = server.resolvedUrls?.local[0];
 let failed = false;
@@ -326,6 +373,8 @@ try {
       try {
         await checkD7(page, url);
         await page.navigate(`${url}?seed=20260929`, 3000);
+        tracks.length = 0;
+        const errorsBefore = page.diagnostics.filter(isError).length;
         const t0 = performance.now();
         const out = await auditStep<Out>(page,`clicks ${tag} ${RUNS} runs`,DRIVE(RUNS),600_000);
         const screens = Object.entries(out.byScreen)
@@ -337,6 +386,13 @@ try {
         );
         for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
         if (out.blocked.length > 0 || out.runs < RUNS) failed = true;
+        // The sound (round R4, B7): no console error over the runs; before May only spring's track, and the scandal's.
+        const errors = page.diagnostics.filter(isError).slice(errorsBefore);
+        const early = earlyTracks(out.months);
+        console.log(`click-through check, ${tag}: sound on — ${errors.length} console errors; before May the first run asked for ${early.asked.join(', ') || 'no track'}`);
+        for (const e of errors.slice(0, 5)) console.log(`CONSOLE  ${e.slice(0, 300)}`);
+        for (const w of early.wrong) console.log(`TRACK TOO EARLY  ${w}`);
+        if (errors.length > 0 || early.wrong.length > 0) failed = true;
         // Every event on its own page (round R2): its replies, and one it can't afford.
         await page.navigate(`${url}check/events.html`, 3000);
         const ev = await auditStep<{ events: number; states: number; replies: number; disabled: number; blocked: string[] }>(page, `clicks ${tag} events`, EVENT_PAGE, 120_000);

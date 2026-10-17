@@ -15,6 +15,8 @@ import { motionMode } from '../motion.ts';
 import { previewEventChoice, type EventChoicePreview, type Legal, type LinesSoFar } from '../preview.ts';
 import type { BeatKind } from '../timeline.ts';
 import { calendarLabel, mastheadName } from '../text.ts';
+import { useArrivalSound } from '../sound/arrival.ts';
+import { cue } from '../sound/sound.ts';
 import { prose } from './common.tsx';
 
 /** When each message arrives (the mockup's rhythm): typing dots, then the bubble; the replies after the last. */
@@ -114,6 +116,7 @@ function useArrival(count: number, settled: boolean): { readonly shown: number; 
         window.setTimeout(() => {
           setTyping(false);
           setShown(i + 1);
+          cue('bubble'); // each message as it arrives (round R4, B2); none for those a click shows at once
         }, at + TYPING),
       );
     }
@@ -156,6 +159,8 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const label = ev.speaker.labelKey ? t(ev.speaker.labelKey) : null;
   const replied = beats.includes('eventReply');
   const answer = chosen === null ? null : (views[chosen] ?? null);
+  // A text comes up (round R4, B2): the phone buzzes; your reply and their answer are the answer's beats (ui/sound/director.ts).
+  useArrivalSound(() => cue('buzz'));
   const onClickCapture = (e: MouseEvent) => {
     if (arrival.done || chosen !== null) return;
     e.stopPropagation();
@@ -223,6 +228,8 @@ function LetterEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const desk = paper ? `${t(ev.speaker.letterheadKey ?? '')} · ${calendarLabel(c, s.turn)}` : calendarLabel(c, s.turn);
   const sent = beats.includes('eventReply');
   const answer = chosen === null ? null : (views[chosen] ?? null);
+  // A letter lands (round R4, B2); its SENT stamp is the answer's beat (ui/sound/director.ts).
+  useArrivalSound(() => cue('letter'));
   return (
     <div className="scr event-screen ev-letter" data-event={ev.id} data-form="letter">
       <div className={`letter${paper ? ` lh-${paper}` : ' lh-house'}${ev.messageKeys.length >= 4 ? ' long' : ''}${chosen !== null ? ' done' : ''}${sent ? ' sent-on' : ''}`}>

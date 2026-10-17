@@ -8,6 +8,7 @@
 
 import { memo, useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motionMode } from '../motion.ts';
+import { cue } from '../sound/sound.ts';
 import { isPlaceholder } from '../text.ts';
 import { photoUrl } from './halftone.ts';
 import type { ItemModel, PageModel, PapersModel, RightModel } from './model.ts';
@@ -112,6 +113,8 @@ const Paper = memo(function Paper({ page, pos, forward, label }: { page: PageMod
 export interface IncomingPaper {
   readonly id: number;
   readonly paper: string | null;
+  /** A card's play (its paper's sound), not an event's answer. */
+  readonly play?: boolean;
 }
 
 /** How long the new month's papers take to land on the old stack: three drops of 0.4 s, 60 ms apart (ui/desk/css/scenes.css). */
@@ -139,7 +142,10 @@ export const Papers = memo(function Papers({ papers, incoming }: { papers: Paper
   useLayoutEffect(() => {
     if (!incoming || incoming.id === seen.current) return;
     seen.current = incoming.id;
-    if (incoming.paper) setChosen({ turn, paper: incoming.paper });
+    if (!incoming.paper) return;
+    // Its paper comes forward (round R4, B2): slid over the others, as the card lifts.
+    if (incoming.play && incoming.paper !== shown.current && motionMode() !== 'off') cue('paper', `${incoming.id}:lift`);
+    setChosen({ turn, paper: incoming.paper });
   }, [incoming, turn]);
   const news = useRef<HTMLDivElement>(null);
   const front = papers && chosen?.turn === papers.turn && papers.pages.some((p) => p.paper === chosen.paper) ? chosen.paper : (papers?.lead ?? '');

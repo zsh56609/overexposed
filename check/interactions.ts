@@ -13,6 +13,9 @@
 //   through a month of plays, paper picks and prints, the bubbles shown, sampled every 90 ms, never decrease.
 // - hovers ease (round R4, A1): a manager card, an offer, a hand card, a paper, a sticky note, a bubble and a door,
 //   60 ms after each one's transition delay, stand strictly between their rest and their hover.
+// - a month's sounds (round R4, B7), from the cue log `?cues` keeps: a deal per card dealt, a pick and a land per
+//   play, a button at END TURN, a stamp for PRINTED, the month at the date; no cue twice for one beat (ticks
+//   excepted); and a click during the next month end (D7) drops the cues of the beats it skips.
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -55,10 +58,11 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
       out.push([`hover eases: ${label} not found`, false]);
       return;
     }
-    const t0 = Date.now();
     await page.move(at[0], at[1]);
-    const wait = delay + 60 - (Date.now() - t0);
-    if (wait > 0) await sleep(wait);
+    // A browser takes the hover in at its next style update — headless WebKit's come about 70 ms apart here — so the
+    // style is read at once: the hover is taken in now, and its transition runs from now, in every browser.
+    await matrix(sel);
+    await sleep(delay + 60);
     const mid = await matrix(sel);
     await sleep(900);
     const end = await matrix(sel);
@@ -106,6 +110,115 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
     await sleep(300);
     await eases('a door', '.doors .inv', '.doors .inv', 0);
   } else out.push(['hover eases: no recorded door', false]);
+  return out;
+}
+
+/** A cue the game played, as `?cues` logs it (ui/sound/sound.ts): a beat's is tagged step:index:kind (ui/sound/director.ts). */
+interface CueLog {
+  readonly name: string;
+  readonly at: number;
+  readonly beat?: string;
+}
+
+/**
+ * A month's sounds (round R4, B7), in full motion from the title with `?cues`: BEGIN, the opening's Continue, a manager
+ * signed, the offers taken; then the month — its hand dealt, a deal for each card; two plays, a pick and a land each;
+ * END TURN, its button, the PRINTED stamp and the date's month. No cue sounds twice for one beat but the ticks. Then
+ * the next month, and a click 0.35 s into its month end — after the stamp, before its numbers: none of the beats it
+ * skipped is heard.
+ */
+async function monthCues(page: Page, url: string): Promise<Result[]> {
+  const out: Result[] = [];
+  const idle = async () => { for (let i = 0; i < 250 && (await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy === '1' || !!document.querySelector('.screen-over.leaving')`)); i++) await sleep(40); };
+  const press = async (selector: string, index = 0) => { const at = await centre(page, selector, index); if (at) await page.click(...at); return !!at; };
+  const log = () => page.evaluate<CueLog[]>(`window.__cues ?? []`);
+  const none: CueLog = { name: '', at: 0 };
+  const stepOf = (c: CueLog) => c.beat?.split(':')[0] ?? '';
+  const kindOf = (c: CueLog) => c.beat?.split(':').at(-1) ?? '';
+  const hand = () => page.evaluate<number>(`document.querySelectorAll('.desk .hand .card').length`);
+  // Takes the offers (a season's Continue, an event's first reply it can afford) until the month's hand is dealt.
+  const toPlay = async () => {
+    for (let i = 0; i < 12 && !(await page.evaluate<boolean>(`!!document.querySelector('.desk .hand .card') && !document.querySelector('.screen-over:not(.leaving)')`)); i++) {
+      const reply = await page.evaluate<number>(`[...document.querySelectorAll('.event-screen .choose')].findIndex((b) => !b.disabled && b.getAttribute('aria-disabled') !== 'true')`);
+      if (reply >= 0) {
+        await sleep(4000); // a text's messages arrive first
+        await press('.event-screen .choose', reply);
+        await sleep(5000);
+      } else if (!(await press('.offers .take', 0))) await press('.season-card .into');
+      await sleep(1600);
+      await idle();
+    }
+    await sleep(500);
+  };
+  // The hand just dealt: a deal cue on each deal beat of the step that dealt it, one beat a card.
+  const dealt = async (what: string) => {
+    const cues = await log();
+    const step = stepOf(cues.filter((c) => kindOf(c) === 'deal').at(-1) ?? none);
+    const deals = cues.filter((c) => stepOf(c) === step && kindOf(c) === 'deal' && c.name === 'deal').length;
+    const n = await hand();
+    out.push([`${what}: a deal for each card dealt (${deals} for ${n})`, step !== '' && deals === n]);
+  };
+  await page.navigate(`${url}?seed=20261017&cues`, 1500);
+  await page.evaluate(`delete document.documentElement.dataset.motion`);
+  for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
+  await sleep(400);
+  await press('.title-screen .begin');
+  await sleep(900);
+  await press('.season-card .into');
+  await sleep(1500);
+  await press('.manager-choice .choose', 0);
+  await sleep(700);
+  await idle();
+  await toPlay();
+  await dealt('the first month');
+  // Two plays: a pick as each leaves the hand, a land as it lands.
+  let plays = 0;
+  for (let k = 0; k < 2; k++) {
+    const before = (await log()).length;
+    const card = await page.evaluate<number>(`[...document.querySelectorAll('.desk .hand .card')].findIndex((c) => c.getAttribute('aria-disabled') === 'false')`);
+    const at = card < 0 ? null : await cardPoint(page, card);
+    if (!at) break;
+    await page.click(...at);
+    await page.move(...(await neutral(page)));
+    await sleep(1400);
+    await idle();
+    plays++;
+    const cues = (await log()).slice(before);
+    const picks = cues.filter((c) => c.name === 'pick' && kindOf(c) === 'lift');
+    const lands = cues.filter((c) => c.name === 'land' && kindOf(c) === 'land');
+    out.push([`play ${k + 1}: a pick and a land (${picks.length}, ${lands.length})`, picks.length === 1 && lands.length === 1 && stepOf(picks[0] ?? none) === stepOf(lands[0] ?? none)]);
+  }
+  if (plays === 0) out.push(['a month played: no playable card', false]);
+  // END TURN: its button, PRINTED's stamp, the date's month.
+  const ended = (await log()).length;
+  await press('.desk .endbtn');
+  await page.move(...(await neutral(page)));
+  await sleep(4000);
+  await idle();
+  const end = (await log()).slice(ended);
+  const endStep = stepOf(end.find((c) => kindOf(c) === 'endPress') ?? none);
+  const of = (kind: string, name: string) => end.filter((c) => stepOf(c) === endStep && kindOf(c) === kind && c.name === name).length;
+  out.push([`END TURN: button ${of('endPress', 'button')}, stamp ${of('stamp', 'stamp')}, month ${of('date', 'month')}`, endStep !== '' && of('endPress', 'button') === 1 && of('stamp', 'stamp') === 1 && of('date', 'month') === 1]);
+  await toPlay();
+  await dealt('the second month');
+  // D7: a click 0.35 s into the next month end skips its numbers, its sweep and its date, and their sounds.
+  await page.evaluate(`window.__skipAt = null; window.addEventListener('click', () => { if (window.__skipAt === null && document.querySelector('.desk')?.dataset.busy === '1') window.__skipAt = performance.now(); }, true)`);
+  const skipping = (await log()).length;
+  await press('.desk .endbtn');
+  await sleep(350);
+  await page.click(...(await neutral(page)));
+  await sleep(2500);
+  await idle();
+  const skipAt = await page.evaluate<number | null>(`window.__skipAt`);
+  const after = (await log()).slice(skipping);
+  const skipStep = stepOf(after.find((c) => kindOf(c) === 'endPress') ?? none);
+  const late = after.filter((c) => stepOf(c) === skipStep && skipAt !== null && c.at > skipAt);
+  out.push([`a D7 click drops the skipped beats' cues${late.length ? `: heard ${late.map((c) => `${c.name}@${kindOf(c)}`).join(', ')}` : ''}`, skipStep !== '' && skipAt !== null && late.length === 0 && !after.some((c) => stepOf(c) === skipStep && c.name === 'month')]);
+  // No cue twice for one beat, ticks excepted.
+  const seen = new Map<string, number>();
+  for (const c of await log()) if (c.beat && c.name !== 'tick') seen.set(`${c.beat} ${c.name}`, (seen.get(`${c.beat} ${c.name}`) ?? 0) + 1);
+  const twice = [...seen].filter(([, n]) => n > 1).map(([k]) => k);
+  out.push([`no cue twice for one beat${twice.length ? `: ${twice.slice(0, 4).join(', ')}` : ''}`, twice.length === 0 && seen.size > 0]);
   return out;
 }
 
@@ -389,7 +502,7 @@ try {
     for (const size of sizesFromArgs(process.argv)) {
     const page = await launch(browser, size);
     try {
-      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url))];
+      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
       const passed = results.filter(([, ok]) => ok === true).length;
       const skipped = results.filter(([, ok]) => ok === 'skipped').length;
       console.log(`interactions, ${browser} ${size.width}x${size.height}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);

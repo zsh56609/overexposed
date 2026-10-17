@@ -4,6 +4,7 @@ import { pressLines } from '../../core/index.ts';
 import { signedAmount } from '../text.ts';
 import type { Snapshot } from '../queue.ts';
 import { motionMode } from '../motion.ts';
+import { cue, tick } from '../sound/sound.ts';
 import { fan } from './Hand.tsx';
 
 const SLOTS = [[896, 458, -8], [918, 450, 5], [938, 442, -3], [956, 436, 7], [972, 430, -5]] as const;
@@ -103,6 +104,8 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
     };
     // History gives the composed story's exact identity; never replace an arbitrary row.
     const line = pressLines(snap.steps).find(l => l.step === snap.steps.length - 1 && l.kind === 'play');
+    // Its sounds on the land beat (round R4, B2): the press for a headline, the pencil for a note.
+    if (line) cue(line.paper ? 'print' : 'pencil', `${step.id}:land`);
     if (line?.paper) {
       const story = root.querySelector<HTMLElement>(`[data-paper="${line.paper}"] [data-story="${line.step}:${line.event}"]`);
       if (story) animate(story, [{ clipPath: 'inset(0 100% 0 0)', backgroundColor: '#fff0be' }, { clipPath: 'inset(0)', backgroundColor: 'transparent' }], 650);
@@ -142,10 +145,11 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
       const value = root.querySelector<HTMLElement>(`[data-hook="${id === 'money' ? 'value' : 'number'}-${id}"]`);
       if (!value) continue;
       const final = value.textContent;
-      const start = performance.now(); let frame = 0;
+      const start = performance.now(); let frame = 0; let ticked = e.value - e.delta;
       const roll = () => {
         const t = Math.min(1, (performance.now() - start) / (mode === 'full' ? 560 : 150));
         const n = Math.round(e.value - e.delta * (1 - t) ** 3);
+        if (n !== ticked) { ticked = n; tick(); }
         value.textContent = id === 'money' ? `£${(n * 1000).toLocaleString('en-GB')}` : String(n);
         if (t < 1) frame = requestAnimationFrame(roll); else value.textContent = value.dataset.final??final;
       };

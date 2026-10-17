@@ -154,7 +154,8 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
   const exe = find('chrome');
   if (!exe) throw new Error('no Chrome or Edge found; set CHROME_PATH');
   const profile = mkdtempSync(join(tmpdir(), 'overexposed-chrome-'));
-  const proc = spawn(exe, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, `--window-size=${width},${height}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
+  // Sound starts without a gesture (round R4, B7): check:clicks clicks by script, and the game's sound runs under it.
+  const proc = spawn(exe, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`, `--window-size=${width},${height}`, '--no-first-run', '--no-default-browser-check', '--disable-extensions', '--hide-scrollbars', '--autoplay-policy=no-user-gesture-required', 'about:blank'], { stdio: 'ignore' });
   let port = 0;
   for (let i = 0; i < 80 && !port; i++) {
     await sleep(250);
@@ -301,7 +302,9 @@ async function startFirefox({ width, height }: { width: number; height: number }
       // Focus as if the window were in front (a headless window never is), so keyboard focus shows as it would.
       '\nuser_pref("focusmanager.testmode", true);' +
       // One process for the page from its first tab on: no new process to start when it loads the game.
-      '\nuser_pref("fission.autostart", false);\n',
+      '\nuser_pref("fission.autostart", false);' +
+      // Sound starts without a gesture (round R4, B7), as in Chrome.
+      '\nuser_pref("media.autoplay.default", 0);\nuser_pref("media.autoplay.block-webaudio", false);\n',
   );
   // Port 0: Firefox picks one and says which on stderr.
   // Explicit diagnostic opt-in only; ordinary correctness checks keep the original headless path.

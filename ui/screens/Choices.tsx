@@ -11,6 +11,8 @@ import { effectChips, offerCardModel, type HandWords, type IconId, type ValueChi
 import { t } from '../i18n.ts';
 import { previewGate, type GatePreview, type Legal } from '../preview.ts';
 import { awardName, calendarLabel, clauseText, endingPair, gateFlavor, gateName, money, offerLabels, seasonName } from '../text.ts';
+import { useArrivalSound } from '../sound/arrival.ts';
+import { cue, cues } from '../sound/sound.ts';
 import { flyToDeck, Header, prose, useStampedChoice } from './common.tsx';
 
 /** Enter and Space take a focused card or door, as a click does. */
@@ -54,6 +56,8 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
     flyToDeck(document.querySelector(`.offers .lift[data-card="${cardId}"]`));
     act({ type: 'DRAFT_PICK', cardId });
   });
+  // The offers rising (round R4, B2): three deals, 70 ms apart.
+  useArrivalSound(() => cues('deal', 3, 70));
   const draft = s.draft;
   if (!draft) return null;
   const c = s.content;
@@ -82,11 +86,25 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
         })}
       </div>
       <div className="row tickets">
-        <button className="tkt extra" disabled={!legal.extraPick || chosen !== null} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
+        <button
+          className="tkt extra"
+          disabled={!legal.extraPick || chosen !== null}
+          onClick={() => {
+            cue('button');
+            act({ type: 'DRAFT_EXTRA_PICK' });
+          }}
+        >
           {t('ui.offers.extra')}
           <em>{money(c.rules.draft.extraPickCost)}</em>
         </button>
-        <button className="tkt reroll" disabled={!legal.reroll || chosen !== null} onClick={() => act({ type: 'DRAFT_REROLL' })}>
+        <button
+          className="tkt reroll"
+          disabled={!legal.reroll || chosen !== null}
+          onClick={() => {
+            cue('button');
+            act({ type: 'DRAFT_REROLL' });
+          }}
+        >
           {freeKey ? (
             t(freeKey)
           ) : (
@@ -190,6 +208,8 @@ function Invitation({ c, s, p, lane, last, sameEnding, chosen, take, legal }: { 
  */
 export function DoorsScreen({ s, legal, act, lane }: { s: GameState; legal: Legal; act: (a: Action) => void; lane: string | null }) {
   const [chosen, choose] = useStampedChoice<string>((gateId) => act({ type: 'CHOOSE_GATE', gateId }));
+  // The doors laid out (round R4, B2).
+  useArrivalSound(() => cue('door'));
   const c = s.content;
   const previews = s.gateOffer.map((id) => previewGate(s, id));
   // The year's last door: choosing ends the year (decision 11).

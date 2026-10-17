@@ -82,7 +82,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
   const incoming = useMemo<IncomingPaper | null>(
     () =>
       playing
-        ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing) }
+        ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing), play: true }
         : answering?.action?.type === 'CHOOSE_EVENT'
           ? { id: answering.id, paper: eventPress(answering.after.content, answering.before?.event ?? '', answering.action.choice)?.paper ?? null }
           : null,
@@ -90,7 +90,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
   );
   const game = mode === 'game';
   return (
-    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${rising ? ' rising' : ''}${arriving ? ' arriving' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${rising ? ' rising' : ''}${arriving ? ' arriving' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-turn={snap.state.turn} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />

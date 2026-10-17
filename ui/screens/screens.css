@@ -270,6 +270,7 @@
 .ov .tog.on { background: #c8281c; }
 .ov .tog.on::after { left: 21px; background: #fff; }
 .ov .crow { margin-top: 14px; padding: 13px 0 12px; border-top: 1px solid rgba(255, 220, 170, .1); }
+.ov .crow + .crow { margin-top: 0; }
 .ov .crow b { display: block; font-size: 14px; font-weight: 800; }
 .ov .crow span { display: block; font-size: 11.5px; line-height: 1.45; color: #9c8e7b; margin-top: 6px; overflow-wrap: anywhere; }
 .ov .crow a { color: #ffcf85; }

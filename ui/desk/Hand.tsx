@@ -8,6 +8,7 @@
 import { memo, useCallback, useEffect, useRef, type KeyboardEvent, type PointerEvent, type MouseEvent } from 'react';
 import type { SeasonId } from '../../core/index.ts';
 import { isPlaceholder } from '../text.ts';
+import { hover } from '../sound/sound.ts';
 import { photoUrl } from './halftone.ts';
 import { Icon, keyboardFocus } from './Icons.tsx';
 import type { EndTurnModel, FaceLine, HandCardModel, HandWords, ValueChip } from './model.ts';
@@ -121,7 +122,9 @@ const Card = memo(function Card({ card, pos, words, season, onPlay, focus, toast
       data-card={card.cardId}
       style={{ visibility:hidden?'hidden':undefined, left: pos.left, zIndex: pos.z, ['--rot' as string]: `${pos.rot}deg`, ['--lift' as string]: `${pos.lift}px`, ...headshot }}
       onPointerEnter={(e: PointerEvent<HTMLDivElement>) => {
-        if (e.pointerType === 'mouse') focus({ kind: 'card', uid: card.uid, anchor });
+        if (e.pointerType !== 'mouse') return;
+        if (!busy) hover(); // once per card entered, mouse only (round R4, B2)
+        focus({ kind: 'card', uid: card.uid, anchor });
       }}
       onPointerLeave={(e: PointerEvent<HTMLDivElement>) => {
         if (e.pointerType === 'mouse') focus(null);

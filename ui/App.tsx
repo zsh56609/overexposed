@@ -28,6 +28,8 @@ import { EventScreen } from './screens/Events.tsx';
 import { SeasonCard } from './screens/Season.tsx';
 import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
+import { direct, seasonTrack } from './sound/director.ts';
+import { ambience, cue, cues, music, prepareSound, startSound } from './sound/sound.ts';
 
 // ---------------------------------------------------------------------------
 // Seeds: every run replays from its seed; ?seed=123 in the URL replays one.
@@ -83,6 +85,9 @@ export function App() {
   }, []);
   const restart = useCallback(() => {
     const mode = motionMode();
+    // PLAY AGAIN (round R4, B2 and B4): its button, and the music fading out with the ink; the title is silent.
+    cue('button');
+    music(null, mode === 'off' ? 0 : mode === 'reduced' ? 100 : 350);
     if (mode === 'off') {
       next();
       return;
@@ -222,6 +227,8 @@ const OVER_ACTIONS: ReadonlySet<string> = new Set(['CHOOSE_MANAGER', 'CHOOSE_GAT
  */
 type Scene = 'begin' | 'into';
 const SCENE_MS: Record<Scene, number> = { begin: 750, into: 1200 };
+/** When the first manager card lands as the desk comes up (B2; ui/screens/title.css), for its sound. */
+const DEAL_IN = 550;
 
 function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const { queue } = run;
@@ -241,7 +248,13 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // B1, title → opening card; B2, opening card → the manager choice. A click during one completes it (D7).
   const [scene, setScene] = useState<Scene | null>(null);
   const sceneTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(sceneTimer.current), []);
+  // The sounds a scene still has to come (round R4, B2): the manager cards dealt as the desk comes up. A click that
+  // completes the scene drops them.
+  const sceneSounds = useRef<() => void>(() => {});
+  useEffect(() => () => {
+    window.clearTimeout(sceneTimer.current);
+    sceneSounds.current();
+  }, []);
   const play = useCallback((next: Scene, then: () => void) => {
     then();
     const mode = motionMode();
@@ -249,6 +262,16 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     setScene(next);
     window.clearTimeout(sceneTimer.current);
     sceneTimer.current = window.setTimeout(() => setScene(null), mode === 'reduced' ? 200 : SCENE_MS[next]);
+    if (next === 'into') {
+      // ui/screens/title.css: the two cards land 0.55 s and 0.67 s in; at once with reduced motion.
+      const full = mode === 'full';
+      let stop = () => {};
+      const timer = window.setTimeout(() => (stop = cues('deal', 2, full ? 120 : 70)), full ? DEAL_IN : 0);
+      sceneSounds.current = () => {
+        window.clearTimeout(timer);
+        stop();
+      };
+    }
   }, []);
   useEffect(() => {
     if (scene === null) return;
@@ -257,6 +280,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       event.preventDefault();
       event.stopImmediatePropagation();
       window.clearTimeout(sceneTimer.current);
+      sceneSounds.current();
       finishTransitions();
       setScene(null);
     };
@@ -268,6 +292,17 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     };
   }, [scene]);
   useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
+  // The queue's beats, heard (round R4, B2 and B4): ui/sound/director.ts.
+  useEffect(() => direct(queue), [queue]);
+  // The sampled sounds rendered once the opening card has settled, never during BEGIN's flash (B1).
+  useEffect(() => {
+    if (intro === 'opening' && scene === null) prepareSound();
+  }, [intro, scene]);
+  // The room (B3): whenever the desk is on stage, under its overlays too, with its season's weather — the season
+  // card's from its arrival, as the music changes; none on the title, the opening card or the awards night.
+  const roomAct = snap.active?.plan?.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') ? snap.active.step.after.act : snap.state.act;
+  const roomSeason = intro === null && snap.state.phase !== 'ended' ? (snap.state.content.rules.seasons?.[roomAct - 1] ?? null) : null;
+  useEffect(() => ambience(roomSeason), [roomSeason]);
   useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
     const skip = (event: MouseEvent | KeyboardEvent) => {
@@ -314,12 +349,18 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // The title's controls: BEGIN and its three links.
   const titleOn = useMemo(
     () => ({
-      begin: () => play('begin', () => setIntro('opening')),
+      // BEGIN (round R4, B1, B2 and B4): the sound starts from this click — its flash, and spring fading in over 2 s.
+      begin: () => {
+        startSound();
+        cue('flash');
+        music(seasonTrack(queue.getSnapshot().state.content, 1), 2000);
+        play('begin', () => setIntro('opening'));
+      },
       scrapbook: () => setPanel('scrapbook'),
       settings: () => setPanel('settings'),
       credits: () => setPanel('credits'),
     }),
-    [play],
+    [play, queue],
   );
 
   if (s.phase === 'ended')
