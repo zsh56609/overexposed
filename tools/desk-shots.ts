@@ -39,13 +39,14 @@ async function screens(page: Page, url: string): Promise<string[]> {
   saved.push(await shot('title'));
   // The title's three panels (round R1, Part G).
   for (const id of ['scrapbook', 'settings', 'credits']) {
-    await click(`.title-screen .${id}-open`);
+    await click(id === 'scrapbook' ? '.desk [data-hook="scrapbook-note"]' : `.desk .${id}-open`);
     await sleep(300);
     saved.push(await shot(id));
     await click(`.p-${id} .closeb`);
     await sleep(200);
   }
-  await click('button.big');
+  await click('.desk .begin');
+  await click('.season-card .into');
   await sleep(400);
   saved.push(await shot('manager'));
   await click('.manager-choice .choose', 0); // Dex: a fourth card on each offer

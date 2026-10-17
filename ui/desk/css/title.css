@@ -1,0 +1,45 @@
+/* The title (round R3, Part A; docs/design/visual/ref/r3-title.png): the desk the night before the year. The title
+   paper stands where the month's papers stand, larger than they are, on the same newsprint; the mirror holds the
+   majors and the scrapbook; five faces fan at the front, not to be played; BEGIN stands in END TURN's place. */
+
+.desk .titlepaper {
+  position: absolute; left: 112px; top: 20px; width: 572px; height: 404px; z-index: 6; padding: 20px 24px 18px;
+  color: var(--newsprint-ink); background-color: var(--newsprint);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .12  0 0 0 0 .10  0 0 0 0 .07  0 0 0 .32 0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>"), radial-gradient(ellipse at 50% 42%, rgba(255, 252, 242, .55) 0%, rgba(0, 0, 0, 0) 58%, rgba(125, 100, 62, .18) 100%);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(60, 48, 30, .12);
+  transform: rotate(-1deg); transform-origin: 50% 100%;
+}
+.desk .title-shadow { left: 128px; top: 414px; width: 548px; }
+.desk .titlepaper .mhrow { gap: 12px; margin-top: -6px; }
+/* The glyphs stand taller than the line (Playfair's ascent and descent): the padding holds them, as the papers' mastheads do. */
+.desk .titlepaper .mh { padding: 8px 0; }
+.desk .titlepaper .ear { width: 70px; font-size: 9px; padding: 5px 4px; line-height: 1.3; }
+.desk .titlepaper .ear.left { color: var(--paper-flash); }
+.desk .titlepaper .mh b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 47px; line-height: 1; letter-spacing: -.012em; white-space: nowrap; }
+.desk .titlepaper .dl { font-size: 8.5px; margin: 9px 0 10px; padding: 3px 1px; }
+.desk .titlepaper .tph { height: 172px; background: #aaa295 center / cover no-repeat; box-shadow: inset 0 0 0 1px rgba(26, 23, 20, .25); }
+.desk .titlepaper .tph.on { animation: title-photo .6s ease-out both; }
+.desk .titlepaper .cp { font-size: 8px; font-style: italic; color: #4f473c; margin-top: 3px; }
+.desk .titlepaper .tlines { margin-top: 12px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 22px; line-height: 1.24; color: #221d17; }
+.desk .titlepaper .tlines i { display: block; }
+@keyframes title-photo { from { opacity: 0; } }
+
+/* The mirror's five notes: the scrapbook as the black card, the four majors as stickies; each opens the scrapbook. */
+.desk .today.book { width: 162px; cursor: pointer; }
+.desk .today.book b { font-size: 15px; margin-top: 1px; }
+.desk .today.book span { font-size: 9.5px; margin-top: 2px; }
+.desk .today.book .dots { display: flex; gap: 2.5px; margin-top: 5px; }
+.desk .today.book .dots i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--cream); flex: none; }
+.desk .today.book .dots i.f { background: var(--cream); }
+.desk .sticky.title-note { cursor: pointer; }
+.desk .sticky.title-note .goal { display: block; }
+.desk .today.book:focus-visible, .desk .sticky.title-note:focus-visible { outline: 2px solid #ffcf85; outline-offset: 2px; }
+
+/* The fan: the hand's own faces and places, never played. */
+.desk .title-fan .card { pointer-events: none; }
+
+/* BEGIN in END TURN's place and style; Settings and Credits under it. */
+.desk .endbtn.begin b { font-size: 17px; letter-spacing: .32em; }
+.desk .title-links { position: absolute; right: 22px; top: 688px; width: 212px; display: flex; justify-content: center; gap: 22px; z-index: 70; }
+.desk .title-links .link { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: #d9cdb8; text-decoration: underline; text-underline-offset: 3px; padding: 4px 0; }
+.desk .title-links .link:hover, .desk .title-links .link:focus-visible { color: #ffcf85; outline: none; }

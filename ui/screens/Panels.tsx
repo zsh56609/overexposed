@@ -194,6 +194,8 @@ export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose
             </a>
           </span>
         </div>
+        {/* The build's version, small at the foot (round R3): major and minor, as the itch page names builds. */}
+        <div className="ver">{t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })}</div>
       </div>
     </Overlay>
   );

@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { establishedLanes, getCard, pressLines, readLines } from '../../core/index.ts';
 import type { Snapshot } from '../queue.ts';
 import { t } from '../i18n.ts';
-import { calendarLabel, lineText, mastheadName, seasonName, seasonOpener, signedAmount } from '../text.ts';
+import { lineText, mastheadName, signedAmount } from '../text.ts';
 import { CardPicture } from './Hand.tsx';
 import { cardModel, type DeskModel } from './model.ts';
 import { PILE_SLOTS, planeFace } from './Pile.tsx';
@@ -37,7 +37,6 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
     });
   },[step]);
   const elapsed=plan!.beats.slice(0,(active.index??0)+1);
-  const season=elapsed.some(b=>b.kind==='season')&&!elapsed.some(b=>b.kind==='seasonEnd');
   useLayoutEffect(()=>()=>{for(const stop of cleanups.current.splice(0))stop();for(const stop of rolls.current.values())stop();rolls.current.clear();last.current=-1;},[]);
   useLayoutEffect(()=>{
     const root=host.current?.closest<HTMLElement>('.desk'); if(!root||!host.current)return;
@@ -94,7 +93,6 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         else if(face){ const own=getComputedStyle(face).transform;animate(face,[{transform:own,opacity:1},{transform:`translate(260px,20px) ${own}`,opacity:0}],550,i*80,'forwards'); }
       });
       if(beat.kind==='date') animate(root.querySelector('[data-hook="date"]'),[{transform:'rotateX(0)'},{transform:'rotateX(90deg)',offset:.5},{transform:'rotateX(0)'}],520);
-      if(beat.kind==='season') animate(host.current.querySelector('.month-season'),[{opacity:0},{opacity:1}],300);
       if(beat.kind==='publish') root.querySelectorAll('.pp').forEach(p=>animate(p,[{opacity:0},{opacity:1}],800));
       if(beat.kind==='deal') {
         const card=root.querySelector<HTMLElement>(`.hand .card[data-uid="${beat.uid}"]`);
@@ -146,6 +144,5 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         <div className="scene3d month-carried motion-face" style={{visibility:carried?'visible':'hidden'}}><div className="plane" data-scandal-plane={item.uid} style={{transform:'rotateX(64deg)'}}><div style={{position:'absolute',transform:planeFace(x,y,rot)}}><CardPicture card={item.card} words={model.handWords} season={model.season}/></div></div></div>
       </div>;
     })}
-    {season&&<div className="month-season"><small>{calendarLabel(step.after.content,step.after.turn)}</small><h2>{seasonName(step.after.content,step.after.act)}</h2><p>{seasonOpener(step.after.content,step.after.seed,step.after.act)}</p></div>}
   </div>;
 }

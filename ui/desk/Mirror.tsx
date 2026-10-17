@@ -3,7 +3,7 @@
 // goal line and its requirements in the stat bar's words. In a frenzy some bulbs flicker or go dark and a red
 // clipping is stuck to the glass. Every word is the adapter's (./model.ts).
 
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { isPlaceholder } from '../text.ts';
 import { Icon } from './Icons.tsx';
 import type { MirrorModel } from './model.ts';
@@ -35,7 +35,8 @@ const SPOTS = [
 
 const ph = (text: string, base: string): string => (isPlaceholder(text) ? `${base} placeholder` : base);
 
-export const Mirror = memo(function Mirror({ mirror, crisis }: { mirror: MirrorModel; crisis: boolean }) {
+/** The mirror; `mirror` null for the title's (round R3), whose notes are its children. */
+export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirror: MirrorModel | null; crisis: boolean; children?: ReactNode }) {
   return (
     <>
       <div className="mShadow" />
@@ -44,17 +45,18 @@ export const Mirror = memo(function Mirror({ mirror, crisis }: { mirror: MirrorM
         <div className="glass" />
         <div className="bulbs">
           {BULBS.map(([x, y], i) => (
-            <div key={i} className={bulbClass(i, crisis)} style={{ left: x, top: y }} />
+            <div key={i} className={bulbClass(i, crisis)} style={{ left: x, top: y, ['--i' as string]: i }} />
           ))}
         </div>
-        {mirror.today && (
+        {children}
+        {mirror?.today && (
           <div className="today" data-hook="today">
             <small>{mirror.kicker}</small>
             <b className={ph(mirror.today.major, '')}>{mirror.today.major}</b>
             <span className={ph(mirror.today.minor, '')}>{mirror.today.minor}</span>
           </div>
         )}
-        {mirror.notes.map((note, i) => {
+        {mirror?.notes.map((note, i) => {
           const spot = SPOTS[i] ?? SPOTS[0];
           return (
             <div key={note.majorId} className={`sticky ${note.colour}`} data-major={note.majorId} style={{ left: spot.left, top: spot.top, ['--r' as string]: `${spot.r}deg` }}>
@@ -70,7 +72,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis }: { mirror: MirrorM
             </div>
           );
         })}
-        {mirror.clipping !== null && (
+        {mirror && mirror.clipping !== null && (
           <div className="clipM" data-hook="clipping">
             {mirror.clipping}
           </div>

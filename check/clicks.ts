@@ -45,7 +45,7 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const blocked = {};
   const note = (m) => { blocked[m] = (blocked[m] || 0) + 1; };
-  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0, settingsViews: 0, events: 0, unaffordable: 0 };
+  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0, settingsViews: 0, events: 0, unaffordable: 0, seasonCards: 0 };
   const POINTS = [[0.5, 0.5], [0.12, 0.12], [0.88, 0.12], [0.12, 0.88], [0.88, 0.88]];
   const name = (el, cards, end) => (el === end ? 'END TURN' : 'card ' + (cards.indexOf(el) + 1) + ' of ' + cards.length);
   const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
@@ -82,9 +82,12 @@ const DRIVE = (runs: number) => `(async () => {
   };
   // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
   // A panel (round R1, Part G) is the screen while it is open: the deck, the scrapbook, House rules, the credits.
-  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.season-card') ? 'season' : document.querySelector('.desk[data-mode="title"]') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
-    title: ['button.big', '.title-screen .link'],
+    // The title is the desk (round R3): BEGIN, its two links, the mirror's five notes (each opens the scrapbook).
+    title: ['.desk .begin', '.desk .title-links .link', '.desk [data-hook="scrapbook-note"]', '.desk .title-note'],
+    // A season's card, the opening's included (round R3): its button.
+    season: ['.season-card .into'],
     credits: ['.p-credits .closeb', '.p-credits a'],
     scrapbook: ['.p-scrapbook .closeb'],
     settings: ['.p-settings .closeb', '.p-settings .srow'],
@@ -159,16 +162,27 @@ const DRIVE = (runs: number) => `(async () => {
   document.head.appendChild(still);
   // The title and its three panels: the scrapbook, House rules, the credits.
   reachable();
-  for (const id of ['scrapbook', 'settings', 'credits']) if (await visit('.title-screen .' + id + '-open', id)) await close(id);
-  document.querySelector('button.big').click();
+  const TITLE_OPENS = { scrapbook: '.desk [data-hook="scrapbook-note"]', settings: '.desk .settings-open', credits: '.desk .credits-open' };
+  for (const id of ['scrapbook', 'settings', 'credits']) if (await visit(TITLE_OPENS[id], id)) await close(id);
+  document.querySelector('.desk .begin').click();
   await sleep(40);
+  // The opening card (round R3): spring's, before the manager.
+  stats.states++;
+  reachable();
+  stats.seasonCards++;
+  document.querySelector('.season-card .into').click();
+  await sleep(20);
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
       window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.event-screen,.hand')?.className};
       stats.states++;
       reachable();
-      if (document.querySelector('.manager-choice')) {
+      if (document.querySelector('.season-card')) {
+        // A season's card waits for its button (round R3).
+        stats.seasonCards++;
+        document.querySelector('.season-card .into').click();
+      } else if (document.querySelector('.manager-choice')) {
         // The managers alternate run by run (round V1a), so every check covers each of them.
         const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
         take[run % take.length].click();
@@ -291,7 +305,7 @@ const EVENT_PAGE = `(async () => {
   return { events: n, states, replies, disabled, blocked };
 })()`;
 
-type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; blocked: [string, number][] };
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; seasonCards: number; blocked: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false } });
 await server.listen();
@@ -313,7 +327,7 @@ try {
           .join(', ');
         console.log(
           `click-through check, ${tag}: ${out.runs} runs, ${out.states} states — ${out.controls} controls reached (${screens}; ${out.extraPicks} extra picks, ${out.rerolls} rerolls, ${out.deckViews} deck views, ${out.settingsViews} House rules over the desk), ` +
-            `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled), ${out.events} events (${out.unaffordable} with a reply they could not afford, which took no click) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+            `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled), ${out.events} events (${out.unaffordable} with a reply they could not afford, which took no click), ${out.seasonCards} season cards (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
         );
         for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
         if (out.blocked.length > 0 || out.runs < RUNS) failed = true;

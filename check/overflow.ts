@@ -120,6 +120,10 @@ const AUDIT = `window.__deskAudit = (where) => {
     sc.replaceChildren(...was);
   }
   const clk = desk.querySelector('.lock .clk'); if (clk) holds(clk, 'phone clock');
+  // The title (round R3): the title paper holds its masthead, ears, dateline and lines; its links on the stage.
+  const tp = desk.querySelector('.titlepaper');
+  if (tp) { holds(tp, 'title paper'); for (const x of tp.querySelectorAll('.mh, .dl, .ear, .tlines i')) holds(x, 'title paper line'); within(tp, STAGE, 'title paper'); }
+  for (const x of desk.querySelectorAll('.title-links .link')) within(x, STAGE, 'title link');
   // The bubbles stay below the stat bar and on the stage, the reaction row too.
   const bub = desk.querySelector('.bubbles'); if (bub && bub.children.length) { const b = S(bub.getBoundingClientRect()); if (b.t < 50) add('bubbles reach the stat bar: top ' + Math.round(b.t)); }
   for (const x of desk.querySelectorAll('.bub, .rx-bar')) within(x, { l: 0, t: 46, r: 1280, b: 720 }, 'bubble');
@@ -307,17 +311,23 @@ const DRIVE = (runs: number) => `(async () => {
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
   document.head.appendChild(still);
-  plain('title');
-  for (const id of ['scrapbook', 'settings', 'credits']) await panel('.title-screen .' + id + '-open', id);
-  document.querySelector('button.big').click();
+  // The title is the desk (round R3): audited as the desk, its panels from the mirror's note and its links.
+  note(__deskAudit('title'));
+  seen.screens.title = 1;
+  for (const [id, opener] of [['scrapbook', '.desk [data-hook="scrapbook-note"]'], ['settings', '.desk .settings-open'], ['credits', '.desk .credits-open']]) await panel(opener, id);
+  document.querySelector('.desk .begin').click();
   await sleep(40);
+  plain('opening card');
+  document.querySelector('.season-card .into').click();
+  await sleep(20);
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
-      const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
+      const phase = document.querySelector('.season-card') ? 'season' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
       window.__auditProgress = { run, guard, phase, states:seen.states, previews:seen.previews, tips:seen.tips };
-      if (phase === 'manager') { plain('manager'); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
+      if (phase === 'season') { plain('season card'); note(__deskAudit('season card')); document.querySelector('.season-card .into').click(); await sleep(8); continue; }
+      if (phase === 'manager') { plain('manager'); note(__deskAudit('manager')); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));
       if (phase === 'draft') {
         plain('draft');

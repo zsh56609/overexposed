@@ -3,24 +3,31 @@
 // flavour), what am I aiming for (the goals board, the ending, the final gate), what can I do (the deck
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
+//
+// Round R3: one desk from the title to the year's end. The run to come is made at once, so the title is the desk
+// the night before it; BEGIN brings spring's card (the opening), "Into spring" the manager choice on the desk.
+// Every season card waits for its button.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { createInitialState, establishedLanes, readLines, reduce, type Action } from '../core/index.ts';
+import { createInitialState, establishedLanes, readLines, reduce, type Action, type GameState } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { motionMode, subscribeMotion } from './motion.ts';
-import { Desk } from './desk/Desk.tsx';
+import { Desk, type DeskIntro, type DeskMode } from './desk/Desk.tsx';
 import { EndTurnPreviewView, PlayPreviewView } from './desk/Preview.tsx';
-import { deskModel } from './desk/model.ts';
+import { cardModel, deskModel } from './desk/model.ts';
+import { TITLE_FAN } from './desk/Title.tsx';
 import { t } from './i18n.ts';
 import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readFound } from './collection.ts';
 import { useFontsReady } from './screens/common.tsx';
-import { ManagerScreen, TitleScreen } from './screens/Opening.tsx';
+import { ManagerScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
+import { SeasonCard } from './screens/Season.tsx';
+import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
 
 // ---------------------------------------------------------------------------
 // Seeds: every run replays from its seed; ?seed=123 in the URL replays one.
@@ -42,42 +49,36 @@ interface RunHandle {
   readonly queue: EventQueue;
 }
 
-export function App() {
-  const [run, setRun] = useState<RunHandle | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const start = useCallback((seed: number) => {
-    try {
-      const state = createInitialState(seed, content, { strict: STRICT });
-      setError(null);
-      setRun((prev) => ({ id: (prev?.id ?? 0) + 1, seed, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) }));
-    } catch (err) {
-      setError(t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed, action: 'start' }));
-    }
-  }, []);
-  if (!run) return <Title onStart={start} error={error} />;
-  return <Run key={run.id} run={run} onRestart={() => start(seedFromUrl() === null ? freshSeed() : ((seedFromUrl()! + run.id) >>> 0))} />;
+/** A run from its seed, or why it could not start. */
+function makeRun(seed: number, id: number): RunHandle | string {
+  try {
+    const state = createInitialState(seed, content, { strict: STRICT });
+    return { id, seed, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) };
+  } catch (err) {
+    return t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed, action: 'start' });
+  }
 }
 
-/** The title (round R1, Part B): shown once the fonts are in; the run to come is chosen now, so the opening is its variant. */
-function Title({ onStart, error }: { onStart: (seed: number) => void; error: string | null }) {
-  const ready = useFontsReady();
-  const urlSeed = seedFromUrl();
-  // The run to come is chosen now, so the opening premise is that run's variant (decision 15, revised).
-  const [seed] = useState(() => urlSeed ?? freshSeed());
-  const [found] = useState(readFound);
-  // The scrapbook, House rules or the credits, over the title (round R1, Part G).
-  const [panel, setPanel] = useState<PanelId | null>(null);
-  const close = useCallback(() => setPanel(null), []);
-  if (!ready) return <div className="scr title-screen" />;
-  return (
-    <>
-      <TitleScreen seed={seed} found={found} onBegin={() => onStart(seed)} open={setPanel} />
-      {panel === 'scrapbook' && <ScrapbookPanel found={found} overDesk={false} onClose={close} />}
-      {panel === 'settings' && <SettingsPanel overDesk={false} onClose={close} />}
-      {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}
-      {error && <p className="plain error-layer">{error}</p>}
-    </>
-  );
+export function App() {
+  // The run to come is made now (decision 15, revised): the title is its desk, and the opening its variant.
+  const [made] = useState(() => makeRun(seedFromUrl() ?? freshSeed(), 1));
+  const [run, setRun] = useState<RunHandle | null>(typeof made === 'string' ? null : made);
+  const [error, setError] = useState<string | null>(typeof made === 'string' ? made : null);
+  const restart = useCallback(() => {
+    setRun((prev) => {
+      const id = (prev?.id ?? 0) + 1;
+      const urlSeed = seedFromUrl();
+      const next = makeRun(urlSeed === null ? freshSeed() : (urlSeed + id - 1) >>> 0, id);
+      if (typeof next === 'string') {
+        setError(next);
+        return prev;
+      }
+      setError(null);
+      return next;
+    });
+  }, []);
+  if (!run) return <p className="plain error-layer">{error}</p>;
+  return <Run key={run.id} run={run} onRestart={restart} />;
 }
 
 /**
@@ -161,14 +162,30 @@ function Floating({ anchor, children, leaving = false }: { anchor: Anchor; child
   );
 }
 
+/**
+ * The season card a state shows, if its season's card has not been answered yet (round R3, A3). Seasons come in
+ * order and each card is answered before the year goes on, so a season other than the last answered is a new one.
+ */
+function seasonOf(s: GameState, answered: number): { readonly act: number; readonly date: string; readonly season: string; readonly paragraphs: readonly string[] } | null {
+  if (s.phase === 'ended' || s.act === answered) return null;
+  const c = s.content;
+  return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(c, s.seed, s.act)] };
+}
+
 function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const { queue } = run;
   const snap = useSyncExternalStore(queue.subscribe, queue.getSnapshot);
   const [error, setError] = useState<string | null>(null);
   const [focus, setFocus] = useState<Focus>(null);
-  // The deck, House rules (over the desk) or the scrapbook (over the awards night): round R1, Part G.
+  // The deck, House rules, the credits or the scrapbook (round R1, Part G), over the desk or the awards night.
   const [panel, setPanel] = useState<PanelId | null>(null);
   const close = useCallback(() => setPanel(null), []);
+  // Before the year (round R3): the title, then the opening card; then the manager choice, played on the desk.
+  const [intro, setIntro] = useState<'title' | 'opening' | null>('title');
+  // The last season whose card was answered: spring's is the opening.
+  const [answered, setAnswered] = useState(1);
+  const [found] = useState(readFound);
+  const fonts = useFontsReady();
   useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
   useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
@@ -213,6 +230,26 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     }),
     [act, queue],
   );
+  // The title's own: the endings found, the fan of five faces (the scandal in the middle), BEGIN and its links.
+  const introProps = useMemo<DeskIntro>(() => {
+    const first = snap.steps[0]?.after ?? s;
+    const inHand = new Map(lines.inHand);
+    const fan = TITLE_FAN.map((cardId, i) => {
+      const uid = -1 - i;
+      if (c.cards[cardId]?.kind === 'scandal') inHand.set(uid, lines.counter.fork().inHand(cardId));
+      return cardModel(first, { uid, cardId }, { ...lines, inHand }, true);
+    });
+    return {
+      c,
+      found,
+      fan,
+      begin: () => setIntro('opening'),
+      settings: () => setPanel('settings'),
+      credits: () => setPanel('credits'),
+      scrapbook: () => setPanel('scrapbook'),
+    };
+    // The title is drawn once per run, from its first state.
+  }, [run.id, found]);
 
   if (s.phase === 'ended')
     return (
@@ -221,22 +258,22 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} overDesk={false} onClose={close} />}
       </>
     );
-  if (s.phase === 'manager')
-    return (
-      <>
-        <ManagerScreen s={s} legal={legal} act={act} />
-        {error && <p className="plain error-layer">{t('ui.error.title')}: {error}</p>}
-      </>
-    );
+  // The title waits for the game's faces (round R1): a font that never comes is waited for 3 s.
+  if (intro === 'title' && !fonts) return <div className="scr title-wait" />;
 
+  const mode: DeskMode = intro ?? (s.phase === 'manager' ? 'manager' : 'game');
   const endPreview = model.endPreview;
   // The answer to an event, while its step plays and before it is published (round R2, Part C).
   const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' && !snap.active.published ? snap.active : null;
   const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
+  // A season's card (round R3, A3): from the month end's 'season' beat, its entrance, until its button is clicked.
+  const reached = snap.active?.plan ? snap.active.plan.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') : false;
+  const season = mode !== 'game' ? null : snap.active ? (reached ? seasonOf(snap.active.step.after, answered) : null) : seasonOf(s, answered);
+  const clear = season === null;
 
   return (
     <>
-      <Desk model={model} on={on} snap={snap} onTails={queue.onTails}>
+      <Desk model={model} on={on} snap={snap} onTails={queue.onTails} mode={mode} intro={introProps}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
           {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} lane={lines.lane} slots={s.slots} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} lane={lines.lane} /> : null}
@@ -249,7 +286,27 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           {t('ui.error.title')}: {error}
         </p>
       )}
-      {(s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan && (
+      {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name. */}
+      {mode === 'opening' && (
+        <div className="screen-over full">
+          <div className="screen-scrim" />
+          <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(c, s.seed).split('\n\n').slice(1)} go={() => setIntro(null)} />
+        </div>
+      )}
+      {/* The manager choice, dealt onto the desk (round R3). */}
+      {mode === 'manager' && (
+        <div className="screen-over full">
+          <div className="screen-scrim" />
+          <ManagerScreen s={s} legal={legal} act={act} />
+        </div>
+      )}
+      {season && (
+        <div className="screen-over">
+          <div className="screen-scrim" />
+          <SeasonCard key={season.act} date={season.date} season={season.season} paragraphs={season.paragraphs} go={() => setAnswered(season.act)} />
+        </div>
+      )}
+      {clear && mode === 'game' && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan && (
         <div className="screen-over">
           <div className="screen-scrim" />
           {s.phase === 'draft' && s.draft && (
@@ -259,7 +316,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         </div>
       )}
       {/* An event (round R2, Part C): once the month end has settled, and while its answer plays, until it is published. */}
-      {s.phase === 'event' && (!snap.active || answering !== null) && (
+      {clear && s.phase === 'event' && (!snap.active || answering !== null) && (
         <div className="screen-over">
           <div className="screen-scrim" />
           <EventScreen
@@ -275,7 +332,9 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         </div>
       )}
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
-      {panel === 'settings' && <SettingsPanel overDesk onClose={close} />}
+      {panel === 'settings' && <SettingsPanel overDesk={mode === 'game'} onClose={close} />}
+      {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}
+      {panel === 'scrapbook' && <ScrapbookPanel found={found} overDesk={false} onClose={close} />}
     </>
   );
 }

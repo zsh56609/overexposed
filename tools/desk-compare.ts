@@ -56,7 +56,8 @@ try {
   if (!s09) throw new Error('no recorded state s09: run npm run desk:states');
   await page.navigate(`${url}?seed=${s09.seed}`, 2500);
   await page.screenshot(join(OUT, '12.jpg'));
-  await page.evaluate(`document.querySelector('button.big').click()`);
+  await page.evaluate(`document.querySelector('.desk .begin').click()`);
+  await page.evaluate(`document.querySelector('.season-card .into')?.click()`);
   await sleep(700);
   await page.screenshot(join(OUT, '13.jpg'));
   // 14: s09's year to its end — END TURN, then the last door.

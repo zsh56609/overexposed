@@ -34,9 +34,13 @@ export function loadStates(): Record<string, DeskState> {
 export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
   document.documentElement.dataset.motion = 'off';
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  document.querySelector('button.big')?.click();
-  await sleep(40);
+  // Round R3: the title is the desk; BEGIN brings the opening card, and every season card waits for its button.
+  const into = async () => { for (let n = 0; n < 3; n++) { const go = document.querySelector('.season-card .into'); if (!go) return; go.click(); await sleep(10); } };
+  document.querySelector('.desk .begin')?.click();
+  await sleep(20);
+  await into();
   for (const [kind, i] of steps) {
+    await into();
     const cards = [...document.querySelectorAll('.desk .hand .card')];
     const el = kind === 'manager' ? document.querySelectorAll('.manager-choice .choose')[i]
       : kind === 'draft' ? document.querySelectorAll('.draft .take')[i]
@@ -49,13 +53,14 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
     el.click();
     await sleep(10);
   }
+  await into();
   return 'ok';
 })(${JSON.stringify(steps)})`;
 
 /** Loads the game on the state's seed and replays its steps; the page settles before it returns. */
 let navigationId=0;
 /** Loads a page and waits until it is ready: by default the game's title (its BEGIN); `test` for another page. */
-export async function openReady(page:Page,url:string,test=`!!document.querySelector('button.big')`):Promise<void> {
+export async function openReady(page:Page,url:string,test=`!!document.querySelector('.desk[data-mode="title"] .begin')`):Promise<void> {
   const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));
   await page.navigate(target.href,0);
   const start=Date.now();let last='';

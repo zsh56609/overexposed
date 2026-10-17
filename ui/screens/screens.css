@@ -15,51 +15,29 @@
 :root[data-motion='reduced'] .scr *, :root[data-motion='reduced'] .scr *::before, :root[data-motion='reduced'] .scr *::after { animation-duration: .01ms !important; transition-duration: .15s !important; }
 :root[data-motion='off'] .scr *, :root[data-motion='off'] .scr *::before, :root[data-motion='off'] .scr *::after { animation: none !important; transition: none !important; }
 
-/* ---------------------------------------------------------------- The title (shot 12) */
-.title-screen { background: #EDE6D6; overflow: hidden; }
-.title-screen::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(21, 18, 14, .12) 1px, transparent 0); background-size: 4px 4px; pointer-events: none; }
-.title-screen .tband { position: absolute; left: 0; right: 0; top: 0; height: 214px; background: #15120E; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.title-screen h1 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 132px; line-height: .9; color: #EDE6D6; letter-spacing: .005em; }
-.title-screen .rule { width: 780px; height: 1px; background: #4a423a; margin: 16px 0 12px; }
-.title-screen .sub { font-weight: 600; font-size: 17px; letter-spacing: .42em; color: #CFC6B2; }
-.title-screen .tred { position: absolute; left: 0; right: 0; top: 206px; height: 8px; background: #D92B1F; }
-.title-screen .premise { position: absolute; left: 78px; top: 262px; width: 470px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 17px; line-height: 1.55; color: #2a241c; }
-.title-screen .premise p { margin: 0 0 10px; }
-.title-screen .premise .season { font-style: normal; font-weight: 900; font-size: 13px; letter-spacing: .24em; text-transform: uppercase; color: #15120E; margin-bottom: 8px; }
-.scr .begin { position: absolute; left: 78px; top: 548px; width: 250px; padding: 14px 0; background: #15120E; color: #EDE6D6; text-align: center; font-weight: 800; font-size: 17px; letter-spacing: .18em; text-transform: uppercase; border: 2px solid #15120E; }
-.scr .begin:hover { background: #D92B1F; border-color: #D92B1F; }
-.title-screen .found { position: absolute; left: 78px; top: 616px; }
+/* ---------------------------------------------------------------- What the title left (round R3: the title is the desk)
+   The endings found as dots and the small links: the awards night keeps them. */
+.scr.title-wait { background: #0c0907; }
 .scr .found { display: flex; align-items: center; gap: 12px; }
 .scr .found b { font-weight: 800; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #4a4238; white-space: nowrap; }
 .scr .dots { display: flex; gap: 5px; }
 .scr .dots i { width: 11px; height: 11px; border: 1.5px solid #15120E; border-radius: 50%; flex: none; }
 .scr .dots i.f { background: #15120E; }
-.title-screen .links { position: absolute; left: 78px; top: 652px; display: flex; gap: 20px; }
 .scr .link { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; color: #6b6155; text-decoration: underline; text-underline-offset: 2px; padding: 4px 0; }
 .scr .link:hover { color: #D92B1F; }
-.title-screen .fan { position: absolute; left: 600px; top: 0; width: 680px; height: 720px; pointer-events: none; }
-.title-screen .tc { position: absolute; width: 210px; height: 300px; background: #F7F2E5; border: 3px solid #15120E; border-radius: 6px; padding: 16px; transform-origin: 50% 130%; box-shadow: 0 14px 24px rgba(0, 0, 0, .25); animation: title-fanin .9s cubic-bezier(.3, 1.3, .5, 1) both; }
-.title-screen .tc .ph { height: 78px; background: #CFC6B2; position: relative; overflow: hidden; }
-.title-screen .tc .ph::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 2px 2px, rgba(21, 18, 14, .55) 1.6px, transparent 0); background-size: 5px 5px; }
-.title-screen .tc .bar { height: 15px; background: #15120E; margin-top: 14px; }
-.title-screen .tc .bar.s { width: 72%; margin-top: 8px; }
-.title-screen .tc .ln { height: 6px; background: #B4AB98; margin-top: 12px; }
-.title-screen .tc .ln.s { width: 85%; margin-top: 7px; }
-.title-screen .tc.red { background: #D92B1F; }
-.title-screen .tc.red .ph { background: #A81C12; }
-.title-screen .tc.red .ph::after { background-image: radial-gradient(circle at 2px 2px, rgba(60, 6, 2, .6) 1.6px, transparent 0); }
-.title-screen .tc.red .bar { background: #FFF3EF; }
-.title-screen .tc.red .ln { background: #F2A79F; }
-.title-screen .tc.red .x { position: absolute; left: 18px; bottom: 26px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 40px; color: #FFF3EF; line-height: 1; }
-@keyframes title-fanin { from { opacity: 0; transform: translateY(80px) rotate(0); } }
+
+/* ---------------------------------------------------------------- A season's card (round R3, A2–A3)
+   The month and year, the season, its opener — or spring's opening — over the dimmed desk; it waits for its button. */
+.scr.season-card { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #EDE6D6; padding: 0 160px 24px; }
+.scr.season-card small { font-size: 10px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; color: #ffcf85; margin-bottom: 12px; }
+.scr.season-card h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 64px; line-height: 1; }
+.scr.season-card p { margin: 14px 0 0; max-width: 600px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.45; color: #d9cdb8; }
+.scr.season-card .go { margin-top: 34px; min-width: 212px; padding: 11px 26px 12px; background: #15120E; color: #EDE6D6; border: 2px solid #EDE6D6; text-align: center; font-weight: 800; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 8px 16px rgba(0, 0, 0, .55); }
+.scr.season-card .go:hover, .scr.season-card .go:focus-visible { box-shadow: 0 10px 20px rgba(0, 0, 0, .6), 0 0 0 2px rgba(255, 207, 133, .5); outline: none; }
 
 /* ---------------------------------------------------------------- The manager choice (shot 13) */
-.manager-choice { background: radial-gradient(ellipse at 50% 22%, #3a2c20 0%, #1c140e 60%, #0c0907 100%); overflow: hidden; color: #EDE6D6; }
-.manager-choice .mgMirror { position: absolute; left: 360px; top: 46px; width: 560px; height: 250px; border-radius: 10px; background: linear-gradient(145deg, #5c4630, #33261a); opacity: .55; }
-.manager-choice .mgMirror .gl { position: absolute; inset: 26px; border-radius: 4px; background: linear-gradient(160deg, #242a30, #11151a); }
-.manager-choice .mgBulb { position: absolute; width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff6d8, #e8c47a 55%, #9c7440); box-shadow: 0 0 10px 3px rgba(255, 210, 130, .35); }
-.manager-choice .mgDesk { position: absolute; left: 0; right: 0; top: 300px; height: 420px; perspective: 1000px; perspective-origin: 640px 60px; overflow: hidden; }
-.manager-choice .mgDesk .top { position: absolute; left: 120px; right: 120px; bottom: 0; height: 520px; transform-origin: 50% 100%; transform: rotateX(66deg); background: linear-gradient(180deg, #4a3322, #2a1c12); }
+/* Dealt onto the desk since round R3: the desk under the dim is its background. */
+.manager-choice { overflow: hidden; color: #EDE6D6; }
 .manager-choice .mgHead { position: absolute; left: 0; right: 0; top: 66px; text-align: center; z-index: 5; }
 .manager-choice .mgHead small { display: block; font-weight: 800; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #ffcf85; margin-bottom: 10px; }
 .manager-choice .mgHead h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 40px; color: #EDE6D6; line-height: 1.05; }
@@ -265,6 +243,7 @@
 .ov .crow b { display: block; font-size: 14px; font-weight: 800; }
 .ov .crow span { display: block; font-size: 11.5px; line-height: 1.45; color: #9c8e7b; margin-top: 6px; overflow-wrap: anywhere; }
 .ov .crow a { color: #ffcf85; }
+.ov .ver { margin-top: 12px; font-size: 10px; font-weight: 700; letter-spacing: .14em; color: #7d7060; }
 
 /* ---------------------------------------------------------------- Events (round R2, Part C; shots 18 and 19) */
 /* A text: the caption to the left of the phone come up large; its thread; the replies with their effects. */

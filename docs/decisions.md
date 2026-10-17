@@ -6,6 +6,49 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, Part A: the opening
+
+- **Versions** (the author, R3): R1's build is v0.1, R2's v0.2, this round's
+  v0.3, the jam submission v1.0. `package.json` carries it; Vite defines
+  `__APP_VERSION__` from it, and the credits show "v0.3" small at the foot.
+  The itch zip is named `overexposed-v<version>.zip`.
+- **The title is the desk** (docs/design/visual/ref/r3-title.png; where the
+  mock and the prompt differ, the prompt): the night before the year, as in
+  March — no stat bar, no bubbles, the notebook's page blank, the phone's
+  lock screen with the player's own time. The run to come is made when the
+  page opens, so the title is its desk and the opening its variant.
+  - The title paper stands where the papers stand, larger (572×404): the
+    masthead OVEREXPOSED (47 px, so the two ears fit beside it) between
+    "Spring / 2027" and the Flash's "Only / £1"; the dateline; the singer
+    under the lights from the photo worker (the bare photograph box until
+    the worker has drawn it); "Photograph: staff."; the two italic lines.
+  - The mirror is lit and holds five notes: the four majors with their
+    names and goal lines, no ticks, and the scrapbook as the black card
+    ("Your scrapbook" / "Endings found" / "{n} of {total}" and the dots).
+    Any of them opens the scrapbook.
+  - Five real faces fan at the front, drawn by the card component, never
+    played: vocal_coaching, side_gig, tabloid_story, press_junket,
+    open_mic. The mock's fan (two Side Gigs and The Feud) differs; the
+    prompt's set is used.
+  - BEGIN in END TURN's place and style; Settings and Credits beneath.
+    The old title band, its fan and their CSS are gone, and the manager
+    choice no longer draws a mirror and desk of its own: it is dealt onto
+    the real desk.
+- **The opening card and the season cards**: BEGIN brings spring's card
+  ("March 2027", "Spring", the opening's paragraphs after its first line);
+  "Into spring" brings the manager choice. Every season's card waits for its
+  button, "Into {season}" (`ui.season.go`). Its entrance is the month end's
+  last beat — a click during it only fast-forwards (D7) — and the step ends
+  once the button can be clicked; the offers, the doors and the events wait
+  for it. The card is the screens' own (`ui/screens/Season.tsx`), no longer
+  part of the month's motion.
+- **Checks**: the replays, check:clicks and check:overflow begin at BEGIN,
+  answer the opening card and every season card; check:clicks reaches the
+  title's controls and the cards' buttons; check:overflow audits the title
+  as the desk (the title paper holds its masthead, ears, dateline and
+  lines) and the cards as screens; check:pace's season change now ends
+  where the card's button can be clicked.
+
 ## 2026-10-17 — Round R2, Part E: the events in the sim, and their numbers
 
 - **E1** (sim/personas.ts): at an event the greedy personas simulate each

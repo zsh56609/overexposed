@@ -7,7 +7,7 @@
 // ACCEPTED stamp). tools/pace.ts measures it over real reducer steps.
 import { getCard, getEvent, managerMessages, type GameEvent } from '../core/index.ts';
 import type { MotionMode, PlayedStep } from './queue.ts';
-export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'seasonEnd' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'settled';
+export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'settled';
 /** `slots`: an 'actions' beat's actions left this month, as an answer to an event leaves them (round R2). */
 export interface Beat { readonly at: number; readonly kind: BeatKind; readonly uid?: number; readonly event?: number; readonly bubble?: number; readonly resourceEvents?: readonly Extract<GameEvent,{type:'resource'}>[]; readonly slots?: number }
 export interface Timeline { readonly beats: readonly Beat[]; readonly duration: number; readonly incomingMessages: number; readonly existingMessages: number }
@@ -22,7 +22,8 @@ export const PACE = {
   scandalFlip: 700, scandalCarry: 1600, scandalImpact: 2220, scandalEnd: 2500, scandalStagger: 540,
   /** The sweep runs into the date flip: a lead, and a little more for each card on the pile. */
   sweepLead: 250, sweepCard: 50,
-  date: 200, season: 300, seasonHold: 2200,
+  /** A season's card (round R3, A3): it rises in — the dim 0.2 s, the card 0.25 s — and waits for its button. */
+  date: 200, season: 300, seasonIn: 450,
   dealLead: 100, dealCard: 90, dealHold: 450, noDeal: 200,
   /** The manager's bubbles, after the issue is out (after the season's card in a new season). */
   messagesLead: 150, bubble: 380, bubbleHold: 450,
@@ -153,7 +154,8 @@ export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode:
   }
   // In a new season its card covers the desk until it lifts; the bubbles follow it. Otherwise they arrive with the deal.
   let messagesAt=publishAt;
-  if(season) {const lift=seasonAt+PACE.seasonHold;beats.push({at:lift,kind:'seasonEnd'});messagesAt=lift;done=Math.max(done,lift);}
+  // A season's card waits for the player (round R3): the step ends once its button can be clicked.
+  if(season) {const ready=seasonAt+PACE.seasonIn;messagesAt=ready;done=Math.max(done,ready);}
   for(let i=0;i<incomingMessages*2;i++) beats.push({at:messagesAt+PACE.messagesLead+i*PACE.bubble,kind:'message',bubble:existingMessages*2+i});
   if(incomingMessages) done=Math.max(done,messagesAt+PACE.messagesLead+(incomingMessages*2-1)*PACE.bubble+PACE.bubbleHold);
   cursor=Math.max(cursor,done);
