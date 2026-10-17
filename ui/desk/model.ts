@@ -25,9 +25,12 @@ import {
   reduce,
   statTiers,
   type CardFace,
+  type Condition,
   type ContentIndex,
   type CountdownLevel,
   type Effect,
+  type FlagTest,
+  type Range,
   type FrontPage,
   type GameEvent,
   type GameState,
@@ -47,13 +50,12 @@ import {
   calendarLabel,
   cardFlavor,
   cardName,
-  cardRuleLines,
-  cardText,
   clauseText,
   conditionText,
   dateLine,
   effectText,
   flagName,
+  flagNegative,
   lineText,
   majorGoal,
   majorName,
@@ -61,11 +63,15 @@ import {
   mastheadName,
   messageBubbles,
   minorName,
+  money,
   pageItemText,
   resourceName,
+  seasonName,
   signed,
   signedAmount,
   signedMoney,
+  tagName,
+  zoneName,
 } from '../text.ts';
 
 /** How many drawings each photograph scene has (README §2: several variants of the same drawing). */
@@ -187,9 +193,20 @@ export interface DeskLabels {
 
 export interface ValueChip {
   /** `flag`: what the card marks the player as ("Went viral"), in the flag's own words. */
-  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'text';
+  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'scandal' | 'text';
   readonly icon: IconId | null;
   readonly text: string;
+}
+
+/**
+ * A line of a card's body (round R1, H2): its words ("Needs", "Otherwise", a flag's label, "At month end:"), the
+ * condition in icons, an arrow for a branch, and what the line gives as value chips.
+ */
+export interface FaceLine {
+  readonly label: string | null;
+  readonly cond: readonly ValueChip[];
+  readonly arrow: boolean;
+  readonly chips: readonly ValueChip[];
 }
 
 export interface HandCardModel {
@@ -198,12 +215,11 @@ export interface HandCardModel {
   readonly face: CardFace;
   readonly scandal: boolean;
   readonly name: string;
-  /** Values for a card whose effects are all plain values (round V1a, 0.3); else null and `rules` holds its text. */
-  readonly values: readonly ValueChip[] | null;
-  /** A conditional card's rules; a scandal's, when drawn and at month end. */
-  readonly rules: string | null;
-  /** What a card with plain values needs to be played ("Needs 20 Hype"). */
-  readonly needs: string | null;
+  /** Its body, in order (round R1, H1–H2): what it needs, its effects as icons and numbers, a scandal's rules. */
+  readonly lines: readonly FaceLine[];
+  /** An opportunity: a small label on the face, like the cost bulbs (round R1, H2). */
+  readonly opportunity: boolean;
+  /** The italic line, always last on the face; a scandal's is its in-hand line. */
   readonly flavour: string | null;
   /** Actions it costs: bulbs on the face only above one. */
   readonly cost: number;
@@ -219,6 +235,7 @@ export interface HandWords {
   readonly pass: string;
   /** The scandal face's ✕. */
   readonly cross: string;
+  readonly opportunity: string;
   readonly scandal: string;
   readonly noActions: string;
 }
@@ -556,68 +573,159 @@ function labels(): DeskLabels {
 // ---------------------------------------------------------------------------
 // The hand (README §6)
 
-/** The effects a face shows as values; a flag it sets is a value too, named by the flag's own label. */
-const PLAIN_OPS = new Set(['resource', 'draw', 'slots', 'setFlag']);
+/** The stat bar's order, the order a condition's stats are shown in. */
+const COND_ORDER: readonly (keyof Condition)[] = ['hype', 'craft', 'heat', 'scandalCount', 'capital', 'act', 'turn', 'flags'];
+
+const craftIcon = (lane: string | null): IconId => (lane === 'screen' ? 'clap' : 'note');
+const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
 
 /**
- * A card's effects as values (round V1a, 0.3): icon and number in the resource's colour — craft's icon the
- * stat bar's, by the established lane; drawing is "Draw N"; extra actions and a flag set in their words.
+ * One effect as value chips (round V1a, 0.3; every number an icon and a number since round R1, H2): a resource in
+ * its colour — craft's icon the stat bar's, by the established lane; drawing "Draw N"; scandals removed as the
+ * countdown's newspaper in scandal red; a flag set in its own words; what is no number in a short phrase of the
+ * existing words ("Remove a Stunt card", "Add a Studio Session to your discard pile").
  */
-/** One effect as a value chip, in the card's value language; null for an effect that is no plain value. */
-function chip(e: Effect, lane: string | null): ValueChip | null {
-  if (e.op === 'draw') return { kind: 'draw', icon: 'cards', text: t('ui.card.draw', { n: e.count }) };
-  if (e.op === 'resource') {
-    if (e.target === 'capital') return { kind: e.value >= 0 ? 'gain' : 'cost', icon: null, text: signedMoney(e.value) };
-    if (e.target === 'hype') return { kind: 'hype', icon: 'star', text: signed(e.value) };
-    if (e.target === 'craft') return { kind: 'craft', icon: lane === 'screen' ? 'clap' : 'note', text: signed(e.value) };
-    return { kind: 'heat', icon: 'flame', text: signed(e.value) };
+function effectChip(c: ContentIndex, e: Effect, lane: string | null, self?: string): ValueChip[] {
+  switch (e.op) {
+    case 'draw':
+      return [{ kind: 'draw', icon: 'cards', text: t('ui.card.draw', { n: e.count }) }];
+    case 'resource':
+      if (e.target === 'capital') return [{ kind: e.value >= 0 ? 'gain' : 'cost', icon: null, text: signedMoney(e.value) }];
+      if (e.target === 'hype') return [{ kind: 'hype', icon: 'star', text: signed(e.value) }];
+      if (e.target === 'craft') return [{ kind: 'craft', icon: craftIcon(lane), text: signed(e.value) }];
+      return [{ kind: 'heat', icon: 'flame', text: signed(e.value) }];
+    case 'setFlag':
+      return [{ kind: 'flag', icon: null, text: flagName(e.flag) }];
+    case 'slots':
+      return [{ kind: 'text', icon: null, text: tp('ui.face.slots', e.value, { delta: signed(e.value) }) }];
+    case 'exhaustTag':
+      if (e.tag === 'scandal') return [{ kind: 'scandal', icon: 'paper', text: signed(-(e.count ?? 1)) }];
+      return [{ kind: 'text', icon: null, text: tp('ui.face.exhaust', e.count ?? 1, { count: e.count ?? 1, tag: capitalised(tagName(e.tag)) }) }];
+    case 'addCard':
+      if (e.cardId === self) return [{ kind: 'text', icon: null, text: capitalised(t('ui.effect.copySelf', { zone: zoneName(e.to) })) }];
+      return [{ kind: 'text', icon: null, text: tp('ui.face.add', e.count ?? 1, { count: e.count ?? 1, card: cardName(c, e.cardId), zone: zoneName(e.to) }) }];
+    case 'conditional':
+      return [{ kind: 'text', icon: null, text: capitalised(effectText(c, e, self)) }];
   }
-  if (e.op === 'setFlag') return { kind: 'flag', icon: null, text: flagName(e.flag) };
-  if (e.op === 'slots') return { kind: 'text', icon: null, text: tp('ui.effect.slots', e.value, { delta: signed(e.value) }) };
-  return null;
 }
 
-function chips(s: GameState, cardId: string, lane: string | null): ValueChip[] | null {
-  const card = getCard(s.content, cardId);
-  const effects = card?.effects ?? [];
-  if (!card || !effects.every((e) => PLAIN_OPS.has(e.op))) return null;
-  return effects.map((e): ValueChip => chip(e, lane) ?? { kind: 'text', icon: null, text: cardText(s.content, cardId) });
+/** A threshold in icons: "★ 25+", "📰 2+", "£4,000" (money needs no plus), "♪ 6 or fewer". */
+function thresholdChip(key: 'hype' | 'craft' | 'heat' | 'capital' | 'scandalCount', range: Range, lane: string | null): ValueChip {
+  const n = (x: number) => (key === 'capital' ? money(x) : String(x));
+  const { min, max } = range;
+  const text = min !== undefined && max === undefined ? (key === 'capital' ? n(min) : t('ui.doors.min', { n: n(min) })) : max !== undefined && min === undefined ? t('ui.doors.max', { n: n(max) }) : `${n(min ?? 0)}–${n(max ?? 0)}`;
+  if (key === 'scandalCount') return { kind: 'scandal', icon: 'paper', text };
+  if (key === 'capital') return { kind: 'gain', icon: null, text };
+  if (key === 'hype') return { kind: 'hype', icon: 'star', text };
+  if (key === 'craft') return { kind: 'craft', icon: craftIcon(lane), text };
+  return { kind: 'heat', icon: 'flame', text };
 }
 
-/** A door's outcomes (round R1): each effect as a value chip, or in words when it is no plain value. */
+/** A flag test in the flags' own labels — the short one a card reads ("Signed") where there is one. */
+function flagWords(test: FlagTest): string {
+  const short = (f: string) => (has(`ui.face.flag.${f}`) ? t(`ui.face.flag.${f}`) : flagName(f));
+  const parts = [...(test.all ?? []).map(short), ...(test.any?.length ? [t('ui.clause.flagsAny', { flags: test.any.map(short).join(', ') })] : []), ...(test.not ?? []).map(flagNegative)];
+  return parts.join(', ');
+}
+
+/** A condition as a line's head: its stats as threshold chips, a flag or a season in words. */
+function conditionHead(c: ContentIndex, cond: Condition, lane: string | null): { readonly label: string | null; readonly chips: ValueChip[] } {
+  const words: string[] = [];
+  const chips: ValueChip[] = [];
+  for (const key of COND_ORDER) {
+    const v = cond[key];
+    if (v === undefined) continue;
+    if (key === 'flags') words.push(flagWords(v as FlagTest));
+    else if (key === 'act') {
+      const r = v as Range;
+      words.push(r.min !== undefined && (r.min === r.max || (r.max === undefined && r.min === c.rules.acts)) ? seasonName(c, r.min) : capitalised(conditionText(c, { act: r })));
+    } else if (key === 'turn') words.push(capitalised(conditionText(c, { turn: v as Range })));
+    else chips.push(thresholdChip(key, v as Range, lane));
+  }
+  return { label: words.length ? words.join(', ') : null, chips };
+}
+
+/** Effects as a face's lines: plain values on one line, each conditional's branches on one line each. */
+function effectLines(c: ContentIndex, effects: readonly Effect[], lane: string | null, self: string): FaceLine[] {
+  const lines: FaceLine[] = [];
+  let plain: ValueChip[] = [];
+  const flush = () => {
+    if (plain.length) lines.push({ label: null, cond: [], arrow: false, chips: plain });
+    plain = [];
+  };
+  for (const e of effects) {
+    if (e.op !== 'conditional') {
+      plain.push(...effectChip(c, e, lane, self));
+      continue;
+    }
+    flush();
+    const head = conditionHead(c, e.if, lane);
+    lines.push({ label: head.label, cond: head.chips, arrow: true, chips: e.then.flatMap((x) => effectChip(c, x, lane, self)) });
+    if (e.else?.length) lines.push({ label: t('ui.face.otherwise'), cond: [], arrow: true, chips: e.else.flatMap((x) => effectChip(c, x, lane, self)) });
+  }
+  flush();
+  return lines;
+}
+
+/** A rule that fires when drawn or at month end: its label on the line when the rule is one plain line, else above. */
+function ruleLines(c: ContentIndex, label: string, effects: readonly Effect[], lane: string | null, self: string): FaceLine[] {
+  const lines = effectLines(c, effects, lane, self);
+  const first = lines[0];
+  if (lines.length === 1 && first && !first.arrow) return [{ ...first, label }];
+  return [{ label, cond: [], arrow: false, chips: [] }, ...lines];
+}
+
+/**
+ * A card's body (round R1, H1–H2), in one order on every face: what it needs, then its effects — every number an
+ * icon and a number — and for a scandal "Can't be played" and its rules. The flavour line follows the body.
+ */
+export function faceLines(c: ContentIndex, cardId: string, lane: string | null): FaceLine[] {
+  const def = getCard(c, cardId);
+  if (!def) return [];
+  const lines: FaceLine[] = [];
+  if (def.kind === 'scandal') lines.push({ label: null, cond: [], arrow: false, chips: [{ kind: 'text', icon: null, text: t('ui.card.cantPlay') }] });
+  if (def.requires) {
+    const head = conditionHead(c, def.requires, lane);
+    lines.push({ label: t('ui.face.needs'), cond: head.label ? [{ kind: 'text', icon: null, text: head.label }, ...head.chips] : head.chips, arrow: false, chips: [] });
+  }
+  lines.push(...effectLines(c, def.effects ?? [], lane, cardId));
+  if (def.onDraw?.length) lines.push(...ruleLines(c, t('ui.face.whenDrawn'), def.onDraw, lane, cardId));
+  if (def.onEndOfTurn?.length) lines.push(...ruleLines(c, t('ui.face.atMonthEnd'), def.onEndOfTurn, lane, cardId));
+  return lines;
+}
+
+/** A door's outcomes (round R1): each effect as value chips, as on a card. */
 export function effectChips(c: ContentIndex, effects: readonly Effect[], lane: string | null): ValueChip[] {
-  return effects.map((e): ValueChip => chip(e, lane) ?? { kind: 'text', icon: null, text: effectText(c, e) });
+  return effects.flatMap((e) => effectChip(c, e, lane));
 }
 
-/** A card on an offer or in the deck viewer (round R1): the hand's face, values and requirement — nothing about playing it now. */
+/** A card on an offer or in the deck viewer (round R1): the hand's face, nothing about playing it now. */
 export function offerCardModel(s: GameState, cardId: string, lane: string | null, uid = -1): HandCardModel {
   const c = s.content;
   const def = getCard(c, cardId);
   const scandal = def?.kind === 'scandal';
-  const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, cardId, lane);
   return {
     uid,
     cardId,
     face: cardFace(c, cardId) ?? 'notebook',
     scandal,
     name: cardName(c, cardId),
-    values,
-    rules: scandal ? cardRuleLines(c, cardId).join(' ') || null : values === null ? cardText(c, cardId) : null,
-    needs: !scandal && values !== null && def?.requires ? capitalised(t('ui.card.needs', { cond: conditionText(c, def.requires) })) : null,
-    flavour: scandal ? null : cardFlavor(c, cardId),
+    lines: faceLines(c, cardId, lane),
+    opportunity: def?.kind === 'opportunity',
+    // A scandal off the hand shows its first in-hand line; in the hand, the one the bag gave it (lines.inHand).
+    flavour: scandal ? (def?.inHandKeys?.[0] ? t(def.inHandKeys[0]) : null) : cardFlavor(c, cardId),
     cost: def?.cost ?? 1,
     playable: !scandal,
     why: scandal ? 'scandal' : null,
   };
 }
 
-const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
-
 const HAND_WORDS = (): HandWords => ({
   callsheet: t('ui.face.callsheet'),
   revision: t('ui.face.revision'),
   pass: t('ui.face.pass'),
   cross: t('ui.face.cross'),
+  opportunity: t('ui.face.opportunity'),
   scandal: t('ui.toast.scandal'),
   noActions: t('ui.toast.noActions'),
 });
@@ -630,7 +738,6 @@ export function cardModel(s: GameState, h: CardInstance, lines: LinesSoFar, play
     const c = s.content;
     const def = getCard(c, h.cardId);
     const scandal = def?.kind === 'scandal';
-    const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, h.cardId, lines.lane);
     const check = playable ? null : playCheck(s, h.uid);
     return {
       uid: h.uid,
@@ -638,9 +745,8 @@ export function cardModel(s: GameState, h: CardInstance, lines: LinesSoFar, play
       face: cardFace(c, h.cardId) ?? 'notebook',
       scandal,
       name: cardName(c, h.cardId),
-      values,
-      rules: scandal ? cardRuleLines(c, h.cardId).join(' ') || null : values === null ? cardText(c, h.cardId) : null,
-      needs: !scandal && values !== null && def?.requires ? capitalised(t('ui.card.needs', { cond: conditionText(c, def.requires) })) : null,
+      lines: faceLines(c, h.cardId, lines.lane),
+      opportunity: def?.kind === 'opportunity',
       flavour: scandal ? lineText(c, lines.inHand.get(h.uid), h.cardId) : cardFlavor(c, h.cardId),
       cost: def?.cost ?? 1,
       playable,

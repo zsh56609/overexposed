@@ -6,6 +6,39 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part H1–H2: one order and icons on every face
+
+- **One order on every face**: the name, the body, then the italic
+  flavour line, always last and at least one body line below it; a
+  longer body moves the flavour down (a one-line body keeps it at the
+  108px anchor). A scandal: its name, "Can't be played", its rules, then
+  its in-hand line as the flavour.
+- **Every number is an icon and a number**, as on the plain-value cards.
+  A face's body is now lines (`FaceLine` in ui/desk/model.ts): the plain
+  values; "Needs" and the condition in icons; a conditional's branches
+  one line each — the condition in icons, an arrow, its values —
+  "Otherwise" for the other branch; a flag condition in the flag's own
+  short label ("Signed", "Went viral", words of the cards' approved
+  texts); a season condition as the season ("Winter"); scandals removed
+  as the countdown's newspaper in scandal red ("📰 −1"); what is no
+  number in a short phrase of the existing words ("Remove a Stunt card",
+  "Add a Studio Session to your discard pile", "Copies itself into your
+  discard pile", "−1 action"). The 13 cards that fell back to a sentence
+  all fit the format; none keeps its text. Requirements list their stats
+  in the stat bar's order, money as "£4,000" (no plus), as the prompt's
+  examples do.
+- **"Opportunity" is a small sticker** in the top right corner, where the
+  cost bulbs sit; like them, a fanned card shows it in front or on hover.
+- **On a scandal's red face** its rules' values take the dark faces' light
+  colours, the red ones in cream.
+- **Every face is checked**: a dev page (check/faces.html, ui/dev) shows
+  all 42 faces in a hand of five, a crowded hand of eight and an offer of
+  four; check:overflow audits them at every size — the name in its box,
+  no body line wider than the face, the flavour clear of the body, the
+  body on the face. It found one: "Networking" in a crowded hand, now set
+  a size smaller like the other crowded notebook names. check:preview
+  holds each face's values to the card's effects.
+
 ## 2026-10-17 — Round R1, Parts E and F: the awards night and the year in front pages
 
 - **The awards night** as mockups/screens.html sets it: the curtains and

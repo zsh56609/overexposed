@@ -598,19 +598,24 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
     const check = playCheck(s, h.uid);
     const why = hc.scandal ? 'scandal' : check.ok ? null : check.blockers.some((b) => b.code === 'slots') ? 'actions' : 'requires';
     if (hc.why !== why) bad(`${h.cardId}: why ${hc.why}, /core's playCheck says ${why}`);
-    if (hc.values && !hc.scandal) {
+    // Every number on a face is an icon and a number (round R1, H2): each effect's amount is a value in its colour,
+    // a conditional's branches each on a line of their own, what the card needs on one "Needs" line.
+    if (!hc.scandal) {
       counts.valueCards++;
       const effects = def.effects ?? [];
-      if (hc.values.length !== effects.length) bad(`${h.cardId}: ${hc.values.length} values for ${effects.length} effects`);
-      effects.forEach((e, k) => {
-        const v = hc.values?.[k];
+      const needs = hc.lines.filter((l) => l.label === t('ui.face.needs')).length;
+      if (needs !== (def.requires ? 1 : 0)) bad(`${h.cardId}: ${needs} "Needs" lines`);
+      const branches = effects.reduce((n, e) => n + (e.op === 'conditional' ? (e.else?.length ? 2 : 1) : 0), 0);
+      if (hc.lines.filter((l) => l.arrow).length !== branches) bad(`${h.cardId}: ${hc.lines.filter((l) => l.arrow).length} branch lines for ${branches} branches`);
+      const shown = hc.lines.flatMap((l) => l.chips);
+      for (const e of effects.flatMap((x) => (x.op === 'conditional' ? [...x.then, ...(x.else ?? [])] : [x]))) {
         const want =
-          e.op === 'resource' ? (e.target === 'capital' ? money(Math.abs(e.value)) : String(Math.abs(e.value))) : e.op === 'draw' ? String(e.count) : e.op === 'setFlag' ? t(`flag.${e.flag}.positive`) : null;
-        if (!v || want === null || !v.text.includes(want)) bad(`${h.cardId}: value ${k} "${v?.text}" for ${JSON.stringify(e)}`);
-        if (e.op === 'resource' && v && v.kind !== (e.target === 'capital' ? (e.value >= 0 ? 'gain' : 'cost') : e.target)) bad(`${h.cardId}: value ${k} coloured ${v.kind}`);
-      });
-      if ((hc.needs !== null) !== (def.requires !== undefined)) bad(`${h.cardId}: needs "${hc.needs}"`);
-    } else if (!hc.scandal && !hc.rules) bad(`${h.cardId}: neither values nor rules`);
+          e.op === 'resource' ? (e.target === 'capital' ? money(Math.abs(e.value)) : String(Math.abs(e.value))) : e.op === 'draw' ? String(e.count) : e.op === 'setFlag' ? t(`flag.${e.flag}.positive`) : e.op === 'exhaustTag' && e.tag === 'scandal' ? String(e.count ?? 1) : null;
+        if (want === null) continue;
+        const kind = e.op === 'resource' ? (e.target === 'capital' ? (e.value >= 0 ? 'gain' : 'cost') : e.target) : e.op === 'exhaustTag' ? 'scandal' : null;
+        if (!shown.some((v) => v.text.includes(want) && (kind === null || v.kind === kind))) bad(`${h.cardId}: no value for ${JSON.stringify(e)}`);
+      }
+    }
   });
   if (s.phase === 'play') {
     const n = previewEndTurn(s, readLines(history).counter, lane)?.scandalCards.length ?? 0;

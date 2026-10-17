@@ -24,21 +24,36 @@
 .desk .hand { --strip: 150px; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .name { position: absolute; left: 14px; top: 18px; width: min(116px, calc(var(--strip) - 12px)); height: 44px; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; line-height: 1.05; overflow: hidden; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .body { position: absolute; left: 14px; top: 70px; width: min(118px, calc(var(--strip) - 16px)); display: flex; flex-direction: column; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx { display: flex; flex-wrap: wrap; gap: 5px 10px; align-items: center; font-weight: 800; font-size: 14px; min-height: 38px; align-content: flex-start; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx span { display: flex; align-items: center; gap: 3px; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx svg { width: 15px; height: 15px; flex: none; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx.text { display: block; font-size: 10.5px; font-weight: 600; line-height: 1.3; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx .needs { flex-basis: 100%; font-size: 9.5px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx.text .needs { display: block; margin-top: 3px; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fl { width: min(114px, 100%); font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .rl { margin-top: 6px; width: 100%; font-size: 9.5px; font-weight: 600; line-height: 1.3; opacity: .9; }
+/* The body (round R1, H1-H2): one line per row of values, each branch of a condition on its own row (its condition in
+   icons, an arrow, its values), what the card needs first; then the italic flavour line, always last, at least one
+   line below the body. A one-line body keeps the flavour at the 108px anchor; a longer one moves it down. */
+:is(.desk :is(.hand, .motion-face), .faces) .card .fx { display: flex; flex-direction: column; gap: 3px; min-height: 25px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 5px; font-weight: 800; font-size: 14px; line-height: 1.2; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln:is(.br, .lbl) { font-size: 12px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln span { display: flex; align-items: center; gap: 3px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .hd { flex: 0 1 auto; min-width: 0; flex-wrap: wrap; gap: 2px 4px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln.br .hd { flex: none; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .ch { flex: 1 1 auto; min-width: min-content; flex-wrap: wrap; gap: 2px 9px; }
+/* A value never breaks inside ("+£2,000"); words wrap. */
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln span:not(.r-text) { white-space: nowrap; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-text { white-space: normal; min-width: 0; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln:not(.br, .lbl) .ch { gap: 3px 10px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln svg { width: 15px; height: 15px; flex: none; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln:is(.br, .lbl) svg { width: 13px; height: 13px; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .lb { font-size: 10px; font-weight: 700; letter-spacing: .01em; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .ar { font-weight: 400; opacity: .7; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-text { font-size: 10.5px; font-weight: 600; line-height: 1.25; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .fl { width: min(114px, 100%); margin-top: 13px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
+/* An opportunity's label: a small sticker in the top right corner, where the cost bulbs sit (below them on a card
+   that has them); in a fan it shows on the front card and on hover, as the bulbs do. */
+:is(.desk :is(.hand, .motion-face), .faces) .card .opp { position: absolute; right: 7px; top: 4px; z-index: 2; padding: 1px 4px; background: #fbf6e6; color: #2a241c; font-size: 6.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; transform: rotate(3deg); box-shadow: 0 1px 2px rgba(0, 0, 0, .3); }
 :is(.desk :is(.hand, .motion-face), .faces) .card .cost2 { position: absolute; right: 12px; top: 14px; display: flex; gap: 4px; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .cost2 i { width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fffbe8, #ffe39a 45%, #e0a64a); box-shadow: 0 0 6px 1px rgba(255, 214, 130, .6); }
 
 /* A crowded hand (eight cards and more): names a size smaller, up to three lines, so they keep to the strip. */
 .desk .hand.tight .card .name { font-size: 16px; height: 52px; }
 .desk .hand.tight .f-script .name, .desk .hand.tight .f-callsheet .name { font-size: 14px; }
-.desk .hand.tight .f-notebook .name { font-size: 14.5px; }
+.desk .hand.tight .f-notebook .name { font-size: 13px; }
 
 /* Values: icon and number in the resource's colour; money green when earned, red when spent; draws in ink. */
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-hype { color: var(--val-hype); }
@@ -47,7 +62,13 @@
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-gain { color: var(--val-gain); }
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-cost { color: var(--val-cost); }
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-draw, :is(.desk :is(.hand, .motion-face), .faces) .card .r-text { color: inherit; }
-:is(.desk :is(.hand, .motion-face), .faces) .card .fx .r-flag { flex-basis: 100%; font-size: 10.5px; font-weight: 700; font-style: italic; opacity: .8; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .r-scandal { color: var(--val-cost); }
+/* On a scandal's red face its rules' values read in the dark faces' light colours, the red ones in cream. */
+:is(.desk :is(.hand, .motion-face), .faces) .f-scandal .r-hype { color: var(--val-dark-hype); }
+:is(.desk :is(.hand, .motion-face), .faces) .f-scandal .r-craft { color: var(--val-dark-craft); }
+:is(.desk :is(.hand, .motion-face), .faces) .f-scandal .r-gain { color: var(--val-dark-gain); }
+:is(.desk :is(.hand, .motion-face), .faces) .f-scandal :is(.r-heat, .r-cost, .r-scandal) { color: #fff3ef; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-flag { font-size: 10.5px; font-weight: 700; font-style: italic; opacity: .8; }
 /* …lighter on the dark faces, paler on pink gloss, deeper on gold foil. */
 :is(.desk :is(.hand, .motion-face), .faces) .f-headshot .r-hype, :is(.desk :is(.hand, .motion-face), .faces) .f-pass .r-hype { color: var(--val-dark-hype); }
 :is(.desk :is(.hand, .motion-face), .faces) .f-headshot .r-craft, :is(.desk :is(.hand, .motion-face), .faces) .f-pass .r-craft { color: var(--val-dark-craft); }

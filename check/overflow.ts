@@ -170,6 +170,47 @@ const PLAIN = `window.__plainAudit = (where) => {
   return out;
 };`;
 
+/**
+ * Runs in the page: every card face (round R1, H1-H2) — the name in its box, the flavour clear of the body (one
+ * order: name, body, flavour), no body line wider than the face, the body on the face, the pass's label clear of it.
+ */
+const FACES = `window.__faceAudit = (where) => {
+  const out = [];
+  for (const card of document.querySelectorAll('.card')) {
+    const add = (m) => out.push(where + ': ' + (card.dataset.card ?? '?') + ' ' + m);
+    const name = card.querySelector('.name'), body = card.querySelector('.body'), fx = card.querySelector('.fx'), fl = card.querySelector('.fl');
+    if (name && (name.scrollHeight > name.clientHeight + 1 || name.scrollWidth > name.clientWidth + 1)) add('name does not fit its box');
+    if (fx && fl && fl.offsetTop < fx.offsetTop + fx.offsetHeight + 8) add('flavour touches the body');
+    for (const ln of card.querySelectorAll('.ln')) if (ln.scrollWidth > ln.clientWidth + 1) add('body line wider than the face: "' + ln.textContent + '"');
+    if (body && body.offsetTop + body.offsetHeight > card.clientHeight - 6) add('body runs off the face');
+    const pass = card.querySelector('.pass');
+    if (pass && body) { const a = pass.getBoundingClientRect(), b = body.getBoundingClientRect(); if (a.top < b.bottom && a.bottom > b.top && a.left < b.right && a.right > b.left) add('the pass label overlaps the body'); }
+  }
+  return out;
+};`;
+
+/** Runs in the page (check/faces.html): every face of the content in a hand of five, of eight and an offer of four. */
+const ALL_FACES = `(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  document.documentElement.dataset.motion = 'off';
+  // The check measures where things settle: no transition carries a card between two groups' places.
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  const issues = [];
+  let groups = 0;
+  for (const layout of ['hand5', 'hand8', 'offer']) {
+    const n = window.__faces.show(layout, 0);
+    for (let g = 0; g < n; g++) {
+      window.__faces.show(layout, g);
+      groups++;
+      await sleep(40);
+      issues.push(...__faceAudit(layout + ' ' + g), ...(layout === 'offer' ? __plainAudit(layout + ' ' + g) : __deskAudit(layout + ' ' + g)));
+    }
+  }
+  return { groups, cards: window.__faces.cards.length, issues };
+})()`;
+
 /** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
 const DRIVE = (runs: number) => `(async () => {
   document.documentElement.dataset.motion = 'off';
@@ -288,6 +329,16 @@ try {
         );
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
         if (out.issues.length > 0) failed = true;
+        // Every face of the content, at its longest, in the hand and in an offer of four (round R1, H2).
+        await openReady(page, `${url}check/faces.html`, `!!window.__faces && !!document.querySelector('.card')`);
+        await auditStep(page, `${tag} faces patch`, PATCH);
+        await page.evaluate(AUDIT);
+        await page.evaluate(PLAIN);
+        await page.evaluate(FACES);
+        const faces = await auditStep<{ groups: number; cards: number; issues: string[] }>(page, `${tag} faces`, ALL_FACES, 120_000);
+        console.log(`overflow check, ${tag}: all ${faces.cards} faces in a hand of five, a hand of eight and an offer of four (${faces.groups} groups)`);
+        for (const m of [...new Set(faces.issues)].slice(0, 20)) console.log(`OVERFLOW faces  ${m}`);
+        if (faces.issues.length > 0) failed = true;
         if (REPLAYS) {
           let n = 0;
           let broke = 0;

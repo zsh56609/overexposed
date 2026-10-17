@@ -53,13 +53,14 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
 
 /** Loads the game on the state's seed and replays its steps; the page settles before it returns. */
 let navigationId=0;
-export async function openReady(page:Page,url:string):Promise<void> {
+/** Loads a page and waits until it is ready: by default the game's title (its BEGIN); `test` for another page. */
+export async function openReady(page:Page,url:string,test=`!!document.querySelector('button.big')`):Promise<void> {
   const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));
   await page.navigate(target.href,0);
   const start=Date.now();let last='';
   while(Date.now()-start<15000){
     try {
-      const ready=await page.evaluate<boolean>(`location.href===${JSON.stringify(target.href)}&&document.readyState==='complete'&&!!document.querySelector('button.big')&&document.fonts.status==='loaded'`,2000);
+      const ready=await page.evaluate<boolean>(`location.href===${JSON.stringify(target.href)}&&document.readyState==='complete'&&(${test})&&document.fonts.status==='loaded'`,2000);
       if(ready)return;
     }catch(error){last=String(error);} // A navigation can replace the execution context between samples.
     await new Promise(r=>setTimeout(r,50));
