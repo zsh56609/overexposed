@@ -6,6 +6,52 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part A: the hand's feel
+
+- **A card play holds input only until the card is set down and the fan
+  has closed** — the queue's settle, 930 ms after the click. Its visual
+  tails (the printed story, the handwriting, the rolling numbers and
+  signed figures, the paper's ping, the countdown's bump) play on but no
+  longer hold input: the next action completes them at once, in their
+  final state, and proceeds. Within the hold, and for the month end, a
+  click still only fast-forwards (decision 7, revised in ui-plan).
+- **How:** the tails stopped calling the queue's `hold`; the queue keeps
+  a hook (`onTails`) the desk's motion registers with, and the action
+  handler settles the tails (`settleTails`) before it reduces.
+  `check:queue` asserts the queue is free after the settle and that the
+  hook runs.
+- **Measured** (headless Chromium, seed 3, click to the desk idle): Open
+  Mic (loud) 2,115 → 936 ms; Side Gig (money) 2,113 → 940 ms; Vocal
+  Coaching (quiet) 3,582 → 939 ms. The author's own measure before the
+  change: 2.8 s and 3.6 s. A click 1.2 s into Vocal Coaching's
+  handwriting now completes it and lifts the next card at once.
+
+## 2026-10-17 — Round R1, Part 0: the author's decisions
+
+- **V1b is accepted for the jam as built** (game source `2964ef8`). Real
+  Safari and iPad: the author tests the itch build when a device is at
+  hand. The Chromium 4× publication frames: no further work. WebKit
+  motion at 800×450 and 844×390: not required. The WebKit
+  continuous-input failure is re-checked after Part A (at most 45
+  minutes). The status lock ("V1b incomplete; no phase 3/V2") is lifted.
+- **Acceptance from now on** (AGENTS.md §8): every round — build,
+  typecheck, validate, check:queue, check:preview, check:clicks and
+  check:overflow in Chromium at 1280×720 and 844×390, and sim:compare
+  whenever content or rules change; a release candidate — the same in
+  Chromium, Firefox and WebKit at the three sizes. No CPU-throttled
+  timing, recordings, frame galleries, performance JSON or evidence
+  folders; one Chinese report per round, under about 200 lines.
+- **The order of work to the deadline** (AGENTS.md §7): R1 (10/17–18) →
+  the public early build; R2 (10/19–21) events; R3 (10/22–23) fixes;
+  10/24 the playtest build; 10/25–31 polish, sound, a retune; 11/1 the
+  freeze; submit 11/3 JST. Cut for the jam: the 27 once-per-run
+  variants, hand-painted illustration and the photo collage (every image
+  is drawn in code), the year in review as its own phase (the awards
+  night's front pages cover it).
+- **The AI disclosure and the credits**: the art is drawn in code with AI
+  assistance — no image-generation models, no public-domain images
+  (AGENTS.md §10, CREDITS.md).
+
 ## 2026-10-01 — Round V1a: the draft the author could not play, and the handoff
 
 - **The blocker** (the author's play of the V1a build): after the

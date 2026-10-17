@@ -52,7 +52,7 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
   return [toast, show];
 }
 
-export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; hold: (ms: number) => void }) {
+export function Desk({ model, on, children, snap, onTails }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void }) {
   const [toast, showToast] = useToast();
   const view=presentation(snap,model);
   return (
@@ -72,7 +72,7 @@ export function Desk({ model, on, children, snap, hold }: { model: DeskModel; on
       <Uprights lane={model.lane} crisis={model.crisis} labels={model.labels} balls={model.balls} />
       {/* This month's pile: the cards played this month lie here, flat in the desk's plane (V1b). */}
       <Pile snap={snap} model={model}/>
-      <Motion snap={snap} hold={hold} />
+      <Motion snap={snap} onTails={onTails} />
       {snap.active?.plan&&<MonthMotion key={snap.active.step.id} snap={snap} model={model}/>}
       <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} />
       <div className="dim" />

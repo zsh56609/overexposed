@@ -13,8 +13,7 @@ export class EventQueue {
   private nextId = 1;
   private snapshot: Snapshot;
   private timers: ReturnType<typeof setTimeout>[] = [];
-  private tailTimer: ReturnType<typeof setTimeout> | undefined;
-  private tailUntil = 0;
+  private readonly tails = new Set<() => void>();
   private readonly mode: () => MotionMode;
   constructor(first: Step, mode: () => MotionMode = () => 'off') {
     this.mode = mode;
@@ -49,17 +48,15 @@ export class EventQueue {
     this.timers.push(setTimeout(() => this.apply(step, { step, beat: 'land', mode }), mode === 'reduced' ? 0 : CARD_TIMING.land));
     this.timers.push(setTimeout(() => this.finish(), mode === 'reduced' ? 150 : CARD_TIMING.settle));
   }
-  private finish(): void { this.timers=[];this.snapshot={...this.snapshot,busy:this.tailTimer!==undefined,active:null};this.emit();this.play(); }
-  /** Presentation tails (printing, handwriting, deltas) still consume a skip click after the card lands. */
-  readonly hold = (ms: number): void => {
-    this.tailUntil = Math.max(this.tailUntil, Date.now() + ms);
-    clearTimeout(this.tailTimer);
-    this.tailTimer = setTimeout(() => {
-      this.tailTimer = undefined; this.tailUntil = 0;
-      if (!this.snapshot.active) { this.snapshot = { ...this.snapshot, busy: false }; this.emit(); this.play(); }
-    }, Math.max(0, this.tailUntil - Date.now()));
-    if (!this.busy) { this.snapshot = { ...this.snapshot, busy: true }; this.emit(); }
-  };
+  private finish(): void { this.timers=[];this.snapshot={...this.snapshot,busy:false,active:null};this.emit();this.play(); }
+  /**
+   * A landed card's visual tails — the printed story, the handwriting, the rolling numbers, the paper's ping, the
+   * phone — play on but hold no input (round R1, Part A): input is held only until the card is set down and the
+   * fan has closed. The presentation registers how to complete its tails; the next action settles them first.
+   */
+  readonly onTails = (fn: () => void): (() => void) => { this.tails.add(fn); return () => this.tails.delete(fn); };
+  /** Completes every running tail at once, in its final state, so the next action proceeds from a settled desk. */
+  settleTails(): void { for (const fn of this.tails) fn(); }
   skip(): void {
     this.clearTimers(); const active = this.snapshot.active;
     this.snapshot = { ...this.snapshot, skipped: this.snapshot.skipped + 1 };
@@ -67,8 +64,8 @@ export class EventQueue {
     else { this.snapshot = { ...this.snapshot, busy: false, active: null }; this.emit(); }
     for (const next of this.pending.splice(0)) this.apply({ id: this.nextId++, action: next.action, before: this.snapshot.state, after: next.state, events: next.events }, null);
   }
-  dispose(): void { this.clearTimers(); this.listeners.clear(); }
-  private clearTimers(): void { for (const timer of this.timers) clearTimeout(timer); this.timers = []; clearTimeout(this.tailTimer); this.tailTimer = undefined; this.tailUntil = 0; }
+  dispose(): void { this.clearTimers(); this.listeners.clear(); this.tails.clear(); }
+  private clearTimers(): void { for (const timer of this.timers) clearTimeout(timer); this.timers = []; }
   private apply(step: PlayedStep, active: ActiveStep | null): void { this.snapshot = { ...this.snapshot, state: step.after, steps: [...this.snapshot.steps, step], busy: active !== null, active }; this.emit(); }
   private emit(): void { for (const fn of this.listeners) fn(); }
   readonly subscribe = (fn: () => void): (() => void) => { this.listeners.add(fn); return () => this.listeners.delete(fn); };

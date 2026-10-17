@@ -214,7 +214,8 @@ Crossing the line and crystallisation are two separate moments
   dozens of entries; anything that makes them wait costs score.
 - Do not lock input longer than necessary. A click during an animation
   only fast-forwards; it never executes an action. The player acts again
-  against the settled state (decision 7).
+  against the settled state (decision 7). A card's visual tails hold no
+  input: the next action completes them at once (decision 7, revised in R1).
 - Layer 1 has no animation: apply events, settle on new state, keep the
   queue structure so animation slots in later without rewiring.
 
@@ -409,7 +410,13 @@ it.
    the fixed right-rail panel, which truncates in winter and forces the
    eye to travel between hand and corner.
 7. A click during an animation only fast-forwards; it never executes an
-   action. The player acts again against the settled state.
+   action. The player acts again against the settled state. Revised in
+   round R1 (2026-10-17): a card play holds input only until the card is
+   set down and the fan has closed (about 0.95 s). Its visual tails — the
+   printed story, the handwriting, the rolling numbers, the paper's ping,
+   the phone — play on without holding input: the next action completes
+   them at once, in their final state, and proceeds. Within that hold, and
+   for the month end, a click still only fast-forwards.
 8. Draft preview: /core provides an "as if this card were in hand"
    query. /ui never assembles hypothetical state itself.
 9. Endings get a nameKey (content, i18n, validate). Real names and text

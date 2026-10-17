@@ -25,5 +25,7 @@ const disposed=new EventQueue(first,()=> 'full');disposed.enqueue(next);disposed
 await sleep(980);assert.equal(disposed.getSnapshot().state,state);
 const reduced=new EventQueue(first,()=> 'reduced');reduced.enqueue(next);await sleep(180);
 assert.equal(reduced.getSnapshot().state,after);assert.equal(reduced.busy,false);reduced.dispose();
-const tail=new EventQueue(first,()=> 'full');tail.enqueue(next);tail.hold(1400);await sleep(980);assert.equal(tail.getSnapshot().active,null);assert.equal(tail.busy,true);tail.skip();assert.equal(tail.busy,false);assert.equal(tail.getSnapshot().steps.length,2);tail.dispose();
-console.log('queue: skip before/after landing, queued actions, stale timers, disposal and reduced timing — PASS');
+// Round R1, Part A: a landed card's tails hold no input. The queue is free once the card has settled (930ms);
+// the next action settles the tails first, through the hook the presentation registers.
+const tail=new EventQueue(first,()=> 'full');let settled=0;const off=tail.onTails(()=>settled++);tail.enqueue(next);await sleep(980);assert.equal(tail.getSnapshot().active,null);assert.equal(tail.busy,false);tail.settleTails();assert.equal(settled,1);off();tail.settleTails();assert.equal(settled,1);tail.dispose();
+console.log('queue: skip before/after landing, queued actions, stale timers, disposal, reduced timing and tails that hold no input — PASS');

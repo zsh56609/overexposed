@@ -222,7 +222,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const model = useMemo(() => deskModel({ state: s, steps: snap.steps, lines }), [s, snap.steps, lines]);
   const act = useCallback(
     (action: Action) => {
-      if (queue.busy) { queue.skip(); return; } // D7: skip consumes this action.
+      if (queue.busy) { queue.skip(); return; } // D7: within the card's hold and the month end, skip consumes this action.
+      queue.settleTails(); // a landed card's tails hold no input: completed at once, then the action proceeds (R1, Part A)
       try {
         const next = reduce(queue.latest, action);
         queue.enqueue({ action, state: next, events: next.events });
@@ -252,7 +253,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
 
   return (
     <>
-      <Desk model={model} on={on} snap={snap} hold={queue.hold}>
+      <Desk model={model} on={on} snap={snap} onTails={queue.onTails}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         {s.phase === 'play' && card && focus?.kind === 'card' && (
           <Floating anchor={focus.anchor}>
