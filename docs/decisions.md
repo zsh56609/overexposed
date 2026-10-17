@@ -6,6 +6,27 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R4, Part D: v0.4, the playtest build
+
+- `package.json` is 0.4.0; the credits read "v0.4". The itch zip,
+  `overexposed-v0.4.zip`, is built from a clean export of the round's last
+  commit and holds `index.html`, `assets` and `audio` — the six tracks as
+  the author gave them.
+- AGENTS.md: §7 puts R4 before the 10/24 playtest build, which it makes
+  (v0.4), and the versions gain v0.4; §10's disclosure names the sound
+  (effects synthesized in code with AI assistance, no audio-generation
+  models) and the music (Holizna, CC0 1.0). To stay under 24 KiB it drops
+  its stale "started late" line and two historical notes (the sim built in
+  week one; how the content budget was raised).
+- check:interactions' hover-ease samples now read the style once the mouse
+  is over the element, then wait: headless WebKit takes a hover in at its
+  next style update, about 70 ms apart here, and its door and offer hovers
+  sampled at 0 % though they ease (a per-frame probe: 29 ms 9 %, 101 ms
+  58 %, 173 ms 87 %, 317 ms all the way).
+- The module's own CommonJS guard (`typeof module !== 'undefined'`) draws
+  one build warning, COMMONJS_VARIABLE_IN_ESM; it is harmless in the
+  browser and the copy is never edited.
+
 ## 2026-10-18 — Round R4, Part C: answers to the R2 and R3 questions
 
 - **C1**: the twelve flag labels R2 left as placeholders are the author's

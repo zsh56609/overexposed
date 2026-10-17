@@ -6,7 +6,6 @@ Visual design reference: [`docs/design/visual/README.md`](docs/design/visual/REA
 
 **Jam window:** 2026-09-24 03:00 JST → **2026-11-05 04:00 JST** (submission).
 **Ship language:** English. **Target:** browser build on itch.io.
-**Started late — as of 2026-09-29 there are 36 days left. Schedule in §7 is already compressed.**
 
 ---
 
@@ -156,7 +155,7 @@ Read-only /core queries, never GameEvents, that change no play: `yearAwards` (ev
 
 ### Content budget
 
-28 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 14 minor endings = 68 pieces (raised for the content expansion, and for round 2c's three screen cards; its events get their own budget).
+28 action · 8 opportunity · 6 scandal · 8 gate (two per season) · 4 major and 14 minor endings = 68 pieces (events have their own budget).
 A ceiling, not a target; validate enforces it.
 
 Card design rules: a card must create an interaction (tags, `conditional`, `requires`), not just add a resource. Keep cards that convert between axes (spend craft to cool heat, spend capital or hype to exhaust a scandal) so the two engines connect. Scandals vary in how they hurt: taking a hand slot, draining at end of turn, and worsening while left in the deck.
@@ -187,7 +186,7 @@ Load failures are loud in dev, graceful in the shipped build.
 
 ## 5. `/sim` — the balance harness
 
-The primary QA instrument, not an extra. Build it in week one.
+The primary QA instrument, not an extra.
 
 - Runs N complete playthroughs headless, seeded, in Node
 - Personas ([`docs/sim.md`](docs/sim.md#personas)): player-like `minmaxer`, `random`, `dealseeker`, `comeback`, `artisan`; control probes `crafter`, `hypechaser`; lane probes `screenseeker`, `celebseeker`. An instrument that shifts when you tune the system it measures is not an instrument: persona parameters (e.g. `COMEBACK_SWITCH_AT`) are fixed, never derived from content.
@@ -225,13 +224,13 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 | 10/17–18 | R1: the screens around the desk, the hand's feel → **public early build on itch** |
 | 10/19–21 | R2: phase 3, events (prose comes as draft-v9) |
 | 10/22–23 | R3: the author's R1 findings, the opening rebuilt (v0.3) |
-| 10/24 | The playtest build on itch |
-| 10/25–31 | R4: sound, once the author picks the music; polish, a retune |
+| 10/23–24 | R4: the author's v0.3 findings, sound and music (v0.4) → **the playtest build on itch** |
+| 10/25–31 | Polish, a retune |
 | **11/1** | **Feature freeze** |
 | 11/2–3 | Fixes only, the itch page; **submit 11/3 JST** |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
-Versions: R1 v0.1, R2 v0.2, R3 v0.3, the submission v1.0.
+Versions: R1 v0.1, R2 v0.2, R3 v0.3, R4 v0.4, the submission v1.0.
 
 Cut for the jam: the 27 once-per-run variants; hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
 
@@ -287,7 +286,7 @@ There is **no official repo** — itch.io does not host code. Build on itch as a
 - [ ] One-line statement of intent — what it simulates and who it's for. Raters use it to judge the game on its own terms; write it deliberately.
 - [ ] Discord username matching the account in the server (**required**)
 - [ ] Credits for every third-party asset
-- [ ] AI content disclosure: code written with AI assistance (Claude Code and OpenAI Codex); player-facing text drafted with AI assistance; all art drawn in code with AI assistance — no image-generation models, no public-domain images; no generated audio
+- [ ] AI content disclosure: code written with AI assistance (Claude Code and OpenAI Codex); player-facing text drafted with AI assistance; all art drawn in code with AI assistance — no image-generation models, no public-domain images; sound effects synthesized in code with AI assistance — no audio-generation models; music by Holizna (CC0 1.0)
 
 **Content standard: ESRB Teen or lower.** Build consequence systems around reputation and public fallout, never explicit content.
 
