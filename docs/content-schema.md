@@ -46,6 +46,8 @@ for its requirement and effects.
 `requires`: optional condition (the shape below) that must hold for the card to be played — e.g. a capital price, `"requires": { "capital": { "min": 4 } }`.
 Player-facing prose, keys only ([`docs/ui-plan.md`](docs/ui-plan.md) §13, decision 15): every line group is a list of variants shown through a shuffle bag counted from the run's history, never the game RNG (`core/variants.ts`, `core/lines.ts`). `headlineKeys` are the headline variants — a card's for playing it, a scandal's for crystallising — and `register` (`loud` | `quiet` | `money`) is the voice a card's headline is printed in. A scandal's `inHandKeys` are the lines it shows in the hand; it has no `textKey`: the interface shows its rules from its effects.
 
+A card may carry lane variants of its display text (round R3): `laneText` maps a lane of `rules.lanes` to a `nameKey` and `headlineKeys` the card shows and prints while that lane is established (`core/lanes.ts` `establishedLanes`, read before the play); the flavour falls back to the card's own. Presentation only: its effects, and the sim, never change. A variant's headlines are a shuffle bag of their own (`lanePlayGroup`, `card:<id>:<lane>`); validate checks the lane, the keys and the fields.
+
 ## Effect ops and conditions
 
 A closed set: extend the set, never special-case a card.

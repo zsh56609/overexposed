@@ -9,6 +9,12 @@
     "textKey": "card.vocal_coaching.text",
     "flavorKey": "card.vocal_coaching.flavor",
     "headlineKeys": ["card.vocal_coaching.headline.1", "card.vocal_coaching.headline.2", "card.vocal_coaching.headline.3", "card.vocal_coaching.headline.4"],
+    "laneText": {
+      "screen": {
+        "nameKey": "card.vocal_coaching.screen.name",
+        "headlineKeys": ["card.vocal_coaching.screen.headline.1", "card.vocal_coaching.screen.headline.2", "card.vocal_coaching.screen.headline.3", "card.vocal_coaching.screen.headline.4"]
+      }
+    },
     "register": "quiet",
     "playable": true,
     "tags": ["craft", "training"],

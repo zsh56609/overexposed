@@ -810,7 +810,7 @@ export function offerCardModel(s: GameState, cardId: string, lane: string | null
     cardId,
     face: cardFace(c, cardId) ?? 'notebook',
     scandal,
-    name: cardName(c, cardId),
+    name: cardName(c, cardId, lane),
     lines: faceLines(c, cardId, lane),
     opportunity: def?.kind === 'opportunity',
     // A scandal off the hand shows its first in-hand line; in the hand, the one the bag gave it (lines.inHand).
@@ -845,7 +845,7 @@ export function cardModel(s: GameState, h: CardInstance, lines: LinesSoFar, play
       cardId: h.cardId,
       face: cardFace(c, h.cardId) ?? 'notebook',
       scandal,
-      name: cardName(c, h.cardId),
+      name: cardName(c, h.cardId, lines.lane),
       lines: faceLines(c, h.cardId, lines.lane),
       opportunity: def?.kind === 'opportunity',
       flavour: scandal ? lineText(c, lines.inHand.get(h.uid), h.cardId) : cardFlavor(c, h.cardId),

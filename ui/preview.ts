@@ -211,7 +211,7 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
   const base = {
     uid,
     cardId,
-    headline: scandal ? null : lines.counter.fork().play(cardId),
+    headline: scandal ? null : lines.counter.fork().play(cardId, lines.lane),
     // A card that can't be played prints nothing; its headline reads as the run stands now.
     press: scandal ? null : pressOf(state.content, cardId, printContext(state, [], lines.lane)),
     inHand: scandal ? (lines.inHand.get(uid) ?? null) : null,
@@ -226,7 +226,7 @@ export function previewPlay(state: GameState, uid: number, lines: LinesSoFar): P
   const after = reduce(state, { type: 'PLAY_CARD', uid });
   // The month end after this card: counted from the run's lines plus this play's own (a copy it adds prints).
   const counted = lines.counter.fork();
-  for (const e of after.events) counted.take(e);
+  for (const e of after.events) counted.take(e, lines.lane);
   const laneAfter = nextEstablishedLane(after, lines.lane);
   const endTurnAfter = previewEndTurn(after, counted, laneAfter);
   return {

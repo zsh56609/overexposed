@@ -140,6 +140,11 @@ export interface CardDef {
   // shuffle bag (core/variants.ts), never by the game RNG.
   /** Headline variants: a non-scandal's for playing it, a scandal's for crystallising (or being copied). */
   readonly headlineKeys?: readonly string[];
+  /**
+   * Display variants by established lane (round R3, E2): the name and the headlines a card shows and prints once
+   * that lane is established; the flavour falls back to the card's own. Presentation only: its effects never change.
+   */
+  readonly laneText?: Readonly<Record<string, { readonly nameKey?: string; readonly headlineKeys?: readonly string[] }>>;
   /** Non-scandals: the voice the feed prints the headline in. */
   readonly register?: Register;
   /** Scandals: the lines shown while it sits in the hand. */

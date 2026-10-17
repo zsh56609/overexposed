@@ -4,6 +4,7 @@
 // and the feed count the same way and the preview shows exactly what will print. Ids, keys and numbers only.
 
 import { CoreError, getCard, getEvent, type ContentIndex } from './content.ts';
+import { establishedLanes } from './lanes.ts';
 import type { GameEvent, GameState } from './state.ts';
 import { bagKey } from './variants.ts';
 
@@ -16,6 +17,8 @@ export interface HistoryStep {
 
 // Line groups: a card's headlines, a scandal's crystallisation headlines, a scandal's in-hand lines.
 export const playGroup = (cardId: string): string => `card:${cardId}`;
+/** A card's headlines in a lane's variant (round R3, E2): a shuffle bag of their own. */
+export const lanePlayGroup = (cardId: string, lane: string): string => `${playGroup(cardId)}:${lane}`;
 export const scandalGroup = (cardId: string): string => `scandal:${cardId}`;
 export const inHandGroup = (cardId: string): string => `inhand:${cardId}`;
 
@@ -86,9 +89,12 @@ export class LineCounter {
     return { group, show: n, key: bagKey(keys, this.seed, group, n) };
   }
 
-  /** A card played: its headline. */
-  play(cardId: string): LineShow {
-    return this.next(playGroup(cardId), getCard(this.content, cardId)?.headlineKeys);
+  /** A card played: its headline — its lane variant's, while that lane is established (round R3, E2). */
+  play(cardId: string, lane: string | null = null): LineShow {
+    const card = getCard(this.content, cardId);
+    const variant = lane === null ? undefined : card?.laneText?.[lane]?.headlineKeys;
+    if (variant && lane !== null) return this.next(lanePlayGroup(cardId, lane), variant);
+    return this.next(playGroup(cardId), card?.headlineKeys);
   }
 
   /** A scandal card joining the deck (crystallised, or copied by a card): its headline. */
@@ -106,7 +112,7 @@ export class LineCounter {
    * one (round R2, Part D) — a scandal card it adds goes to the discard pile as a scandal held: no headline of its
    * own, nothing going to press — until the month goes on.
    */
-  take(e: GameEvent): TakenLine[] {
+  take(e: GameEvent, lane: string | null = null): TakenLine[] {
     const isScandal = (id: string) => getCard(this.content, id)?.kind === 'scandal';
     if (e.type === 'eventChosen') {
       this.inEvent = true;
@@ -116,7 +122,7 @@ export class LineCounter {
       return [{ kind: press.kind === 'scandal' ? 'scandal' : 'play', line, source: { eventId: e.eventId, choice: e.choice } }];
     }
     if (e.type === 'draftOffer' || e.type === 'turnStart' || e.type === 'gateOffer' || e.type === 'turnEnd') this.inEvent = false;
-    if (e.type === 'play') return [{ kind: 'play', line: this.play(e.cardId) }];
+    if (e.type === 'play') return [{ kind: 'play', line: this.play(e.cardId, lane) }];
     if (e.type === 'draw' && isScandal(e.cardId)) return [{ kind: 'inHand', line: this.inHand(e.cardId) }];
     if (e.type === 'addCard' && isScandal(e.cardId)) {
       if (this.inEvent) return [];
@@ -157,9 +163,11 @@ export function readLines(history: readonly HistoryStep[]): RunLines {
   const counter = new LineCounter(first.content, first.seed);
   const printed: PrintedLine[] = [];
   const inHand = new Map<number, LineShow>();
+  // The lane established before each step: a card played in it prints its lane variant (round R3, E2).
+  const lanes = establishedLanes(history);
   history.forEach((step, i) => {
     step.events.forEach((e, j) => {
-      for (const taken of counter.take(e)) {
+      for (const taken of counter.take(e, i > 0 ? (lanes[i - 1] ?? null) : null)) {
         if (taken.source) printed.push({ ...taken.line, kind: taken.kind === 'scandal' ? 'scandal' : 'play', step: i, event: j, uid: -1, cardId: '', source: taken.source });
         else if (e.type !== 'play' && e.type !== 'draw' && e.type !== 'addCard') continue;
         else if (taken.kind === 'inHand') inHand.set(e.uid, taken.line);

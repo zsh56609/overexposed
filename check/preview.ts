@@ -660,7 +660,9 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   m.hand.forEach((hc, i) => {
     const h = s.hand[i];
     const def = h ? getCard(c, h.cardId) : undefined;
-    if (!h || !def || hc.uid !== h.uid || hc.cardId !== h.cardId || hc.name !== t(`card.${h.cardId}.name`) || hc.face !== (cardFace(c, h.cardId) ?? 'notebook') || hc.scandal !== (def.kind === 'scandal') || hc.cost !== def.cost) return bad(`card ${i}: ${JSON.stringify(hc)}`);
+    // A card's lane variant names it while that lane is established (round R3, E2).
+    const named = lane !== null && def?.laneText?.[lane]?.nameKey ? t(def.laneText[lane]?.nameKey ?? '') : t(`card.${h?.cardId}.name`);
+    if (!h || !def || hc.uid !== h.uid || hc.cardId !== h.cardId || hc.name !== named || hc.face !== (cardFace(c, h.cardId) ?? 'notebook') || hc.scandal !== (def.kind === 'scandal') || hc.cost !== def.cost) return bad(`card ${i}: ${JSON.stringify(hc)}`);
     counts.handCards++;
     if (hc.playable !== plays.has(h.uid)) bad(`${h.cardId}: playable ${hc.playable}, /core says ${plays.has(h.uid)}`);
     const check = playCheck(s, h.uid);

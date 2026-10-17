@@ -22,6 +22,7 @@ import {
   signoffGroup,
   NEUTRAL_LANE,
   onceItem,
+  lanePlayGroup,
   playGroup,
   COUNTDOWN_LEVELS,
   EVENT_CATEGORIES,
@@ -99,7 +100,7 @@ const q = (v: unknown) => JSON.stringify(v);
 
 const CARD_FIELDS = [
   'release',
-  'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'face', 'headlineKeys', 'register', 'inHandKeys',
+  'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'face', 'headlineKeys', 'laneText', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
@@ -646,6 +647,22 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     // Prose keys (decision 15): every line group is a list of variants. Whether the prose itself is written is
     // the 'prose' check; whether there are enough variants for how often it is seen, the 'variants' check.
     if (c.headlineKeys !== undefined) v.keys(c.headlineKeys, `${where}.headlineKeys`);
+    // Display variants by established lane (round R3, E2): a lane of the rules, a name and headlines that exist.
+    if (c.laneText !== undefined) {
+      if (!isObj(c.laneText) || c.kind === 'scandal') v.error('schema', `${where}.laneText`, 'a lane variant is an object by lane, on a card that is played');
+      else
+        for (const [lane, variant] of Object.entries(c.laneText)) {
+          const at = `${where}.laneText.${lane}`;
+          if (!v.lanes.includes(lane)) v.error('schema', at, `not a lane in rules.lanes (${v.lanes.join(', ')})`);
+          if (!isObj(variant)) {
+            v.error('schema', at, 'must be an object: nameKey, headlineKeys');
+            continue;
+          }
+          for (const k of Object.keys(variant)) if (k !== 'nameKey' && k !== 'headlineKeys') v.error('schema', `${at}.${k}`, 'unknown field (nameKey, headlineKeys)');
+          if (variant.nameKey !== undefined) v.key(variant.nameKey, `${at}.nameKey`);
+          if (variant.headlineKeys !== undefined) v.keys(variant.headlineKeys, `${at}.headlineKeys`);
+        }
+    }
     if (c.register !== undefined && !(REGISTERS as readonly unknown[]).includes(c.register)) {
       v.error('schema', `${where}.register`, `must be one of ${REGISTERS.join(', ')}, got ${q(c.register)}`);
     }
@@ -1095,7 +1112,12 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
     if (c.kind === 'scandal') {
       groups.push({ id: scandalGroup(c.id), kind: 'scandal', owner: c.id, keys: keyList(c.headlineKeys), register: null, lane: null });
       groups.push({ id: inHandGroup(c.id), kind: 'inHand', owner: c.id, keys: keyList(c.inHandKeys), register: null, lane: null });
-    } else groups.push({ id: playGroup(c.id), kind: 'card', owner: c.id, keys: keyList(c.headlineKeys), register, lane });
+    } else {
+      groups.push({ id: playGroup(c.id), kind: 'card', owner: c.id, keys: keyList(c.headlineKeys), register, lane });
+      // A lane's variant prints from its own shuffle bag (round R3, E2).
+      for (const [variantLane, variant] of Object.entries(isObj(c.laneText) ? c.laneText : {}))
+        if (isObj(variant) && variant.headlineKeys !== undefined) groups.push({ id: lanePlayGroup(c.id, variantLane), kind: 'card', owner: c.id, keys: keyList(variant.headlineKeys), register, lane: variantLane });
+    }
   }
   const rules = isObj(raw.rules) ? raw.rules : {};
   const openers: unknown[] = Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];

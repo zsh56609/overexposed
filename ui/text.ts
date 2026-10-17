@@ -46,7 +46,9 @@ export const signedMoney = (capital: number): string => trueMinus(signedMoneyFor
 export const amount = (key: string, n: number): string => (key === 'capital' ? money(n) : String(n));
 export const signedAmount = (key: string, n: number): string => (key === 'capital' ? signedMoney(n) : signed(n));
 
-export const cardName = (c: ContentIndex, id: string): string => t(getCard(c, id)?.nameKey ?? `card.${id}.name`);
+/** A card's name — its lane variant's while that lane is established (round R3, E2). */
+export const cardName = (c: ContentIndex, id: string, lane: string | null = null): string =>
+  t((lane !== null ? getCard(c, id)?.laneText?.[lane]?.nameKey : undefined) ?? getCard(c, id)?.nameKey ?? `card.${id}.name`);
 /** A card's text: its rules, or for a scandal the line shown while it sits in hand. */
 /**
  * A card's rules as the card states them: its rules text — or, for a card without one (round 2c's new screen

@@ -272,15 +272,59 @@ function BrushCup() {
   );
 }
 
+/**
+ * The mug on the neutral desk (round R3, E1; docs/design/visual/ref/mug.svg): rim and base share the desk's
+ * foreshortening (ry/rx ≈ 0.42) and a red band follows the cylinder. Scaled to the old mug's body (34 px wide) and
+ * standing where it stood; its contact shadow is the standing objects' own (.cshadow), so the drawing's blurred
+ * shadows are left out. Its ids carry a prefix: no other drawing in the page shares them.
+ */
 function Mug() {
   return (
-    <svg className="up" style={{ left: 722, top: 408 }} width="62" height="58" viewBox="0 0 62 58" aria-hidden="true">
-      <path className="steam" d="M20 14 C18 9 23 7 21 2" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="1.5" strokeLinecap="round" />
-      <path className="steam late" d="M30 14 C28 9 33 7 31 2" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="1.5" strokeLinecap="round" />
-      <rect x="9" y="18" width="34" height="36" rx="4" fill="#ece6d8" />
-      <rect x="11" y="22" width="4" height="28" rx="2" fill="rgba(255,255,255,.5)" />
-      <path d="M43 25 C56 25 56 45 43 45" fill="none" stroke="#ece6d8" strokeWidth="4.5" />
-      <ellipse cx="26" cy="18" rx="17" ry="3.4" fill="#3b2415" />
+    <svg className="up mug" style={{ left: 715, top: 399 }} width="74" height="74" viewBox="0 0 140 140" aria-hidden="true">
+      <defs>
+        <linearGradient id="mug-body" x1="0" x2="1">
+          <stop offset="0" stopColor="#d9d1c1" />
+          <stop offset=".18" stopColor="#f6f1e6" />
+          <stop offset=".45" stopColor="#ece5d6" />
+          <stop offset=".8" stopColor="#c9bfad" />
+          <stop offset="1" stopColor="#a99f8e" />
+        </linearGradient>
+        <linearGradient id="mug-band" x1="0" x2="1">
+          <stop offset="0" stopColor="#a51f16" />
+          <stop offset=".2" stopColor="#e0352a" />
+          <stop offset=".5" stopColor="#d22b1f" />
+          <stop offset=".85" stopColor="#9c1d14" />
+          <stop offset="1" stopColor="#7f170f" />
+        </linearGradient>
+        <linearGradient id="mug-handle" x1="0" x2="1">
+          <stop offset="0" stopColor="#cfc6b5" />
+          <stop offset=".5" stopColor="#e9e2d3" />
+          <stop offset="1" stopColor="#a39886" />
+        </linearGradient>
+        <radialGradient id="mug-coffee" cx=".45" cy=".6" r=".7">
+          <stop offset="0" stopColor="#4a2c1c" />
+          <stop offset=".75" stopColor="#2c1910" />
+          <stop offset="1" stopColor="#6b4630" />
+        </radialGradient>
+        <linearGradient id="mug-inner" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stopColor="#b8ae9c" />
+          <stop offset="1" stopColor="#e3dccd" />
+        </linearGradient>
+      </defs>
+      <path d="M90 54 C116 50 124 64 121 78 C118 92 106 98 90 97 L90 88 C102 89 110 84 112 76 C114 67 108 61 90 63 Z" fill="url(#mug-handle)" />
+      <path d="M90 63 C108 61 114 67 112 76" fill="none" stroke="#8f8574" strokeWidth="1.2" opacity=".7" />
+      <path d="M30 40 L30 106 A32 13.4 0 0 0 94 106 L94 40 Z" fill="url(#mug-body)" />
+      <path d="M30 52 A32 13.4 0 0 0 94 52 L94 59 A32 13.4 0 0 1 30 59 Z" fill="url(#mug-band)" />
+      <path d="M30 102 A32 13.4 0 0 0 94 102 L94 106 A32 13.4 0 0 1 30 106 Z" fill="#000" opacity=".12" />
+      <path d="M37 44 L37 100" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" opacity=".55" />
+      <ellipse cx="62" cy="40" rx="32" ry="13.4" fill="#f8f4eb" />
+      <ellipse cx="62" cy="40.6" rx="28" ry="11.4" fill="url(#mug-inner)" />
+      <ellipse cx="62" cy="43" rx="27.2" ry="10" fill="url(#mug-coffee)" />
+      <ellipse cx="55" cy="41" rx="9" ry="2.2" fill="#fff" opacity=".10" />
+      <g fill="none" stroke="#fff" strokeLinecap="round" opacity=".28">
+        <path className="steam" d="M54 30 C48 22 60 18 54 8" strokeWidth="2" />
+        <path className="steam late" d="M68 28 C74 20 62 15 68 4" strokeWidth="1.6" />
+      </g>
     </svg>
   );
 }

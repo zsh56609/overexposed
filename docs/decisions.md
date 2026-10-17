@@ -6,6 +6,25 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, Part E: small things
+
+- **E1, the mug** (docs/design/visual/ref/mug.svg): the neutral desk's mug is
+  the reference's drawing — rim and base share the desk's foreshortening, a
+  red band follows the cylinder — scaled to the old mug's body (34 px) and
+  standing where it stood. Its contact shadow is the standing objects' own
+  (`.cshadow`), so the drawing's two blurred shadow ellipses are left out;
+  its gradients' ids carry a `mug-` prefix; its two wisps of steam keep the
+  old mug's steam motion.
+- **E2, lane variants of a card's display text**: a card may carry
+  `laneText`, a name and headlines by established lane (content-schema.md);
+  the flavour falls back to the card's own. The established lane before a
+  play picks the headline (/core's `readLines` and the play preview alike,
+  still keys only, from the variant's own shuffle bag); the faces, the offers
+  and the deck name the card by it. Presentation only: effects and the sim
+  are unchanged. Vocal Coaching in the screen lane is "Scene Study", with the
+  four approved lines; its craft chip already showed the clapperboard in the
+  screen lane. validate checks the lane, the keys and the fields.
+
 ## 2026-10-17 — Round R3, Part D: what the player cannot see
 
 - **D1, scandals held.** The Deck & Discard button carries a red newspaper

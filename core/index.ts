@@ -6,6 +6,7 @@ export { axisSide, endingIfYearEndedNow, majorNow, majorOf, majorRequirements, t
 export { currentLane, establishedLanes, lanePlays, laneShares, nextEstablishedLane } from './lanes.ts';
 export {
   inHandGroup,
+  lanePlayGroup,
   LineCounter,
   playGroup,
   readLines,
