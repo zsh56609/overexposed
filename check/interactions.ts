@@ -8,7 +8,7 @@
 // - a paper behind comes forward on a click by its masthead, and nothing outside the papers changes;
 // - a scandal shakes and the desk says it can't be played; a card's preview opens on hover; a click plays a card
 //   (one card fewer, one bulb darker); with no actions left a click says so; END TURN's preview opens on hover and
-//   a click ends the month; the deck opens from the stat bar and closes.
+//   a click ends the month; the deck and House rules open from the stat bar and close (round R1, Part G).
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -223,14 +223,18 @@ async function hand(page: Page, url: string): Promise<Result[]> {
   await page.move(...end);
   await sleep(400);
   out.push(["END TURN's preview opens on hover", (await look()).preview]);
-  const deck = (await centre(page, '.desk .deckbtn')) as [number, number];
-  await page.click(...deck);
-  await sleep(300);
-  const opened = await page.evaluate<boolean>(`!!document.querySelector('.deck-viewer')`);
-  const close = await centre(page, '.deck-viewer .row button');
-  if (close) await page.click(...close);
-  await sleep(300);
-  out.push(['the deck opens from the stat bar and closes', opened && !(await page.evaluate<boolean>(`!!document.querySelector('.deck-viewer')`))]);
+  // A panel opens from its button in the stat bar and closes from its own (round R1, Part G).
+  const panel = async (opener: string, id: string): Promise<boolean> => {
+    await page.click(...((await centre(page, opener)) as [number, number]));
+    await sleep(300);
+    const opened = await page.evaluate<boolean>(`!!document.querySelector('.p-${id}')`);
+    const close = await centre(page, `.p-${id} .closeb`);
+    if (close) await page.click(...close);
+    await sleep(300);
+    return opened && !(await page.evaluate<boolean>(`!!document.querySelector('.p-${id}')`));
+  };
+  out.push(['the deck opens from the stat bar and closes', await panel('.desk .deckbtn', 'deck')]);
+  out.push(['House rules open from the stat bar and close', await panel('.desk .setbtn', 'settings')]);
   const turn = await page.evaluate<string>(`document.querySelector('.desk [data-hook="date"]')?.textContent ?? ''`);
   await page.click(...end);
   await sleep(700);

@@ -104,7 +104,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
             animate(phone,[{transform:own},{transform:`${own} translateX(3px)`,offset:.2},{transform:`${own} translateX(-2px)`,offset:.4},{transform:own}],450);
             // v18 lights the screen itself. The whole-phone filter introduced a
             // measured arrival stall in hardware-composited Firefox.
-            const screen=phone.querySelector('.scr');
+            const screen=phone.querySelector('.phone-screen');
             if(screen){const shadow=getComputedStyle(screen).boxShadow;animate(screen,[{boxShadow:shadow},{boxShadow:root.classList.contains('crisis')?'inset 0 0 24px rgba(255,120,100,.5)':'inset 0 0 22px rgba(170,205,255,.35)',offset:.2},{boxShadow:shadow}],450);}
           }
         }

@@ -118,7 +118,7 @@ const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis
   }, [buzz]);
   return (
     <div className={`onDesk phone${buzzing ? ' buzz wake' : ''}`} data-hook="phone" key={buzz}>
-      <div className="scr">
+      <div className="phone-screen">
         <div className="lock">
           <b className="clk">{clock}</b>
           {phone.notes.map((k, i) => (

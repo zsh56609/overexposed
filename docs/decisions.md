@@ -6,6 +6,21 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1 acceptance: one name for one thing
+
+- **The desk's phone screen is `.phone-screen`**: the screens around the
+  desk stand under the root class `.scr` (Part B), and the phone's lock
+  screen was also `.scr`, so the screens' rules reached into the phone
+  (its font, colour and box sizing, and the reduced and off motion
+  overrides) and check:motion's parity read the phone's clock as the
+  "choice" on screen — a run crossing a minute failed in all three
+  browsers. Renamed in the desk (V1b's code), no visual change; the check
+  reads `.screen-over, .scr` only.
+- **check:interactions follows Part G**: it closed the deck by the plain
+  viewer's button, so the deck stayed open and END TURN's click fell on
+  the dimmed scene. It now opens and closes the deck and House rules
+  from the stat bar by real clicks.
+
 ## 2026-10-17 — Round R1 acceptance: a preview under a resting pointer
 
 - **Found in the run by real input**: a card that comes under a resting
