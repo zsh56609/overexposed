@@ -1,5 +1,7 @@
 # Handoff: round V1a → V1b
 
+> Round R1 (2026-10-17) removed the evidence folders and the timing tools from the working tree (AGENTS.md §8): `desk:perf` is gone, and `docs/handoff/v1a-compare/` is in the history at [92d97c9](https://github.com/zsh56609/overexposed/tree/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1a-compare).
+
 Round V1a built the desk, static: the main screen as `docs/design/visual/README.md` §1–§7 describes it,
 every state, hover, tooltips and the simple interactions. Round V1b adds the motion on the desk — README §9
 "Playing a card" and "Month end". This note is what the V1b agent needs; the decisions behind each part are in
@@ -114,8 +116,7 @@ naming the command, instead of hanging it.
 | `npm run check:overflow:full` | The longer overflow audit: 10 runs a size, then every recorded state replayed and audited, with each card's preview and each paper forward. |
 | `npm run check:interactions` | Above. |
 | `npm run desk:shots -- s02 s07:paper=flash` · `-- --all` · `-- --screens` | Screenshots of recorded states (with a finishing touch), of all of them, or of every screen of one run: the title, the credits, the manager choice, drafts of three and four, after an extra pick and a reroll, the deck, a door, the last door, the hand, the ending. `--browser=`, `--size=`, `--out=`. |
-| `npm run desk:compare` | The reference comparison: the game in the state nearest each of shots 01–14, beside the shot, into `docs/handoff/v1a-compare/` (`--out=` elsewhere). |
-| `npm run desk:perf` | The production build's timings: the cold load, the first desk after the manager's choice, a play, sweeping the hand, switching papers; at 1× and 4× CPU (`--throttle=`), in Chromium and Firefox. |
+| `npm run desk:compare` | The reference comparison: the game in the state nearest each of shots 01–14, beside the shot, into `check/out/compare/` (`--out=` elsewhere). The comparison V1a committed is in the history: [docs/handoff/v1a-compare at 92d97c9](https://github.com/zsh56609/overexposed/tree/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1a-compare). |
 | `npm run desk:photos` | A contact sheet of every halftone photograph the papers can print. |
 | `npm run desk:sheet -- <out.png> <in.png>…` | Screenshots on one sheet: a captioned grid (`--cols=`), or the same strip of each stacked (`--band=0,110`). |
 | `npm run sim:baseline -- --out=sim/out/<name>`, `npm run sim:compare -- <a> <b>` | Records `sim`, `sim:awards`, `sim:tiers` and `sim:managers` on seeds 20260929, 1 and 424242; then proves two records the same game, every run record and every report line. A round that must not move the numbers records before and after. |

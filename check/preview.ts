@@ -17,7 +17,7 @@
 // and the feed prints every message and every month-end perk line.
 // The desk (round V1a): at every state, every number and word the desk's adapter (ui/desk/model.ts) gives
 // the scene against /core; before each END TURN, the issue on the desk is the month END TURN prints.
-// Exit code 1 on any mismatch.
+// Exit code 1 on any mismatch. --runs=60 by default, as every round runs it; --runs=300 for a release candidate.
 
 import {
   bagIndex,
@@ -73,7 +73,7 @@ import { statCells } from '../ui/stats.ts';
 import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
 import { deskIssue, deskModel, PHOTO_VARIANTS } from '../ui/desk/model.ts';
 
-const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 300);
+const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 60);
 const SEED = 20260929;
 
 const raw = loadRawContent();

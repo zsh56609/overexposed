@@ -1,6 +1,0 @@
-D7 chrome at 60ms: click fast-forwards exactly one play; END TURN not executed
-D7 chrome at 1100ms: click fast-forwards exactly one play; END TURN not executed
-progress 2026-10-04T17:56:17.164Z chrome clicks chrome 844x390 (phone) 4 runs: {"progress":{"run":1,"guard":44,"states":95,"controls":455,"previews":311,"phase":"gates"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"draft","step":"45","busy":"0"}
-progress 2026-10-04T17:56:27.165Z chrome clicks chrome 844x390 (phone) 4 runs: {"progress":{"run":3,"guard":25,"states":201,"controls":967,"previews":617,"phase":"hand"},"url":"http://localhost:5190/?seed=20260929","ready":"complete","phase":"hand","step":"25","busy":"0"}
-click-through check, chrome 844x390 (phone): 4 runs, 233 states — 1101 controls reached (title 1, credits 1, manager 4, draft 66, hand 143, doors 16, deck 16, ending 4; 8 extra picks, 18 rerolls, 16 deck views), 716 previews opened, 3756 targets hit-tested at 18780 points, 66 drafts (33 with Dex's extra card, labelled) (23.1s)
-PASS: every control for a legal action is on the stage and takes its click, in every browser and size

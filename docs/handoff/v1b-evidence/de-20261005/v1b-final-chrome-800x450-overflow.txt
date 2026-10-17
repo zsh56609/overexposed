@@ -1,8 +1,0 @@
-starting overflow chrome 800x450
-progress 2026-10-04T17:26:16.635Z chrome chrome 800x450 4 runs: {"progress":{"run":0,"guard":35,"phase":"play","states":35,"previews":89,"tips":154},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"35","busy":"0"}
-progress 2026-10-04T17:26:26.637Z chrome chrome 800x450 4 runs: {"progress":{"run":1,"guard":11,"phase":"play","states":71,"previews":176,"tips":315},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"11","busy":"0"}
-progress 2026-10-04T17:26:36.655Z chrome chrome 800x450 4 runs: {"progress":{"run":1,"guard":44,"phase":"draft","states":104,"previews":268,"tips":490},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"draft","step":"45","busy":"0"}
-progress 2026-10-04T17:26:46.662Z chrome chrome 800x450 4 runs: {"progress":{"run":2,"guard":24,"phase":"play","states":141,"previews":357,"tips":651},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"25","busy":"0"}
-progress 2026-10-04T17:26:56.687Z chrome chrome 800x450 4 runs: {"progress":{"run":3,"guard":7,"phase":"play","states":179,"previews":450,"tips":812},"url":"http://localhost:5191/?seed=20260929&auditLoad=1","ready":"complete","phase":"hand","step":"8","busy":"0"}
-overflow check, chrome 800x450: 213 states — 544 previews, 973 tooltips, 106 papers pulled forward, 36 reaction rows, hands of up to 6; plain screens title 1, credits 1, manager 4, draft 54, doors 16, deck 20, ending 4 (3 extra picks, 16 rerolls); 30 cards and 9 faces seen (59.6s)
-PASS: every text fits, at its longest, on the desk and the plain screens, in every browser and size

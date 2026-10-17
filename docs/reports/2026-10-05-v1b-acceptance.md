@@ -22,11 +22,11 @@
 - 优化后 Chromium 正常十场景活动 p95 8.5–8.6ms；普通出牌落地约 940–943ms，loud 总忙碌 2110ms、quiet 3290ms，最长真实安静句 4040ms。calm 3508ms、frenzy 10664ms、换季 8045ms、冬季 1826ms；不将落地误称为解锁。
 - Chromium 4× 多数场景最慢帧 33–83ms，但 reviewed-frenzy 出现 **895.3ms** 的搬运阶段停顿，没有对应 Long Task。三次独立重跑最慢帧 41.6/49.9/58.3ms；异常未复现，根因未确定，不删除、不以重跑覆盖。空闲缓存准备仍可产生 67–95ms 长任务。
 - Firefox 正常活动 p95 约 17–47ms，原 frenzy 场景 44.1ms、空闲 17.0ms。WebKit 仍持续约 82–111ms 的活动 p95，不能称顺滑。机器刷新节奏随运行时段变化，跨次改善数值不是严格硬件恒定的对照。
-- 原始数据：[优化前](../handoff/v1b-compare/de-active.json)、[优化后](../handoff/v1b-compare/de-optimized-final.json)、[原审查源](../handoff/v1b-compare/reviewed-active.json)，异常重跑为同目录 `de-outlier-repeat-1/2/3.json`。CPU profile 在 `.npm-cache/profiles/`，不混作无 profiling 的验收结果。
+- 原始数据：[优化前](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-active.json)、[优化后](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-optimized-final.json)、[原审查源](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/reviewed-active.json)，异常重跑为同目录 `de-outlier-repeat-1/2/3.json`。CPU profile 在 `.npm-cache/profiles/`，不混作无 profiling 的验收结果。
 
 ## 连续录像与视觉检查
 
-[有序帧画廊](../handoff/v1b-compare/continuous/index.html) 与 [清单](../handoff/v1b-compare/continuous/manifest.json) 已生成：10 段连续 WebKit 录像、160 张从录像解码的有序帧；覆盖 game/v18 的 loud、quiet、frenzy、season，另有 game calm/winter。大录像不进 Git，位置：
+[有序帧画廊](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/continuous/index.html) 与 [清单](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/continuous/manifest.json) 已生成：10 段连续 WebKit 录像、160 张从录像解码的有序帧；覆盖 game/v18 的 loud、quiet、frenzy、season，另有 game calm/winter。大录像不进 Git，位置：
 
 `C:\Users\91205\Documents\overexposed\.npm-cache\v1b-recordings-2e6a3f8-1791115338409\`
 

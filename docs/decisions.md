@@ -6,6 +6,33 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part I: the checks, leaner
+
+- **What a round runs**: build, typecheck, validate, `check:queue`,
+  `check:preview` — now the previews (60 runs by default) and the press
+  contract only; `check:clicks` is its own step — and `check:clicks` and
+  `check:overflow` in Chromium at 1280×720 and 844×390. A release
+  candidate runs them in all three browsers at all three sizes, with
+  `check:preview -- --runs=300`, `check:motion` and
+  `check:overflow:full` (AGENTS.md §8, §11).
+- **Kept**: the checks that guard correctness — `check:queue`,
+  `check:preview`, `check:clicks`, `check:overflow` (and `:full`),
+  `check:interactions`, `check:motion`, the press contract, the
+  photo-worker check, `sim:compare` — and the desk's review tools
+  `desk:states`, `desk:shots`, `desk:compare`, `desk:photos`,
+  `desk:sheet`.
+- **Removed**: everything that only measured frames, power or
+  compositors, or recorded video — `desk:perf`, `desk:motion-perf`,
+  `desk:motion-shots`, `desk:reference` and the tools behind them, with
+  `motion-active-perf`, `motion-cases`, `motion-record`,
+  `render-environment`, `profile-summary` and `perf-observed.ps1`.
+- **The evidence folders** (`docs/handoff/v1a-compare/`, `v1b-compare/`,
+  `v1b-evidence/`) are deleted from the working tree; the history keeps
+  them, and the handoff notes and reports link to them at 92d97c9.
+  `desk:compare` now writes to `check/out/compare/` with its own index
+  page; every check and tool output is under the ignored `check/out/` or
+  `sim/out/`.
+
 ## 2026-10-17 — Round R1, Part G: the deck, the scrapbook, House rules, the credits
 
 - **Four panels over the scene** (README §9; mockups/vanity.html, shots
@@ -321,6 +348,8 @@ rules).
   dev dependency, which the author has not approved.
 - **The reference comparison** is in `docs/handoff/v1a-compare/`: the
   game in the state nearest each of shots 01–14, beside the shot.
+  (Round R1 moved its output to `check/out/compare/`; this one is in the
+  history at 92d97c9.)
 
 ## 2026-10-01 — Round V1a, Part F: the hand
 

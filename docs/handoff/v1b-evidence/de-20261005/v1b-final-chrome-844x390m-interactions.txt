@@ -1,1 +1,0 @@
-interactions check: Input.dispatchTouchEvent: no answer from the browser in 120s

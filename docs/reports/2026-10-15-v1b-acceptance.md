@@ -10,7 +10,7 @@
 - D 的实际阶段边界、UID 去重、真实抽牌/消息及 D7，E 的历史牌堆、减弱/关闭动效和偏好切换均保持不变。实现与必要偏离详见 [10 月 4 日](2026-10-04-v1b-de.md)、[10 月 5 日](2026-10-05-v1b-acceptance.md)及 [10 月 13 日报告](2026-10-13-v1b-acceptance.md)；A–C 原报告保持原样。
 - 新修复将相同照片的预生成与 PNG 编码移至原生工作线程，解决空闲预热未赶上发布时的同步成本。34 张照片在 Chromium/Firefox 逐像素一致；WebKit 缺少 OffscreenCanvas，保留原路径并通过回退检查。无新增依赖、文案、规则、事件、数值或人格参数。
 - 构建/类型检查、validate 0 错误/27 既定警告、queue 的 690 动作及 13,976 跳过点已通过。Node 24.16.0 未变。300-run preview、601/152 冷却、18 文件相同/14 栏全过/零崩溃及软锁属于本次完成轮前段已复跑证据，没有冒称今日再跑，也没有替换模拟或 press 基线。
-- 游戏源 `508fb2b` 的 Chromium/Firefox/WebKit × 1280×720、800×450、844×390 共 45 个检查组合已串行完成：clicks、普通/完整 overflow、interactions、full/reduced 真输入的可执行断言全部通过。每配置点击 233 状态/1,101 控件/716 预览/18,780 命中点；普通溢出 213/544/973；完整溢出 549/1,422/2,548，另 50 固定回放覆盖 42 卡，均与基线一致。交互 Chromium 24/24、Firefox 22/22、WebKit 21/21；无头焦点、OS 媒体和可信长按能力跳过不算通过。日志归档 [de-508fb2b](../handoff/v1b-evidence/de-508fb2b/)。
+- 游戏源 `508fb2b` 的 Chromium/Firefox/WebKit × 1280×720、800×450、844×390 共 45 个检查组合已串行完成：clicks、普通/完整 overflow、interactions、full/reduced 真输入的可执行断言全部通过。每配置点击 233 状态/1,101 控件/716 预览/18,780 命中点；普通溢出 213/544/973；完整溢出 549/1,422/2,548，另 50 固定回放覆盖 42 卡，均与基线一致。交互 Chromium 24/24、Firefox 22/22、WebKit 21/21；无头焦点、OS 媒体和可信长按能力跳过不算通过。日志归档 [de-508fb2b](https://github.com/zsh56609/overexposed/tree/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-508fb2b)。
 
 ## 整轮实际交付（不含测试和文档）
 
@@ -49,26 +49,26 @@
 | WebKit 正常，独立重测 | 81.00–111.00ms | 187.00ms | 未解决，不能称流畅 |
 | Firefox 4× | — | — | 驱动不支持，明确跳过 |
 
-活动窗口与之后 1,500ms 空闲窗口始终分开。落桌与总 busy 时间分别记录，未缩短阅读或改动跳过合同。完整数据：[新源生产测量](../handoff/v1b-compare/de-worker-final-508fb2b.json)、[Firefox/WebKit 独立重测](../handoff/v1b-compare/de-worker-ff-wk-isolated-508fb2b.json)。
+活动窗口与之后 1,500ms 空闲窗口始终分开。落桌与总 busy 时间分别记录，未缩短阅读或改动跳过合同。完整数据：[新源生产测量](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-worker-final-508fb2b.json)、[Firefox/WebKit 独立重测](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-worker-ff-wk-isolated-508fb2b.json)。
 
 Chromium 正常：响亮落桌/总 busy 为 938/2,113ms，安静 934/3,276ms，固定回放最长安静文案 946/4,029ms；平静月末 busy 3,514ms，多丑闻 10,665ms，Copycat 11,298ms，换季 8,045ms，冬季结局 1,830ms。约 0.95 秒仍只是卡牌落桌，不能用作解锁时刻。
 
 定向试跑未观察到的长任务在完整运行中仍有出现：Chromium 4× frenzy/Copycat 初始动作约 54/56ms，reviewed-frenzy 发布约 53ms。修复确实移走了照片生成成本，但没有把全部剩余工作归因于照片，也没有把定向通过写成全通过。
 
-10 月 14 日只读诊断确认 Firefox `Compositing: WebRender (Software)`，原因代码 `FEATURE_FAILURE_COMP_HEADLESSMODE`。同桌面关闭动效 p95 8.34ms、完整环境动效 33.34ms；通过已有控制停下节拍器后回到 8.34ms。此对照定位软件重绘成本，**不是关闭动画后的验收成绩**。WebKit 停节拍器后仍慢；其 WebGL 返回“Apple GPU”也不能证明这台 Windows 机器的页面合成后端。详见 [渲染诊断](../handoff/v1b-compare/render-environment-detail-20261014.json)。
+10 月 14 日只读诊断确认 Firefox `Compositing: WebRender (Software)`，原因代码 `FEATURE_FAILURE_COMP_HEADLESSMODE`。同桌面关闭动效 p95 8.34ms、完整环境动效 33.34ms；通过已有控制停下节拍器后回到 8.34ms。此对照定位软件重绘成本，**不是关闭动画后的验收成绩**。WebKit 停节拍器后仍慢；其 WebGL 返回“Apple GPU”也不能证明这台 Windows 机器的页面合成后端。详见 [渲染诊断](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/render-environment-detail-20261014.json)。
 
-进一步读取已安装 Playwright 1.63.0 的启动代码，确认原生 Windows WebKit 默认加上 `--disable-accelerated-compositing`，与是否无头无关。本项目使用这条默认路径。该 [启动证据](../handoff/v1b-compare/webkit-windows-launch-20261014.json) 说明它不能替代真实 Safari 的硬件合成验收；不等于所有慢帧都已排除游戏成本。没有移除驱动默认参数来制造更好数字。有界面、确认硬件合成的 Firefox 已追加实测；真实 Safari/iPad 仍缺实际设备证据。
+进一步读取已安装 Playwright 1.63.0 的启动代码，确认原生 Windows WebKit 默认加上 `--disable-accelerated-compositing`，与是否无头无关。本项目使用这条默认路径。该 [启动证据](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/webkit-windows-launch-20261014.json) 说明它不能替代真实 Safari 的硬件合成验收；不等于所有慢帧都已排除游戏成本。没有移除驱动默认参数来制造更好数字。有界面、确认硬件合成的 Firefox 已追加实测；真实 Safari/iPad 仍缺实际设备证据。
 
 ## 有界面 Firefox 与消息停顿修复
 
-- 初次有界面启动报 `script.evaluate: no such frame`，未产生帧结果；[失败日志](../handoff/v1b-evidence/de-508fb2b/firefox-headed-initial-failure.txt)与电源记录保留。推断为启动标签页引用失效，首次没有完整生命周期证据，不称唯一根因已证实。改为明确创建并激活独立自动化标签，默认无头路径不变。
-- [硬件合成十场景](../handoff/v1b-compare/de-firefox-hardware-tab-508fb2b-20261015.json)确认 WebRender、HW_COMPOSITING 可用；页面始终可见且有焦点，电源记录无待机。活动 p95 全部 8.34ms，说明此前持续慢帧与无头软件合成环境有关，不能把这一变化归功于游戏代码优化。
+- 初次有界面启动报 `script.evaluate: no such frame`，未产生帧结果；[失败日志](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-508fb2b/firefox-headed-initial-failure.txt)与电源记录保留。推断为启动标签页引用失效，首次没有完整生命周期证据，不称唯一根因已证实。改为明确创建并激活独立自动化标签，默认无头路径不变。
+- [硬件合成十场景](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-firefox-hardware-tab-508fb2b-20261015.json)确认 WebRender、HW_COMPOSITING 可用；页面始终可见且有焦点，电源记录无待机。活动 p95 全部 8.34ms，说明此前持续慢帧与无头软件合成环境有关，不能把这一变化归功于游戏代码优化。
 - 原始硬件运行仍有平静月末消息拍 158.32ms、疯狂月末 50ms 单帧；两次独立平静月末复测均约 58.32ms，均在消息拍。原值保留，没有用复测覆盖。
 - 临时去掉整机亮度滤镜后最大帧 16.68ms；保留效果但预建图层的探针仍为 74.98ms，未采用。该对照定位整机滤镜的成本，不将关闭效果后的成绩算作验收。
 - v18 本来用手机屏幕内侧发光。实现改用相同蓝/红内阴影，保留原震动和 450ms 到达拍；没有删除手机反应、修改通知数、阅读速度或队列时长。这里保持本轮既有 450ms 到达反馈，区别于 v18 独立 phonePing 的 1,400ms wake 状态；既有疯狂模式环境 wake 时长不变。新动画随 skip/disposal 取消。
 - 修复后定向生产测量：平静月末最大帧 16.68ms、疯狂月末 25ms，活动 p95 均 8.34ms；分别 busy 3,529/10,663ms。这只是定向结果；下面另列完整新源测量，不用定向数字代替。
 - 新断言验证屏幕发光存在、整机无滤镜、跳过立即取消发光；三引擎 1280×720 的消息边界通过（Firefox 无头键盘焦点跳过）。build/typecheck 通过，主 JS 474.86 kB / gzip 145.71；worker/CSS/字体不变。静态路径未改变，完整 45 组合的旧源证据继续明确归属 `508fb2b`。
-- 新源首次完整回归在 Chromium `Runtime.enable` 启动阶段 120 秒超时，未进入游戏断言；[原始失败](../handoff/v1b-evidence/de-2964ef8/chrome-startup-failure.txt)保留。后续待机发生在失败之后，不能当作原因。通过已授权的本机浏览器运行权限重试后正常运行；尚不把成功重试说成唯一根因已确定。
+- 新源首次完整回归在 Chromium `Runtime.enable` 启动阶段 120 秒超时，未进入游戏断言；[原始失败](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-2964ef8/chrome-startup-failure.txt)保留。后续待机发生在失败之后，不能当作原因。通过已授权的本机浏览器运行权限重试后正常运行；尚不把成功重试说成唯一根因已确定。
 
 ## 新源回归的最终阶段状态
 
@@ -78,9 +78,9 @@ Chromium 正常：响亮落桌/总 busy 为 938/2,113ms，安静 934/3,276ms，�
 | Firefox | 每尺寸 22/22，通过 | 三尺寸可执行断言通过 | 无头键盘焦点、OS 媒体模拟能力跳过，不算通过 |
 | WebKit | 每尺寸 21/21，通过 | 1280×720 最终复测通过；800×450、844×390 尚未完成 | 两次完整顺序的连续出牌失败尚未解释；可信触摸长按跳过 |
 
-尺寸为 1280×720、800×450、844×390 手机横屏。小日志归档 [de-2964ef8](../handoff/v1b-evidence/de-2964ef8/)。Chromium/Firefox 的新源日志覆盖预览、D7、消息发光取消、五类牌堆、静态历史回放、真实命中及八类月末流程；WebKit 1280 的最后一次完整复测在 15:47 完成，覆盖相同可执行项目。未把旧源另外两个 WebKit 尺寸的通过冒充新源复跑。
+尺寸为 1280×720、800×450、844×390 手机横屏。小日志归档 [de-2964ef8](https://github.com/zsh56609/overexposed/tree/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-2964ef8)。Chromium/Firefox 的新源日志覆盖预览、D7、消息发光取消、五类牌堆、静态历史回放、真实命中及八类月末流程；WebKit 1280 的最后一次完整复测在 15:47 完成，覆盖相同可执行项目。未把旧源另外两个 WebKit 尺寸的通过冒充新源复跑。
 
-**WebKit 连续出牌失败不是已修复项：** 在 s02、Open Mic → Lay Low、skip-early 路径，跳过第一张牌后，第二次真实 pointerdown/up/click 的目标不是卡牌，队列仍 idle/step 21，断言正确失败。初次和带输入记录的完整重跑均失败；[原始轨迹](../handoff/v1b-evidence/de-2964ef8/webkit-pile-input-failure.json)保留。尚无证据表明游戏收到合法卡牌点击后丢弃了动作。
+**WebKit 连续出牌失败不是已修复项：** 在 s02、Open Mic → Lay Low、skip-early 路径，跳过第一张牌后，第二次真实 pointerdown/up/click 的目标不是卡牌，队列仍 idle/step 21，断言正确失败。初次和带输入记录的完整重跑均失败；[原始轨迹](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-2964ef8/webkit-pile-input-failure.json)保留。尚无证据表明游戏收到合法卡牌点击后丢弃了动作。
 
 隔离双牌六路径、隔离全部牌堆、第三次完整 1280 复测和追加八次短重复均通过。短重复记录显示手牌在 300ms 补位过渡中仍移动，故坐标采样与真实命中不同步是**待验证假设**；失败时缺少目标类名，不能排除其他原因，也没有用成功重复抹去失败。完整浏览器诊断仍在 `check/out/motion-webkit-1280-1792048615153-diagnostics.json`、`check/out/motion-webkit-1280-1792049102830-diagnostics.json`；首份无 console/page error，只有测试断言失败和既定内容警告。
 
@@ -98,7 +98,7 @@ Chromium 正常：响亮落桌/总 busy 为 938/2,113ms，安静 934/3,276ms，�
 | WebKit Windows 默认软件路径 | 86–132ms | 170ms | 持续慢帧，不算流畅度通过 |
 | Firefox 4× | — | — | BiDi 不支持，不算通过 |
 
-原始数据：[Chromium/WebKit](../handoff/v1b-compare/de-screen-glow-2964ef8-20261015.json)、[硬件 Firefox](../handoff/v1b-compare/de-screen-glow-firefox-hardware-2964ef8-20261015.json)，各自同名 `-power.json`。活动窗口不混入尾随 1,500ms 空闲窗口；无诊断 CSS 探针启用。`firstFrameMs` 不是输入响应延迟指标。
+原始数据：[Chromium/WebKit](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-screen-glow-2964ef8-20261015.json)、[硬件 Firefox](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-screen-glow-firefox-hardware-2964ef8-20261015.json)，各自同名 `-power.json`。活动窗口不混入尾随 1,500ms 空闲窗口；无诊断 CSS 探针启用。`firstFrameMs` 不是输入响应延迟指标。
 
 Chromium 正常落桌/总 busy：响亮 **944/2,119ms**，安静 **944/3,286ms**，最长安静 **938/4,030ms**；平静月末 3,509ms，疯狂 10,660ms，Copycat 11,302ms，换季 8,039ms，冬季 1,820ms。各浏览器逐场景值见原始数据。保留阅读速度和视觉尾部锁；不把 0.95 秒落桌当作全部输入解锁。
 
@@ -106,15 +106,15 @@ Chromium 正常落桌/总 busy：响亮 **944/2,119ms**，安静 **944/3,286ms**
 
 阶段收尾另采两个 4× 发布场景的 CPU 调用栈，生产构建单独输出带源码映射的副本，未替换 ZIP/dist；正确性检查已停止，无待机。近似发布窗口中，冬季 `deskModel` 约 31.44ms、`managerMessages/thisMonth` 约 22ms、`composeYear` 约 21.79ms；reviewed-frenzy 分别约 90.97、60.72、65.83ms。**这些是相互重叠的 inclusive 采样值，不能相加，也不能当作无采样开销的帧指标。** 采样运行最大帧 149.9/125.1ms，原样保留；不替换上表 100/91.6ms 的验收观测。
 
-这把下一步定位缩小到发布时 UI 模型重新计算、历史消息和新闻组合查询，尚未实施进一步优化。[摘要](../handoff/v1b-compare/de-glow-publication-profile-summary-20261015.json)、[带采样运行](../handoff/v1b-compare/de-glow-publication-profile-20261015.json)和匹配电源记录已保存。大调用栈与源码映射位于 `.npm-cache/profiles/de-glow-publication-profile-20261015-chrome-4-*.cpuprofile`、`.npm-cache/profile-2964ef8/dist/`；交接文档提供复现命令。
+这把下一步定位缩小到发布时 UI 模型重新计算、历史消息和新闻组合查询，尚未实施进一步优化。[摘要](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-glow-publication-profile-summary-20261015.json)、[带采样运行](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/de-glow-publication-profile-20261015.json)和匹配电源记录已保存。大调用栈与源码映射位于 `.npm-cache/profiles/de-glow-publication-profile-20261015-chrome-4-*.cpuprofile`、`.npm-cache/profile-2964ef8/dist/`；交接文档提供复现命令。
 
 ## 打包、证据与限制
 
 - 生产包在 `/itch-preview/` 子目录于三引擎加载；照片全部解码，无游戏资源越出子目录。Chromium/Firefox 的实际照片缓存使用 worker blob；WebKit 使用原路径。首次诊断被 Firefox 自动请求的可选 `/favicon.ico` 触发，保留失败，后续明确单列它，没有放宽游戏资源检查。
 - 主 JS **474.86 kB / gzip 145.71**；对比 `508fb2b` 为 474.69 / 145.62。worker 15.137 kB / gzip 5.083，CSS 52.46 / gzip 11.74，字体不变。工作线程修复前主 JS 473.61 / 145.14，无 worker；A–C 为 JS 458.54 / 140.45、CSS 49.65 / 11.20。
-- 新候选 ZIP：`C:\Users\91205\Documents\overexposed\.npm-cache\overexposed-v1b-2964ef8.zip`，**466,256 字节**，根目录 `index.html`、相对 JS/CSS/字体及 worker 均在包内。SHA-256：`0644462A3B9B795E7C6B5F1F6127323D6F7C4A30025948D9F6E23D237D786571`。[验证记录](../handoff/v1b-evidence/de-2964ef8/zip-verification.json)。未提交 Git、未上传 itch；旧 ZIP 保留。
-- 新源追加四段连续录像（游戏/v18 的响亮出牌和疯狂月末）及 **64 张有序抽帧**：[新对照](../handoff/v1b-compare/continuous-2964ef8/index.html)。实际鼠标点在卡内 (40,120)，之后不移动；游戏片段无 console/page 错误。v18 两段各保留一次未带 URL 的网络连接错误；工具随后使用本地字体，尚未证明失败请求的具体来源，因此不称参考页无错误。人工检查出牌后的稳定桌面、扫牌与最终真实 draft 边界，未见预览覆盖动作反馈；参考页自己的换季/样例牌仅作视觉对照，未导入游戏。
-- 大录像在 `C:\Users\91205\Documents\overexposed\.npm-cache\v1b-recordings-2964ef8-1792034465400\`。录屏内有逐帧时钟，抽帧来自实际视频，**不是预约截图延迟，也不是生产性能指标**。原 [十录像/160 帧](../handoff/v1b-compare/continuous/index.html) 和 `.npm-cache/v1b-recordings-2e6a3f8-1791115338409/` 保留。
+- 新候选 ZIP：`C:\Users\91205\Documents\overexposed\.npm-cache\overexposed-v1b-2964ef8.zip`，**466,256 字节**，根目录 `index.html`、相对 JS/CSS/字体及 worker 均在包内。SHA-256：`0644462A3B9B795E7C6B5F1F6127323D6F7C4A30025948D9F6E23D237D786571`。[验证记录](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-evidence/de-2964ef8/zip-verification.json)。未提交 Git、未上传 itch；旧 ZIP 保留。
+- 新源追加四段连续录像（游戏/v18 的响亮出牌和疯狂月末）及 **64 张有序抽帧**：[新对照](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/continuous-2964ef8/index.html)。实际鼠标点在卡内 (40,120)，之后不移动；游戏片段无 console/page 错误。v18 两段各保留一次未带 URL 的网络连接错误；工具随后使用本地字体，尚未证明失败请求的具体来源，因此不称参考页无错误。人工检查出牌后的稳定桌面、扫牌与最终真实 draft 边界，未见预览覆盖动作反馈；参考页自己的换季/样例牌仅作视觉对照，未导入游戏。
+- 大录像在 `C:\Users\91205\Documents\overexposed\.npm-cache\v1b-recordings-2964ef8-1792034465400\`。录屏内有逐帧时钟，抽帧来自实际视频，**不是预约截图延迟，也不是生产性能指标**。原 [十录像/160 帧](https://github.com/zsh56609/overexposed/blob/92d97c98375e746c415edacdb36006779df7ed56/docs/handoff/v1b-compare/continuous/index.html) 和 `.npm-cache/v1b-recordings-2e6a3f8-1791115338409/` 保留。
 - 仍需解释 WebKit 连续输入失败、补完新源 WebKit 两尺寸动效、处理剩余发布长帧及真实 Safari/iPad 验收。Firefox 无头焦点/OS 媒体模拟/4×、WebKit 可信长按缺口明确列出；headless WebKit 不等于 Safari/iPad。旧 1200s overflow 超时及 895.3ms 异常的单次原因仍未确定，保留原证据。
 
 修复提交 `2964ef8` 和证据提交 `c9b217e` 已正常推送。过程中多次连接重置/超时；使用已授权网络权限及正常重试，没有强推、重置或拉取。历史日志、报告与慢帧数据保留。

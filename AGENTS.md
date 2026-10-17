@@ -255,8 +255,8 @@ The failure mode is not running out of time; it's spending week five adding a sy
 
 ### Acceptance (2026-10-17)
 
-- **Every round:** build, typecheck, validate, `check:queue`, `check:preview`, `check:clicks` and `check:overflow` in Chromium at 1280×720 and 844×390; `sim:compare` whenever content or rules change.
-- **A release candidate** (once per public build): the same checks in Chromium, Firefox and WebKit at 1280×720, 800×450 and 844×390.
+- **Every round:** build, typecheck, validate, `check:queue`, `check:preview` (60 runs), `check:clicks` and `check:overflow` in Chromium at 1280×720 and 844×390; `sim:compare` whenever content or rules change.
+- **A release candidate** (once per public build): the same checks in Chromium, Firefox and WebKit at 1280×720, 800×450 and 844×390, with `check:preview -- --runs=300`, `check:motion` and `check:overflow:full`.
 - No CPU-throttled timing, video recordings, frame galleries, performance JSON or evidence folders — commit no more of them. A round's report is one Chinese markdown file in `docs/reports/`, under about 200 lines.
 
 ---
@@ -305,9 +305,10 @@ npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
 npm run check:queue    # the event queue and the month-end timeline, on real reducer steps
-npm run check:preview  # every UI preview against the real reducer outcome, then check:clicks
+npm run check:preview  # every UI preview against the real reducer outcome, and the press contract
 npm run check:clicks   # every legal action's control on the stage and hit at its centre; no click swallowed
-npm run check:overflow # every text at its longest, desk and plain screens (:full replays check/desk-states.json)
+npm run check:overflow # every text at its longest, desk and screens (:full replays check/desk-states.json)
+npm run check:motion   # the motion by real input (release candidates, with check:overflow:full)
 npm run check:interactions  # the desk's tooltips, bubbles, papers and hand by real input
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
@@ -316,7 +317,7 @@ npm run sim:variants   # appearances per line group → sim/appearances.json, an
 npm run sim:press      # front pages: lead papers, the fame meter, the rival, world-pool repeats
 npm run sim:baseline -- --out=sim/out/<name>; npm run sim:compare -- <a> <b>  # numbers unmoved?
 npm run tune:thresholds | tune:endings | tune:lanes | tune:try  # a content number, measured before it is set
-npm run desk:states | desk:shots | desk:compare | desk:perf | desk:photos | desk:sheet  # the desk's tools
+npm run desk:states | desk:shots | desk:compare | desk:photos | desk:sheet  # the desk's tools
 ```
 
 Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chromium, Firefox and Playwright WebKit at three sizes unless `--browsers=chrome --sizes=1280x720,844x390m` narrows them (every round; §8). Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).

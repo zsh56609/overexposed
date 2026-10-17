@@ -16,7 +16,7 @@
     "sim:press": "node sim/press.ts",
     "sim:managers": "node sim/managers.ts",
     "validate": "node validate/run.ts",
-    "check:preview": "node check/preview.ts && node check/press-contract.ts && node check/clicks.ts",
+    "check:preview": "node check/preview.ts && node check/press-contract.ts",
     "check:clicks": "node check/clicks.ts",
     "check:overflow": "node check/overflow.ts",
     "check:overflow:full": "node check/overflow.ts --runs=10 --replays",
@@ -24,7 +24,6 @@
     "desk:states": "node tools/desk-states.ts",
     "desk:shots": "node tools/desk-shots.ts",
     "desk:compare": "node tools/desk-compare.ts",
-    "desk:perf": "node tools/desk-perf.ts",
     "desk:photos": "node tools/desk-photos.ts",
     "desk:sheet": "node tools/contact-sheet.ts",
     "sim:baseline": "node sim/baseline.ts",
@@ -35,10 +34,7 @@
     "tune:try": "node sim/tune/try.ts",
     "typecheck": "tsc -b",
     "check:queue": "node check/queue.ts && node check/timeline.ts",
-    "check:motion": "node check/motion-run.ts",
-    "desk:reference": "node tools/reference-shots.ts",
-    "desk:motion-shots": "node tools/motion-shots.ts",
-    "desk:motion-perf": "node tools/motion-perf.ts"
+    "check:motion": "node check/motion-run.ts"
   },
   "dependencies": {
     "react": "^19.3.0",

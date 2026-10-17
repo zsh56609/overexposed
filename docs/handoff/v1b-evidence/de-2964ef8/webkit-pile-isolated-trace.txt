@@ -1,8 +1,0 @@
-pile input webkit: s02 open_mic+lay_low off exact final parity
-pile input webkit: s02 open_mic+lay_low full exact final parity
-pile input webkit: s02 open_mic+lay_low reduced exact final parity
-pile input webkit: s02 open_mic+lay_low skip-early exact final parity
-pile input webkit: s02 open_mic+lay_low skip-late exact final parity
-pile input webkit: s02 open_mic+lay_low switch-reduced exact final parity
-pile input webkit: s02 static replay parity; all settled modes preserve real control hit points
-PASS motion input webkit 1280x720
