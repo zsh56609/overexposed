@@ -78,16 +78,16 @@
 .desk .bub.has-rx { margin-bottom: 9px; z-index: 2; }
 .desk .bub.open { z-index: 10; }
 /* A bubble comes in (round R3, C1): as it did on its beat, now as it mounts. */
-.desk .bub[data-k] { animation: bub-in .45s ease-out both; }
+.desk .bub[data-k] { animation: bub-in .45s ease-out backwards; }
 @keyframes bub-in { from { opacity: 0; transform: translateY(14px) scale(.8); } }
-:root[data-motion-resolved='reduced'] .desk .bub[data-k] { animation: bub-fade .2s ease-out both; }
+:root[data-motion-resolved='reduced'] .desk .bub[data-k] { animation: bub-fade .2s ease-out backwards; }
 @keyframes bub-fade { from { opacity: 0; } }
 :root[data-motion='off'] .desk .bub[data-k] { animation: none; }
 .desk .bub.who { background: transparent; box-shadow: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
 .desk.crisis .bub { background: #5a1f1a; }
 .desk.crisis .bub.who { background: transparent; color: #ffb3a6; }
 .desk .rx { position: absolute; left: -9px; bottom: -12px; font-size: 12px; line-height: 1; background: #0f151b; border: 1px solid rgba(255, 255, 255, .2); border-radius: 10px; padding: 2px 4px; box-shadow: 0 3px 6px rgba(0, 0, 0, .5); animation: desk-rxPop .22s cubic-bezier(.3, 1.6, .5, 1); }
-.desk .rx-bar { animation: desk-pop-in .15s ease-out both; position: absolute; right: 0; top: calc(100% + 7px); display: flex; gap: 2px; padding: 4px 6px; background: #0f151b; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; box-shadow: 0 8px 18px rgba(0, 0, 0, .6); z-index: 9; animation: desk-rxIn .16s ease-out; }
+.desk .rx-bar { animation: desk-pop-in .15s ease-out backwards; position: absolute; right: 0; top: calc(100% + 7px); display: flex; gap: 2px; padding: 4px 6px; background: #0f151b; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; box-shadow: 0 8px 18px rgba(0, 0, 0, .6); z-index: 9; animation: desk-rxIn .16s ease-out; }
 .desk .rx-bar button { border: 0; background: transparent; font-size: 17px; line-height: 1; padding: 3px 4px; border-radius: 12px; cursor: pointer; transition: transform .15s; }
 .desk .rx-bar button:hover { transform: scale(1.25); }
 .desk .rx-bar button.on { background: rgba(255, 255, 255, .16); }

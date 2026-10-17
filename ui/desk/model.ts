@@ -630,6 +630,19 @@ function labels(): DeskLabels {
 const COND_ORDER: readonly (keyof Condition)[] = ['hype', 'craft', 'heat', 'scandalCount', 'capital', 'act', 'turn', 'flags'];
 
 const craftIcon = (lane: string | null): IconId => (lane === 'screen' ? 'clap' : 'note');
+
+/**
+ * The craft a card builds (round R4, A8): craft stays one number, its colour says which stat it is, and its icon says
+ * what kind of craft — a music card's note, a screen card's clapperboard, whatever the career; a card shown as a lane
+ * variant (round R3, E2: Vocal Coaching as Scene Study) takes the variant's lane. Neutral and celebrity cards keep
+ * the career's icon, as the stat bar and the doors' thresholds do — the note before a lane is established: she
+ * starts as a singer.
+ */
+export function craftLane(c: ContentIndex, cardId: string, career: string | null): string | null {
+  const def = getCard(c, cardId);
+  if (career !== null && def?.laneText?.[career]) return career;
+  return def?.lane === 'music' || def?.lane === 'screen' ? def.lane : career;
+}
 const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
 
 /**
@@ -732,9 +745,10 @@ function ruleLines(c: ContentIndex, label: string, effects: readonly Effect[], l
  * A card's body (round R1, H1–H2), in one order on every face: what it needs, then its effects — every number an
  * icon and a number — and for a scandal "Can't be played" and its rules. The flavour line follows the body.
  */
-export function faceLines(c: ContentIndex, cardId: string, lane: string | null): FaceLine[] {
+export function faceLines(c: ContentIndex, cardId: string, career: string | null): FaceLine[] {
   const def = getCard(c, cardId);
   if (!def) return [];
+  const lane = craftLane(c, cardId, career);
   const lines: FaceLine[] = [];
   if (def.kind === 'scandal') lines.push({ label: null, cond: [], arrow: false, chips: [{ kind: 'text', icon: null, text: t('ui.card.cantPlay') }] });
   if (def.requires) {

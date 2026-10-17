@@ -34,27 +34,40 @@ ul, ol { margin: 0; padding-left: 1.1em; }
 
 /* The offers and the doors (round R1) stand over the dimmed scene, beside the desk and never inside it; the stat bar
    stays in view above them (README §9). */
-.screen-over { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; z-index: 150; }
-.screen-over > .screen-scrim { position: absolute; inset: 0; background: rgba(8, 6, 4, .74); }
+.screen-over { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; z-index: 151; }
 /* Before the year there is no stat bar (round R3): the opening card and the manager choice take the whole stage. */
 .screen-over.full { top: 0; }
+/* The dim (round R4, A3c): one layer under every overlay. It comes up with the first overlay, stays as it is while one
+   follows another — the first one's content leaves, the next one's rises in, the desk never lit between them — and
+   lifts only when the month opens onto the desk (signing, A2, lifts it on purpose at 0.6 s). */
+.dim-layer { position: absolute; left: 0; right: 0; top: 46px; bottom: 0; z-index: 150; background: rgba(8, 6, 4, .74); opacity: 0; pointer-events: none; transition: opacity .35s ease-out; }
+.dim-layer.full { top: 0; }
+/* The offer taken, on its way to Deck & Discard (round R4, A3e; ui/screens/common.tsx flyToDeck). */
+.offer-flight { position: absolute; z-index: 300; pointer-events: none; transform-origin: 50% 50%; font-family: 'Libre Franklin', system-ui, sans-serif; color: #15120e; }
+.dim-layer.on { opacity: 1; pointer-events: auto; transition-duration: .2s; }
 
-/* One set of transitions (round R3, Part B; ui/motion.ts TRANSITION). What opens over the desk: the dim fades in in
-   0.2 s, the content rises and fades in in 0.25 s; on the way out, 0.15 s. Every transition's keyframes are named
-   tr-…: a click during a change of scene completes them (D7). Reduced motion crossfades in 0.2 s; off, none. */
-.screen-over > .screen-scrim { animation: tr-dim .2s ease-out both; }
-.screen-over > .scr { animation: tr-rise .25s ease-out both; }
-.screen-over.leaving { animation: tr-out .15s ease-in forwards; pointer-events: none; }
+/* One set of transitions (round R3, Part B; ui/motion.ts TRANSITION). What opens over the desk: the content rises and
+   fades in in 0.25 s. Every transition's keyframes are named tr-…: a click during a change of scene completes them
+   (D7). Reduced motion crossfades in 0.2 s; off, none.
+   Round R4, A3b: one exit. What leaves leaves as one piece, once — the phone with everything on it, the offers, the
+   doors, a season card, the manager choice: down 40 px and fading, 0.4 s ease-in (a letter goes up). */
+.screen-over > .scr { animation: tr-rise .25s ease-out backwards; }
+.screen-over.leaving { pointer-events: none; }
+.screen-over.leaving > .scr { transform: translateY(40px); opacity: 0; transition: transform .4s ease-in, opacity .4s ease-in; }
+.screen-over.leaving.up > .scr { transform: translateY(-40px); }
 @keyframes tr-dim { from { opacity: 0; } }
 @keyframes tr-rise { from { opacity: 0; transform: translateY(14px); } }
 @keyframes tr-fade { from { opacity: 0; } }
 @keyframes tr-out { to { opacity: 0; } }
 :root[data-motion-resolved='reduced'] .screen-over > .scr { animation-name: tr-fade; animation-duration: .2s; }
-:root[data-motion='off'] .screen-over, :root[data-motion='off'] .screen-over > * { animation: none !important; }
+:root[data-motion-resolved='reduced'] .screen-over.leaving > .scr { transform: none; transition: opacity .2s ease-out; }
+:root[data-motion-resolved='reduced'] .dim-layer { transition-duration: .2s; }
+:root[data-motion='off'] .screen-over, :root[data-motion='off'] .screen-over > * { animation: none !important; transition: none !important; }
+:root[data-motion='off'] .dim-layer { transition: none; }
 
 /* PLAY AGAIN (B6): a fade through ink to the next run's title. */
 .ink { position: absolute; inset: 0; z-index: 400; background: #070504; pointer-events: none; }
-.ink.in { animation: tr-ink-in .35s ease-in both; }
+.ink.in { animation: tr-ink-in .35s ease-in backwards; }
 .ink.out { animation: tr-out .5s ease-out both; }
 @keyframes tr-ink-in { from { opacity: 0; } }
 :root[data-motion-resolved='reduced'] .ink.in, :root[data-motion-resolved='reduced'] .ink.out { animation-duration: .1s; }

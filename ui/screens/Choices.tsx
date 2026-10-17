@@ -11,7 +11,7 @@ import { effectChips, offerCardModel, type HandWords, type IconId, type ValueChi
 import { t } from '../i18n.ts';
 import { previewGate, type GatePreview, type Legal } from '../preview.ts';
 import { awardName, calendarLabel, clauseText, endingPair, gateFlavor, gateName, money, offerLabels, seasonName } from '../text.ts';
-import { Header, prose, useStampedChoice } from './common.tsx';
+import { flyToDeck, Header, prose, useStampedChoice } from './common.tsx';
 
 /** Enter and Space take a focused card or door, as a click does. */
 const onKeys = (go: () => void) => (e: KeyboardEvent) => {
@@ -49,7 +49,11 @@ interface OffersProps {
  * /core has no query for the line an offered card would print.
  */
 export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps) {
-  const [chosen, choose] = useStampedChoice<string>((cardId) => act({ type: 'DRAFT_PICK', cardId }));
+  // The card taken flies to Deck & Discard as its pick goes (round R4, A3e).
+  const [chosen, choose] = useStampedChoice<string>((cardId) => {
+    flyToDeck(document.querySelector(`.offers .lift[data-card="${cardId}"]`));
+    act({ type: 'DRAFT_PICK', cardId });
+  });
   const draft = s.draft;
   if (!draft) return null;
   const c = s.content;

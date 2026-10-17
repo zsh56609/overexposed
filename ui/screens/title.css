@@ -9,7 +9,7 @@
 .title-screen { position: absolute; inset: 0; z-index: 148; overflow: hidden; background: #15120E; color: #EDE6D6; font-family: 'Libre Franklin', system-ui, sans-serif; }
 .title-screen * { box-sizing: border-box; }
 .title-screen .tphoto { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; }
-.title-screen.lit .tphoto { opacity: 1; animation: tr-spot .6s ease-out both; }
+.title-screen.lit .tphoto { opacity: 1; animation: tr-spot .6s ease-out backwards; }
 @keyframes tr-spot { from { opacity: 0; } }
 .title-screen .topfade { position: absolute; left: 0; right: 0; top: 0; height: 300px; background: linear-gradient(rgba(21, 18, 14, .88), rgba(21, 18, 14, .55) 60%, transparent); }
 .title-screen .vign { position: absolute; inset: 0; background: radial-gradient(120% 95% at 50% 58%, transparent 45%, rgba(10, 8, 6, .55) 75%, rgba(10, 8, 6, .92) 100%); }
@@ -18,7 +18,7 @@
 /* The photographers' flashes: a white burst of 0.1 s and a 0.3 s fade, once a cycle each, at its own moment
    (ui/screens/Title.tsx FLASHES). Never tr-…: it never ends, so no click completes it. */
 .title-screen .flashes { position: absolute; inset: 0; pointer-events: none; }
-.title-screen .flashes i { position: absolute; border-radius: 50%; opacity: 0; mix-blend-mode: screen; background: radial-gradient(circle, rgba(255, 255, 255, .95), rgba(255, 250, 235, .5) 18%, rgba(255, 245, 225, 0) 60%); animation: title-flash 13.7s linear infinite both; }
+.title-screen .flashes i { position: absolute; border-radius: 50%; opacity: 0; mix-blend-mode: screen; background: radial-gradient(circle, rgba(255, 255, 255, .95), rgba(255, 250, 235, .5) 18%, rgba(255, 245, 225, 0) 60%); animation: title-flash 13.7s linear infinite backwards; }
 @keyframes title-flash { 0% { opacity: 0; } .25% { opacity: 1; } .73% { opacity: 1; } 2.92% { opacity: 0; } 100% { opacity: 0; } }
 .title-screen:not(.lit) .flashes, .title-screen.dim .flashes, .title-screen.out .flashes { display: none; }
 
@@ -27,13 +27,15 @@
   position: absolute; left: 0; right: 0; top: 46px; margin: 0; text-align: center; white-space: nowrap;
   font: 900 132px/1 'Playfair Display', Georgia, serif; letter-spacing: -1px; color: #F7F1E3;
   text-shadow: 0 0 18px rgba(255, 248, 232, .55), 0 0 46px rgba(255, 236, 200, .35), 0 0 110px rgba(255, 226, 180, .25);
-  animation: tr-develop .8s ease-out both;
+  animation: tr-develop .8s ease-out backwards;
 }
 @keyframes tr-develop { from { color: #FFFFFF; text-shadow: 0 0 26px #FFFFFF, 0 0 80px rgba(255, 252, 240, .95), 0 0 190px rgba(255, 244, 222, .8); } }
 .title-screen .trule { position: absolute; left: 50%; top: 198px; width: 120px; height: 4px; margin-left: -60px; background: #D92B1F; }
 /* As the masthead's: the padding holds the italic's ascent and descent (33 px on a 31 px line). */
 .title-screen .slogan { position: absolute; left: 0; right: 0; top: 214px; padding: 2px 0; margin: 0; text-align: center; font: italic 500 24px/1.3 'Playfair Display', Georgia, serif; color: #E9E1CF; }
-.title-screen .found { position: absolute; left: 56px; bottom: 84px; display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: #E9E1CF; white-space: nowrap; }
+/* The endings found and the awards won (round R4, A7), one row each, above the links. */
+.title-screen .counts { position: absolute; left: 56px; bottom: 84px; display: flex; flex-direction: column; gap: 9px; }
+.title-screen .found { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: #E9E1CF; white-space: nowrap; }
 .title-screen .dots { display: flex; gap: 5px; }
 .title-screen .dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.4px solid #E9E1CF; flex: none; }
 .title-screen .dots i.f { background: #E9E1CF; }
@@ -60,18 +62,16 @@
 .title-screen.dim .words { opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s .2s; }
 .whiteout { position: absolute; inset: 0; z-index: 390; background: #FFFDF6; pointer-events: none; animation: tr-whiteout .75s ease-out both; }
 @keyframes tr-whiteout { 0% { opacity: 0; } 16% { opacity: 1; } 30% { opacity: 1; } 100% { opacity: 0; } }
-.screen-over.develop > .screen-scrim { display: none; }
-.screen-over.develop > .scr { animation: tr-develop-card .6s .15s ease-out both; }
+.screen-over.develop > .scr { animation: tr-develop-card .6s .15s ease-out backwards; }
 @keyframes tr-develop-card { from { filter: brightness(2.3) contrast(.45) saturate(.2); } }
 /* B2, "Into spring": the card fades, the photograph fades to dark, the desk comes up (ui/desk/css/scenes.css) and
    the two manager cards are dealt onto it. */
 .title-screen.out { animation: tr-out .12s .3s ease-in both; pointer-events: none; }
 .title-screen.lit.out .tphoto, .title-screen.out .words { animation: tr-out .3s ease-in both; }
-.screen-over.deal > .screen-scrim { animation: tr-dim .35s .35s ease-out both; }
 .screen-over.deal > .scr { animation: none; }
 .screen-over.deal .manager-choice .mgHead, .screen-over.deal .manager-choice .mgFoot { animation-delay: .6s; }
-.screen-over.deal .manager-choice .biz:nth-child(1) { animation-delay: .55s; }
-.screen-over.deal .manager-choice .biz:nth-child(2) { animation-delay: .67s; }
+.screen-over.deal .manager-choice .biz:not(.gone):nth-child(1) { animation-delay: .55s; }
+.screen-over.deal .manager-choice .biz:not(.gone):nth-child(2) { animation-delay: .67s; }
 
 /* Reduced motion: no develop and no flashes; each change of scene a crossfade of at most 0.2 s. Off: nothing moves. */
 :root[data-motion-resolved='reduced'] .title-screen .tphoto, :root[data-motion-resolved='reduced'] .title-screen .tname { animation: none; }

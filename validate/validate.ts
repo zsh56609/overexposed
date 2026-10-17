@@ -108,7 +108,7 @@ const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
 const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note'];
 const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKeys', 'goalKey'];
-const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'conditions', 'fallback'];
+const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'howKey', 'conditions', 'fallback'];
 /** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
 const MAX_AWARDS = 8;
 /**
@@ -826,11 +826,22 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
  * Year-end awards (decisions 16 and 20): the condition shape, plus the award-only keys (the year's ending,
  * and a range on any year stat — YEAR_STAT_KEYS). At most 8, and a fallback so that every year ends with one.
  */
-function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>): Obj[] {
+function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>, i18n: Obj): Obj[] {
   const awards = checkList(v, raw, 'content/awards.json', 'award', (a, where) => {
     v.fields(a, AWARD_FIELDS, where);
     v.key(a.nameKey, `${where}.nameKey`);
     v.key(a.citationKey, `${where}.citationKey`);
+    // How it is won (round R4, A7): a placeholder names one of the award's numeric conditions, which fills it with
+    // its min (its max when it has only a max), so a tuned number needs no new prose; an ending stays in words.
+    v.key(a.howKey, `${where}.howKey`);
+    const how = isStr(a.howKey) ? i18n[a.howKey] : undefined;
+    if (typeof how === 'string') {
+      const numeric = isObj(a.conditions) ? Object.entries(a.conditions).filter(([, r]) => isObj(r) && (typeof r.min === 'number' || typeof r.max === 'number')).map(([k]) => k) : [];
+      for (const m of how.matchAll(/\{(\w+)\}/g)) {
+        const name = m[1] ?? '';
+        if (!numeric.includes(name)) v.error('i18n', `${where}.howKey`, `{${name}} is not one of the award's numeric conditions (${numeric.join(', ') || 'none'})`);
+      }
+    }
     if (a.fallback !== undefined && typeof a.fallback !== 'boolean') v.error('schema', `${where}.fallback`, 'must be a boolean');
     if (a.fallback === true && a.conditions !== undefined) v.error('structure', where, 'a fallback award is granted only when no other is: it takes no conditions');
     if (a.fallback !== true && a.conditions === undefined) v.error('structure', where, 'needs "conditions", or "fallback": true');
@@ -1045,7 +1056,7 @@ function checkProse(
   const unwrittenFilms = films.filter((k) => !written(k)).length;
   if (unwrittenFilms > 0) v.warn('prose', 'press.boxOffice.titleKeys', `${unwrittenFilms} of ${films.length} film titles not written`);
   for (const a of awards) {
-    const missing = (['nameKey', 'citationKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
+    const missing = (['nameKey', 'citationKey', 'howKey'] as const).filter((f) => !written(a[f])).map((f) => f.replace('Key', ''));
     if (missing.length > 0) v.warn('prose', `award ${String(a.id)}`, `no ${missing.join(', ')}`);
   }
   for (const flag of flagsIn(v)) {
@@ -1204,7 +1215,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const gates = checkGates(v, raw.gates);
   const endings = checkEndings(v, raw.endings, rules);
   const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
-  const awards = checkAwards(v, raw.awards, endingIds);
+  const awards = checkAwards(v, raw.awards, endingIds, isObj(i18n) ? i18n : {});
   checkReferences(v, rules, cards);
   checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)), isObj(i18n) ? i18n : {});
   checkManagers(v, raw.managers, rules, raw.endings);
@@ -1587,7 +1598,8 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
   // The sign-off's mood (round 2c): the hard triggers, by name or by line key; and the quiet lookback.
   if (!Array.isArray(msg.hard)) v.error('schema', `${at}.hard`, 'must list the triggers (or trigger line keys) with hard sign-offs');
   else for (const h of msg.hard) if (!known.includes(h) && !needed.includes(h as string)) v.error('references', `${at}.hard`, `${q(h)} is no trigger and no trigger line key`);
-  v.int(msg.quietAfter, `${at}.quietAfter`, [1, v.totalTurns]);
+  // 0: every month nothing else fired in brings the quiet line (round R4, A5); n: after n silent months (round 2c).
+  v.int(msg.quietAfter, `${at}.quietAfter`, [0, v.totalTurns]);
   if (v.fameBands.length === 0) v.warn('structure', `${at}`, 'no rules.fameBands: the quiet trigger never fires');
 }
 

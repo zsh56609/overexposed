@@ -5,11 +5,11 @@
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 //
 // Round R3 (amended): the title is one photograph, the whole screen (ui/screens/Title.tsx); BEGIN's flash brings
-// spring's card (the opening) over it, dimmed; "Into spring" takes it to dark and brings the desk up, the manager
+// spring's card (the opening) over it, dimmed; its "Continue" takes it to dark and brings the desk up, the manager
 // choice dealt onto it. Every season card waits for its button.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { createInitialState, establishedLanes, readLines, reduce, type Action, type GameState } from '../core/index.ts';
+import { createInitialState, establishedLanes, getEvent, readLines, reduce, type Action, type GameState } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { finishTransitions, motionMode, subscribeMotion } from './motion.ts';
 import { Desk, type DeskMode } from './desk/Desk.tsx';
@@ -18,7 +18,7 @@ import { deskModel } from './desk/model.ts';
 import { t } from './i18n.ts';
 import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
-import { readFound } from './collection.ts';
+import { readAwards, readFound } from './collection.ts';
 import { Over, useFontsReady } from './screens/common.tsx';
 import { ManagerScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, NumbersPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
@@ -212,6 +212,9 @@ function seasonOf(s: GameState, answered: number): { readonly act: number; reado
   return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(c, s.seed, s.act)] };
 }
 
+/** The actions taken over the desk: their steps keep the dim up until the month opens onto it (round R4, A3c). */
+const OVER_ACTIONS: ReadonlySet<string> = new Set(['CHOOSE_MANAGER', 'CHOOSE_GATE', 'CHOOSE_EVENT', 'DRAFT_PICK', 'DRAFT_EXTRA_PICK', 'DRAFT_REROLL']);
+
 /**
  * A change of scene before the year (round R3, amended), and how long it runs, in ms: B1, BEGIN's flash and the
  * opening card developing out of it (ui/screens/title.css); B2, the photograph to dark, the desk coming up and the
@@ -233,6 +236,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // The last season whose card was answered: spring's is the opening.
   const [answered, setAnswered] = useState(1);
   const [found] = useState(readFound);
+  const [won] = useState(readAwards);
   const fonts = useFontsReady();
   // B1, title → opening card; B2, opening card → the manager choice. A click during one completes it (D7).
   const [scene, setScene] = useState<Scene | null>(null);
@@ -322,7 +326,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     return (
       <>
         <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} openNumbers={() => setPanel('numbers')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
-        {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} overDesk={false} onClose={close} />}
+        {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} awards={readAwards()} overDesk={false} onClose={close} />}
         {panel === 'numbers' && <NumbersPanel s={s} steps={snap.steps} onClose={close} />}
       </>
     );
@@ -330,13 +334,14 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   if (intro === 'title' && !fonts) return <div className="scr title-wait" />;
 
   const mode: DeskMode = s.phase === 'manager' ? 'manager' : 'game';
-  // The desk from "Into spring" on (B2); the title until the desk has come up out of its dark.
+  // The desk from the opening card's "Continue" on (B2); the title until the desk has come up out of its dark.
   const desk = intro === null;
   const titled = intro !== null || scene === 'into';
   const game = desk && mode === 'game';
   const endPreview = model.endPreview;
   // The answer to an event, while its step plays and before it is published (round R2, Part C).
-  const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' && !snap.active.published ? snap.active : null;
+  // Round R4, A3b: the content leaves from the end of the reading hold (eventClose), and the month is published after it.
+  const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' && !snap.active.published && !(snap.active.plan?.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'eventClose') ?? false) ? snap.active : null;
   const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
   // A season's card (round R3, A3): from the month end's 'season' beat, its entrance, until its button is clicked.
   const reached = snap.active?.plan ? snap.active.plan.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') : false;
@@ -347,6 +352,12 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const signBeats = signing?.plan ? signing.plan.beats.slice(0, (signing.index ?? 0) + 1).map((b) => b.kind) : [];
   const offers = clear && game && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan;
   const eventShown = clear && game && s.phase === 'event' && (!snap.active || answering !== null);
+  const letter = s.phase === 'event' && getEvent(c, s.event ?? '')?.form === 'letter';
+  // The dim (round R4, A3c): up with the first overlay and through the steps between overlays — a door, an offer, an
+  // answer — until the month opens onto the desk, when its state is published in play. Signing lifts it on purpose at
+  // its undim beat, and the offers bring it back (A2).
+  const between = !!snap.active && OVER_ACTIONS.has(snap.active.step.action?.type ?? '') && s.phase !== 'play';
+  const dimmed = desk && !(signing && signBeats.includes('undim')) && (mode === 'manager' || season !== null || offers || eventShown || between);
 
   return (
     <>
@@ -358,8 +369,10 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           </Popover>
         </Desk>
       )}
+      {/* The dim under every overlay (round R4, A3c): the whole stage before the stat bar comes, below it after. */}
+      {desk && <div className={`dim-layer${mode === 'manager' || signing ? ' full' : ''}${dimmed ? ' on' : ''}`} data-hook="dim" aria-hidden="true" />}
       {/* The title (round R3, amended): over the desk while it goes to dark (B2); under the opening card, dimmed (B1). */}
-      {titled && <TitleScreen c={c} found={found} dim={intro !== 'title'} out={scene === 'into'} busy={scene !== null} {...titleOn} />}
+      {titled && <TitleScreen c={c} found={found} won={won} dim={intro !== 'title'} out={scene === 'into'} busy={scene !== null} {...titleOn} />}
       {/* B1: BEGIN's one big flash, the screen gone white like an overexposed photograph. */}
       {scene === 'begin' && motionMode() === 'full' && <div className="whiteout" aria-hidden="true" />}
       {/* The screens around the desk (round R1), over the dimmed scene — beside the desk, never inside it, so none
@@ -387,7 +400,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         {offers && s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
       </Over>
       {/* An event (round R2, Part C): once the month end has settled, and while its answer plays, until it is published. */}
-      <Over show={eventShown}>
+      <Over show={eventShown} exit={letter ? 'up' : 'down'}>
         {eventShown && (
           <EventScreen
             key={`${s.turn}:${s.event}`}
@@ -404,7 +417,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
       {panel === 'settings' && <SettingsPanel overDesk={game} onClose={close} />}
       {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}
-      {panel === 'scrapbook' && <ScrapbookPanel found={found} overDesk={false} onClose={close} />}
+      {panel === 'scrapbook' && <ScrapbookPanel found={found} awards={won} overDesk={false} onClose={close} />}
     </>
   );
 }

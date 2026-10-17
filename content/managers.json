@@ -112,6 +112,6 @@
     "viralFlag": "went_viral",
     "stuck": { "heatTierFrom": 4, "months": 2 },
     "hard": ["first_scandal", "frenzy", "stuck", "gate_failed", "checkin.overexposed", "checkin.hard_way"],
-    "quietAfter": 1
+    "quietAfter": 0
   }
 }

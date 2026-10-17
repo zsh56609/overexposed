@@ -11,6 +11,8 @@
 //   a click ends the month; the deck and House rules open from the stat bar and close (round R1, Part G);
 // - a bubble once shown stays until the month ends (round R3, C2): for each manager, from the title with motion full,
 //   through a month of plays, paper picks and prints, the bubbles shown, sampled every 90 ms, never decrease.
+// - hovers ease (round R4, A1): a manager card, an offer, a hand card, a paper, a sticky note, a bubble and a door,
+//   60 ms after each one's transition delay, stand strictly between their rest and their hover.
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -26,6 +28,86 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const neutral = (page: Page) => page.evaluate<[number, number]>(`(() => { const r = document.querySelector('.desk').getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height * 300 / 720]; })()`);
 type Result = [what: string, ok: boolean | 'skipped'];
+
+/**
+ * Hovers ease (round R4, A1): an entrance animation that kept filling its last frame overrode the element's own
+ * transition, so a hover's transform landed at once. In full motion, a manager card, an offer, a hand card, a paper,
+ * a sticky note, a bubble and a door are hovered with the mouse; 60 ms after each one's own transition delay (the
+ * hand's and the offers' are 70 ms), its transform lies strictly between its rest and its hover value.
+ */
+async function hoversEase(page: Page, url: string): Promise<Result[]> {
+  const out: Result[] = [];
+  const idle = async () => { for (let i = 0; i < 250 && (await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy === '1' || !!document.querySelector('.screen-over.leaving,.bubbles[data-revealing]')`)); i++) await sleep(40); };
+  // A transform as a 4x4 matrix's sixteen numbers, a 2D one lifted into it, so any two can be compared.
+  const matrix = (sel: string) => page.evaluate<number[] | null>(`(() => {
+    const el = document.querySelector(${JSON.stringify(sel)});
+    if (!el) return null;
+    const t = getComputedStyle(el).transform;
+    const v = !t || t === 'none' ? [1, 0, 0, 1, 0, 0] : t.replace(/^matrix(3d)?\\(|\\)$/g, '').split(',').map(Number);
+    return v.length === 16 ? v : [v[0], v[1], 0, 0, v[2], v[3], 0, 0, 0, 0, 1, 0, v[4], v[5], 0, 1];
+  })()`);
+  const eases = async (label: string, sel: string, hover: string, delay: number, point?: () => Promise<[number, number] | null>): Promise<void> => {
+    await page.move(4, 4);
+    await sleep(500);
+    const at = point ? await point() : await centre(page, hover);
+    const rest = await matrix(sel);
+    if (!at || !rest) {
+      out.push([`hover eases: ${label} not found`, false]);
+      return;
+    }
+    const t0 = Date.now();
+    await page.move(at[0], at[1]);
+    const wait = delay + 60 - (Date.now() - t0);
+    if (wait > 0) await sleep(wait);
+    const mid = await matrix(sel);
+    await sleep(900);
+    const end = await matrix(sel);
+    await page.move(4, 4);
+    if (!mid || !end) {
+      out.push([`hover eases: ${label} went away`, false]);
+      return;
+    }
+    const d = end.map((v, i) => v - (rest[i] ?? 0));
+    const k = d.reduce((best, v, i) => (Math.abs(v) > Math.abs(d[best] ?? 0) ? i : best), 0);
+    const span = d[k] ?? 0;
+    const f = span === 0 ? NaN : ((mid[k] ?? 0) - (rest[k] ?? 0)) / span;
+    out.push([`hover eases: ${label}, ${Number.isNaN(f) ? 'no hover move' : `${Math.round(f * 100)}% of the way`} at ${delay + 60} ms`, f > 0.02 && f < 0.98]);
+  };
+  await page.navigate(`${url}?seed=20261017`, 1500);
+  await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+  for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
+  await sleep(400);
+  const press = async (sel: string, i = 0) => { const at = await centre(page, sel, i); if (at) await page.click(...at); return !!at; };
+  await press('.title-screen .begin');
+  await sleep(900);
+  await press('.season-card .into');
+  await sleep(1800);
+  await eases('a manager card', '.manager-choice .biz:nth-child(2)', '.manager-choice .biz:nth-child(2) .bcard', 0);
+  await press('.manager-choice .choose', 1);
+  await sleep(2700);
+  await idle();
+  await eases('an offer', '.offers .dslot:nth-child(2) .lift', '.offers .dslot:nth-child(2) .lift', 70);
+  await press('.offers .take', 0);
+  await sleep(1600);
+  await idle();
+  for (let i = 0; i < 30 && (await page.evaluate<boolean>(`!!document.querySelector('.offers .take')`)); i++) { await press('.offers .take', 0); await sleep(1600); await idle(); }
+  await sleep(600);
+  await idle();
+  await eases('a hand card', '.desk .hand .card:nth-child(2)', '.desk .hand .card:nth-child(2)', 70);
+  // A paper behind, by the strip of it that shows above the front one.
+  await eases('a paper', '.desk .news .pp.pos1', '.desk .news .pp.pos1', 0, () => page.evaluate<[number, number] | null>(`(() => { const p = document.querySelector('.desk .news .pp.pos1'); if (!p) return null; const r = p.getBoundingClientRect(); return [r.x + r.width / 2, r.y + 12]; })()`));
+  await eases('a sticky note', '.desk .mirror .sticky', '.desk .mirror .sticky', 0);
+  await eases('a bubble', '.desk .bubbles .bub[data-k]', '.desk .bubbles .bub[data-k]', 0);
+  // A door: the season's last month, its doors laid out; then full motion for the hover.
+  const s02 = states.s02;
+  const gate = s02 ? s02.steps.findIndex((x) => x[0] === 'gate') : -1;
+  if (s02 && gate > 0 && (await reach(page, url, { ...s02, steps: s02.steps.slice(0, gate) })) === 'ok') {
+    await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+    await sleep(300);
+    await eases('a door', '.doors .inv', '.doors .inv', 0);
+  } else out.push(['hover eases: no recorded door', false]);
+  return out;
+}
 
 async function tooltips(page: Page, url: string): Promise<Result[]> {
   const out: Result[] = [];
@@ -307,7 +389,7 @@ try {
     for (const size of sizesFromArgs(process.argv)) {
     const page = await launch(browser, size);
     try {
-      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url))];
+      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url))];
       const passed = results.filter(([, ok]) => ok === true).length;
       const skipped = results.filter(([, ok]) => ok === 'skipped').length;
       console.log(`interactions, ${browser} ${size.width}x${size.height}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);

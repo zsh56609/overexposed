@@ -466,15 +466,15 @@ function checkMessages(history: readonly PlayedStep[], seed: number): void {
       if (bubbles !== 2 || (m.signoff !== null) !== (m.bubbles.length === 1) || (m.signoff && m.signoff.key === null)) report('messages', seed, month.turn, `${m.lineKey}: ${m.bubbles.length} bubble(s) and ${m.signoff ? 'a' : 'no'} sign-off`);
       if (m.signoff && rules && !m.signoff.group.endsWith(`:${moodOf(rules, m.trigger, m.lineKey)}`)) report('messages', seed, month.turn, `${m.lineKey}: sign-off from ${m.signoff.group}`);
     }
-    // A quiet month (round 2c): only when nothing else fired and the months before it were silent.
+    // A quiet month (round 2c): only when nothing else fired and the months before it were silent. Round R4, A5:
+    // `quietAfter` 0 is "always" — every month nothing else fired in brings it, so no month opens without a message.
+    const after = rules?.quietAfter ?? 2;
+    const before = after === 0 ? [] : final.filter((m) => m.turn < month.turn).slice(-after);
+    const owed = after === 0 || (before.length === after && before.every((m) => m.messages.length === 0));
     if (month.fired.includes(`quiet.${month.fired.find((f) => f.startsWith('quiet.'))?.slice(6)}`)) {
       counts.quiet++;
-      const before = final.filter((m) => m.turn < month.turn).slice(-(rules?.quietAfter ?? 2));
-      if (month.fired.length !== 1 || before.length < (rules?.quietAfter ?? 2) || before.some((m) => m.messages.length > 0)) report('quiet', seed, month.turn, `fired ${month.fired.join()} after ${before.map((m) => m.messages.length).join('/')}`);
-    } else if (month.fired.length === 0) {
-      const before = final.filter((m) => m.turn < month.turn).slice(-(rules?.quietAfter ?? 2));
-      if (before.length === (rules?.quietAfter ?? 2) && before.every((m) => m.messages.length === 0)) report('quiet', seed, month.turn, 'a silent month after silent ones, and no quiet line');
-    }
+      if (month.fired.length !== 1 || !owed) report('quiet', seed, month.turn, `fired ${month.fired.join()} after ${before.map((m) => m.messages.length).join('/')}`);
+    } else if (month.fired.length === 0 && owed) report('quiet', seed, month.turn, after === 0 ? 'a month with nothing fired, and no quiet line' : 'a silent month after silent ones, and no quiet line');
   }
   // The last word (round 2c, C3): two bubbles on the ending screen, for the major the year ended in.
   const end = history.at(-1)?.after;

@@ -268,6 +268,8 @@ export interface AwardDef {
   readonly id: string;
   readonly nameKey: string;
   readonly citationKey: string;
+  /** How it is won (round R4, A7): its placeholders are its numeric conditions, filled with their min (else max). */
+  readonly howKey: string;
   readonly conditions?: AwardConditions;
   readonly fallback?: boolean;
 }

@@ -124,7 +124,7 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
         for (const word of words) {
           const span = document.createElement('span'); span.textContent = word + ' '; overlay.appendChild(span);
           const duration = Math.max(90, word.length * 40);
-          const a = span.animate(mode==='full'?[{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0)' }]:[{opacity:0},{opacity:1}], { delay: mode === 'full' ? delay : 0, duration: mode === 'full' ? duration : 150, fill: 'both' });
+          const a = span.animate(mode==='full'?[{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }, { opacity: 1, clipPath: 'inset(0)' }]:[{opacity:0},{opacity:1}], { delay: mode === 'full' ? delay : 0, duration: mode === 'full' ? duration : 150, fill: 'backwards' });
           tails.current.push(() => a.cancel()); delay += duration + 40;
         }
         note.style.visibility = 'hidden'; note.parentElement?.appendChild(overlay);

@@ -114,7 +114,23 @@ export interface IncomingPaper {
   readonly paper: string | null;
 }
 
+/** How long the new month's papers take to land on the old stack: three drops of 0.4 s, 60 ms apart (ui/desk/css/scenes.css). */
+const DROP_MS = 520;
+const stay = (): void => {};
+
 export const Papers = memo(function Papers({ papers, incoming }: { papers: PapersModel | null; incoming: IncomingPaper | null }) {
+  // Papers never blink out (round R4, A3d): at a month change the new month's papers drop onto the old stack, which
+  // stays under them, inert, until it is covered; reduced motion crossfades them in 0.2 s, and with motion off they swap.
+  const [under, setUnder] = useState<PapersModel | null>(null);
+  const before = useRef(papers);
+  useLayoutEffect(() => {
+    const was = before.current;
+    before.current = papers;
+    if (!was || !papers || was.turn === papers.turn || motionMode() === 'off') return;
+    setUnder(was);
+    const timer = window.setTimeout(() => setUnder(null), motionMode() === 'reduced' ? 200 : DROP_MS);
+    return () => window.clearTimeout(timer);
+  }, [papers?.turn]);
   // The paper in front for this month: the last one a play brought forward or the player pulled forward.
   const [chosen, setChosen] = useState<{ turn: number; paper: string } | null>(null);
   const turn = papers?.turn ?? 0;
@@ -138,7 +154,14 @@ export const Papers = memo(function Papers({ papers, incoming }: { papers: Paper
   return (
     <>
       <div className="baseShadow" />
-      <div className="news" data-hook="papers" data-front={front} ref={news}>
+      {under && (
+        <div className="news under" aria-hidden="true">
+          {under.pages.map((page) => (
+            <Paper key={page.paper} page={page} pos={[under.lead, ...under.pages.map((p) => p.paper).filter((p) => p !== under.lead)].indexOf(page.paper)} forward={stay} label={under.forwardLabel} />
+          ))}
+        </div>
+      )}
+      <div className={`news${under ? ' dropping' : ''}`} data-hook="papers" data-front={front} ref={news}>
         {papers.pages.map((page) => (
           <Paper key={page.paper} page={page} pos={order.indexOf(page.paper)} forward={forward} label={papers.forwardLabel} />
         ))}

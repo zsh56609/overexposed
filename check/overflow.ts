@@ -195,7 +195,9 @@ const TITLE_AUDIT = `window.__titleAudit = (where) => {
     const r = document.createRange(); r.selectNodeContents(tname); const g = S(r.getBoundingClientRect());
     if (g.l < 0 || g.r > 1280 || g.t < 0) add('the name runs off the stage at ' + [g.l, g.t, g.r, g.b].map(Math.round));
   } else add('no name');
-  const parts = [['slogan', '.slogan'], ['endings found', '.found'], ['links', '.tlinks'], ['BEGIN', '.begin']].map(([w, sel]) => [w, t.querySelector(sel)]);
+  // The foot's counts (round R4, A7): the endings found and the awards won, a row each, as one block.
+  const parts = [['slogan', '.slogan'], ['endings and awards', '.counts'], ['links', '.tlinks'], ['BEGIN', '.begin']].map(([w, sel]) => [w, t.querySelector(sel)]);
+  for (const row of t.querySelectorAll('.counts .found')) holds(row, 'count row');
   for (const [w, el] of parts) { if (!el) { add('no ' + w); continue; } holds(el, w); within(el, w); }
   for (const l of t.querySelectorAll('.tlinks .link')) { holds(l, 'link'); within(l, 'link'); }
   const boxes = parts.filter(([, el]) => el).map(([w, el]) => [w, S(el.getBoundingClientRect())]);
@@ -235,13 +237,18 @@ const ALL_FACES = `(async () => {
   document.head.appendChild(still);
   const issues = [];
   let groups = 0;
-  for (const layout of ['hand5', 'hand8', 'offer']) {
-    const n = window.__faces.show(layout, 0);
-    for (let g = 0; g < n; g++) {
-      window.__faces.show(layout, g);
-      groups++;
-      await sleep(40);
-      issues.push(...__faceAudit(layout + ' ' + g), ...(layout === 'offer' ? __plainAudit(layout + ' ' + g) : __deskAudit(layout + ' ' + g)));
+  // Every face before a lane is established, then in a music year and a screen year (round R4, A8): a screen card in
+  // a music year shows its own clapperboard, a music card in a screen year its note (or its variant's clapperboard).
+  for (const lane of [null, 'music', 'screen']) {
+    for (const layout of ['hand5', 'hand8', 'offer']) {
+      const n = window.__faces.show(layout, 0, lane);
+      for (let g = 0; g < n; g++) {
+        window.__faces.show(layout, g, lane);
+        groups++;
+        await sleep(40);
+        const where = layout + ' ' + g + (lane ? ' (' + lane + ' year)' : '');
+        issues.push(...__faceAudit(where), ...(layout === 'offer' ? __plainAudit(where) : __deskAudit(where)));
+      }
     }
   }
   return { groups, cards: window.__faces.cards.length, issues };
@@ -333,6 +340,9 @@ const DRIVE = (runs: number) => `(async () => {
   const panel = async (opener, id, where = id) => {
     const b = document.querySelector(opener); if (!b) return;
     b.click(); await shown('.p-' + id); plain(where);
+    // The scrapbook's second page (round R4, A7): the awards, as plaques.
+    const awards = document.querySelector('.p-' + id + ' .tab[data-tab="awards"]');
+    if (awards) { awards.click(); await sleep(30); plain(where + ' (awards)'); }
     document.querySelector('.p-' + id + ' .closeb').click(); await shown('.p-' + id, false);
   };
   const deck = async () => { seen.deckViews++; await panel('.desk .deckbtn', 'deck'); };

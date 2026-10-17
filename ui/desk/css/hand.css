@@ -146,7 +146,7 @@
 /* The floating previews (the plain previews, dressed for the desk): a newsprint slip above the hand. */
 .desk .floating { position: absolute; z-index: 90; pointer-events: none; }
 /* One way to appear (round R1, H4): the stat bar's tooltip's rise and fade, after a brief delay; a quick fade out. */
-.desk .floating.in { animation: desk-pop-in .15s ease-out 70ms both; }
+.desk .floating.in { animation: desk-pop-in .15s ease-out 70ms backwards; }
 .desk .floating.out { animation: desk-pop-out .1s ease-in both; }
 @keyframes desk-pop-in { from { opacity: 0; transform: translateY(5px); } }
 @keyframes desk-pop-out { to { opacity: 0; } }

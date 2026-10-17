@@ -351,19 +351,24 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
 /** How the month's bubbles come (round R3, C1): once its hand is dealt and the desk is still, one by one. */
 const REVEAL = { first: 250, next: 380 } as const;
 
+/** The phone's screen lights once — v18's own glow, never a whole-phone filter (V1b; on its own at signing, R4 A2). */
+export function glowPhone(desk: Element | null): Animation[] {
+  const screen = desk?.querySelector('.phone .phone-screen');
+  if (!desk || !screen) return [];
+  const shadow = getComputedStyle(screen).boxShadow;
+  return [screen.animate([{ boxShadow: shadow }, { boxShadow: desk.classList.contains('crisis') ? 'inset 0 0 24px rgba(255,120,100,.5)' : 'inset 0 0 22px rgba(170,205,255,.35)', offset: 0.2 }, { boxShadow: shadow }], 450)];
+}
+
 /**
- * A message comes in (V1b): the phone shakes and its screen lights — v18's own glow, never a whole-phone filter.
- * Its animations, for the next action to finish with the rest of the messages (round R3, C1).
+ * A message comes in (V1b): the phone shakes and its screen lights. Its animations, for the next action to finish
+ * with the rest of the messages (round R3, C1).
  */
 function buzz(desk: Element | null): Animation[] {
   const phone = desk?.querySelector('.phone');
   if (!desk || !phone) return [];
   const own = getComputedStyle(phone).transform;
   const shake = phone.animate([{ transform: own }, { transform: `${own} translateX(3px)`, offset: 0.2 }, { transform: `${own} translateX(-2px)`, offset: 0.4 }, { transform: own }], 450);
-  const screen = phone.querySelector('.phone-screen');
-  if (!screen) return [shake];
-  const shadow = getComputedStyle(screen).boxShadow;
-  return [shake, screen.animate([{ boxShadow: shadow }, { boxShadow: desk.classList.contains('crisis') ? 'inset 0 0 24px rgba(255,120,100,.5)' : 'inset 0 0 22px rgba(170,205,255,.35)', offset: 0.2 }, { boxShadow: shadow }], 450)];
+  return [shake, ...glowPhone(desk)];
 }
 
 /**

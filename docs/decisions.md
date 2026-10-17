@@ -6,6 +6,83 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R4, Part A: what the author found in v0.3
+
+- **A1, hovers ease.** An entrance animation that kept filling its last
+  frame overrode the element's own transition: the manager cards' and the
+  bubbles' hovers snapped, the manager heading and footer vanished in one
+  frame at signing, the unsigned card dimmed in one. The rule: an
+  entrance's rest style is its visible end state, so an entrance fills
+  backwards — its first frame during its delay, never its last after it
+  ends. Every entrance in ui/ changed (bubbles, the reaction row, the
+  previews, the desk coming up, the papers dropping, the manager cards
+  and heading, an event's messages, the panels, the title's photograph,
+  name and flashes, the opening card, the ink). Kept: exits whose element
+  is removed when they end (the preview's, the overlays', the title's
+  going, the white flash, the ink going, the bulbs going out), and the
+  awards night's `.rv`, whose rest style hides it until `.shown`.
+  check:interactions hovers a manager card, an offer, a hand card, a
+  paper, a sticky note, a bubble and a door in full motion: 60 ms after
+  each one's transition delay its transform lies strictly between its rest
+  and its hover.
+- **A2, signing** (replaces R3's B3), from the action, which the SIGNED
+  stamp sends 0.56 s after the click (`SIGN` in ui/timeline.ts): 0 s the
+  heading and footer fade (0.25 s) and the other card slides down off the
+  stage, 0.45 s ease-in, turning 7°, back at full opacity as it goes; 0.12 s
+  the signed card follows on its own side, its size unchanged, and the
+  phone glows once (the message glow, `glowPhone`); 0.6 s the dim lifts
+  (0.35 s); 0.75 s publish — the papers drop, the stat bar and notes come
+  up; 1.8 s settled, the offers coming up over their dim. Nothing flies
+  into the phone. Click to offers: about 2.45 s.
+- **A3, leaving and arriving over the desk.** What leaves leaves as one
+  piece, once; the dim never flickers; nothing blinks out.
+  - a: an answer is held to be read — until it has arrived (a text's pop,
+    0.28 s; a letter's outcome fade-in, 0.5 s), then 1.6 s and 0.1 s a word
+    (a run of letters or digits, `answerWords`). A click ends the hold.
+  - b: one exit, the overlay's (`Over`): the content — the phone with
+    everything on it, a letter, the offers, the doors, a season card, the
+    manager choice — goes down 40 px (a letter up) and fades, 0.4 s
+    ease-in; the event screen's own exit is gone. `eventClose` now starts
+    that exit and the month is published after it.
+  - c: the dim is one layer of its own (App's `dim-layer`). It comes up
+    with the first overlay and stays through the steps between overlays —
+    a door, an offer, an answer — until the month opens onto the desk,
+    when its state is published in play; signing is the exception.
+  - d: at a month change the new papers drop onto the old stack, which
+    stays under them, inert, until covered (`Papers`), in place of the old
+    stack going first.
+  - e: the offer taken flies to Deck & Discard (a copy of its face, 0.56 s;
+    `flyToDeck`), instead of vanishing with the screen.
+  - Reduced motion: no travel, crossfades of at most 0.2 s, the reading
+    hold kept; motion off: none.
+- **A4**: every season card's button and the opening card's read
+  "Continue".
+- **A5, the manager writes every month**: `messages.quietAfter` 0 reads as
+  "always" (core/manager.ts; validate allows 0), so a month in which
+  nothing else fires brings the quiet line for the fame band. sim:managers:
+  no month opens without a message under either manager (was 25–26 %);
+  the quiet lines rise from about 0.7 to 3.7–3.8 a run.
+- **A6**: the awards night's bottom block stands right-aligned on the
+  front pages' right edge (164 px in), the mirror of the manager's last
+  word on their left edge.
+- **A7, awards collected** (`overexposed.awardsWon`, guarded as the
+  endings are). The scrapbook has two pages, Endings and Awards, by tabs
+  in its head; it opens on Endings and its title counts the open page. The
+  awards page shows the seven as the night's plaques, four and three: won
+  bright, Winner and its citation; not yet won dimmed, "Not won yet", its
+  name and how it is won. `howKey` per award (`award.<id>.how`): its
+  placeholders are the award's numeric conditions, filled with their min
+  (else max); validate checks them. A plaque won for the first time says
+  "New"; the title and the awards night count "Awards won {n} / {total}"
+  under the endings found.
+- **A8, the craft icon follows the card** (`craftLane`, ui/desk/model.ts):
+  a music card's craft chips show the note, a screen card's the
+  clapperboard, whatever the career; a card shown as a lane variant takes
+  the variant's lane. Neutral and celebrity cards, the stat bar and the
+  doors keep the career's — the note before a lane is established. On every
+  face: the hand, the offers, the deck panel, the preview's needs and
+  results.
+
 ## 2026-10-17 — Round R3, amended: the title is one photograph
 
 The author, looking at the title mock: the desk is the game's busiest screen, so
@@ -1312,7 +1389,8 @@ changes in sim/out/baseline-v1a, not committed: `npm run sim`,
     runs.
   - `messages.quietAfter` is content, and set to 1. A month with no
     trigger after a silent month brings a quiet-month line: it fills the
-    second month of a two-month silence.
+    second month of a two-month silence. (Round R4, A5 sets it to 0:
+    every month.)
   - It fires about 0.7 times a run, in about half of all runs. Months
     without a message fall from 32% to 26%.
   - The band is the player's fame at the month's opening, from the new

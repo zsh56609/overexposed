@@ -155,7 +155,6 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const name = t(ev.speaker.nameKey ?? '');
   const label = ev.speaker.labelKey ? t(ev.speaker.labelKey) : null;
   const replied = beats.includes('eventReply');
-  const leaving = beats.includes('eventClose');
   const answer = chosen === null ? null : (views[chosen] ?? null);
   const onClickCapture = (e: MouseEvent) => {
     if (arrival.done || chosen !== null) return;
@@ -164,7 +163,7 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
     arrival.finish();
   };
   return (
-    <div className={`scr event-screen ev-text${leaving ? ' leaving' : ''}`} data-event={ev.id} data-form="text" data-arriving={arrival.done ? undefined : '1'} onClickCapture={onClickCapture}>
+    <div className="scr event-screen ev-text" data-event={ev.id} data-form="text" data-arriving={arrival.done ? undefined : '1'} onClickCapture={onClickCapture}>
       <div className="evcap">
         <small>{t('ui.event.kicker', { date: calendarLabel(c, s.turn), category: category ? t(category.nameKey) : ev.category })}</small>
         <b className={prose(t(ev.titleKey ?? ''))}>{t(ev.titleKey ?? '')}</b>
@@ -223,10 +222,9 @@ function LetterEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const head = paper ? mastheadName(c, paper) : t(ev.speaker.letterheadKey ?? '');
   const desk = paper ? `${t(ev.speaker.letterheadKey ?? '')} · ${calendarLabel(c, s.turn)}` : calendarLabel(c, s.turn);
   const sent = beats.includes('eventReply');
-  const leaving = beats.includes('eventClose');
   const answer = chosen === null ? null : (views[chosen] ?? null);
   return (
-    <div className={`scr event-screen ev-letter${leaving ? ' leaving' : ''}`} data-event={ev.id} data-form="letter">
+    <div className="scr event-screen ev-letter" data-event={ev.id} data-form="letter">
       <div className={`letter${paper ? ` lh-${paper}` : ' lh-house'}${ev.messageKeys.length >= 4 ? ' long' : ''}${chosen !== null ? ' done' : ''}${sent ? ' sent-on' : ''}`}>
         <div className="lhd">
           <b>{head}</b>

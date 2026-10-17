@@ -7,12 +7,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { lastWord, majorOf, rivalArc, seasonPages, yearAwards, type GameState } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
-import { recordEnding } from '../collection.ts';
+import { recordAwards, recordEnding } from '../collection.ts';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
 import { awardCitation, awardName, majorName, managerName, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
-import { FoundDots, prose } from './common.tsx';
+import { AwardDots, FoundDots, prose } from './common.tsx';
 
 /** How long the night's reveal runs (the mockup's sequence); a click during it shows everything at once. */
 const REVEAL_MS = 5200;
@@ -34,6 +34,8 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
   const id = s.endingId ?? '';
   const majorId = majorOf(c, id) ?? '';
   const [found] = useState(() => recordEnding(id));
+  // The awards, collected (round R4, A7): every one won is kept, and one won for the first time says so.
+  const [won] = useState(() => recordAwards(yearAwards(s)));
   const [revealed, setRevealed] = useState(() => motionMode() !== 'full');
   useEffect(() => {
     if (revealed) return;
@@ -96,6 +98,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
         {awards.map((award, i) => (
           <div key={award} className="pl rv" style={delay(2.45 + i * 0.3)} data-fit="1">
             <div className="t">{t('ui.awards.winner')}</div>
+            {won.fresh.has(award) && <span className="new">{t('ui.awards.new')}</span>}
             <div className={prose(awardName(c, award), 'n')}>{awardName(c, award)}</div>
             <div className={prose(awardCitation(c, award), 'c')}>{awardCitation(c, award)}</div>
           </div>
@@ -136,6 +139,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
           {t('ui.ending.playAgain')}
         </button>
         <FoundDots minors={c.minors} found={found} />
+        <AwardDots awards={c.awards} won={won.won} />
         <nav className="links">
           {openScrapbook && (
             <button className="link scrapbook-open" onClick={openScrapbook}>

@@ -40,14 +40,12 @@
    cards are dealt onto the desk. B3: after SIGNED the other card slides away (the signed one flies to the phone,
    Opening.tsx). */
 .manager-choice { overflow: hidden; color: #EDE6D6; }
-.manager-choice .mgHead, .manager-choice .mgFoot { animation: tr-dim .3s .1s ease-out both; transition: opacity .25s; }
-.manager-choice .biz { animation: tr-deal .5s cubic-bezier(.2, .7, .3, 1) both; }
+.manager-choice .mgHead, .manager-choice .mgFoot { animation: tr-dim .3s .1s ease-out backwards; transition: opacity .25s; }
+.manager-choice .biz { animation: tr-deal .5s cubic-bezier(.2, .7, .3, 1) backwards; }
 .manager-choice .biz:nth-child(1) { --deal-x: -260px; --deal-r: -14deg; animation-delay: .16s; }
 .manager-choice .biz:nth-child(2) { --deal-x: 260px; --deal-r: 14deg; animation-delay: .28s; }
 @keyframes tr-deal { from { opacity: 0; transform: translate(var(--deal-x, 0), 420px) rotate(var(--deal-r, 0)); } }
 .manager-choice.away .mgHead, .manager-choice.away .mgFoot { opacity: 0; }
-.manager-choice .biz.gone { animation: tr-away .4s ease-in forwards; }
-@keyframes tr-away { to { opacity: 0; transform: translateY(280px) rotate(12deg); } }
 .manager-choice .mgHead { position: absolute; left: 0; right: 0; top: 66px; text-align: center; z-index: 5; }
 .manager-choice .mgHead small { display: block; font-weight: 800; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #ffcf85; margin-bottom: 10px; }
 .manager-choice .mgHead h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 40px; color: #EDE6D6; line-height: 1.05; }
@@ -56,6 +54,13 @@
 .manager-choice .biz { position: relative; width: 360px; transition: transform .3s cubic-bezier(.25, .8, .3, 1), opacity .3s; }
 .manager-choice:not(.done) .biz:hover { transform: translateY(-12px); }
 .manager-choice.done .biz:not(.chosen) { opacity: .35; }
+/* Signing (round R4, A2): the other card slides down off the stage from where it lies, 0.45 s ease-in, turning a few
+   degrees, at full opacity until it is gone; 0.12 s later the signed one follows on its own side, its size unchanged. */
+.manager-choice .biz:nth-child(1) { --away-r: -7deg; }
+.manager-choice .biz:nth-child(2) { --away-r: 7deg; }
+.manager-choice.done .biz.gone { opacity: 1; transition: opacity .12s; animation: tr-away .45s ease-in forwards; }
+@keyframes tr-away { to { transform: translateY(640px) rotate(var(--away-r, 7deg)); } }
+:root[data-motion-resolved='reduced'] .manager-choice.done .biz.gone { animation: tr-out .2s ease-out forwards; }
 .manager-choice .bcard { display: flex; flex-direction: column; width: 100%; min-height: 262px; padding: 22px 24px; position: relative; text-align: left; box-shadow: 0 22px 34px rgba(0, 0, 0, .6); background: #f5ecda; color: #2a2018; transform: rotate(2deg); }
 .manager-choice .bcard::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: #c9a27a; }
 .manager-choice .m-veteran .bcard { background: #141414; color: #e8dcc0; transform: rotate(-2.5deg); }
@@ -161,11 +166,11 @@
 .awards-night .a-label, .awards-night .a-rev { position: absolute; left: 0; right: 0; z-index: 5; font-weight: 800; font-size: 10.5px; letter-spacing: .3em; text-transform: uppercase; color: #8a7d6c; }
 .awards-night .a-label { top: 266px; }
 .awards-night .plaques { position: absolute; left: 100px; right: 100px; top: 284px; z-index: 5; display: flex; justify-content: center; gap: 16px; }
-.awards-night .pl { flex: 0 1 226px; height: 124px; overflow: hidden; padding: 11px 16px; text-align: left; position: relative; background: linear-gradient(160deg, #2a2218, #15110c); border: 1px solid #6b5230; box-shadow: 0 12px 22px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(214, 180, 110, .12); }
-.awards-night .pl::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 0%, rgba(255, 220, 150, .18), transparent 60%); opacity: 0; pointer-events: none; }
-.awards-night .pl .t { font-size: 8.5px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: #d6b46e; }
-.awards-night .pl .n { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 17px; line-height: 1.1; color: #FFF3DC; margin-top: 4px; }
-.awards-night .pl .c { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 10.5px; line-height: 1.35; color: #bfb09a; margin-top: 5px; }
+:is(.awards-night, .ov .book) .pl { flex: 0 1 226px; height: 124px; overflow: hidden; padding: 11px 16px; text-align: left; position: relative; background: linear-gradient(160deg, #2a2218, #15110c); border: 1px solid #6b5230; box-shadow: 0 12px 22px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(214, 180, 110, .12); }
+:is(.awards-night, .ov .book) .pl::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 20% 0%, rgba(255, 220, 150, .18), transparent 60%); opacity: 0; pointer-events: none; }
+:is(.awards-night, .ov .book) .pl .t { font-size: 8.5px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: #d6b46e; }
+:is(.awards-night, .ov .book) .pl .n { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 17px; line-height: 1.1; color: #FFF3DC; margin-top: 4px; }
+:is(.awards-night, .ov .book) .pl .c { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 10.5px; line-height: 1.35; color: #bfb09a; margin-top: 5px; }
 .awards-night .a-rev { top: 420px; }
 .awards-night .review { position: absolute; left: 100px; right: 100px; top: 440px; z-index: 5; display: flex; justify-content: center; gap: 16px; }
 .awards-night .fp { flex: 0 0 226px; height: 112px; overflow: hidden; background: #EDE6D6; color: #15120E; padding: 9px 11px; position: relative; box-shadow: 0 12px 20px rgba(0, 0, 0, .6); text-align: left; }
@@ -181,21 +186,25 @@
 .awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 420px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
 .awards-night .lastword small { font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
 .awards-night .lastword .bub { max-width: 420px; background: #1f2a35; color: #eef3f6; font-size: 12px; line-height: 1.35; padding: 7px 12px; border-radius: 12px 12px 12px 3px; box-shadow: 0 6px 12px rgba(0, 0, 0, .4); }
-.awards-night .a-bottom { position: absolute; left: 680px; top: 568px; z-index: 5; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+/* The bottom block stands right-aligned on the front pages' right edge (round R4, A6): the mirror of the manager's last
+   word, which stands on their left edge. Four pages of 226 px, 16 px apart, centred: 164 px in from either side. */
+.awards-night .a-bottom { position: absolute; right: 164px; top: 568px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; text-align: right; }
 .scr .again { padding: 14px 42px; background: #EDE6D6; color: #15120E; font-weight: 800; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(255, 220, 160, .18); }
 .scr .again:hover { background: #ffcf85; }
 .awards-night .found b { color: #bfb3a0; }
+/* A plaque won for the first time (round R4, A7). */
+.awards-night .pl .new { position: absolute; right: 10px; top: 9px; padding: 2px 6px 1px; background: #ffcf85; color: #15120E; font-size: 8px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
 .awards-night .dots i { border-color: #bfb3a0; }
 .awards-night .dots i.f { background: #ffcf85; border-color: #ffcf85; }
-.awards-night .links { display: flex; gap: 20px; margin-top: -4px; }
+.awards-night .links { display: flex; justify-content: flex-end; gap: 20px; margin-top: -4px; }
 .awards-night .link { color: #8a7d6c; }
 .awards-night .link:hover { color: #ffcf85; }
 .awards-night .flashbulb { position: absolute; inset: 0; z-index: 9; background: #fff; opacity: 0; pointer-events: none; }
 /* The reveal, as the mockup sequences it; a click during it, or reduced motion, shows the night at once. */
 .awards-night.play .rv { opacity: 0; animation: awards-rise .7s ease-out both; }
 .awards-night.play .pl.rv { animation: awards-pop .6s cubic-bezier(.3, 1.5, .5, 1) both; }
-.awards-night.play .pl.rv::before { animation: awards-flash .9s ease-out both; animation-delay: inherit; }
-.awards-night.play .flashbulb { animation: awards-bulbs 3.4s linear both; }
+.awards-night.play .pl.rv::before { animation: awards-flash .9s ease-out backwards; animation-delay: inherit; }
+.awards-night.play .flashbulb { animation: awards-bulbs 3.4s linear backwards; }
 @keyframes awards-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes awards-pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes awards-flash { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
@@ -223,6 +232,19 @@
 /* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
 .ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; min-height: 540px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
 .ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 18px; }
+/* Its two pages (round R4, A7): tabs in its head; the awards as the night's plaques, four and three, not yet won dimmed. */
+.ov .book .pnh { align-items: flex-end; }
+.ov .book .tabs { display: flex; gap: 4px; margin-left: auto; margin-right: 18px; }
+.ov .book .tab { padding: 7px 14px 6px; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b9c4b6; border-bottom: 2px solid transparent; }
+.ov .book .tab.on { color: #f3ead4; border-bottom-color: #ffcf85; }
+.ov .book .tab:hover { color: #ffcf85; }
+.ov .book .awards-page { display: flex; flex-direction: column; gap: 18px; margin-top: 34px; }
+.ov .book .prow { display: flex; justify-content: center; gap: 16px; }
+.ov .book .pl { flex: 0 0 226px; height: 136px; }
+.ov .book .pl.dim { background: linear-gradient(160deg, #1c1a14, #12100c); border-color: #4a3d27; box-shadow: none; }
+.ov .book .pl.dim .t { color: #8f8470; }
+.ov .book .pl.dim .n { color: #b8ac97; }
+.ov .book .pl.dim .c { font-style: normal; font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 10.5px; color: #a89c87; }
 .ov .col h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; margin: 0 0 4px; color: #f3ead4; }
 .ov .col .gl { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; color: #b9c4b6; margin-bottom: 14px; min-height: 32px; }
 .ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 9px 10px 10px; margin-bottom: 17px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
@@ -266,10 +288,10 @@
 .event-screen .ph-top b { display: block; font-size: 14px; }
 .event-screen .ph-top small { display: block; font-size: 10.5px; color: #8fa1b2; }
 .event-screen .thread { flex: 1; min-height: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
-.event-screen .m { max-width: 80%; padding: 8px 11px; border-radius: 15px; font-size: 12.5px; line-height: 1.38; animation: ev-pop .28s ease-out both; }
+.event-screen .m { max-width: 80%; padding: 8px 11px; border-radius: 15px; font-size: 12.5px; line-height: 1.38; animation: ev-pop .28s ease-out backwards; }
 .event-screen .m.in { align-self: flex-start; background: #26303a; color: #eef3f6; border-bottom-left-radius: 4px; }
 .event-screen .m.out { align-self: flex-end; background: #2f6fd6; color: #fff; border-bottom-right-radius: 4px; }
-.event-screen .typing { flex: none; align-self: flex-start; background: #26303a; border-radius: 15px; padding: 10px 12px; display: flex; gap: 4px; animation: ev-pop .28s ease-out both; }
+.event-screen .typing { flex: none; align-self: flex-start; background: #26303a; border-radius: 15px; padding: 10px 12px; display: flex; gap: 4px; animation: ev-pop .28s ease-out backwards; }
 .event-screen .typing.late { animation-delay: 450ms; }
 .event-screen .typing i { width: 6px; height: 6px; border-radius: 50%; background: #8fa1b2; animation: ev-blink 1s infinite; }
 .event-screen .typing i:nth-child(2) { animation-delay: .15s; }
@@ -293,8 +315,6 @@
 .event-screen .rep .r-action svg { color: #ffd56b; }
 .event-screen .rep .r-later { color: #8fa1b2; }
 .event-screen .rep .needs { color: #ffb3a8; }
-.ev-text.leaving .phone-big { transition: transform .38s ease-in, opacity .38s ease-in; transform: translateY(90px) rotate(-1.5deg); opacity: 0; }
-.ev-text.leaving .evcap { transition: opacity .3s; opacity: 0; }
 /* A letter: it lands slightly turned; a letterhead in the sender's style, a typed body, the choices as tick boxes. */
 .event-screen .letter { position: absolute; left: 380px; top: 40px; width: 520px; min-height: 500px; display: flex; flex-direction: column; background: #faf7ef; color: #1c1712; padding: 30px 40px 32px; transform: rotate(1.2deg); box-shadow: 0 26px 40px rgba(0, 0, 0, .65); }
 .event-screen .letter::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #c8281c; }
@@ -337,20 +357,17 @@
 .event-screen .lout.on { opacity: 1; }
 .event-screen .sent { flex: none; margin-right: 6px; transform: rotate(-10deg) scale(1.8); border: 3px solid #1d4fb8; color: #1d4fb8; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 22px; letter-spacing: .14em; text-transform: uppercase; padding: 2px 12px; opacity: 0; transition: opacity .3s cubic-bezier(.3, 1.5, .5, 1), transform .3s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
 .event-screen .letter.sent-on .sent { opacity: .85; transform: rotate(-10deg) scale(1); }
-.ev-letter.leaving .letter { transition: transform .38s ease-in, opacity .38s ease-in; transform: translateY(-70px) rotate(4deg); opacity: 0; }
 /* Reduced motion: no travel, crossfades only. */
-:root[data-motion-resolved='reduced'] .ev-text.leaving .phone-big { transform: rotate(-1.5deg); }
-:root[data-motion-resolved='reduced'] .ev-letter.leaving .letter { transform: rotate(1.2deg); }
 @keyframes ev-pop { from { opacity: 0; transform: translateY(8px); } }
 @keyframes ev-blink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
 
 /* ---------------------------------------------------------------- One set of transitions (round R3, B4–B5)
    The panels open as everything over the desk opens: the dim 0.2 s, the content 0.25 s; they close in 0.15 s. The
    awards night comes up out of the dark the last door left. */
-.scr.ov > .scrim { animation: tr-dim .2s ease-out both; }
-.scr.ov > :not(.scrim) { animation: tr-rise .25s ease-out both; }
+.scr.ov > .scrim { animation: tr-dim .2s ease-out backwards; }
+.scr.ov > :not(.scrim) { animation: tr-rise .25s ease-out backwards; }
 .scr.ov.leaving { animation: tr-out .15s ease-in forwards; pointer-events: none; }
-.scr.awards-night { animation: tr-up .6s ease-out both; }
+.scr.awards-night { animation: tr-up .6s ease-out backwards; }
 @keyframes tr-up { from { opacity: 0; } }
 :root[data-motion-resolved='reduced'] .scr.awards-night { animation-duration: .2s; }
 :root[data-motion='off'] .scr.ov, :root[data-motion='off'] .scr.awards-night { animation: none !important; }

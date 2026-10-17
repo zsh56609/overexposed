@@ -1,9 +1,10 @@
 // Every card face of the content, for check:overflow (round R1, H2): a group at a time in the real hand — five
 // cards, and a crowded eight — and in an offer of four at 1.1×, on the game's own stage. The page is driven from the
-// check: window.__faces.show('hand5' | 'hand8' | 'offer', group) renders a group and reports how many groups there
-// are. Dev-only: Vite serves it, the build never includes it.
+// check: window.__faces.show('hand5' | 'hand8' | 'offer', group, lane) renders a group in a year of that lane (none,
+// music or screen: round R4, A8 — a screen card in a music year shows its own clapperboard) and reports how many
+// groups there are. Dev-only: Vite serves it, the build never includes it.
 
-import { useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInitialState } from '../../core/index.ts';
 import { content } from '../content.ts';
@@ -22,20 +23,20 @@ const SIZE: Record<Layout, number> = { hand5: 5, hand8: 8, offer: 4 };
 
 const state = createInitialState(1, content, { strict: true });
 const ids = (Array.isArray(content.cards) ? content.cards : []).map((card) => card.id);
-let shown: { layout: Layout; group: number } = { layout: 'hand5', group: 0 };
+let shown: { layout: Layout; group: number; lane: string | null } = { layout: 'hand5', group: 0, lane: null };
 const listeners = new Set<() => void>();
 const words = (): HandWords => ({ callsheet: t('ui.face.callsheet'), revision: t('ui.face.revision'), pass: t('ui.face.pass'), cross: t('ui.face.cross'), opportunity: t('ui.face.opportunity'), scandal: '', noActions: '' });
 void Desk; // the desk's styles: the hand's faces live under .desk .hand
 
 declare global {
   interface Window {
-    __faces: { show(layout: Layout, group: number): number; cards: readonly string[] };
+    __faces: { show(layout: Layout, group: number, lane?: string | null): number; cards: readonly string[] };
   }
 }
 window.__faces = {
   cards: ids,
-  show(layout, group) {
-    shown = { layout, group };
+  show(layout, group, lane = null) {
+    shown = { layout, group, lane };
     for (const fn of listeners) fn();
     return Math.ceil(ids.length / SIZE[layout]);
   },
@@ -49,7 +50,7 @@ function Faces() {
     },
     () => shown,
   );
-  const [lane] = useState<string | null>(null);
+  const lane = now.lane;
   const size = SIZE[now.layout];
   const cards = ids.slice(now.group * size, now.group * size + size).map((id, i) => offerCardModel(state, id, lane, i + 1));
   if (now.layout === 'offer')

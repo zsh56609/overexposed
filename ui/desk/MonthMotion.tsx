@@ -113,7 +113,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         });
       }
       if(beat.kind==='date') animate(root.querySelector('[data-hook="date"]'),[{transform:'rotateX(0)'},{transform:'rotateX(90deg)',offset:.5},{transform:'rotateX(0)'}],520);
-      if(beat.kind==='publish') root.querySelectorAll('.pp').forEach(p=>animate(p,[{opacity:0},{opacity:1}],800));
+      // The month's papers drop onto the old stack as it is published (round R4, A3d: ui/desk/Papers.tsx).
       // The last door (round R3, B5): the bulbs go out in quick succession, then the room goes dark.
       if(beat.kind==='lightsOut') {root.classList.add('lights-out');cleanups.current.push(()=>root.classList.remove('lights-out'));}
       if(beat.kind==='dark') {root.classList.add('dark');cleanups.current.push(()=>root.classList.remove('dark'));}

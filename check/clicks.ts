@@ -89,7 +89,7 @@ const DRIVE = (runs: number) => `(async () => {
     // A season's card, the opening's included (round R3): its button.
     season: ['.season-card .into'],
     credits: ['.p-credits .closeb', '.p-credits a'],
-    scrapbook: ['.p-scrapbook .closeb'],
+    scrapbook: ['.p-scrapbook .closeb', '.p-scrapbook .tab'],
     settings: ['.p-settings .closeb', '.p-settings .srow'],
     deck: ['.p-deck .closeb'],
     numbers: ['.p-numbers .closeb'],

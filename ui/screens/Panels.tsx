@@ -14,7 +14,7 @@ import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import { setSetting, useSettings, type Settings } from '../settings.ts';
 import type { PlayedStep } from '../queue.ts';
-import { cardName, flagName, money } from '../text.ts';
+import { awardCitation, awardHow, awardName, cardName, flagName, money } from '../text.ts';
 
 export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits' | 'numbers';
 
@@ -57,13 +57,14 @@ function Overlay({ id, label, overDesk, onClose, children }: { id: PanelId; labe
   );
 }
 
-function Head({ kicker, title, close, onClose }: { kicker: string; title: string; close: string; onClose: () => void }) {
+function Head({ kicker, title, close, onClose, tabs }: { kicker: string; title: string; close: string; onClose: () => void; tabs?: ReactNode }) {
   return (
     <div className="pnh">
       <div>
         <small>{kicker}</small>
         <b>{title}</b>
       </div>
+      {tabs}
       <button className="closeb" onClick={onClose}>
         {close}
       </button>
@@ -132,13 +133,54 @@ export function DeckPanel({ s, lane, season, words, onClose }: { s: GameState; l
 /** The clippings' tilts, as the mockup pins them. */
 const TILT = [-2, 1.5, -1, 2];
 
-export function ScrapbookPanel({ found, overDesk, onClose }: { found: ReadonlySet<string>; overDesk: boolean; onClose: () => void }) {
+/**
+ * The scrapbook: two pages, the endings found and the awards won (round R4, A7), switched by two tabs in its head; it
+ * opens on the endings, and its title counts the open page. The awards page shows all seven as the awards night's
+ * plaques, four and three: one won bright, Winner and its citation; one not yet won dimmed, its name and how it is won.
+ */
+export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: ReadonlySet<string>; awards: ReadonlySet<string>; overDesk: boolean; onClose: () => void }) {
   const { majors, minors } = content.endings;
+  const [page, setPage] = useState<'endings' | 'awards'>('endings');
   const n = minors.filter((m) => found.has(m.id)).length;
+  const list = content.awards ?? [];
+  const won = list.filter((a) => awards.has(a.id)).length;
+  const tabs = (
+    <nav className="tabs" role="tablist">
+      {(['endings', 'awards'] as const).map((id) => (
+        <button key={id} className={`tab${page === id ? ' on' : ''}`} role="tab" aria-selected={page === id} data-tab={id} onClick={() => setPage(id)}>
+          {t(id === 'endings' ? 'ui.scrapbook.tabEndings' : 'ui.scrapbook.tabAwards')}
+        </button>
+      ))}
+    </nav>
+  );
+  const title = page === 'endings' ? t('ui.scrapbook.title', { n, total: minors.length }) : t('ui.scrapbook.awardsTitle', { n: won, total: list.length });
   return (
     <Overlay id="scrapbook" label={t('ui.scrapbook.kicker')} overDesk={overDesk} onClose={onClose}>
-      <div className="book">
-        <Head kicker={t('ui.scrapbook.kicker')} title={t('ui.scrapbook.title', { n, total: minors.length })} close={t('ui.scrapbook.close')} onClose={onClose} />
+      <div className="book" data-page={page}>
+        <Head kicker={t('ui.scrapbook.kicker')} title={title} close={t('ui.scrapbook.close')} onClose={onClose} tabs={tabs} />
+        {page === 'awards' ? (
+          <div className="awards-page">
+            {[list.slice(0, 4), list.slice(4)].map((row, r) => (
+              <div key={r} className="prow">
+                {row.map((a) =>
+                  awards.has(a.id) ? (
+                    <div key={a.id} className="pl" data-award={a.id} data-fit="1">
+                      <div className="t">{t('ui.awards.winner')}</div>
+                      <div className="n">{awardName(content, a.id)}</div>
+                      <div className="c">{awardCitation(content, a.id)}</div>
+                    </div>
+                  ) : (
+                    <div key={a.id} className="pl dim" data-award={a.id} data-fit="1">
+                      <div className="t">{t('ui.scrapbook.notWon')}</div>
+                      <div className="n">{awardName(content, a.id)}</div>
+                      <div className="c">{awardHow(content, a.id)}</div>
+                    </div>
+                  ),
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="cols">
           {majors.map((major) => (
             <div key={major.id} className="col" data-major={major.id}>
@@ -164,6 +206,7 @@ export function ScrapbookPanel({ found, overDesk, onClose }: { found: ReadonlySe
             </div>
           ))}
         </div>
+        )}
       </div>
     </Overlay>
   );

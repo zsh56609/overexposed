@@ -5,7 +5,8 @@
 //
 // A month's messages arrive as it opens: the manager reacts to what the month before brought — its scandals,
 // its paper, the season's gate — and a new season opens with a check-in. The first month opens with the
-// opening line; a month nothing happened in, after two silent ones, brings a quiet-month line. Every message
+// opening line; a month nothing else fired in brings a quiet-month line (round R4, A5: `quietAfter` 0, always; a
+// number n keeps round 2c's rule, after n silent months). Every message
 // is two bubbles (round 2c): a one-bubble line takes a sign-off from the manager's pool for its mood. What the
 // year's last month brings is never messaged: the manager has the last word on the ending screen instead.
 
@@ -150,8 +151,9 @@ export function managerMessages(history: readonly HistoryStep[]): MonthMessages[
         const major = endingIfYearEndedNow(step.after)?.majorId;
         if (major) due.set('checkin', `checkin.${major}`);
       }
-      // A quiet month (round 2c): nothing fired, and the months before it were silent too.
-      const silent = months.length >= rules.quietAfter && months.slice(-rules.quietAfter).every((m) => m.messages.length === 0);
+      // A quiet month (round 2c): nothing fired, and the months before it were silent too. `quietAfter` 0 (round R4, A5)
+      // reads as "always": the manager writes every month. (`slice(-0)` would take every month, month 1's opening among them.)
+      const silent = rules.quietAfter === 0 || (months.length >= rules.quietAfter && months.slice(-rules.quietAfter).every((m) => m.messages.length === 0));
       if (due.size === 0 && silent) {
         const band = fameBand(c, fameTier(c, step.after.resources.hype));
         if (band) due.set('quiet', `quiet.${band}`);

@@ -112,12 +112,21 @@ each month end.
 
 ## Awards — `content/awards.json`
 
-`id`, `nameKey`, `citationKey`, and `conditions` — year conditions plus
-`ending` (`any`/`not` major or minor ids; a major matches each of its
-minors) — or `fallback: true`, won only when nothing else is. Every award
-whose conditions hold is won. /core's `yearAwards` is a read-only query
-on the final state, never a GameEvent. Awards change no play: outside the
-content budget, capped at 8.
+`id`, `nameKey`, `citationKey`, `howKey`, and `conditions` — year
+conditions plus `ending` (`any`/`not` major or minor ids; a major matches
+each of its minors) — or `fallback: true`, won only when nothing else is.
+Every award whose conditions hold is won. /core's `yearAwards` is a
+read-only query on the final state, never a GameEvent. Awards change no
+play: outside the content budget, capped at 8.
+
+`howKey` (round R4) is the line that says how it is won, in the
+scrapbook's awards page. Its placeholders are the award's numeric
+condition keys (`{hype}`, `{scandalDrop}`), each filled with that
+condition's `min` — its `max` when it has only a max — so a tuned number
+never needs new prose; an `ending` condition stays in words. validate
+checks the key and that every placeholder names a numeric condition of the
+award. The awards won are kept like the endings found, in this browser
+only (`overexposed.awardsWon`).
 
 ## The press — `content/press.json`
 
@@ -219,7 +228,8 @@ Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
   tier counted as over the line; `months`, how many month ends running);
   `hard`, the triggers or trigger line keys whose sign-off is from the hard
   pool; `quietAfter`, how many silent months before a month with no
-  trigger brings a quiet-month line. The quiet line's case is the fame band
+  trigger brings a quiet-month line — 0 (round R4) for every such month, so
+  the manager writes every month. The quiet line's case is the fame band
   (`rules.fameBands`) at the month's opening.
 
 /core's `managerMessages` derives each month's messages from the run's
@@ -296,7 +306,7 @@ Events have their own budget: 15.
 
 ## i18n keys
 
-The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `event.<id>.title` · `event.<id>.message.<n>` · `event.<id>.<a|b|c>.reply` · `event.<id>.<a|b|c>.outcome` · `event.<id>.<a|b|c>.press.<n>` · `event.speaker.<who>.name` · `event.speaker.<who>.label` · `event.letterhead.<house>` · `event.signoff.<who>` · `event.category.<category>.name` · `event.category.<category>.line` · `ui.<area>.<label>`
+The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `award.<id>.how` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `event.<id>.title` · `event.<id>.message.<n>` · `event.<id>.<a|b|c>.reply` · `event.<id>.<a|b|c>.outcome` · `event.<id>.<a|b|c>.press.<n>` · `event.speaker.<who>.name` · `event.speaker.<who>.label` · `event.letterhead.<house>` · `event.signoff.<who>` · `event.category.<category>.name` · `event.category.<category>.line` · `ui.<area>.<label>`
 
 ## What validate checks
 

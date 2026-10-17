@@ -48,6 +48,8 @@ function useTitlePhoto(): string | null {
 export interface TitleProps {
   readonly c: ContentIndex;
   readonly found: ReadonlySet<string>;
+  /** The awards won (round R4, A7), under the endings found. */
+  readonly won: ReadonlySet<string>;
   /** Under the opening card (B1): the photograph alone, dimmed, no flashes. */
   readonly dim?: boolean;
   /** Going to dark as the desk comes up (B2). */
@@ -60,7 +62,7 @@ export interface TitleProps {
   readonly credits: () => void;
 }
 
-export const TitleScreen = memo(function TitleScreen({ c, found, dim = false, out = false, busy = false, begin, scrapbook, settings, credits }: TitleProps) {
+export const TitleScreen = memo(function TitleScreen({ c, found, won, dim = false, out = false, busy = false, begin, scrapbook, settings, credits }: TitleProps) {
   const photo = useTitlePhoto();
   const n = c.minors.filter((m) => found.has(m.id)).length;
   return (
@@ -78,13 +80,23 @@ export const TitleScreen = memo(function TitleScreen({ c, found, dim = false, ou
         <h1 className="tname">{t('ui.title.name')}</h1>
         <div className="trule" />
         <p className="slogan">{t('ui.title.slogan')}</p>
-        <div className="found">
-          <span>{t('ui.title.found', { n, total: c.minors.length })}</span>
-          <span className="dots" aria-hidden="true">
-            {c.minors.map((m) => (
-              <i key={m.id} className={found.has(m.id) ? 'f' : undefined} />
-            ))}
-          </span>
+        <div className="counts">
+          <div className="found">
+            <span>{t('ui.title.found', { n, total: c.minors.length })}</span>
+            <span className="dots" aria-hidden="true">
+              {c.minors.map((m) => (
+                <i key={m.id} className={found.has(m.id) ? 'f' : undefined} />
+              ))}
+            </span>
+          </div>
+          <div className="found awardsrow">
+            <span>{t('ui.title.awards', { n: c.awards.filter((a) => won.has(a.id)).length, total: c.awards.length })}</span>
+            <span className="dots" aria-hidden="true">
+              {c.awards.map((a) => (
+                <i key={a.id} className={won.has(a.id) ? 'f' : undefined} />
+              ))}
+            </span>
+          </div>
         </div>
         <nav className="tlinks">
           <button className="link scrapbook-open" onClick={scrapbook}>

@@ -313,7 +313,9 @@ Guardian.
   mood — hard after bad news (the first scandal, a frenzy, stuck, a failed
   gate, a check-in on the Overexposed or Hard Way course), easy otherwise.
   A month nothing fired in, after a silent month, brings a quiet-month
-  line for the player's fame band (low, mid, high). The winter gate gets
+  line for the player's fame band (low, mid, high). Round R4: every month
+  nothing fired in brings it (`quietAfter` 0), so the manager writes every
+  month. The winter gate gets
   no reaction; the manager has the last word on the ending screen instead,
   keyed by the major.
 

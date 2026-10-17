@@ -68,11 +68,12 @@ try {
   coverage.add(`${step.action?.type}->${step.after.phase}`);
   // An answer (round R2): the reply goes, theirs comes back, its effects land between the two and the phone going
   // down or the letter leaving; only then is it published. A scandal it adds is carried to the pile, never lifted.
-  // Round R3, Part B: signing plays out (the other card away, the signed one to the phone) before the month is
-  // published; the last door puts the lights out and the room dark before the awards night.
+  // Round R4, A2: signing plays out — the other card away, the signed one after it, the dim lifting — before the month
+  // is published; the step ends with the desk lit, the offers to come. The last door puts the lights out and the
+  // room dark before the awards night (R3, B5).
   if(step.action?.type==='CHOOSE_MANAGER'){
     const at=(k:string)=>plan.beats.find(b=>b.kind===k)?.at??-1;
-    assert.ok(at('signAway')===0&&at('signAway')<at('toPhone')&&at('toPhone')<at('publish'),'signing plays out of order');
+    assert.ok(at('signAway')===0&&at('signAway')<at('signedAway')&&at('signedAway')<at('undim')&&at('undim')<at('publish')&&at('publish')<at('settled'),'signing plays out of order');
     coverage.add('signing');
   }
   if(step.after.phase==='ended'){

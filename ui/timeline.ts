@@ -6,8 +6,9 @@
 // 6 s plus 0.6 s for each scandal after the first, and a season change 5.5 s from the door's choice (with its
 // ACCEPTED stamp). tools/pace.ts measures it over real reducer steps.
 import { getCard, getEvent, type GameEvent } from '../core/index.ts';
+import { t } from './i18n.ts';
 import type { MotionMode, PlayedStep } from './queue.ts';
-export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'signAway' | 'toPhone' | 'lightsOut' | 'dark' | 'settled';
+export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'signAway' | 'signedAway' | 'undim' | 'lightsOut' | 'dark' | 'settled';
 /** `slots`: an 'actions' beat's actions left this month, as an answer to an event leaves them (round R2). */
 export interface Beat { readonly at: number; readonly kind: BeatKind; readonly uid?: number; readonly event?: number; readonly bubble?: number; readonly resourceEvents?: readonly Extract<GameEvent,{type:'resource'}>[]; readonly slots?: number }
 export interface Timeline { readonly beats: readonly Beat[]; readonly duration: number; readonly incomingMessages: number; readonly existingMessages: number }
@@ -31,12 +32,15 @@ export const PACE = {
   lightsOut: 700, dark: 450,
 } as const;
 /**
- * Signing (round R3, B3): the other manager's card slides away, the signed one flies to the phone; the month's
- * papers drop onto the desk (they arrive as the state is published), then the offers.
+ * Signing (round R4, A2; it replaces R3's B3), from the action, which the SIGNED stamp sends 0.56 s after the click:
+ * the heading and the footer fade and the other card slides down off the stage; 0.12 s later the signed card follows
+ * on its own side, the phone glowing once — the manager lives there now; from 0.6 s the dim over the desk lifts
+ * (0.35 s); at 0.75 s the month is published — its papers drop, the stat bar and the notes come up — and the desk
+ * stays lit, on purpose, until the offers come up over their dim at 1.8 s.
  */
-export const SIGN = { toPhone: 250, publish: 750, settled: 1300 } as const;
+export const SIGN = { signed: 120, undim: 600, publish: 750, settled: 1800 } as const;
 function signTimeline(mode: MotionMode): Timeline {
-  const beats: Beat[] = [{ at: 0, kind: 'signAway' }, { at: SIGN.toPhone, kind: 'toPhone' }, { at: SIGN.publish, kind: 'publish' }, { at: SIGN.settled, kind: 'settled' }];
+  const beats: Beat[] = [{ at: 0, kind: 'signAway' }, { at: SIGN.signed, kind: 'signedAway' }, { at: SIGN.undim, kind: 'undim' }, { at: SIGN.publish, kind: 'publish' }, { at: SIGN.settled, kind: 'settled' }];
   if (mode === 'reduced') return { beats: beats.map((b, i) => ({ ...b, at: i * 150 })), duration: (beats.length - 1) * 150, existingMessages: 0, incomingMessages: 0 };
   return { beats, duration: SIGN.settled, existingMessages: 0, incomingMessages: 0 };
 }
@@ -44,15 +48,24 @@ function signTimeline(mode: MotionMode): Timeline {
  * An event's answer (round R2, Part C): the player's bubble or tick, then — after a few typing dots — their reply,
  * or the SENT stamp and the outcome; the answer's effects land; the phone goes down, or the letter leaves; then
  * the month goes on (its offers, or its deal).
+ *
+ * Round R4, A3a: time to read the answer. The phone stays until their answer has finished arriving (its pop), then
+ * 1.6 s and 0.1 s for each word of it; a letter the same, from the end of its outcome line's 0.5 s fade-in. A click
+ * ends the hold at once (D7). Then, A3b, one exit: the content leaves as one piece (0.4 s; ui/style.css), and only
+ * after it is the month published.
  */
 export const EVENT_PACE = {
   replyText: 1300, replyLetter: 450,
   effectsLead: 250, effectGap: 120, carry: 620,
-  close: 900, closeHold: 380,
+  popText: 280, popLetter: 500, read: 1600, perWord: 100, exit: 400,
 } as const;
+/** A word of an answer: a run of letters or digits (round R4, A3a); emoji and punctuation don't count. */
+export const answerWords = (text: string): number => (text.match(/[\p{L}\p{N}]+/gu) ?? []).length;
 function eventTimeline(step: PlayedStep, mode: MotionMode, chosen: number): Timeline {
   const e = step.events[chosen];
-  const form = e?.type === 'eventChosen' ? getEvent(step.after.content, e.eventId)?.form : undefined;
+  const ev = e?.type === 'eventChosen' ? getEvent(step.after.content, e.eventId) : undefined;
+  const form = ev?.form;
+  const answer = e?.type === 'eventChosen' ? ev?.choices[e.choice]?.outcomeKey : undefined;
   const beats: Beat[] = [{at:0,kind:'eventSend'}];
   const reply = form === 'letter' ? EVENT_PACE.replyLetter : EVENT_PACE.replyText;
   beats.push({at:reply,kind:'eventReply'});
@@ -67,9 +80,11 @@ function eventTimeline(step: PlayedStep, mode: MotionMode, chosen: number): Time
     if(x.type==='slots') {beats.push({at,kind:'actions',slots:x.value,event:i});last=at;at+=EVENT_PACE.effectGap;}
     if(x.type==='addCard' && getCard(step.after.content,x.cardId)?.kind==='scandal') {beats.push({at,kind:'scandalCarry',uid:x.uid,event:i},{at:at+EVENT_PACE.carry,kind:'impact',uid:x.uid,event:i});last=at+EVENT_PACE.carry;at+=EVENT_PACE.effectGap;}
   }
-  const close = Math.max(reply+EVENT_PACE.close, last+200);
+  // Time to read their answer, then the one exit (round R4, A3a–b).
+  const read = (form === 'letter' ? EVENT_PACE.popLetter : EVENT_PACE.popText) + EVENT_PACE.read + EVENT_PACE.perWord * answerWords(answer ? t(answer) : '');
+  const close = Math.max(reply+read, last+200);
   beats.push({at:close,kind:'eventClose'});
-  const publishAt = close+EVENT_PACE.closeHold;
+  const publishAt = close+EVENT_PACE.exit;
   beats.push({at:publishAt,kind:'publish'});
   // The month's messages are the desk's own tails now (round R3, C1): no step holds input for them.
   const existingMessages=0, incomingMessages=0;
@@ -86,10 +101,16 @@ function eventTimeline(step: PlayedStep, mode: MotionMode, chosen: number): Time
   beats.push({at:done,kind:'settled'});
   beats.sort((a,b)=>a.at-b.at);
   if(mode==='reduced') {
-    // No travel: the reply still waits a moment to be read; everything else crossfades quickly.
-    let t=0,prev=0;
-    const reduced=beats.map((beat,i)=>{const gap=beat.at-prev;prev=beat.at;t+=beats[i-1]?.kind==='eventSend'?Math.min(500,gap):Math.min(150,gap);return {...beat,at:t};});
-    return {beats:reduced,duration:t,existingMessages,incomingMessages};
+    // No travel: the reply still waits a moment, and the answer its time to be read (A3a); everything else is quick.
+    let now=0,prev=0,replied=0;
+    const reduced=beats.map((beat,i)=>{
+      const gap=beat.at-prev;prev=beat.at;
+      if(beat.kind==='eventClose') now=Math.max(now+Math.min(150,gap),replied+read);
+      else now+=beats[i-1]?.kind==='eventSend'?Math.min(500,gap):Math.min(150,gap);
+      if(beat.kind==='eventReply') replied=now;
+      return {...beat,at:now};
+    });
+    return {beats:reduced,duration:now,existingMessages,incomingMessages};
   }
   return {beats,duration:done,existingMessages,incomingMessages};
 }

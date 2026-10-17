@@ -9,7 +9,7 @@ import type { EndTurnPreview, Outcome, PlayPreview } from '../preview.ts';
 import { blockerText, cardName, heatText, isPlaceholder, lineText, mastheadName, money } from '../text.ts';
 import { FaceLines, Value } from './Hand.tsx';
 import { Icon } from './Icons.tsx';
-import { actionChip, clauseChip, faceLines, outcomeChips, type ValueChip } from './model.ts';
+import { actionChip, clauseChip, craftLane, faceLines, outcomeChips, type ValueChip } from './model.ts';
 
 const prose = (text: string, base = ''): string => `${base}${isPlaceholder(text) ? ' placeholder' : ''}`.trim();
 
@@ -55,6 +55,8 @@ function PreviewHeadline({ c, p }: { c: ContentIndex; p: PlayPreview }) {
 }
 
 export function PlayPreviewView({ c, p, lane, slots }: { c: ContentIndex; p: PlayPreview; lane: string | null; slots: number }) {
+  // The card's own craft (round R4, A8): its needs and its results show the craft it builds, not the career's.
+  const own = craftLane(c, p.cardId, lane);
   if (!p.ok || !p.outcome || !p.lineAfter) {
     const scandal = getCard(c, p.cardId)?.kind === 'scandal';
     const text = scandal ? lineText(c, p.inHand, p.cardId) : '';
@@ -76,7 +78,7 @@ export function PlayPreviewView({ c, p, lane, slots }: { c: ContentIndex; p: Pla
             );
           if (b.code === 'requires')
             return b.clauses.map((clause, k) => {
-              const chip = clauseChip(clause, lane);
+              const chip = clauseChip(clause, own);
               if (!chip) return <p key={`${i}.${k}`}>{blockerText({ code: 'requires', clauses: [clause] })}</p>;
               return (
                 <p key={`${i}.${k}`} className="vals">
@@ -98,7 +100,7 @@ export function PlayPreviewView({ c, p, lane, slots }: { c: ContentIndex; p: Pla
   }
   // Story first, then the numbers, then the heat and any line crossing: a light warning only (decision 3).
   const crossing = Math.sign(p.linesCrossed);
-  const results = outcomeChips(c, p.outcome, lane, { slots: (p.slotsAfter ?? slots) - slots });
+  const results = outcomeChips(c, p.outcome, own, { slots: (p.slotsAfter ?? slots) - slots });
   return (
     <div className="preview">
       <PreviewHeadline c={c} p={p} />

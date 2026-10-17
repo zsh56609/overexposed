@@ -11,6 +11,7 @@ import {
   onceItem,
   onceKey,
   type AddCardZone,
+  type AwardDef,
   type ClauseReport,
   type Condition,
   type ContentIndex,
@@ -129,8 +130,21 @@ export const messageText = (managerId: string, m: ManagerMessage): string => mes
 /** The line for the manager's month-end perk (Mags's relief). */
 export const monthEndText = (line: MonthEndLine): string => t(line.key ?? `manager.${line.manager}.perk.monthEnd`);
 
-export const awardName = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
-export const awardCitation = (c: ContentIndex, id: string): string => t(c.awards.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
+/** An award's words: from the content index, or the raw content the panels hold (any `awards` list). */
+type Awarded = { readonly awards?: readonly AwardDef[] };
+export const awardName = (c: Awarded, id: string): string => t(c.awards?.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
+export const awardCitation = (c: Awarded, id: string): string => t(c.awards?.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
+/** How an award is won (round R4, A7): its line, each placeholder its numeric condition's min (its max if only a max). */
+export function awardHow(c: Awarded, id: string): string {
+  const award = c.awards?.find((a) => a.id === id);
+  const values: Record<string, number> = {};
+  for (const [key, test] of Object.entries(award?.conditions ?? {})) {
+    const range = test as { readonly min?: unknown; readonly max?: unknown };
+    const value = typeof range?.min === 'number' ? range.min : typeof range?.max === 'number' ? range.max : undefined;
+    if (value !== undefined) values[key] = value;
+  }
+  return t(award?.howKey ?? `award.${id}.how`, values);
+}
 /**
  * A line group's showing as words: the variant /core's shuffle bag picked from the run's history (decision 15,
  * revised) — the same in the preview and the feed. A group with no variants shows the card's name, loudly.

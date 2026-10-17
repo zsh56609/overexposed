@@ -1,5 +1,5 @@
 // A season's card (round R3, A2–A3): the month and year, the season's name, its opener — or, before the year,
-// spring's card with the opening's paragraphs. It waits for the player: it stays until "Into {season}" is
+// spring's card with the opening's paragraphs. It waits for the player: it stays until "Continue" (round R4) is
 // clicked. Its entrance is the month end's last beat (ui/timeline.ts), so a click during it only fast-forwards
 // (D7); once the button shows, the button is the next decision.
 
@@ -26,7 +26,7 @@ export function SeasonCard({ date, season, paragraphs, go }: SeasonCardProps) {
         </p>
       ))}
       <button className="go into" data-hook="into" onClick={go}>
-        {t('ui.season.go', { season: season.toLowerCase() })}
+        {t('ui.season.go')}
       </button>
     </div>
   );
