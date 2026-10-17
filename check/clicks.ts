@@ -77,9 +77,9 @@ const DRIVE = (runs: number) => `(async () => {
     return null;
   };
   // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
-  const screenOf = () => document.querySelector('.deck-viewer') ? 'deck' : document.querySelector('.plain.credits') ? 'credits' : document.querySelector('.plain.title') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  const screenOf = () => document.querySelector('.deck-viewer') ? 'deck' : document.querySelector('.plain.credits') ? 'credits' : document.querySelector('.plain.title, .title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
-    title: ['button.big', '.credits-open'],
+    title: ['button.big', '.title-screen .link'],
     credits: ['.plain.credits button'],
     manager: ['.manager-choice .choose'],
     draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn'],

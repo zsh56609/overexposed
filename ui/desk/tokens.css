@@ -1,7 +1,8 @@
 /* The desk's tokens (round V1a; docs/design/visual/README.md). Every colour the scene uses is named here,
    exactly as the README and the approved mockup (v18) give it; the component styles read these names. */
 
-.desk {
+/* The screens around the desk (round R1) read the same names. */
+.desk, .scr {
   /* The palette (AGENTS.md §6): newsprint cream, ink, tabloid red. */
   --cream: #EDE6D6;
   --ink: #15120E;

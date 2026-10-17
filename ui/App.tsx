@@ -35,6 +35,9 @@ import licenceUrl from './fonts/OFL.txt?url';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewDraftCard, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
+import { readFound, recordEnding } from './collection.ts';
+import { useFontsReady } from './screens/common.tsx';
+import { ManagerScreen, TitleScreen, type TitleLink } from './screens/Opening.tsx';
 import {
   awardCitation,
   awardName,
@@ -60,7 +63,6 @@ import {
   managerName,
   mastheadName,
   money,
-  openingText,
   resourceName,
   seasonName,
   signedAmount,
@@ -106,30 +108,21 @@ export function App() {
   return <Run key={run.id} run={run} onRestart={() => start(seedFromUrl() === null ? freshSeed() : ((seedFromUrl()! + run.id) >>> 0))} />;
 }
 
+/** The title (round R1, Part B): shown once the fonts are in; the run to come is chosen now, so the opening is its variant. */
 function Title({ onStart, error }: { onStart: (seed: number) => void; error: string | null }) {
+  const ready = useFontsReady();
   const urlSeed = seedFromUrl();
   // The run to come is chosen now, so the opening premise is that run's variant (decision 15, revised).
   const [seed] = useState(() => urlSeed ?? freshSeed());
-  const [credits, setCredits] = useState(false);
-  const opening = openingText(content, seed);
-  if (credits) return <Credits onClose={() => setCredits(false)} />;
+  const [found] = useState(readFound);
+  const [panel, setPanel] = useState<TitleLink | null>(null);
+  if (!ready) return <div className="scr title-screen" />;
+  if (panel === 'credits') return <Credits onClose={() => setPanel(null)} />;
   return (
-    <div className="plain full title">
-      <h1>{t('ui.title.name')}</h1>
-      <div className={prose(opening, 'opening')}>
-        {opening.split('\n\n').map((para, i) => (
-          <p key={i}>{para}</p>
-        ))}
-      </div>
-      <button className="big" onClick={() => onStart(seed)}>
-        {t('ui.title.newRun')}
-      </button>
-      {urlSeed !== null && <p className="muted">{t('ui.title.seed', { seed: urlSeed })}</p>}
-      {error && <p className="error">{error}</p>}
-      <button className="credits-open" onClick={() => setCredits(true)}>
-        {t('ui.title.credits')}
-      </button>
-    </div>
+    <>
+      <TitleScreen seed={seed} found={found} onBegin={() => onStart(seed)} open={setPanel} links={['credits']} />
+      {error && <p className="plain error-layer">{error}</p>}
+    </>
   );
 }
 
@@ -246,7 +239,13 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   );
 
   if (s.phase === 'ended') return <div className="plain full" data-presentation="ending" data-busy={snap.busy?'1':'0'} data-beat={snap.active?.beat??'idle'} data-step={snap.steps.length}><Ending s={s} steps={snap.steps} onRestart={onRestart} /></div>;
-  if (s.phase === 'manager') return <div className="plain full"><ManagerChoice s={s} legal={legal} act={act} error={error} /></div>;
+  if (s.phase === 'manager')
+    return (
+      <>
+        <ManagerScreen s={s} legal={legal} act={act} />
+        {error && <p className="plain error-layer">{t('ui.error.title')}: {error}</p>}
+      </>
+    );
 
   const endPreview = model.endPreview;
   const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
@@ -589,31 +588,6 @@ function DeckViewer({ s, onClose }: { s: GameState; onClose: () => void }) {
 // ---------------------------------------------------------------------------
 // Ending
 
-/** Where the endings collection is kept: found minor ids, this browser only (design §1.5). */
-const COLLECTION_KEY = 'overexposed.endingsFound';
-
-/**
- * Add this year's ending to the collection and return every minor found. A completion record only — it
- * changes nothing in play. Storage can be missing or refuse (private windows, blocked site data): the
- * collection then shows this run's ending alone, and never fails.
- */
-function recordEnding(minorId: string): ReadonlySet<string> {
-  let stored: string[] = [];
-  try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(COLLECTION_KEY) ?? '[]');
-    if (Array.isArray(parsed)) stored = parsed.filter((x): x is string => typeof x === 'string');
-  } catch {
-    // unreadable or unavailable: start from this run
-  }
-  const found = new Set([...stored, minorId]);
-  try {
-    localStorage.setItem(COLLECTION_KEY, JSON.stringify([...found]));
-  } catch {
-    // not saved; still shown
-  }
-  return found;
-}
-
 /** Endings found, grouped by major; the rest undiscovered. */
 function EndingsCollection({ c, found }: { c: ContentIndex; found: ReadonlySet<string> }) {
   const known = c.minors.filter((m) => found.has(m.id)).length;
@@ -635,41 +609,6 @@ function EndingsCollection({ c, found }: { c: ContentIndex; found: ReadonlySet<s
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// The manager (round 2b, C1): before month 1 the player chooses someone for their corner. Each card shows
-// who they are, their one perk — its name and its rule, plain like a card's — and how they text.
-
-function ManagerChoice({ s, legal, act, error }: { s: GameState; legal: Legal; act: (a: Action) => void; error: string | null }) {
-  const m = s.content.managers;
-  if (!m) return null;
-  return (
-    <div className="manager-choice">
-      <p className="kicker muted">{t(m.choice.kickerKey)}</p>
-      <h1>{t(m.choice.titleKey)}</h1>
-      <p className="subtitle">{t(m.choice.subtitleKey)}</p>
-      <div className="managers">
-        {m.managers.map((mg) => (
-          <button key={mg.id} className="manager choose" disabled={!legal.managers.has(mg.id)} onClick={() => act({ type: 'CHOOSE_MANAGER', managerId: mg.id })}>
-            <strong className="manager-name">{t(mg.nameKey)}</strong>
-            <span className="muted role">{t(mg.roleKey)}</span>
-            <em className="quote">{t(mg.quoteKey)}</em>
-            <span className="description">{t(mg.descriptionKey)}</span>
-            <span className="tag muted">{t(mg.tagKey)}</span>
-            <span className="perk">
-              <strong>{t(mg.perk.nameKey)}</strong> <span>{t(mg.perk.effectKey)}</span>
-            </span>
-            <span className="sample">
-              <span className="muted">{t(mg.sample.labelKey)}</span> <span className="bubble">{t(mg.sample.key)}</span>
-            </span>
-          </button>
-        ))}
-      </div>
-      <p className="footer muted">{t(m.choice.footerKey)}</p>
-      {error && <p className="error">{error}</p>}
     </div>
   );
 }

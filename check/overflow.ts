@@ -148,8 +148,12 @@ const PLAIN = `window.__plainAudit = (where) => {
   const name = (el) => el.tagName.toLowerCase() + '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.');
   const text = (el) => ' "' + (el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 40) + '"';
   const clips = (el) => { const cs = getComputedStyle(el); return ['hidden', 'clip'].includes(cs.overflowX) || ['hidden', 'clip'].includes(cs.overflowY); };
-  for (const root of document.querySelectorAll('.stage .plain')) {
+  // The plain screens and the screens around the desk (round R1). Decoration (data-deco) may run off the stage on
+  // purpose, like the title's fan of cards; a box marked data-fit must hold its text.
+  for (const root of document.querySelectorAll('.stage :is(.plain, .scr)')) {
     for (const el of [root, ...root.querySelectorAll('*')]) {
+      if (el.closest('[data-deco]')) continue;
+      if (el.matches('[data-fit]') && (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1)) add('does not hold its text: ' + name(el) + ' ' + el.scrollWidth + 'x' + el.scrollHeight + ' in ' + el.clientWidth + 'x' + el.clientHeight + text(el));
       const r = el.getBoundingClientRect();
       if (r.width < 1 || r.height < 1) continue;
       const cs = getComputedStyle(el);

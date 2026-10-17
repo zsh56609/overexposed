@@ -6,6 +6,30 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part B: the title and the manager choice
+
+- **As mockups/screens.html sets them**, every label verbatim: the title's
+  band, "FOUR SEASONS · ONE CAREER", the red rule, BEGIN, "Endings found
+  N / 14" with a dot per minor ending, and the fan of cards drawn in code;
+  the manager choice's two business cards on the vanity under the mirror.
+  Every manager line and the opening come from content. No seed on screen
+  (`?seed=` still replays one).
+- **The season label is the opening's own first paragraph** ("Spring.",
+  shown as SPRING.): the content's only opening begins with it, so a
+  separate label would have printed the season twice.
+- **The footer reads the mockup's "Click a card to sign."**, as the prompt
+  asks, instead of content's "Choose one."
+- **A choice wears its stamp before it is made**: SIGNED lands, the other
+  card fades, and the month begins 0.56 s later (0.15 s with reduced
+  motion; at once with motion off, as the audits run).
+- **The fonts load before the title shows** (a 3 s cap if one never
+  comes). The links to the scrapbook and settings arrive with Part G;
+  until then the title links to the credits.
+- The screens stand beside the desk under one root class (`.scr`), with
+  the desk's colour tokens; the overflow audit covers them, skips
+  decoration (`data-deco`), and checks boxes marked `data-fit` hold their
+  text.
+
 ## 2026-10-17 — Round R1, Part A: the hand's feel
 
 - **A card play holds input only until the card is set down and the fan
