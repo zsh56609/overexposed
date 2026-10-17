@@ -208,43 +208,36 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 
 **Tabloid / editorial. Card faces use the visual README §6 templates, including the code-drawn halftone headshot.** Presentation is scored on clarity as well as art; card text density is high.
 
-Illustration is concentrated at emotional beats:
-- **4 endings — required.** These are what players screenshot and what drives "one more run".
-- 4 season gates (one per season) — if time allows
-- Meltdown trigger — nice to have
-
-**Source: public-domain photo collage** (Library of Congress, Smithsonian Open Access, NYPL Digital Collections, Wikimedia Commons — PD only), recorded item by item in `CREDITS.md`: name / author / URL / licence / date. **Objects and scenes only — never recognisable faces**: PD photos of identifiable people still carry personality rights, and an unseen protagonist lets the player project themselves in. Newspaper photographs are drawn in code, never image files or generated images.
+**Every image is drawn in code** — the newspaper photographs, the headshot, the scenes around the desk — with AI assistance and no image-generation models: no image files, no public-domain photographs. Hand-painted illustration and the photo collage were cut for the jam (2026-10-17).
 
 **Palette:** newsprint cream `#EDE6D6` · ink `#15120E` · tabloid red `#D92B1F`. **Type:** Playfair Display (mastheads, headlines, card titles) and Libre Franklin (UI, numbers, body), self-hosted — the game loads no web fonts. Everything else — the scene, components, colours, behaviour: [`docs/design/visual/README.md`](docs/design/visual/README.md).
 
 **Motion is the art budget.** In this direction, juice is not decoration — without card flight, number roll-up, hit-stop and screen shake, the game reads as a spreadsheet. Budget real time for it.
 
-**Code-drawn scene art belongs to the visual rounds. Hand-painted illustration, if any, waits until 2026-10-26.** The visual work (type, palette, layout, texture, motion) runs alongside the content, not after the freeze — the order of work is in §7.
 
 ---
 
-## 7. Schedule (compressed — 5 days lost)
+## 7. Schedule (the order of work to the deadline, 2026-10-17)
 
 | Dates | Phase |
 |---|---|
-| 9/29–10/2 | `/core` + `/sim` running. **No UI.** |
-| 10/3–10/9 | Card pool draft + balance via sim |
-| 10/10–10/15 | React UI |
-| **10/15** | **Internal feature freeze — tuning and polish only after this** |
-| 10/16–10/25 | Early build to jam Discord; iterate on feedback |
-| **Week of 10/5** | **Submit an early build to itch as insurance** (see §10) |
-| 10/26–11/2 | Illustration + motion polish |
-| 11/3–11/4 | Buffer, itch page, submission materials |
+| 10/17–18 | R1: the screens around the desk, the hand's feel → **public early build on itch** |
+| 10/19–21 | R2: phase 3, events (prose comes as draft-v9) |
+| 10/22–23 | R3: fixes from play and feedback |
+| 10/24 | The playtest build on itch |
+| 10/25–31 | Polish, sound, a retune |
+| **11/1** | **Feature freeze** |
+| 11/2–3 | Fixes only, the itch page; **submit 11/3 JST** |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
-Progress runs ahead of this table: UI layer 1 was built on 2026-09-29. **The order of work (2026-10-01):** V1a (the desk, static) → V1b (the motion on the desk) → phase 3 (events) → V2 (the screens around the desk) → phase 4 (the year in review, the once-per-run variants, a full retune) → the feature freeze on 10/15. The current task is in [`docs/status.md`](docs/status.md).
+Cut for the jam: the 27 once-per-run variants; hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
 
 ### Scope control
 
 The failure mode is not running out of time; it's spending week five adding a system instead of tuning the loop.
 
 - Anything not required for a complete, tunable run goes to `BACKLOG.md`, not the build.
-- After 10/15: tuning, polish, fixes only.
+- After the 11/1 freeze: fixes only.
 
 ---
 
@@ -259,6 +252,12 @@ The failure mode is not running out of time; it's spending week five adding a sy
 | Ship | Browser build loads cold in under 10s and runs in Safari |
 
 "Do you want another run?" is a literal community rating criterion. Engagement is the primary gate.
+
+### Acceptance (2026-10-17)
+
+- **Every round:** build, typecheck, validate, `check:queue`, `check:preview`, `check:clicks` and `check:overflow` in Chromium at 1280×720 and 844×390; `sim:compare` whenever content or rules change.
+- **A release candidate** (once per public build): the same checks in Chromium, Firefox and WebKit at 1280×720, 800×450 and 844×390.
+- No CPU-throttled timing, video recordings, frame galleries, performance JSON or evidence folders — commit no more of them. A round's report is one Chinese markdown file in `docs/reports/`, under about 200 lines.
 
 ---
 
@@ -276,7 +275,7 @@ The repo is public and its history is evidence. The jam requires a signed attest
 
 There is **no official repo** — itch.io does not host code. Build on itch as a project page, then submit that project from the jam page. Put the GitHub link in the project description.
 
-**Submit an early build in the week of 10/5 and keep replacing it.** itch allows unlimited build updates until submissions close, so an early submission is insurance against anything going wrong on 11/4.
+**The public early build goes on itch after round R1 (10/18); keep replacing it.** itch allows unlimited build updates until submissions close, so an early submission is insurance against anything going wrong on 11/4.
 
 **Submission must include:**
 - [ ] Playable browser build (browser builds get the most plays and ratings)
@@ -285,7 +284,7 @@ There is **no official repo** — itch.io does not host code. Build on itch as a
 - [ ] One-line statement of intent — what it simulates and who it's for. Raters use it to judge the game on its own terms; write it deliberately.
 - [ ] Discord username matching the account in the server (**required**)
 - [ ] Credits for every third-party asset
-- [ ] AI content disclosure: code written with AI assistance (Claude Code and OpenAI Codex); player-facing text drafted with AI assistance; art public-domain/CC0; no generated images or audio
+- [ ] AI content disclosure: code written with AI assistance (Claude Code and OpenAI Codex); player-facing text drafted with AI assistance; all art drawn in code with AI assistance — no image-generation models, no public-domain images; no generated audio
 
 **Content standard: ESRB Teen or lower.** Build consequence systems around reputation and public fallout, never explicit content.
 
@@ -305,6 +304,7 @@ npm run build          # production browser build
 npm run sim            # headless balance run
 npm run validate       # content schema + i18n key check
 npm run typecheck
+npm run check:queue    # the event queue and the month-end timeline, on real reducer steps
 npm run check:preview  # every UI preview against the real reducer outcome, then check:clicks
 npm run check:clicks   # every legal action's control on the stage and hit at its centre; no click swallowed
 npm run check:overflow # every text at its longest, desk and plain screens (:full replays check/desk-states.json)
@@ -319,6 +319,6 @@ npm run tune:thresholds | tune:endings | tune:lanes | tune:try  # a content numb
 npm run desk:states | desk:shots | desk:compare | desk:perf | desk:photos | desk:sheet  # the desk's tools
 ```
 
-Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chromium, Firefox and Playwright WebKit at three sizes. Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).
+Every `sim` and `tune` script takes `--seed=` and `--manager=<id>` (without it, each manager in turn). The browser checks run Chromium, Firefox and Playwright WebKit at three sizes unless `--browsers=chrome --sizes=1280x720,844x390m` narrows them (every round; §8). Every tool and its options: [`docs/handoff/v1a.md`](docs/handoff/v1a.md#tools).
 
 Vite must be configured with `base: './'` — itch.io serves HTML5 from a relative path. This is the single most common cause of a blank page on itch.

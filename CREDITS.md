@@ -19,10 +19,10 @@ its title screen.
 
 ## Images
 
-None yet. The newspaper photographs are drawn in code and screened into
-halftone dots in the browser: no image files and no generated images. The
-public-domain photographs for the ending illustrations will be listed here,
-item by item, when they are added (from 2026-10-26).
+None. Every image in the game is drawn in code, with AI assistance: the
+newspaper photographs (screened into halftone dots in the browser), the
+headshot, the scenes and props. No image files, no image-generation models
+and no public-domain or other third-party images.
 
 ## Sound
 
