@@ -2,7 +2,8 @@
 // effect synthesized in code from a fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0), one at
 // a time, through two <audio> elements, each with its own gain into the module's music bus. Nothing sounds before the
 // first BEGIN click — browsers allow audio only after a gesture — and a play the browser refuses leaves the game
-// silent, never an error. With `?cues` in the URL every cue is logged on window.__cues for the checks (B7).
+// silent, never an error. With `?cues` in the URL every cue is logged on window.__cues for the checks (B7); with
+// `?mute` the sound never starts (the checks that replay a run: see startSound).
 
 import { OXSound, type OXAmbience } from './oxsound.js';
 import { settings, subscribeSettings } from '../settings.ts';
@@ -33,6 +34,7 @@ declare global {
   }
 }
 const LOG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('cues');
+const MUTE = typeof location !== 'undefined' && new URLSearchParams(location.search).has('mute');
 if (LOG) {
   window.__cues = [];
   window.__music = [];
@@ -119,6 +121,8 @@ let current: Track | null = null;
 const warmed = new Set<Track>();
 const failed = new Set<Track>();
 const url = (track: Track): string => `./audio/music/${track}.mp3`;
+/** An empty sound, for unlocking a player (`unlock`): no request, nothing heard. */
+const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
 
 /** The player not in use: the one fading out (`not`) keeps fading. */
 function player(not: Player | null): Player | null {
@@ -243,9 +247,29 @@ function visibility(): void {
   else if (on && settings().music) void on.el.play().catch(() => {});
 }
 
-/** The first BEGIN click (B1): the audio graph, from the gesture. Later calls do nothing. */
+/**
+ * Safari lets a media element play without a click only once it has played from one, so both players play the empty
+ * sound from BEGIN's click: the second's first track comes at a season change, with no click to start it.
+ */
+function unlock(): void {
+  player(null);
+  for (const p of players) {
+    if (p.track) continue;
+    p.el.src = SILENT;
+    void p.el.play().then(
+      () => p.el.pause(),
+      () => {},
+    );
+  }
+}
+
+/**
+ * The first BEGIN click (B1): the audio graph, from the gesture. Later calls do nothing. With `?mute` it never starts:
+ * the checks that replay a run race into its first seconds, while the module renders its samples on the main thread
+ * (long tasks of up to about 90 ms), and they measure motion and timing; the cues are still logged.
+ */
 export function startSound(): void {
-  if (live()) return;
+  if (live() || MUTE) return;
   try {
     ctx = OXSound.init();
   } catch {
@@ -255,6 +279,7 @@ export function startSound(): void {
   apply();
   subscribeSettings(apply);
   document.addEventListener('visibilitychange', visibility);
+  unlock();
 }
 
 /** Once the opening card has settled, never during BEGIN's flash: the sampled sounds, rendered ahead of first play. */

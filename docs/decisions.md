@@ -26,6 +26,32 @@ rules).
 - The module's own CommonJS guard (`typeof module !== 'undefined'`) draws
   one build warning, COMMONJS_VARIABLE_IN_ESM; it is harmless in the
   browser and the copy is never edited.
+- Found in the acceptance, and fixed:
+  - A3d's old stack of papers stayed 0.52 s after a D7 skip; a skip must land
+    the settled desk at once. `Papers` takes the queue's skip count: a skip
+    ends the drop, or never starts it. The drop is one of the desk's tails
+    too: it holds no input, and the next action lands it first — a season
+    card's Continue can be clicked 0.2 s after the papers start to drop.
+    check:motion's settled layouts wait for it (`.news.dropping`), as they
+    wait for the bubbles' arrival.
+  - Safari lets a media element play without a click only once it has played
+    from one, and the second music player's first track comes at a season
+    change. Both players play an empty sound (a data URI, no request) from
+    BEGIN's click.
+  - check:motion's cases at the last door compare the awards night across
+    passes, and A7's "New" shows only the first time: each pass now starts
+    from no awards collected.
+  - After BEGIN the module renders its sampled sounds in idle callbacks on
+    the main thread — 58 renders, three of each sampled sound and the rain;
+    Chrome measured long tasks of 83–95 ms among them. A replay races into a
+    run's first seconds while they run, and check:motion's busy long-press
+    failed twice on it. The checks' loader (`openReady`, so every replay)
+    adds `?mute`, which keeps the sound from starting (`startSound`); the
+    cues are still logged. The checks that hear the game load it as a player
+    does: check:clicks' runs, check:interactions' month, bubbles and hovers,
+    and the real-input run. Real play gives the renders the opening card's
+    reading time; moving them off the main thread is a change to the
+    author's module, so it is left to the author.
 
 ## 2026-10-18 — Round R4, Part C: answers to the R2 and R3 questions
 

@@ -7,8 +7,9 @@ const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.scr')?.textContent})`;
 async function waitIdle(page:Page) {
   // Round R3: the month's bubbles come as the desk's tails after a step (C1), and what leaves the desk fades for 0.15 s;
-  // a text's messages arrive one at a time (round R2) — all of them are settled layout.
-  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'||!!document.querySelector('.bubbles[data-revealing],.screen-over.leaving,.event-screen[data-arriving]')`)){
+  // a text's messages arrive one at a time (round R2); a month's papers drop onto the old stack (round R4, A3d), which
+  // can outlast a step whose season card waits — all of them are settled layout.
+  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'||!!document.querySelector('.bubbles[data-revealing],.screen-over.leaving,.event-screen[data-arriving],.news.dropping')`)){
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
 }
@@ -86,6 +87,12 @@ export async function checkMonthEntry(page:Page,url:string) {
   await page.click(640,350);await waitIdle(page);
   console.log(`month entry ${page.name}: ${exits} remaining cards animate before the stamp; skip settles`);
 }
+/**
+ * The awards collected (round R4, A7) say "New" only the first time they are won: a pass that reaches the awards night
+ * starts from none collected, so the night reads the same on every pass.
+ */
+const freshAwards=(page:Page)=>page.evaluate(`(() => { try { localStorage.removeItem('overexposed.awardsWon'); } catch {} })()`);
+
 export async function checkMonthInput(page:Page,url:string) {
   const states=loadStates();
   const qualifying=qualifyingMonths();
@@ -104,6 +111,7 @@ export async function checkMonthInput(page:Page,url:string) {
     if(process.argv.includes('--coverage-only')&&!['single-scandal','mags-relief'].includes(name))continue;
     let expected='';
     for(const mode of ['off','full','reduced','skip-early','skip-late']) {
+      await freshAwards(page);
       assert.equal(await reach(page,url,fixture,80),'ok',name);
       await page.evaluate(`document.documentElement.dataset.motion=${JSON.stringify(mode.startsWith('skip')?'full':mode)}`);
       const step=await page.evaluate<string>(`document.querySelector('.desk,[data-presentation]')?.dataset.step??''`);
@@ -206,11 +214,14 @@ export async function checkBoundaryInput(page:Page,url:string) {
     ['deal',{...states.early!,steps:states.early!.steps.slice(0,-1)},'.draft .take','deal'],
     ['winter-publication',{...winter,steps:winter.steps.slice(0,-1)},'.gates .take','publish'],
   ];
+  const fresh=()=>freshAwards(page);
   for(const [name,fixture,selector,beat] of cases){
     const selected=process.argv.find(a=>a.startsWith('--boundary='))?.slice(11);if(selected&&name!==selected)continue;
+    await fresh();
     assert.equal(await reach(page,url,fixture,80),'ok');
     await page.click(...(await centre(page,selector))!);await waitIdle(page);await page.move(10,100);await sleep(150);const expected=await page.evaluate<string>(settled);
     for(const input of ['click','Enter','Space']){
+      await fresh();
       assert.equal(await reach(page,url,fixture,80),'ok');
       if(input!=='click'&&!await page.evaluate<boolean>('document.hasFocus()')){console.log(`SKIP ${name} ${input} ${page.name}: headless keyboard focus`);continue;}
       await page.evaluate(`document.documentElement.dataset.motion='full'`);await page.click(...(await centre(page,selector))!);

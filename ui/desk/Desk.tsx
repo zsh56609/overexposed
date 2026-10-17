@@ -95,7 +95,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
       <div className="wallpaper" />
       <div className="lightpool" />
       {/* The night before the year (round R3): no papers and no notes until the manager is signed. */}
-      {game && <Papers papers={model.papers} incoming={incoming} />}
+      {game && <Papers papers={model.papers} incoming={incoming} skipped={snap.skipped} onTails={onTails} />}
       <Mirror mirror={game ? model.mirror : null} crisis={game && model.crisis} />
       <div className="floor" />
       <div className="deskscene">

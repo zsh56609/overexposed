@@ -61,7 +61,9 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
 let navigationId=0;
 /** Loads a page and waits until it is ready: by default the game's title (its BEGIN); `test` for another page. */
 export async function openReady(page:Page,url:string,test=`!!document.querySelector('.title-screen .begin')`):Promise<void> {
-  const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));
+  // Muted (round R4): a replay races into a run's first seconds, while the sound renders its samples on the main
+  // thread; the checks that hear the game (check:clicks, check:interactions' month) load it as a player does.
+  const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));target.searchParams.set('mute','1');
   await page.navigate(target.href,0);
   const start=Date.now();let last='';
   while(Date.now()-start<15000){

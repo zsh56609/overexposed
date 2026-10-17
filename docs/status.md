@@ -43,6 +43,9 @@ in code); the year in review as its own phase.
   only from a click, and Playwright's WebKit on Windows has no Web Audio, so the checks never heard it.
 - The sound's levels: the music's is one number, `MUSIC_GAIN` (0.25) in `ui/sound/sound.ts`; the effects' and the
   room's are the module's own.
+- The module renders its sampled sounds on the main thread after BEGIN: 58 renders in idle callbacks, long tasks of
+  83–95 ms among them in Chrome. Real play spends that time on the opening card; a fast clicker may feel a hitch in the
+  first seconds. Rendering them in a worker would end it — a change to the module, so the author's call.
 - A prose gap: Mags's month-end lines (`monthEnd:guardian`) have 3 variants and come 6.4 times a run; validate asks
   for 4. The 27 once-per-run groups stay cut for the jam.
 - The bubbles that went away (R3, C2): not reproduced. The bubbles now keep their own count, which only grows in a
@@ -68,6 +71,7 @@ node check/clicks.ts --browsers=chrome --sizes=1280x720,844x390m     # the every
 npm run check:preview -- --runs=300; npm run check:motion; npm run check:overflow:full   # release candidates
 npm run sim -- --seed=20260929                                       # and sim:awards, sim:tiers, sim:managers
 npm run sim:baseline -- --out=sim/out/<name>; npm run sim:compare -- <a> <b>
+?seed=123 replays a run; ?cues logs the sound's cues (window.__cues, window.__music); ?mute keeps the sound off
 ```
 
 Every command and tool: AGENTS.md §11 and [handoff/v1a.md](handoff/v1a.md#tools). Playwright (dev only) drives

@@ -121,19 +121,29 @@ export interface IncomingPaper {
 const DROP_MS = 520;
 const stay = (): void => {};
 
-export const Papers = memo(function Papers({ papers, incoming }: { papers: PapersModel | null; incoming: IncomingPaper | null }) {
+export const Papers = memo(function Papers({ papers, incoming, skipped = 0, onTails }: { papers: PapersModel | null; incoming: IncomingPaper | null; skipped?: number; onTails?: (settle: () => void) => () => void }) {
   // Papers never blink out (round R4, A3d): at a month change the new month's papers drop onto the old stack, which
   // stays under them, inert, until it is covered; reduced motion crossfades them in 0.2 s, and with motion off they swap.
+  // A D7 skip (`skipped`, the queue's count) lands them at once: the drop ends, or never starts, and nothing is under.
+  // The drop is one of the desk's tails (round R1, Part A): it holds no input, and the next action lands it first.
   const [under, setUnder] = useState<PapersModel | null>(null);
   const before = useRef(papers);
+  const skips = useRef(skipped);
   useLayoutEffect(() => {
     const was = before.current;
     before.current = papers;
+    const skip = skips.current !== skipped;
+    skips.current = skipped;
+    if (skip) {
+      setUnder(null);
+      return;
+    }
     if (!was || !papers || was.turn === papers.turn || motionMode() === 'off') return;
     setUnder(was);
     const timer = window.setTimeout(() => setUnder(null), motionMode() === 'reduced' ? 200 : DROP_MS);
     return () => window.clearTimeout(timer);
-  }, [papers?.turn]);
+  }, [papers?.turn, skipped]);
+  useLayoutEffect(() => (under && onTails ? onTails(() => setUnder(null)) : undefined), [under, onTails]);
   // The paper in front for this month: the last one a play brought forward or the player pulled forward.
   const [chosen, setChosen] = useState<{ turn: number; paper: string } | null>(null);
   const turn = papers?.turn ?? 0;
