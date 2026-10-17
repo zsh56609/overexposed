@@ -19,14 +19,20 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
     const history=snap.steps.filter(s=>s.id!==step.id);
     const lines={...readLines([...history,step]),lane:establishedLanes(history).at(-1)??null};
     const printed=pressLines([...history,step]);
+    // An event's answer (round R2): a scandal card it adds is held, not printed — no headline to lift, only the lay-down.
+    const chosen=step.events.findIndex(e=>e.type==='eventChosen');
+    const opens=step.events.findIndex((e,i)=>i>chosen&&(e.type==='draftOffer'||e.type==='turnStart'));
+    const fromEvent=(event:number)=>chosen>=0&&event>chosen&&(opens<0||event<opens);
     return step.events.flatMap((e,event)=>{
       if(e.type!=='addCard'||getCard(step.after.content,e.cardId)?.kind!=='scandal')return [];
-      const line=printed.find(l=>l.step===history.length&&l.event===event&&l.uid===e.uid);
-      if(!line) throw new Error(`Missing canonical scandal line ${step.id}:${event}:${e.uid}`);
       // Newly added discard cards have not had a draw. Show an approved in-hand variant from a
       // disposable counter fork, without consuming a real showing or inventing a draw event.
       const inHand=new Map(lines.inHand);if(!inHand.has(e.uid))inHand.set(e.uid,lines.counter.fork().inHand(e.cardId));
-      return [{uid:e.uid,card:cardModel(step.after,e,{...lines,inHand}),story:`${line.step}:${line.event}`,paper:line.paper,
+      const card=cardModel(step.after,e,{...lines,inHand});
+      if(fromEvent(event)) return [{uid:e.uid,card,story:null,paper:null,title:'',masthead:''}];
+      const line=printed.find(l=>l.step===history.length&&l.event===event&&l.uid===e.uid);
+      if(!line) throw new Error(`Missing canonical scandal line ${step.id}:${event}:${e.uid}`);
+      return [{uid:e.uid,card,story:`${line.step}:${line.event}` as string|null,paper:line.paper,
         title:lineText(step.after.content,line,e.cardId,line.subjectKey),masthead:line.paper?mastheadName(step.after.content,line.paper):''}];
     });
   },[step]);
@@ -134,9 +140,9 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
       const count=snap.steps.flatMap(s=>s.before?.turn===step.before?.turn?s.events.filter(e=>e.type==='play'):[]).length;
       const [x,y,rot]=PILE_SLOTS[Math.min(count+i,PILE_SLOTS.length-1)]!;
       return <div key={item.uid}>
-        <div data-flip={item.uid} className={`month-flip motion-face${stage==='scandalFlip'?' turned':''}${mode==='reduced'?' reduced':''}`} style={{left:cx-93,visibility:lifted?'visible':'hidden'}}>
+        {item.story!==null&&<div data-flip={item.uid} className={`month-flip motion-face${stage==='scandalFlip'?' turned':''}${mode==='reduced'?' reduced':''}`} style={{left:cx-93,visibility:lifted?'visible':'hidden'}}>
           <div className="month-flip-inner"><div className="month-headline"><small>{item.masthead}</small><b>{item.title}</b></div><div className="month-back"><CardPicture card={item.card} words={model.handWords} season={model.season}/></div></div>
-        </div>
+        </div>}
         <div className="scene3d month-carried motion-face" style={{visibility:carried?'visible':'hidden'}}><div className="plane" data-scandal-plane={item.uid} style={{transform:'rotateX(64deg)'}}><div style={{position:'absolute',transform:planeFace(x,y,rot)}}><CardPicture card={item.card} words={model.handWords} season={model.season}/></div></div></div>
       </div>;
     })}

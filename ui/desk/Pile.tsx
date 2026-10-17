@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { establishedLanes, readLines } from '../../core/index.ts';
+import { establishedLanes, getCard, readLines } from '../../core/index.ts';
 import type { Snapshot } from '../queue.ts';
 import { CardPicture } from './Hand.tsx';
 import { cardModel, type DeskModel } from './model.ts';
@@ -11,9 +11,20 @@ export function Pile({snap,model}:{snap:Snapshot;model:DeskModel}) {
     snap.steps.forEach((step,i)=> {
       if(step.events.some(e=>e.type==='turnEnd')) found.length=0;
       if(!step.before || step.before.turn!==snap.state.turn) return;
-      const event=step.events.findIndex(e=>e.type==='play'),played=step.events[event]; if(played?.type!=='play') return;
       const before=snap.steps.slice(0,i);
       const lines={...readLines(before),lane:establishedLanes(before).slice(-1)[0]??null};
+      // An event's answer (round R2): a scandal card it adds lies on this month's pile, laid there like a played card.
+      const chosen=step.events.findIndex(e=>e.type==='eventChosen');
+      if(chosen>=0) {
+        const opens=step.events.findIndex((e,j)=>j>chosen&&(e.type==='draftOffer'||e.type==='turnStart'));
+        step.events.forEach((e,event)=>{
+          if(event<=chosen||(opens>=0&&event>=opens)||e.type!=='addCard'||getCard(step.after.content,e.cardId)?.kind!=='scandal') return;
+          const inHand=new Map(lines.inHand);if(!inHand.has(e.uid))inHand.set(e.uid,lines.counter.fork().inHand(e.cardId));
+          found.push({face:cardModel(step.after,e,{...lines,inHand},true),step:step.id,event});
+        });
+        return;
+      }
+      const event=step.events.findIndex(e=>e.type==='play'),played=step.events[event]; if(played?.type!=='play') return;
       found.push({face:cardModel(step.before,played,lines,true),step:step.id,event});
     });return found;
   },[snap.steps,snap.state.turn]);

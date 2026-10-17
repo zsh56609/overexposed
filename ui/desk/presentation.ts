@@ -13,6 +13,8 @@ export function presentation(snap: Snapshot, model: DeskModel) {
   const published=!!active.published;
   const projection={...(published?step.after:base),resources};
   const stats=statBar(projection,model.lane==='early'?null:model.lane);
+  // An answer to an event that spends an action (round R2, C4): its bulb goes dark with the numbers, before publish.
+  const spent=published?undefined:elapsed.filter(b=>b.kind==='actions').at(-1)?.slots;
   const draws=step.events.filter(e=>e.type==='draw');
   const dealt=new Set(elapsed.filter(b=>b.kind==='deal').map(b=>b.uid));
   const hiddenCards=published?draws.filter(e=>!dealt.has(e.uid)).map(e=>e.uid):[];
@@ -22,5 +24,5 @@ export function presentation(snap: Snapshot, model: DeskModel) {
   const visibleBubbles=published && plan.incomingMessages>0 ? (lastBubble===undefined?plan.existingMessages*2:lastBubble+1):undefined;
   let managerCount=0;
   const phone=visibleBubbles===undefined?model.phone:{notes:model.phone.notes.filter(k=>k!=='mgr'||++managerCount<=Math.ceil(visibleBubbles/2))};
-  return {stats:outgoing||dealing?{...stats,actions:{...stats.actions,left:0}}:stats,phone,visibleBubbles,hiddenCards};
+  return {stats:outgoing||dealing?{...stats,actions:{...stats.actions,left:0}}:spent!==undefined?{...stats,actions:{...stats.actions,left:spent}}:stats,phone,visibleBubbles,hiddenCards};
 }

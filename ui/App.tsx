@@ -20,6 +20,7 @@ import { ManagerScreen, TitleScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
+import { EventScreen } from './screens/Events.tsx';
 
 // ---------------------------------------------------------------------------
 // Seeds: every run replays from its seed; ?seed=123 in the URL replays one.
@@ -229,6 +230,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     );
 
   const endPreview = model.endPreview;
+  // The answer to an event, while its step plays and before it is published (round R2, Part C).
+  const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' && !snap.active.published ? snap.active : null;
   const card = !snap.busy && focus?.kind === 'card' && s.hand.some((h) => h.uid === focus.uid) ? previewPlay(s, focus.uid, lines) : null;
 
   return (
@@ -253,6 +256,22 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
             <OffersScreen key={`${s.turn}:${s.draft.offer.join()}:${s.draft.picksLeft}`} s={s} legal={legal} act={act} lane={lines.lane} season={model.season} words={model.handWords} />
           )}
           {s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
+        </div>
+      )}
+      {/* An event (round R2, Part C): once the month end has settled, and while its answer plays, until it is published. */}
+      {s.phase === 'event' && (!snap.active || answering !== null) && (
+        <div className="screen-over">
+          <div className="screen-scrim" />
+          <EventScreen
+            key={`${s.turn}:${s.event}`}
+            s={s}
+            chosen={answering?.step.action?.type === 'CHOOSE_EVENT' ? answering.step.action.choice : null}
+            beats={answering?.plan ? answering.plan.beats.slice(0, (answering.index ?? 0) + 1).map((b) => b.kind) : []}
+            legal={legal}
+            act={act}
+            lines={lines}
+            lane={lines.lane}
+          />
         </div>
       )}
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}

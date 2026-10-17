@@ -368,7 +368,8 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
   });
   // The month's actions are all still ahead until it is played.
   const total = c.rules.slotsPerTurn;
-  const left = s.phase === 'play' ? s.slots : total;
+  // This month's actions show from its first decision on: in play, or once an event has been answered (round R2).
+  const left = s.phase === 'play' || s.eventLog.some((r) => r.turn === s.turn) ? s.slots : total;
   const actionsCell = cell('actions');
   const date = calendarDate(c, s.turn);
   return {
@@ -748,7 +749,7 @@ export const scandalChip = (delta: number): ValueChip => ({ kind: 'scandal', ico
  * the preview's own heat line — actions as the bulb, cards drawn as "Draw N", scandal cards added or removed as
  * the newspaper; what involves no number stays in words (a card added, a card removed, a flag set).
  */
-export function outcomeChips(c: ContentIndex, o: Outcome, lane: string | null, opts: { readonly heat?: boolean; readonly slots?: number } = {}): { readonly chips: ValueChip[]; readonly words: string[] } {
+export function outcomeChips(c: ContentIndex, o: Outcome, lane: string | null, opts: { readonly heat?: boolean; readonly slots?: number; readonly flags?: boolean } = {}): { readonly chips: ValueChip[]; readonly words: string[] } {
   const chips: ValueChip[] = [];
   const words: string[] = [];
   for (const target of ['hype', 'craft', 'capital', 'heat'] as const) {
@@ -764,8 +765,19 @@ export function outcomeChips(c: ContentIndex, o: Outcome, lane: string | null, o
   if (removed) chips.push(scandalChip(-removed));
   for (const a of o.added) if (!scandal(a.cardId)) words.push(tp('ui.face.add', 1, { count: 1, card: cardName(c, a.cardId), zone: zoneName(a.to) }));
   for (const id of o.exhausted) if (!scandal(id)) words.push(t('ui.preview.exhausted', { card: cardName(c, id) }));
-  for (const f of o.flags) words.push(t('ui.preview.flag', { flag: flagName(f) }));
+  if (opts.flags !== false) for (const f of o.flags) words.push(t('ui.preview.flag', { flag: flagName(f) }));
   return { chips, words };
+}
+
+/**
+ * An event's answer as chips from its content (round R2), for one that can't be chosen now — what it would do; an
+ * answer that can be chosen shows the reducer's outcome instead. An action as the bulb, a scandal card added as the
+ * newspaper; a flag it sets is "↺ remembered", never its name.
+ */
+export function eventEffectChips(c: ContentIndex, effects: readonly Effect[], lane: string | null): ValueChip[] {
+  return effects.flatMap((e): ValueChip[] =>
+    e.op === 'slots' ? [actionChip(e.value)] : e.op === 'addCard' && getCard(c, e.cardId)?.kind === 'scandal' ? [scandalChip(e.count ?? 1)] : e.op === 'setFlag' ? [] : effectChip(c, e, lane),
+  );
 }
 
 /** A requirement's threshold in icons ("★ 25+", "📰 1+"), as a face's "Needs" line shows it; null for one with no number. */

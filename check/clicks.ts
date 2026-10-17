@@ -5,7 +5,8 @@
 //
 // 1. Reachable controls (round V1a, after the author found the draft's offers pushed off its panel): in every
 //    state — the title and its credits, the manager choice, every draft (three offers and Dex's four, after an
-//    extra pick, after a reroll), the season doors, the hand, the deck viewer, the ending — every control for a
+//    extra pick, after a reroll), the season doors, every event (round R2: its replies, or its letter's tick
+//    boxes), the hand, the deck viewer, the ending — every control for a
 //    legal action lies inside the stage and is the element actually hit at its centre (elementFromPoint). A
 //    fanned card is hit at the centre of the strip of it the next card leaves showing, in its own tilted frame.
 //    A state with no control for any action fails too.
@@ -14,6 +15,9 @@
 //    reaches: END TURN at its centre and near each corner, a card across its visible strip, near its top, its
 //    middle and its lower edge. A hover that opens no preview fails too, so the check is never vacuous.
 // At every draft (round 2c): at most one extra card — Dex's — labelled with his line, the label inside its card.
+// Every event on its own page (round R2, check/events.html), and two at the schema's limits — three messages and
+// three replies, four paragraphs and three choices — with money and without: every reply it can afford is on the
+// stage, hit at its centre and sends itself; one it can't afford sends nothing.
 // The managers alternate run by run, so any two runs cover both. Transitions are switched off: the check
 // measures where things settle.
 //
@@ -41,7 +45,7 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const blocked = {};
   const note = (m) => { blocked[m] = (blocked[m] || 0) + 1; };
-  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0, settingsViews: 0 };
+  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0, settingsViews: 0, events: 0, unaffordable: 0 };
   const POINTS = [[0.5, 0.5], [0.12, 0.12], [0.88, 0.12], [0.12, 0.88], [0.88, 0.88]];
   const name = (el, cards, end) => (el === end ? 'END TURN' : 'card ' + (cards.indexOf(el) + 1) + ' of ' + cards.length);
   const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
@@ -78,7 +82,7 @@ const DRIVE = (runs: number) => `(async () => {
   };
   // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
   // A panel (round R1, Part G) is the screen while it is open: the deck, the scrapbook, House rules, the credits.
-  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
     title: ['button.big', '.title-screen .link'],
     credits: ['.p-credits .closeb', '.p-credits a'],
@@ -88,6 +92,7 @@ const DRIVE = (runs: number) => `(async () => {
     manager: ['.manager-choice .choose'],
     draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn', '.desk .setbtn'],
     doors: ['.gates .take', '.desk .deckbtn', '.desk .setbtn'],
+    event: ['.event-screen .choose'],
     hand: ['.desk .endbtn', '.desk .deckbtn', '.desk .setbtn'],
     ending: ['button.play-again', '.awards-night .link'],
   };
@@ -95,7 +100,7 @@ const DRIVE = (runs: number) => `(async () => {
     const screen = screenOf();
     const stage = document.querySelector('.stage').getBoundingClientRect();
     const inStage = (x, y) => x >= stage.left - 0.5 && x <= stage.right + 0.5 && y >= stage.top - 0.5 && y <= stage.bottom + 0.5;
-    const els = (CONTROLS[screen] ?? []).flatMap((sel) => [...document.querySelectorAll(sel)]).filter((el) => !el.disabled);
+    const els = (CONTROLS[screen] ?? []).flatMap((sel) => [...document.querySelectorAll(sel)]).filter((el) => !el.disabled && el.getAttribute('aria-disabled') !== 'true');
     const cards = screen === 'hand' ? [...document.querySelectorAll('.desk .hand .card')] : [];
     const playable = cards.filter((c) => c.getAttribute('aria-disabled') === 'false');
     if (screen === 'unknown') note('a state with no screen the check knows');
@@ -160,7 +165,7 @@ const DRIVE = (runs: number) => `(async () => {
   for (let run = 0; run < ${runs}; run++) {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
-      window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.hand')?.className};
+      window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.event-screen,.hand')?.className};
       stats.states++;
       reachable();
       if (document.querySelector('.manager-choice')) {
@@ -192,6 +197,14 @@ const DRIVE = (runs: number) => `(async () => {
       } else if (document.querySelector('.gates')) {
         const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled);
         take[rand(take.length)].click();
+      } else if (document.querySelector('.event-screen')) {
+        // An event (round R2): a reply it can afford; one it can't shows, disabled, and takes no click.
+        stats.events++;
+        const all = [...document.querySelectorAll('.event-screen .choose')];
+        const take = all.filter((b) => !b.disabled && b.getAttribute('aria-disabled') !== 'true');
+        if (take.length < all.length) stats.unaffordable++;
+        for (const off of all.filter((b) => !take.includes(b))) { off.click(); await sleep(2); if (!document.querySelector('.event-screen .choose')) note('a reply that cannot be afforded was taken'); }
+        if (take.length) take[rand(take.length)].click();
       } else {
         // Assertion 2: under every preview, every card and END TURN still takes the click.
         const cards = [...document.querySelectorAll('.desk .hand .card')];
@@ -232,7 +245,53 @@ const DRIVE = (runs: number) => `(async () => {
   return { ...stats, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
 })()`;
 
-type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; blocked: [string, number][] };
+/**
+ * Runs in the page (check/events.html): every event of the content, and the two at the schema's limits — three
+ * messages and three replies, four paragraphs and three choices — with money to spare and with none (round R2).
+ * Every reply it can afford is on the stage, hit at its centre, and its click sends that reply; one it can't
+ * afford shows, disabled, and its click sends nothing.
+ */
+const EVENT_PAGE = `(async () => {
+  document.documentElement.dataset.motion = 'off';
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let i = 0; i < 200 && !window.__events; i++) await sleep(20);
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  const blocked = [];
+  let replies = 0, disabled = 0, states = 0;
+  const n = window.__events.show(0, 'choices');
+  const stage = document.querySelector('.stage').getBoundingClientRect();
+  for (let i = 0; i < n; i++) for (const mode of ['choices', 'broke']) {
+    window.__events.show(i, mode);
+    await sleep(30);
+    states++;
+    const where = window.__events.ids[i] + ' ' + mode + ': reply ';
+    const all = [...document.querySelectorAll('.event-screen .choose')];
+    if (all.length === 0) blocked.push(where + 'none shown');
+    for (const el of all) {
+      const ok = !el.disabled && el.getAttribute('aria-disabled') !== 'true';
+      const r = el.getBoundingClientRect();
+      if (r.left < stage.left - 0.5 || r.top < stage.top - 0.5 || r.right > stage.right + 0.5 || r.bottom > stage.bottom + 0.5) blocked.push(where + el.dataset.choice + ' lies outside the stage');
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!top || !(top === el || el.contains(top))) { blocked.push(where + el.dataset.choice + ' is covered at its centre'); continue; }
+      const before = window.__events.acted.length;
+      top.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      await sleep(4);
+      const sent = window.__events.acted.slice(before);
+      if (ok) {
+        replies++;
+        if (sent.length !== 1 || sent[0].type !== 'CHOOSE_EVENT' || sent[0].choice !== Number(el.dataset.choice)) blocked.push(where + el.dataset.choice + ' sent ' + JSON.stringify(sent));
+      } else {
+        disabled++;
+        if (sent.length > 0) blocked.push(where + el.dataset.choice + ' cannot be afforded but sent ' + JSON.stringify(sent));
+      }
+    }
+  }
+  return { events: n, states, replies, disabled, blocked };
+})()`;
+
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; blocked: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false } });
 await server.listen();
@@ -254,10 +313,16 @@ try {
           .join(', ');
         console.log(
           `click-through check, ${tag}: ${out.runs} runs, ${out.states} states — ${out.controls} controls reached (${screens}; ${out.extraPicks} extra picks, ${out.rerolls} rerolls, ${out.deckViews} deck views, ${out.settingsViews} House rules over the desk), ` +
-            `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+            `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled), ${out.events} events (${out.unaffordable} with a reply they could not afford, which took no click) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
         );
         for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);
         if (out.blocked.length > 0 || out.runs < RUNS) failed = true;
+        // Every event on its own page (round R2): its replies, and one it can't afford.
+        await page.navigate(`${url}check/events.html`, 3000);
+        const ev = await auditStep<{ events: number; states: number; replies: number; disabled: number; blocked: string[] }>(page, `clicks ${tag} events`, EVENT_PAGE, 120_000);
+        console.log(`click-through check, ${tag}: ${ev.events} events (two at the limits) in ${ev.states} states — ${ev.replies} replies took their click, ${ev.disabled} it could not afford took none`);
+        for (const what of ev.blocked.slice(0, 20)) console.log(`BLOCKED events  ${what}`);
+        if (ev.blocked.length > 0 || ev.disabled === 0) failed = true;
       } finally {
         await page.close();
       }

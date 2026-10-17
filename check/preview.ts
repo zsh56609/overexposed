@@ -574,7 +574,8 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   const cash = bar.cells.find((x) => x.id === 'money');
   if (cash?.word !== money(s.resources.capital) || cash.number !== null) bad(`money shows ${cash?.word}, is ${money(s.resources.capital)}`);
   const total = c.rules.slotsPerTurn;
-  const left = s.phase === 'play' ? s.slots : total;
+  // This month's actions, from its first decision on: in play, or once its event is answered (round R2).
+  const left = s.phase === 'play' || s.eventLog.some((r) => r.turn === s.turn) ? s.slots : total;
   if (bar.actions.total !== total || bar.actions.left !== left) bad(`actions ${bar.actions.left} of ${bar.actions.total}, are ${left} of ${total}`);
   if (!bar.actions.tipHeader.endsWith(` · ${left} left`)) bad(`actions tooltip "${bar.actions.tipHeader}"`);
   if (bar.when.date !== CALENDAR[s.turn - 1] || bar.when.tipHeader !== bar.when.date || bar.when.tipLine !== dateLine(c, s.turn)) bad(`date ${bar.when.date}`);

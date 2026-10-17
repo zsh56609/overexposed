@@ -6,6 +6,57 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R2, Part C: the events on the desk
+
+- **A text** (README §9; mockups/vanity.html, "Event · text"): the desk
+  dims, the phone comes up large, the caption to its left — the date and
+  the category, the event's title, the category's line. The messages
+  arrive one at a time, each after 0.7 s of typing dots, 1.1 s apart, the
+  first 0.25 s in; the replies 0.4 s after the last. A click during the
+  arrival shows it all (D7); with motion reduced or off, all of it is there
+  at once.
+- **A letter** ("Event · letter"): it lands slightly turned, on the
+  paper's letterhead (its masthead, the desk and the date) or a house's
+  (its name in plain serif, the date). The body is typed in Courier New —
+  the mockup's face, a system font of the same widths on every machine,
+  so a letter breaks its lines alike everywhere. "Your reply" over tick
+  boxes with chips. The outcome and the SENT stamp share the letter's
+  foot, the stamp beside the words, never over them (the mockup's corner
+  stamp sat over a long outcome). A letter of four paragraphs — the
+  schema's most, which no event reaches yet — sits 14 px higher and sets
+  its body at 13 px so it stays on the stage; the content's letters keep
+  the mockup's sizes.
+- **Chips** (0.3): a reply the player can afford shows what the reducer
+  does — the outcome its preview would show, a bulb for an action, the
+  scandal for a scandal card; one they can't shows its effects as content
+  writes them, and "Needs …"; "↺ remembered" where it sets a flag an event
+  reads; "No cost" where it does nothing (the mockup's words).
+- **Answering is a step** (ui/timeline.ts `eventTimeline`, `EVENT_PACE`):
+  the player's bubble or the tick at once; their answer, or the SENT stamp
+  and the outcome, 1.3 s (a text) or 0.45 s (a letter) later; the answer's
+  effects from 0.25 s after that, 0.12 s apart — numbers roll, a bulb an
+  action spends goes dark (a new `actions` beat), a scandal card is
+  carried to this month's pile (0.62 s) as a month end's lands, without
+  the headline it never had; the phone goes down or the letter leaves
+  0.9 s after the answer, and after the last effect; the state is
+  published 0.38 s later and the month opens — the paper that printed the
+  answer in front, then the offers, the deal, the manager's messages.
+  Reduced motion: no travel, crossfades only, the answer still held up to
+  0.5 s to be read.
+- **This month's actions** show from its first decision on: an answer
+  spends them before the offers, so the bulbs show them through the draft.
+- **Checks**: a dev page (check/events.html) shows every event — with its
+  replies, with money at nothing so a reply that needs it shows disabled,
+  and answered — and two at the schema's limits built only from the
+  content's longest words (three messages and three replies; four
+  paragraphs and three choices). check:overflow audits each, and the events
+  met in its runs, with the event's own audit (the letter holds its words,
+  the caption stays clear of the phone, no words over other words);
+  check:clicks clicks every reply on the page (one the player can afford
+  sends itself, a disabled one nothing) and answers the events in its runs;
+  check:queue checks every answer's beats in order, with answers that add a
+  scandal and spend an action.
+
 ## 2026-10-17 — Round R2, Parts A, B and D: the event engine, the prose, the press
 
 - **The engine** (core/events.ts, core/reducer.ts; additive): a new phase

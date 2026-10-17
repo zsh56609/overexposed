@@ -14,6 +14,7 @@ import { Hand, type HandFocus } from './Hand.tsx';
 import { IconDefs } from './Icons.tsx';
 import { Mirror } from './Mirror.tsx';
 import { Papers, type IncomingPaper } from './Papers.tsx';
+import { eventPress } from '../../core/index.ts';
 import { paperForPlay, type DeskModel } from './model.ts';
 import { StatBar } from './StatBar.tsx';
 import { useSettings } from '../settings.ts';
@@ -60,7 +61,17 @@ export function Desk({ model, on, children, snap, onTails }: { model: DeskModel;
   const marks = useSettings().markStories;
   // The paper a play in flight brings forward (round R1, H3): read once, as the card lifts.
   const playing = snap.active && !snap.active.plan && snap.active.step.events.some((e) => e.type === 'play') ? snap.active.step : null;
-  const incoming = useMemo<IncomingPaper | null>(() => (playing ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing) } : null), [playing?.id]);
+  // An event's answer that prints (round R2, Part D): the paper that printed it is in front when the desk returns.
+  const answering = snap.active?.step.action?.type === 'CHOOSE_EVENT' ? snap.active.step : null;
+  const incoming = useMemo<IncomingPaper | null>(
+    () =>
+      playing
+        ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing) }
+        : answering?.action?.type === 'CHOOSE_EVENT'
+          ? { id: answering.id, paper: eventPress(answering.after.content, answering.before?.event ?? '', answering.action.choice)?.paper ?? null }
+          : null,
+    [playing?.id, answering?.id],
+  );
   return (
     <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}`} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />

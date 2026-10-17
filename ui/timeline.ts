@@ -5,10 +5,11 @@
 // dealt — so that, unskipped, a calm month end keeps the next decision waiting at most 4 s, a month with scandals
 // 6 s plus 0.6 s for each scandal after the first, and a season change 5.5 s from the door's choice (with its
 // ACCEPTED stamp). tools/pace.ts measures it over real reducer steps.
-import { getCard, managerMessages, type GameEvent } from '../core/index.ts';
+import { getCard, getEvent, managerMessages, type GameEvent } from '../core/index.ts';
 import type { MotionMode, PlayedStep } from './queue.ts';
-export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'seasonEnd' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'settled';
-export interface Beat { readonly at: number; readonly kind: BeatKind; readonly uid?: number; readonly event?: number; readonly bubble?: number; readonly resourceEvents?: readonly Extract<GameEvent,{type:'resource'}>[] }
+export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'seasonEnd' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'settled';
+/** `slots`: an 'actions' beat's actions left this month, as an answer to an event leaves them (round R2). */
+export interface Beat { readonly at: number; readonly kind: BeatKind; readonly uid?: number; readonly event?: number; readonly bubble?: number; readonly resourceEvents?: readonly Extract<GameEvent,{type:'resource'}>[]; readonly slots?: number }
 export interface Timeline { readonly beats: readonly Beat[]; readonly duration: number; readonly incomingMessages: number; readonly existingMessages: number }
 /** Every hold of the month end, in ms (round R2, 0.2). */
 export const PACE = {
@@ -26,7 +27,65 @@ export const PACE = {
   /** The manager's bubbles, after the issue is out (after the season's card in a new season). */
   messagesLead: 150, bubble: 380, bubbleHold: 450,
 } as const;
+/**
+ * An event's answer (round R2, Part C): the player's bubble or tick, then — after a few typing dots — their reply,
+ * or the SENT stamp and the outcome; the answer's effects land; the phone goes down, or the letter leaves; then
+ * the month goes on (its offers, or its deal).
+ */
+export const EVENT_PACE = {
+  replyText: 1300, replyLetter: 450,
+  effectsLead: 250, effectGap: 120, carry: 620,
+  close: 900, closeHold: 380,
+} as const;
+function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode, chosen: number): Timeline {
+  const e = step.events[chosen];
+  const form = e?.type === 'eventChosen' ? getEvent(step.after.content, e.eventId)?.form : undefined;
+  const beats: Beat[] = [{at:0,kind:'eventSend'}];
+  const reply = form === 'letter' ? EVENT_PACE.replyLetter : EVENT_PACE.replyText;
+  beats.push({at:reply,kind:'eventReply'});
+  // The answer's own effects, up to the month going on: numbers roll, a bulb dims, a scandal card is laid on the pile.
+  const rest = step.events.slice(chosen+1);
+  const open = rest.findIndex(x=>x.type==='draftOffer'||x.type==='turnStart');
+  const stop = chosen+1+(open<0?rest.length:open);
+  let at = reply+EVENT_PACE.effectsLead, last = at;
+  for(let i=chosen+1;i<stop;i++) {
+    const x = step.events[i]!;
+    if(x.type==='resource') {beats.push({at,kind:'resources',resourceEvents:[x],event:i});last=at;at+=EVENT_PACE.effectGap;}
+    if(x.type==='slots') {beats.push({at,kind:'actions',slots:x.value,event:i});last=at;at+=EVENT_PACE.effectGap;}
+    if(x.type==='addCard' && getCard(step.after.content,x.cardId)?.kind==='scandal') {beats.push({at,kind:'scandalCarry',uid:x.uid,event:i},{at:at+EVENT_PACE.carry,kind:'impact',uid:x.uid,event:i});last=at+EVENT_PACE.carry;at+=EVENT_PACE.effectGap;}
+  }
+  const close = Math.max(reply+EVENT_PACE.close, last+200);
+  beats.push({at:close,kind:'eventClose'});
+  const publishAt = close+EVENT_PACE.closeHold;
+  beats.push({at:publishAt,kind:'publish'});
+  const existingMessages=managerMessages(history).find(m=>m.turn===step.after.turn)?.messages.length??0;
+  const afterMessages=managerMessages([...history,step]).find(m=>m.turn===step.after.turn)?.messages.length??0;
+  const incomingMessages=Math.max(0,afterMessages-existingMessages);
+  let done = publishAt+PACE.noDeal;
+  const start = step.events.findIndex(x=>x.type==='turnStart');
+  if(start>=0) {
+    let drawCount=0;
+    step.events.slice(start).forEach((x,i)=>{
+      if(x.type==='draw') beats.push({at:publishAt+PACE.dealLead+drawCount++*PACE.dealCard,kind:'deal',uid:x.uid,event:start+i});
+      if(x.type==='resource') beats.push({at:publishAt+PACE.dealLead+Math.max(0,drawCount-1)*PACE.dealCard,kind:'resources',resourceEvents:[x],event:start+i});
+    });
+    done=publishAt+PACE.dealLead+Math.max(0,drawCount-1)*PACE.dealCard+PACE.dealHold;
+  }
+  for(let i=0;i<incomingMessages*2;i++) beats.push({at:publishAt+PACE.messagesLead+i*PACE.bubble,kind:'message',bubble:existingMessages*2+i});
+  if(incomingMessages) done=Math.max(done,publishAt+PACE.messagesLead+(incomingMessages*2-1)*PACE.bubble+PACE.bubbleHold);
+  beats.push({at:done,kind:'settled'});
+  beats.sort((a,b)=>a.at-b.at);
+  if(mode==='reduced') {
+    // No travel: the reply still waits a moment to be read; everything else crossfades quickly.
+    let t=0,prev=0;
+    const reduced=beats.map((beat,i)=>{const gap=beat.at-prev;prev=beat.at;t+=beats[i-1]?.kind==='eventSend'?Math.min(500,gap):Math.min(150,gap);return {...beat,at:t};});
+    return {beats:reduced,duration:t,existingMessages,incomingMessages};
+  }
+  return {beats,duration:done,existingMessages,incomingMessages};
+}
 export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode): Timeline | null {
+  const chosen = step.events.findIndex(e=>e.type==='eventChosen');
+  if(chosen>=0) return eventTimeline(step,history,mode,chosen);
   const end = step.events.findIndex(e=>e.type==='turnEnd');
   const start = step.events.findIndex(e=>e.type==='turnStart');
   const gate = step.events.some(e=>e.type==='gate');

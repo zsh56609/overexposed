@@ -12,7 +12,10 @@
 // - the plain screens of round V2 are audited (after the author found the draft's offers pushed off its panel):
 //   the title, its credits, the manager choice, every draft (after extra picks and rerolls too), the deck viewer,
 //   the season doors, the ending — nothing in them leaves the stage, and nothing is cut off by a box that hides
-//   its overflow.
+//   its overflow;
+// - the events (round R2): each one met in the runs, and every event of the content on its own page
+//   (check/events.html) with two more at the schema's limits — with its replies, with one it can't afford, and
+//   answered — on the stage, the letter holding its words, no words over other words.
 // With --replays, every state recorded in check/desk-states.json (the reference states, the biggest hand, a hand
 // for every card, every minor ending's screen) is replayed and audited too. Transitions are switched off: the
 // check measures where things settle.
@@ -42,7 +45,8 @@ const PATCH = `(async () => {
   window.__scenes = content.default.scripts.map((sc) => ({ heading: s[sc.headingKey], lines: sc.lines.map((l) => ({ kind: l.kind, text: s[l.key] })) }));
   const groups = new Map();
   for (const [k, v] of Object.entries(s)) {
-    if (typeof v !== 'string' || k.startsWith('script.')) continue;
+    // An event's messages are a sequence, not variants (round R2): the events page shows each as written.
+    if (typeof v !== 'string' || k.startsWith('script.') || (k.startsWith('event.') && k.includes('.message.'))) continue;
     const g = k.startsWith('press.subject.') ? 'press.subject.*' : k.replace(/\\.\\d+(?=\\.|$)/g, '.#');
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g).push(k);
@@ -211,6 +215,75 @@ const ALL_FACES = `(async () => {
   return { groups, cards: window.__faces.cards.length, issues };
 })()`;
 
+/**
+ * Runs in the page: an event's own audit (round R2, Part C) — the letter holds its words, the caption stays clear of
+ * the phone, and no words lie over other words (the SENT stamp included). Measured flat: the letter's and the
+ * phone's turn would swell every line's box into the next.
+ */
+const EVENTS = `window.__eventAudit = (where) => {
+  const out = [];
+  const add = (m) => out.push(where + ': ' + m);
+  const flat = document.createElement('style');
+  flat.textContent = '.event-screen .letter, .event-screen .phone-big { transform: none !important; }';
+  document.head.appendChild(flat);
+  try {
+    const screen = document.querySelector('.event-screen');
+    if (!screen) { add('no event screen'); return out; }
+    const shown = (el) => { for (let a = el; a && a !== document.body; a = a.parentElement) { const cs = getComputedStyle(a); if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return false; } return true; };
+    const inside = (r, b) => r.left >= b.left - 1 && r.top >= b.top - 1 && r.right <= b.right + 1 && r.bottom <= b.bottom + 1;
+    const meets = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    const words = (el) => ' "' + (el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 30) + '"';
+    const letter = screen.querySelector('.letter');
+    if (letter) {
+      const box = letter.getBoundingClientRect();
+      for (const el of letter.querySelectorAll('*')) { const r = el.getBoundingClientRect(); if (r.width >= 1 && r.height >= 1 && shown(el) && !inside(r, box)) add('off the letter:' + words(el)); }
+    }
+    const cap = screen.querySelector('.evcap'), phone = screen.querySelector('.phone-big');
+    if (cap && phone && meets(cap.getBoundingClientRect(), phone.getBoundingClientRect())) add('the caption runs into the phone');
+    const marks = [];
+    const walk = document.createTreeWalker(screen, NodeFilter.SHOW_TEXT);
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      if (!n.textContent.trim() || !shown(n.parentElement)) continue;
+      const range = document.createRange();
+      range.selectNodeContents(n);
+      for (const r of range.getClientRects()) if (r.width >= 1 && r.height >= 1) marks.push({ el: n.parentElement, node: n, r });
+    }
+    const stamp = screen.querySelector('.sent');
+    if (stamp && shown(stamp)) marks.push({ el: stamp, node: stamp, r: stamp.getBoundingClientRect() });
+    for (let i = 0; i < marks.length; i++) for (let j = i + 1; j < marks.length; j++) {
+      const a = marks[i], b = marks[j];
+      if (a.node === b.node || a.el.contains(b.el) || b.el.contains(a.el)) continue;
+      if (meets(a.r, b.r)) add('words overlap:' + words(a.el) + ' and' + words(b.el));
+    }
+  } finally { flat.remove(); }
+  return out;
+};`;
+
+/** Runs in the page (check/events.html): every event, and the two at the schema's limits, in each of its states. */
+const ALL_EVENTS = `(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  document.documentElement.dataset.motion = 'off';
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  const issues = [];
+  let shown = 0;
+  let disabled = 0;
+  const n = window.__events.show(0, 'choices');
+  for (let i = 0; i < n; i++) {
+    for (const mode of ['choices', 'broke', 'answered']) {
+      window.__events.show(i, mode);
+      await sleep(40);
+      const where = window.__events.ids[i] + ' ' + mode;
+      // Broke: only where a reply needs money, so one shows disabled with what it needs.
+      if (mode === 'broke') { if (!document.querySelector('.event-screen .choose.off')) continue; disabled++; }
+      shown++;
+      issues.push(...__plainAudit(where), ...__eventAudit(where));
+    }
+  }
+  return { events: n, shown, disabled, issues };
+})()`;
+
 /** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
 const DRIVE = (runs: number) => `(async () => {
   document.documentElement.dataset.motion = 'off';
@@ -242,7 +315,7 @@ const DRIVE = (runs: number) => `(async () => {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
-      const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : 'play';
+      const phase = document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
       window.__auditProgress = { run, guard, phase, states:seen.states, previews:seen.previews, tips:seen.tips };
       if (phase === 'manager') { plain('manager'); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));
@@ -258,6 +331,14 @@ const DRIVE = (runs: number) => `(async () => {
         continue;
       }
       if (phase === 'gate') { plain('doors'); const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
+      // An event (round R2): its screen audited, then a reply it can afford; while the answer plays, nothing to take.
+      if (phase === 'event') {
+        plain('event'); note(__eventAudit('event'));
+        const take = [...document.querySelectorAll('.event-screen .choose')].filter((b) => !b.disabled && b.getAttribute('aria-disabled') !== 'true');
+        if (take.length) take[rand(take.length)].click();
+        await sleep(6);
+        continue;
+      }
       const cards = [...document.querySelectorAll('.desk .hand .card')];
       seen.maxHand = Math.max(seen.maxHand, cards.length);
       for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await shown('.floating'); seen.previews++; note(__deskAudit('preview')); out(c); await shown('.floating', false); }
@@ -321,6 +402,7 @@ try {
         await auditStep(page, `${tag} longest-text patch`, PATCH);
         await page.evaluate(AUDIT);
         await page.evaluate(PLAIN);
+        await page.evaluate(EVENTS);
         const out = await auditStep<Out>(page, `${tag} ${RUNS} runs`, DRIVE(RUNS), 600_000);
         const screens = Object.entries(out.screens)
           .map(([k, n]) => `${k} ${n}`)
@@ -341,6 +423,16 @@ try {
         console.log(`overflow check, ${tag}: all ${faces.cards} faces in a hand of five, a hand of eight and an offer of four (${faces.groups} groups)`);
         for (const m of [...new Set(faces.issues)].slice(0, 20)) console.log(`OVERFLOW faces  ${m}`);
         if (faces.issues.length > 0) failed = true;
+        // Every event (round R2, Part C), and the two at the schema's limits — three messages and three replies, four
+        // paragraphs and three choices: with their replies, with one they can't afford, and answered.
+        await openReady(page, `${url}check/events.html`, `!!window.__events && !!document.querySelector('.event-screen')`);
+        await auditStep(page, `${tag} events patch`, PATCH);
+        await page.evaluate(PLAIN);
+        await page.evaluate(EVENTS);
+        const evs = await auditStep<{ events: number; shown: number; disabled: number; issues: string[] }>(page, `${tag} events`, ALL_EVENTS, 120_000);
+        console.log(`overflow check, ${tag}: ${evs.events} events (two at the limits) in ${evs.shown} states — with their replies, answered, and ${evs.disabled} with a reply they can't afford`);
+        for (const m of [...new Set(evs.issues)].slice(0, 20)) console.log(`OVERFLOW events  ${m}`);
+        if (evs.issues.length > 0) failed = true;
         if (REPLAYS) {
           let n = 0;
           let broke = 0;
