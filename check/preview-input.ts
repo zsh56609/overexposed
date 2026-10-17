@@ -6,7 +6,7 @@ const visible = (page: Page) => page.evaluate<boolean>(`!!document.querySelector
 const busy = (page: Page) => page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy==='1'`);
 async function card(page: Page, id: string) {
   const i = await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].findIndex(c=>c.dataset.card===${JSON.stringify(id)})`);
-  assert.ok(i >= 0, `missing ${id}`); return (await cardPoint(page, i, 40, 120))!;
+  assert.ok(i >= 0, `${id} is not in the hand: the recorded state's hand changed (npm run desk:states); pick a card it holds`); return (await cardPoint(page, i, 40, 120))!;
 }
 async function idle(page: Page) {
   const start = Date.now();
@@ -19,7 +19,7 @@ export async function checkPreviewInput(page: Page, url: string) {
     if(path==='keyboard' && !await page.evaluate<boolean>('document.hasFocus()')) { console.log(`SKIP preview keyboard ${page.name}: headless window has no focus`); continue; }
     await page.evaluate(`document.documentElement.dataset.motion='full'`);
     const before = await page.evaluate<string>(`document.querySelector('[data-hook="date"]').textContent`);
-    await page.click(...await card(page,'open_mic'));
+    await page.click(...await card(page,'side_gig'));
     await sleep(180);
     assert.equal(await visible(page),false,`${path}: busy preview under stationary pointer`);
     if (path==='moving') {

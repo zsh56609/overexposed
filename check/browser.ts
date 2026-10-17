@@ -29,7 +29,7 @@ export interface Page {
   /** A touch held down for `ms`, then lifted. */
   press(x: number, y: number, ms: number): Promise<void>;
   /** One key, by its name: 'Tab', 'Enter'. */
-  key(name: 'Tab' | 'Enter' | 'Space'): Promise<void>;
+  key(name: 'Tab' | 'Enter' | 'Space' | 'Escape'): Promise<void>;
   /** Chrome only: slows the CPU by `rate` (1 is off). */
   throttle(rate: number): Promise<void>;
   /** Separate Chromium diagnostic run, never enabled during frame acceptance measurements. */
@@ -223,7 +223,7 @@ async function launchChrome({ width, height, mobile = false }: { width: number; 
       await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     },
     async key(name) {
-      const code = name === 'Tab' ? 9 : name === 'Space' ? 32 : 13;
+      const code = name === 'Tab' ? 9 : name === 'Space' ? 32 : name === 'Escape' ? 27 : 13;
       await send('Input.dispatchKeyEvent', { type: 'keyDown', key: name === 'Space' ? ' ' : name, code: name, windowsVirtualKeyCode: code });
       await send('Input.dispatchKeyEvent', { type: 'keyUp', key: name === 'Space' ? ' ' : name, code: name, windowsVirtualKeyCode: code });
     },
@@ -429,7 +429,7 @@ async function startFirefox({ width, height }: { width: number; height: number }
       await pointer([at(x, y), { type: 'pointerDown', button: 0 }, { type: 'pause', duration: ms }, { type: 'pointerUp', button: 0 }], 'touch');
     },
     async key(name) {
-      const value = name === 'Tab' ? '\uE004' : name === 'Space' ? ' ' : '\uE007';
+      const value = name === 'Tab' ? '\uE004' : name === 'Space' ? ' ' : name === 'Escape' ? '\uE00C' : '\uE007';
       await send('input.performActions', { context, actions: [{ type: 'key', id: 'keyboard', actions: [{ type: 'keyDown', value }, { type: 'keyUp', value }] }] });
     },
     async throttle(rate) {

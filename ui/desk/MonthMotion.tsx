@@ -96,7 +96,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
           held++;if(!chip||!count)return;chip.classList.remove('none');count.textContent=String(held);
           const delta=document.createElement('span');delta.className='motion-delta delta-held';delta.textContent='+1';
           const r=chip.getBoundingClientRect();delta.style.left=`${(r.x+r.width/2-desk.x)/k}px`;host.current?.appendChild(delta);
-          const a=delta.animate([{opacity:0},{opacity:1,offset:.12},{opacity:0}],{duration:reduced?400:1350,fill:'forwards'});cleanups.current.push(()=>{a.cancel();delta.remove();});
+          animate(delta,[{opacity:0},{opacity:1,offset:.12},{opacity:0}],1350,0,'forwards');cleanups.current.push(()=>delta.remove());
         };
         root.querySelectorAll<HTMLElement>('.motion-pile .plane,[data-scandal-plane]').forEach((plane,i)=>{
           const face=plane.firstElementChild as HTMLElement|null;

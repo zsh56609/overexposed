@@ -351,16 +351,19 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
 /** How the month's bubbles come (round R3, C1): once its hand is dealt and the desk is still, one by one. */
 const REVEAL = { first: 250, next: 380 } as const;
 
-/** A message comes in (V1b): the phone shakes and its screen lights — v18's own glow, never a whole-phone filter. */
-function buzz(desk: Element | null) {
+/**
+ * A message comes in (V1b): the phone shakes and its screen lights — v18's own glow, never a whole-phone filter.
+ * Its animations, for the next action to finish with the rest of the messages (round R3, C1).
+ */
+function buzz(desk: Element | null): Animation[] {
   const phone = desk?.querySelector('.phone');
-  if (!desk || !phone) return;
+  if (!desk || !phone) return [];
   const own = getComputedStyle(phone).transform;
-  phone.animate([{ transform: own }, { transform: `${own} translateX(3px)`, offset: 0.2 }, { transform: `${own} translateX(-2px)`, offset: 0.4 }, { transform: own }], 450);
+  const shake = phone.animate([{ transform: own }, { transform: `${own} translateX(3px)`, offset: 0.2 }, { transform: `${own} translateX(-2px)`, offset: 0.4 }, { transform: own }], 450);
   const screen = phone.querySelector('.phone-screen');
-  if (!screen) return;
+  if (!screen) return [shake];
   const shadow = getComputedStyle(screen).boxShadow;
-  screen.animate([{ boxShadow: shadow }, { boxShadow: desk.classList.contains('crisis') ? 'inset 0 0 24px rgba(255,120,100,.5)' : 'inset 0 0 22px rgba(170,205,255,.35)', offset: 0.2 }, { boxShadow: shadow }], 450);
+  return [shake, screen.animate([{ boxShadow: shadow }, { boxShadow: desk.classList.contains('crisis') ? 'inset 0 0 24px rgba(255,120,100,.5)' : 'inset 0 0 22px rgba(170,205,255,.35)', offset: 0.2 }, { boxShadow: shadow }], 450)];
 }
 
 /**
@@ -378,6 +381,7 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
+  const buzzing = useRef<Animation[]>([]);
   useEffect(() => {
     if (open === null) return;
     const close = () => setOpen(null);
@@ -402,10 +406,11 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
     if (busy) return; // the deal first: they come once the desk is still
     const id = window.setTimeout(() => {
       setShown({ month, n: n + 1 });
-      if (n % 2 === 0) buzz(box.current?.closest('.desk') ?? null);
+      if (n % 2 === 0) buzzing.current = buzz(box.current?.closest('.desk') ?? null);
     }, n === 0 ? REVEAL.first : REVEAL.next);
     const untail = onTails?.(() => {
       window.clearTimeout(id);
+      for (const a of buzzing.current) a.finish();
       setShown({ month, n: allowed });
     });
     return () => {
@@ -419,9 +424,11 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
   const list = all.slice(0, n);
   for (const x of list) if (!seen.current.list.some((y) => y.k === x.k)) seen.current.list.push(x);
   for (const x of seen.current.list) if (!list.some((y) => y.k === x.k)) list.push(x);
-  if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" ref={box} />;
+  // Revealing from the moment the month's messages are due until the last is shown, the wait before the first included.
+  const revealing = messages && n < allowed ? '1' : undefined;
+  if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box} />;
   return (
-    <div className="bubbles" data-hook="bubbles" data-revealing={n < allowed ? '1' : undefined} ref={box}>
+    <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box}>
       <div className="bub who">{messages.from}</div>
       {list.map(({ k, text }) => {
           const mine = rx.get(k);

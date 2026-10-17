@@ -11,8 +11,15 @@ import type { StatBarModel, StatCellModel } from './model.ts';
 
 type TipId = StatCellModel['id'] | 'actions' | 'when' | 'held';
 
-/** Where the tooltip stands: under its cell, kept on the stage (the mockup's 1280 − 252). */
-const tipLeft = (el: HTMLElement): number => Math.min(el.offsetLeft, 1280 - 252);
+/**
+ * Where the tooltip stands: under its cell, kept on the stage (the mockup's 1280 − 252). Measured to the stat bar, so a
+ * control inside a group (the Deck & Discard button, round R3) stands under itself too.
+ */
+const tipLeft = (el: HTMLElement): number => {
+  let x = 0;
+  for (let a: HTMLElement | null = el; a && !a.classList.contains('stats'); a = a.offsetParent instanceof HTMLElement ? a.offsetParent : null) x += a.offsetLeft;
+  return Math.min(x, 1280 - 252);
+};
 
 const PILL: Record<string, string> = { calm: '', amber: ' warn', red: ' close', crossed: ' over' };
 

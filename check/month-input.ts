@@ -6,8 +6,9 @@ import { qualifyingMonths } from './month-fixtures.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.scr')?.textContent})`;
 async function waitIdle(page:Page) {
-  // Round R3: the month's bubbles come as the desk's tails after a step (C1), and what leaves the desk fades for 0.15 s.
-  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'||!!document.querySelector('.bubbles[data-revealing],.screen-over.leaving')`)){
+  // Round R3: the month's bubbles come as the desk's tails after a step (C1), and what leaves the desk fades for 0.15 s;
+  // a text's messages arrive one at a time (round R2) — all of them are settled layout.
+  const start=Date.now();while(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'||!!document.querySelector('.bubbles[data-revealing],.screen-over.leaving,.event-screen[data-arriving]')`)){
     assert.ok(Date.now()-start<45000,`month stalled: ${await page.evaluate('document.querySelector(".desk")?.dataset.beat')}`);await sleep(35);
   }
 }
@@ -50,7 +51,7 @@ export async function checkOsMotion(page:Page,url:string) {
   const states=loadStates();
   try {
     for(const [name,fixture,selector] of [
-      ['play',states.s02!,'.hand .card[data-card="open_mic"]'],
+      ['play',states.s02!,'.hand .card[data-card="side_gig"]'],
       ['month',states.s07b!,'.endbtn'],
     ] as const){
       await page.reducedMotion(false);assert.equal(await reach(page,url,fixture,80),'ok');
@@ -122,7 +123,10 @@ export async function checkMonthInput(page:Page,url:string) {
 
 export async function checkPileInput(page:Page,url:string) {
   const states=loadStates();
-  const cases=[['s02',['networking']],['card:self_tape',['self_tape']],['s02',['streaming_role']],['s02',['open_mic','lay_low']],['bigHand',['@recorded']]] as const;
+  // Each case names a recorded state that holds its cards: a draw, a two-action card, an opportunity, two plays in a row,
+  // the biggest hand. A new recording (npm run desk:states) can deal other hands: then name another state that holds them.
+  const cases=[['s02',['networking']],['s10',['self_tape']],['celebFamous',['streaming_role']],['s02',['side_gig','lay_low']],['bigHand',['@recorded']]] as const;
+  for(const [key,cards] of cases) for(const id of cards) assert.ok(states[key]&&(id==='@recorded'||states[key]!.hand.includes(id)),`pile case ${key}: its recorded hand has no ${id}`);
   const selected=process.argv.find(a=>a.startsWith('--pile-case='))?.slice(12);
   assert.ok(!selected||cases.some(([,cards])=>cards.join('+')===selected),`unknown pile case: ${selected}`);
   for(const [key,cards] of cases) {
@@ -200,7 +204,6 @@ export async function checkBoundaryInput(page:Page,url:string) {
     ['season',{...s,steps:s.steps.slice(0,gate)},'.gates .take','season'],
     ['after-season-publication',{...s,steps:s.steps.slice(0,gate)},'.gates .take','publish'],
     ['deal',{...states.early!,steps:states.early!.steps.slice(0,-1)},'.draft .take','deal'],
-    ['arrival',states.s07b!,'.endbtn','message'],
     ['winter-publication',{...winter,steps:winter.steps.slice(0,-1)},'.gates .take','publish'],
   ];
   for(const [name,fixture,selector,beat] of cases){
@@ -215,17 +218,40 @@ export async function checkBoundaryInput(page:Page,url:string) {
       while(!await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.beat===${JSON.stringify(beat)}`)){
         assert.ok(Date.now()-start<45000,`${name}: did not observe ${beat}`);await sleep(15);
       }
-      if(name==='arrival'){
-        const phone=await page.evaluate<{filter:string;screenPulse:boolean}>(`({filter:getComputedStyle(document.querySelector('.phone')).filter,screenPulse:document.querySelector('.phone .phone-screen').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))})`);
-        assert.equal(phone.filter,'none','arrival must not filter the whole transformed phone');
-        assert.equal(phone.screenPulse,true,'arrival must retain the screen light response');
-      }
       if(input==='click')await page.click(...(name==='winter-publication'?(await centre(page,'.play-again'))!:[640,350] as [number,number]));else await page.key(input as 'Enter'|'Space');
       await sleep(40);assert.equal(await page.evaluate<boolean>(`document.querySelector('.desk,[data-presentation]')?.dataset.busy==='1'`),false,`${name}: input failed to skip`);
-      if(name==='arrival')assert.equal(await page.evaluate(`document.querySelector('.phone .phone-screen').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))`),false,'skip cancels the screen pulse');
-      await page.move(10,100);await sleep(180);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: skip also chose/played`);
+      // The month's messages are the desk's tails after the deal (round R3, C1): they come once it is still, so wait for them.
+      await page.move(10,100);await sleep(180);await waitIdle(page);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: skip also chose/played`);
       await sleep(1600);assert.equal(await page.evaluate<string>(settled),expected,`${name} ${input}: stale callback`);
       console.log(`boundary input ${page.name}: ${name} ${input} exact final parity, no stale callbacks`);
     }
+  }
+  // The month's messages (round R3, C1): no step's beat any more but the desk's tails, once its hand is dealt. They
+  // hold no input; the phone lights as each comes, never a whole-phone filter; the next action brings the rest at
+  // once, its light finished, and acts.
+  const only=process.argv.find(a=>a.startsWith('--boundary='))?.slice(11);
+  if(!only||only==='arrival'){
+    const fixture={...states.early!,steps:states.early!.steps.slice(0,-1)};
+    assert.equal(await reach(page,url,fixture,80),'ok');
+    await page.evaluate(`document.documentElement.dataset.motion='full'`);
+    await page.click(...(await centre(page,'.draft .take'))!);
+    const start=Date.now();
+    while(!await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy!=='1'&&!!document.querySelector('.bubbles[data-revealing] .bub[data-k]')`)){
+      assert.ok(Date.now()-start<15000,'arrival: no message came once the hand was dealt');await sleep(10);
+    }
+    const pulse=`document.querySelector('.phone .phone-screen').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))`;
+    const phone=await page.evaluate<{filter:string;screenPulse:boolean}>(`({filter:getComputedStyle(document.querySelector('.phone')).filter,screenPulse:${pulse}})`);
+    assert.equal(phone.filter,'none','arrival must not filter the whole transformed phone');
+    assert.equal(phone.screenPulse,true,'arrival must retain the screen light response');
+    const step=await page.evaluate<string>(`document.querySelector('.desk').dataset.step`);
+    const index=await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].findIndex(c=>c.getAttribute('aria-disabled')==='false')`);
+    assert.ok(index>=0,'arrival: no legal card to play');
+    await page.click(...(await cardPoint(page,index))!);
+    await sleep(40);
+    const after=await page.evaluate<{revealing:boolean;pulse:boolean;acted:boolean}>(`({revealing:!!document.querySelector('.bubbles[data-revealing]'),pulse:${pulse},acted:document.querySelector('.desk').dataset.busy==='1'||document.querySelector('.desk').dataset.step!==${JSON.stringify(step)}})`);
+    assert.equal(after.revealing,false,'arrival: the next action did not bring the rest of the messages');
+    assert.equal(after.pulse,false,'arrival: the next action did not finish the phone light');
+    assert.equal(after.acted,true,'arrival: the next action did not act');
+    console.log(`boundary input ${page.name}: arrival holds no input; the next action brings the rest, finishes the light and acts`);
   }
 }

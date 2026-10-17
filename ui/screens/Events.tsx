@@ -164,7 +164,7 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
     arrival.finish();
   };
   return (
-    <div className={`scr event-screen ev-text${leaving ? ' leaving' : ''}`} data-event={ev.id} data-form="text" onClickCapture={onClickCapture}>
+    <div className={`scr event-screen ev-text${leaving ? ' leaving' : ''}`} data-event={ev.id} data-form="text" data-arriving={arrival.done ? undefined : '1'} onClickCapture={onClickCapture}>
       <div className="evcap">
         <small>{t('ui.event.kicker', { date: calendarLabel(c, s.turn), category: category ? t(category.nameKey) : ev.category })}</small>
         <b className={prose(t(ev.titleKey ?? ''))}>{t(ev.titleKey ?? '')}</b>
