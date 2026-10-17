@@ -1,7 +1,8 @@
 # Status
 
-As of 2026-10-17: round R1 is done — every screen around the desk is built, the hand's feel is fixed, the card faces
-share one order, and the checks are leaner. The public early build goes on itch next. **Read this first; update it at
+As of 2026-10-17: round R2 is done — the events (phase 3): fifteen texts and letters that come every other month,
+answered on the phone or on paper, printed in the papers, measured and tuned in the sim. Its build is v0.2. Round R3
+is next: what the author found playing the R1 build, and the opening rebuilt (v0.3). **Read this first; update it at
 the end of every session** (AGENTS.md → Session rules).
 
 Overexposed is a deck-building career sim for the Game Gauntlet SIM Jam, played in the browser: one year as a young
@@ -11,25 +12,25 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-17-r1.md](reports/2026-10-17-r1.md).
+[reports/2026-10-17-r2.md](reports/2026-10-17-r2.md).
 
 ## Built
 
 | Area | State |
 |---|---|
-| Engine | Pure TypeScript reducer, seeded, 19 GameEvents; content-driven cards, gates, two-level endings, awards, managers, the press, lanes and the draft; read-only queries for everything the UI shows (R1 added `seasonPages`) |
-| Content | 42 cards, 8 gates, 4 majors and 14 minors, 7 awards, 2 managers, 3 papers, 9 desk scripts; prose keyed in `i18n/en.json`; no TODO(prose) left |
-| Sim | 9 personas, 14 bands, once per manager; `sim:compare` holds a round to the recorded numbers |
+| Engine | Pure TypeScript reducer, seeded, 21 GameEvents; content-driven cards, gates, two-level endings, awards, managers, the press, lanes, the draft and the events (phase `event`, `CHOOSE_EVENT`); read-only queries for everything the UI shows |
+| Content | 42 cards, 8 gates, 4 majors and 14 minors, 7 awards, 2 managers, 3 papers, 9 desk scripts, 15 events in 3 chains; prose keyed in `i18n/en.json`; TODO(prose): the 12 labels of the six event flags |
+| Sim | 9 personas, 17 bands, once per manager, with the events reported; `sim:compare` holds a round to the recorded numbers |
 | The desk (V1a, V1b) | Stat bar, papers with code-drawn halftone photographs, mirror, props, phone and bubbles, the fanned hand, and its motion. Handoff notes: [handoff/v1a.md](handoff/v1a.md), [handoff/v1b.md](handoff/v1b.md) |
 | The hand (R1) | A play holds input only until the card is down (about 0.94 s); its tails play on and the next action completes them. One face order everywhere (name, body, flavour), every number an icon; the paper a play prints in comes forward; popovers rise and fade in one way |
 | Screens (R1, `ui/screens/`) | The title, the manager choice, the offers, the doors and the last door, the awards night with the year in four front pages, and four panels — the deck, the endings scrapbook, House rules (`ui/settings.ts`) and the credits. No plain screen is left |
+| Events (R2) | A text comes up on the phone, message by message; a letter lands on the desk, typed, with tick boxes. Answering is a step of its own: the reply, their answer or the SENT stamp, the effects landing, then the month opens with the paper that printed it in front. A dev page, `check/events.html`, shows every event and two at the schema's limits for the checks |
 
 ## Next
 
-1. **Now:** the public early build on itch, from the R1 release candidate (the zip is built outside the repo; see the
-   R1 report).
-2. **R2 (10/19–21):** phase 3, events (prose comes as draft-v9).
-3. **R3 (10/22–23):** fixes from play and feedback. **10/24:** the playtest build on itch.
+1. **Now:** R3 — the author's findings from the R1 build and the opening rebuilt, as the R3 prompt sets out (v0.3, a
+   release candidate). The v0.2 zip is built outside the repo (see the R2 report).
+2. **10/24:** the playtest build on itch.
 4. **10/25–31:** polish, sound, a retune. **11/1:** feature freeze. **11/2–3:** fixes only, the itch page; submit
    11/3 JST. Deadline 11/5 04:00 JST — treat 11/4 as the real one.
 
@@ -39,12 +40,10 @@ in code); the year in review as its own phase.
 ## For the author
 
 - Real Safari and iPad: test the itch build when a device is at hand (the itch embed at 1280×720, fullscreen on).
-- The year in front pages follows the rule as written: a season shows a player lead only when the player's story led
-  a front page; below Famous it rarely does, so many years show mostly the world's news (the R1 report has the count).
-  A decision for the author: keep it, or fall back to the player's most prominent story of the season first.
-- The pace of a month end: unskipped, it takes 7.7 s at the median and up to 11.5 s, and a season change about
-  8.6 s from the door to the next offers (a click skips). Shorten it, or keep V1b's sequence as accepted.
-- Optional: the hover preview still lists its outcome in words ("+3 Hype"); the card faces use icons.
+- The events' one failing band: three replies the greedy players always take — "I can't right now. Sorry."
+  (sam_rent), "On my way." (producer_room), "I'll be there at nine." (casting_arc). Accept them as take-it-or-leave-it
+  offers, let the last two cost two actions, or have the personas value the flags events read (decisions.md, R2 Part E).
+- The labels of the six event flags (TODO(prose), listed in the R2 report).
 - Playtest: does Dex's extra card compete with Mags's calm; does the stat bar read at a glance; do players start a
   second run unprompted; time a first run against 10–15 minutes.
 
