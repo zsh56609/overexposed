@@ -9,7 +9,8 @@
 //   levels;
 // - the biggest hand a draw-seeking player reaches (bigHand);
 // - every card of the content in some hand (card:<id>, only for cards no other state already holds);
-// - every minor ending (ending:<id>): a run's steps to its ending screen, for the plain-screen audit.
+// - every minor ending (ending:<id>): a run's steps to its ending screen, for the plain-screen audit;
+// - the awards night at its fullest (awards:4): a year with four awards, the most play gives (sim:awards).
 // Run it again after a content change: recorded steps no longer replay once the rules or the cards move.
 //
 // Usage: node tools/desk-states.ts [--out=check/desk-states.json]
@@ -27,6 +28,7 @@ import {
   readLines,
   reduce,
   seedRng,
+  yearAwards,
   type Action,
   type Content,
   type GameState,
@@ -206,8 +208,11 @@ cards: for (let i = 0; i < 1500 && cards.some((id) => !found[`card:${id}`]); i++
 }
 
 // 4. Every minor ending: the first run that ends in it, all its steps — the replay stops on the ending screen.
+// And the first year with four awards, the most play gives (round R1): the awards night at its fullest.
 const minors = (content.endings?.minors ?? []).map((m) => m.id);
-endings: for (let i = 0; i < 1500 && minors.some((id) => !found[`ending:${id}`]); i++) {
+const AWARDS = 'awards:4';
+const allEndings = () => minors.every((id) => found[`ending:${id}`]) && !!found[AWARDS];
+endings: for (let i = 0; i < 1500 && !allEndings(); i++) {
   for (const persona of PERSONA_IDS) {
     const seed = deriveSeed(4244, i * 16 + PERSONA_IDS.indexOf(persona));
     const pick = (i + PERSONA_IDS.indexOf(persona)) % managers.length;
@@ -217,13 +222,18 @@ endings: for (let i = 0; i < 1500 && minors.some((id) => !found[`ending:${id}`])
       pick,
       () => false,
       (s, steps) => {
+        const won = s.endingId ? yearAwards(s).length : 0;
+        if (won >= 4 && !found[AWARDS]) {
+          found[AWARDS] = { seed, persona, manager: managers[pick] as string, steps: [...steps], note: `the ending ${s.endingId} with ${won} awards, ${steps.length} steps`, hand: [] };
+          console.log(AWARDS.padEnd(28), found[AWARDS].note, persona, seed);
+        }
         const name = `ending:${s.endingId}`;
         if (!s.endingId || found[name]) return;
         found[name] = { seed, persona, manager: managers[pick] as string, steps: [...steps], note: `the ending ${s.endingId}, ${steps.length} steps`, hand: [] };
         console.log(name.padEnd(28), found[name].note, persona, seed);
       },
     );
-    if (minors.every((id) => found[`ending:${id}`])) break endings;
+    if (allEndings()) break endings;
   }
 }
 
@@ -234,5 +244,6 @@ const missing = [
   ...names.filter((n) => !found[n]),
   ...cards.filter((id) => !found[`card:${id}`]).map((id) => `card:${id}`),
   ...minors.filter((id) => !found[`ending:${id}`]).map((id) => `ending:${id}`),
+  ...(found[AWARDS] ? [] : [AWARDS]),
 ];
 console.log(`${Object.keys(found).length} states → ${OUT}${missing.length ? `; not found: ${missing.join(', ')}` : ''}`);
