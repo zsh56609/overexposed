@@ -6,6 +6,21 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R4, Part C: answers to the R2 and R3 questions
+
+- **C1**: the twelve flag labels R2 left as placeholders are the author's
+  six pairs: Lent Sam the rent; Lent Sam half the rent; Turned Sam down;
+  Told the papers about your break-up; Wrote a song with Juno Vale; Turned
+  Juno Vale down — each with its "Never …" side.
+- **C2**: the one-sided replies stay as they are — sam_rent/c,
+  producer_room/a, casting_arc/a — and so does juno_hello/b at 89.4 %. No
+  persona change, no content change.
+- **C3**: a text that opens a season (April, October) keeps its arrival:
+  its messages one by one after the season card, a click showing them all.
+- **C4**: BEGIN stays 56 px in from the corner, as the reference has it.
+- **C5**: real Safari and iPad are the author's to test; the rounds keep
+  Playwright's WebKit as the stand-in.
+
 ## 2026-10-18 — Round R4, Part B: sound and music
 
 - **B1, the module.** The author's `docs/design/sound/overexposed-sound.js`
