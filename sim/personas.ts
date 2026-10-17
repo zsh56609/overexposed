@@ -376,6 +376,22 @@ function greedyChoose(state: GameState, legal: readonly Action[], w: Weights): A
     return best;
   }
 
+  if (state.phase === 'event') {
+    // An event's answers (round R2, E1): each simulated through the reducer and scored as a card play is scored —
+    // the state it leaves against this one, an action it spends at the slots' weight. Every answer opens the same
+    // month after it, so what differs between them is the answer itself.
+    const here = score(state, w);
+    let best = legal[0] as Action;
+    let bestGain = Number.NEGATIVE_INFINITY;
+    for (const action of legal) {
+      if (action.type !== 'CHOOSE_EVENT') continue;
+      const next = reduce(state, action);
+      const gain = score(next, w) - here + w.slots * (next.slots - state.slots);
+      if (gain > bestGain + 1e-9) [best, bestGain] = [action, gain];
+    }
+    return best;
+  }
+
   const base = score(state, w);
   const seen = new Set<string>();
   let best: Action = END_TURN;

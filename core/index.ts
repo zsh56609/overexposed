@@ -13,6 +13,7 @@ export {
   type HistoryStep,
   type LineKind,
   type LineShow,
+  type LineSource,
   type PrintedLine,
   type RunLines,
   type TakenLine,
@@ -61,6 +62,7 @@ export {
   type MonthMessages,
 } from './manager.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
+export { choiceRemembered, eventCandidates, eventChoiceCheck, eventPress, isEventMonth, rememberedFlags, runChains, type EventSubject } from './events.ts';
 export {
   effectiveHeatThreshold,
   evaluate,

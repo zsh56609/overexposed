@@ -4,6 +4,7 @@ import type { Content } from '../core/index.ts';
 import awards from '../content/awards.json';
 import cards from '../content/cards.json';
 import endings from '../content/endings.json';
+import events from '../content/events.json';
 import gates from '../content/gates.json';
 import managers from '../content/managers.json';
 import press from '../content/press.json';
@@ -11,7 +12,7 @@ import rules from '../content/rules.json';
 import scripts from '../content/scripts.json';
 import en from '../i18n/en.json';
 
-export const content = { rules, cards, gates, endings, awards, press, managers, scripts } as unknown as Content;
+export const content = { rules, cards, gates, endings, awards, press, managers, scripts, events } as unknown as Content;
 
 /** Dev builds run with strict /core: bad content or an illegal action throws, loudly. The shipped build degrades. */
 export const STRICT = import.meta.env.DEV;
@@ -23,7 +24,7 @@ export const STRICT = import.meta.env.DEV;
 export async function checkContentInDev(): Promise<void> {
   if (!import.meta.env.DEV) return;
   const { validateContent } = await import('../validate/validate.ts');
-  for (const issue of validateContent({ rules, cards, gates, endings, awards, press, managers, scripts }, en).issues) {
+  for (const issue of validateContent({ rules, cards, gates, endings, awards, press, managers, scripts, events }, en).issues) {
     const line = `[content ${issue.check}] ${issue.where}: ${issue.message}`;
     if (issue.level === 'error') console.error(line);
     else console.warn(line);

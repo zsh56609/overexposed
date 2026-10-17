@@ -263,9 +263,38 @@ an actor's copy), `other`, or `action`.
 from which a band holds: low from Unknown, mid from Rising, high from
 Known. The quiet-month trigger and the desk scripts read them.
 
+## Events — `content/events.json`
+
+Round R2 (phase 3; design §5): the world acting on the player. `categories`:
+a `{ nameKey, lineKey }` for each of `personal`, `industry`, `press`,
+`rival` — the word in a text's kicker and its caption line. `events`, each:
+
+- `id`; `category`; `form` — `text` (the phone: up to three bubbles) or
+  `letter` (up to four paragraphs); `titleKey` (a text's caption title; a
+  letter has none).
+- `speaker`: a text's `nameKey` and optional `labelKey`; a letter's
+  `letterheadKey` (the desk on a paper's letterhead, with `paper`; or the
+  house, in plain serif) and `signoffKey`.
+- `chain` (optional): `{ id, role }`, `opener` or `followUp`. A chain has
+  one opener; a follow-up reads the flag its opener's answer set.
+- `when`: `months` `{ from, to? }` (inclusive; `to` defaults to the
+  year's last), an optional `condition` (the one shape), an optional
+  `lane` — its weight doubles while that lane is established.
+- `messageKeys`; `choices` (two or three): `replyKey`, optional
+  `requires` (a condition — unmet, the choice shows disabled with
+  "Needs …"), `effects` (the closed set; money in thousands), optional
+  `press` `{ paper, kind: loud | scandal, lineKeys }` (printed when
+  chosen), `outcomeKey`. Every event has a choice with no requirement.
+
+`rules.events`: `months` (the months an event may open — 2, 4, 6, 8, 10,
+12), `maxChains` (2), `laneWeight` (2). At each: an open chain's eligible
+follow-up (the earliest-opened chain first), else one drawn with the game's
+RNG among the eligible openers and one-offs; each at most once a run.
+Events have their own budget: 15.
+
 ## i18n keys
 
-The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `ui.<area>.<label>`
+The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `event.<id>.title` · `event.<id>.message.<n>` · `event.<id>.<a|b|c>.reply` · `event.<id>.<a|b|c>.outcome` · `event.<id>.<a|b|c>.press.<n>` · `event.speaker.<who>.name` · `event.speaker.<who>.label` · `event.letterhead.<house>` · `event.signoff.<who>` · `event.category.<category>.name` · `event.category.<category>.line` · `ui.<area>.<label>`
 
 ## What validate checks
 

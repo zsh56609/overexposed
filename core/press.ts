@@ -3,6 +3,7 @@
 // private work. Read-only; ids, keys and numbers only — /ui renders the words.
 
 import { getCard, type ContentIndex, type PaperDef, type Prominence, type RivalArcDef, type SceneId } from './content.ts';
+import { eventPress } from './events.ts';
 import { establishedLanes } from './lanes.ts';
 import { readLines, type HistoryStep, type PrintedLine } from './lines.ts';
 import { deriveSeed } from './rng.ts';
@@ -83,7 +84,9 @@ export function pressLines(history: readonly HistoryStep[]): PressLine[] {
     const step = history[line.step] as HistoryStep;
     let at = contexts.get(line.step);
     if (!at) contexts.set(line.step, (at = printContext(step.after, step.events, lanes[line.step] ?? null)));
-    return { ...line, ...pressOf(step.after.content, line.cardId, at) };
+    const press = pressOf(step.after.content, line.cardId, at);
+    // An event's answer prints in the paper its choice names (round R2, Part D).
+    return { ...line, ...press, paper: line.source ? (eventPress(step.after.content, line.source.eventId, line.source.choice)?.paper ?? null) : press.paper };
   });
 }
 
@@ -303,7 +306,7 @@ function composeYear(history: readonly HistoryStep[], inProgress: boolean): { mo
     const lanePapers = new Set(
       lane !== null
         ? [press.route.loud[lane] ?? '']
-        : mine.flatMap((l) => (l.kind === 'play' && l.paper !== null && getCard(c, l.cardId)?.register === 'loud' ? [l.paper] : [])),
+        : mine.flatMap((l) => (l.kind === 'play' && l.paper !== null && (l.source !== undefined || getCard(c, l.cardId)?.register === 'loud') ? [l.paper] : [])),
     );
     const beat = arc && turn === rivalBeatTurn(c, seed, act) ? (arc.beats[act - 1] ?? null) : null;
     let rivalPrinted = false;

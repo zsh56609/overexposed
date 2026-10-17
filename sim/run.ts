@@ -67,6 +67,9 @@ function describe(e: GameEvent): string {
     case 'gate': return `GATE ${e.gateId} ${e.passed ? 'PASS' : 'FAIL'}`;
     case 'ending': return `ENDING ${e.endingId ?? 'none'}`;
     case 'warning': return `WARNING ${e.code} ${e.ref}`;
+    case 'eventOffered': return `
+EVENT ${e.eventId}`;
+    case 'eventChosen': return `EVENT ${e.eventId} -> choice ${e.choice}`;
   }
 }
 

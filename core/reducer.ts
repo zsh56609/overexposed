@@ -8,10 +8,13 @@
 //   END_TURN:      onEndOfTurn for cards in hand → heat check (Heat → Scandal) → hand discarded
 //                  → the manager's month-end effects → next turn, or the act's Gate after its last turn
 //   CHOOSE_GATE:   requires → onPass / onFail → next act (its draft), or ending resolution after the last act
+//   CHOOSE_EVENT:  in an event month (round R2) the month opens on an event: the answer's effects, then its
+//                  offers or its play (core/events.ts)
 
-import { CoreError, getCard, getGate, getManager, type GateDef } from './content.ts';
+import { CoreError, getCard, getEvent, getGate, getManager, type GateDef } from './content.ts';
 import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { endingIfYearEndedNow } from './endings.ts';
+import { eventCandidates, isEventMonth } from './events.ts';
 import { nextEstablishedLane } from './lanes.ts';
 import { nextInt } from './rng.ts';
 import {
@@ -34,7 +37,9 @@ export type Action =
   | { readonly type: 'DRAFT_REROLL' }
   | { readonly type: 'PLAY_CARD'; readonly uid: number }
   | { readonly type: 'END_TURN' }
-  | { readonly type: 'CHOOSE_GATE'; readonly gateId: string };
+  | { readonly type: 'CHOOSE_GATE'; readonly gateId: string }
+  /** Round R2: the answer to the event waiting (its index in the event's choices). */
+  | { readonly type: 'CHOOSE_EVENT'; readonly choice: number };
 
 export function reduce(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -52,6 +57,8 @@ export function reduce(state: GameState, action: Action): GameState {
       return endTurn(state);
     case 'CHOOSE_GATE':
       return chooseGate(state, action.gateId);
+    case 'CHOOSE_EVENT':
+      return chooseEvent(state, action.choice);
     default:
       return illegal(state, 'unknownAction', String((action as { readonly type?: unknown }).type));
   }
@@ -134,6 +141,10 @@ export function legalActions(state: GameState): Action[] {
   switch (state.phase) {
     case 'manager':
       return (state.content.managers?.managers ?? []).map((m) => ({ type: 'CHOOSE_MANAGER', managerId: m.id }));
+    case 'event': {
+      const ev = state.event === null ? undefined : getEvent(state.content, state.event);
+      return (ev?.choices ?? []).flatMap((choice, i): Action[] => (evaluate(choice.requires, state) ? [{ type: 'CHOOSE_EVENT', choice: i }] : []));
+    }
     case 'draft': {
       const dr = state.draft;
       if (!dr) return [];
@@ -295,6 +306,23 @@ function endTurn(state: GameState): GameState {
   return closeDraft(d);
 }
 
+/**
+ * The answer to an event (round R2): its effects — heat from an event is blamed on no card, like a gate's — then the
+ * month goes on to its offers or its play. An action it spends comes off this month's, refreshed when it came.
+ */
+function chooseEvent(state: GameState, choice: number): GameState {
+  const ev = state.event === null ? undefined : getEvent(state.content, state.event);
+  const def = ev?.choices[choice];
+  if (state.phase !== 'event' || !ev || !def || !evaluate(def.requires, state)) return illegal(state, 'illegalEventChoice', `${state.event}:${choice}`);
+  const d = openDraft(state);
+  d.events.push({ type: 'eventChosen', eventId: ev.id, choice });
+  d.eventLog.push({ eventId: ev.id, turn: d.turn, choice });
+  d.event = null;
+  applyEffects(d, def.effects);
+  openMonth(d);
+  return closeDraft(d);
+}
+
 function chooseGate(state: GameState, gateId: string): GameState {
   if (state.phase !== 'gate' || !state.gateOffer.includes(gateId)) return illegal(state, 'illegalGate', gateId);
   const gate = getGate(state.content, gateId);
@@ -314,8 +342,33 @@ function chooseGate(state: GameState, gateId: string): GameState {
 // ---------------------------------------------------------------------------
 // Flow steps (operate on the reducer's draft)
 
-/** Open the current turn: a card draft first if this turn-in-act is listed in draft.atTurns, else play. */
+/** Open the current turn: its event first in an event month (round R2), then its offers or its play. */
 export function beginTurn(d: Draft): void {
+  if (!offerEvent(d)) openMonth(d);
+}
+
+/**
+ * An event month (round R2): a follow-up of an open chain, else one drawn with the game's RNG, weighted by lane
+ * (core/events.ts). The month's actions are refreshed as it comes, so an action the answer spends comes off them.
+ */
+function offerEvent(d: Draft): boolean {
+  if (!isEventMonth(d.content, d.turn) || d.eventLog.some((r) => r.turn === d.turn)) return false;
+  const { followUp, pool } = eventCandidates(d);
+  let ev = followUp;
+  if (!ev && pool.length > 0) {
+    let r = nextInt(d.rng, pool.reduce((n, p) => n + p.weight, 0));
+    ev = pool.find((p) => (r -= p.weight) < 0)?.event ?? null;
+  }
+  if (!ev) return false;
+  d.phase = 'event';
+  d.event = ev.id;
+  d.slots = d.content.rules.slotsPerTurn;
+  d.events.push({ type: 'eventOffered', eventId: ev.id });
+  return true;
+}
+
+/** The month's offers, or its play: a card draft first if this turn-in-act is listed in draft.atTurns, else play. */
+function openMonth(d: Draft): void {
   const cfg = d.content.rules.draft;
   if (!cfg || cfg.picks <= 0 || !cfg.atTurns.includes(turnInAct(d))) return startTurn(d);
   const { offer, extras } = rollOffer(d);
@@ -355,10 +408,10 @@ function rollOffer(d: Draft): { offer: string[]; extras: string[] } {
   return { offer: pool.filter((id) => picked.has(id)), extras: pool.filter((id) => picked.has(id) && !before.has(id)) };
 }
 
-/** Refresh slots and draw to hand size. */
+/** Refresh slots and draw to hand size. A month that opened on an event refreshed them then (round R2). */
 export function startTurn(d: Draft): void {
   d.phase = 'play';
-  d.slots = d.content.rules.slotsPerTurn;
+  if (!d.eventLog.some((r) => r.turn === d.turn)) d.slots = d.content.rules.slotsPerTurn;
   d.events.push({ type: 'turnStart', act: d.act, turn: d.turn });
   drawToHandSize(d);
 }

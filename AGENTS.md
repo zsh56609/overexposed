@@ -88,8 +88,9 @@ The player plants the seeds of their own collapse. Failure is never random.
 - End of each act: a Gate — the player picks 1 of 2 offered
 - After the last act (winter): ending resolution. **A run always completes.**
 - Before month 1: the player chooses a manager (phase `manager`). Each has one perk — data in `content/managers.json`, applied by the engine — and messages /core derives from history ([`docs/design/content-expansion.md`](docs/design/content-expansion.md) §3.2).
+- Events (round R2): months in `rules.events.months` open on an event (phase `event`) before their offers and draw — design §5, [`docs/content-schema.md`](docs/content-schema.md).
 
-Actions: `CHOOSE_MANAGER`, `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`.
+Actions: `CHOOSE_MANAGER`, `DRAFT_PICK`, `DRAFT_EXTRA_PICK`, `DRAFT_REROLL`, `PLAY_CARD`, `END_TURN`, `CHOOSE_GATE`, `CHOOSE_EVENT`.
 
 End-of-turn resolution, in order:
 1. `onEndOfTurn` effects of every card still in hand, in hand order.

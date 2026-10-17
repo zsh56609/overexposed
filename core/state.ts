@@ -3,8 +3,11 @@ import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
 import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
 import { beginTurn } from './reducer.ts';
 
-/** 'manager': before month 1, the player chooses a manager (round 2b) — only when content has managers. */
-export type Phase = 'manager' | 'draft' | 'play' | 'gate' | 'ended';
+/**
+ * 'manager': before month 1, the player chooses a manager (round 2b) — only when content has managers.
+ * 'event': at the start of an event month, before its offers and its draw, an event waits on its answer (round R2).
+ */
+export type Phase = 'manager' | 'event' | 'draft' | 'play' | 'gate' | 'ended';
 
 /**
  * Heat changes since the last end-of-turn check, each with the card whose effect caused it (null for
@@ -40,6 +43,13 @@ export interface CardInstance {
 export interface RerollRecord {
   readonly act: number;
   readonly cost: number;
+}
+
+/** An event the run met (round R2): its month and the player's answer. At most once a run each. */
+export interface EventRecord {
+  readonly eventId: string;
+  readonly turn: number;
+  readonly choice: number;
 }
 
 export interface GateRecord {
@@ -98,6 +108,10 @@ export type GameEvent =
   | { readonly type: 'gateOffer'; readonly gateIds: readonly string[] }
   | { readonly type: 'gate'; readonly gateId: string; readonly passed: boolean }
   | { readonly type: 'ending'; readonly endingId: string | null }
+  /** Round R2 (additive): an event comes at a month's start; the run waits on its answer (phase 'event'). */
+  | { readonly type: 'eventOffered'; readonly eventId: string }
+  /** Round R2 (additive): the player's answer; its effects' events follow, then the month goes on. */
+  | { readonly type: 'eventChosen'; readonly eventId: string; readonly choice: number }
   /** Only in non-strict (shipped) mode, where bad content degrades instead of throwing. */
   | { readonly type: 'warning'; readonly code: string; readonly ref: string };
 
@@ -131,6 +145,10 @@ export interface GameState {
   readonly draft: DraftState | null;
   /** Gate ids on offer; non-empty only in the 'gate' phase. */
   readonly gateOffer: readonly string[];
+  /** The event waiting on its answer; non-null only in the 'event' phase (round R2). */
+  readonly event: string | null;
+  /** Every event the run has answered, in order (round R2): what happens at most once, which chains are open. */
+  readonly eventLog: readonly EventRecord[];
   readonly gateHistory: readonly GateRecord[];
   /**
    * Every draft reroll so far. The reducer sees only state, so the run's reroll history lives here, like
@@ -201,6 +219,8 @@ export function createInitialState(seed: number, content: Content, options: Stat
     nextUid: uid,
     draft: null,
     gateOffer: [],
+    event: null,
+    eventLog: [],
     gateHistory: [],
     rerolls: [],
     manager: null,

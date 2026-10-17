@@ -90,6 +90,7 @@ const stepOf = (s: GameState, a: Action, pick: number): Step => {
   if (a.type === 'DRAFT_PICK') return ['draft', s.draft?.offer.indexOf(a.cardId) ?? -1];
   if (a.type === 'DRAFT_EXTRA_PICK') return ['extra', 0];
   if (a.type === 'DRAFT_REROLL') return ['reroll', 1];
+  if (a.type === 'CHOOSE_EVENT') return ['event', a.choice];
   return ['gate', s.gateOffer.indexOf(a.gateId)];
 };
 const fameOf = (s: GameState): number => {

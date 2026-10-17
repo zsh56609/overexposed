@@ -11,7 +11,7 @@ import type { Page } from './browser.ts';
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const STATES_FILE = join(ROOT, 'check', 'desk-states.json');
 
-export type StepKind = 'manager' | 'draft' | 'extra' | 'reroll' | 'gate' | 'play' | 'end';
+export type StepKind = 'manager' | 'draft' | 'extra' | 'reroll' | 'gate' | 'play' | 'end' | 'event';
 export type Step = readonly [StepKind, number];
 
 export interface DeskState {
@@ -41,6 +41,7 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
     const el = kind === 'manager' ? document.querySelectorAll('.manager-choice .choose')[i]
       : kind === 'draft' ? document.querySelectorAll('.draft .take')[i]
       : kind === 'gate' ? document.querySelectorAll('.gates .take')[i]
+      : kind === 'event' ? document.querySelector('.event-screen .choose[data-choice="' + i + '"]')
       : kind === 'extra' || kind === 'reroll' ? document.querySelectorAll('.draft > .row > button')[i]
       : kind === 'end' ? document.querySelector('.desk .endbtn')
       : cards[i];

@@ -6,6 +6,42 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R2, Parts A, B and D: the event engine, the prose, the press
+
+- **The engine** (core/events.ts, core/reducer.ts; additive): a new phase
+  `event`, a new action `CHOOSE_EVENT { choice }`, two new GameEvents —
+  `eventOffered { eventId }` and `eventChosen { eventId, choice }` — and the
+  run's `eventLog`. At the start of months 2, 4, 6, 8, 10 and 12
+  (`rules.events.months`), after the season's opening card and before the
+  offers and the draw: an open chain's eligible follow-up (the
+  earliest-opened chain first), else one drawn with the game's seeded RNG
+  among the eligible openers and one-offs, an event of the established
+  lane weighted ×2; at most once a run each; at most two chains opened.
+  The month's actions are refreshed when the event comes, so "−1 action"
+  comes off them (startTurn does not refresh them again). Heat from an
+  answer is blamed on no card, as a gate's is. "↺ remembered" is derived
+  from content: a choice that sets a flag some event's condition reads.
+- **The prose** (Part B): draft-v9 saved verbatim and committed on its
+  own; its 163 lines imported by a script that parses the draft itself,
+  so every key content reads comes from the approved text. Effects as the
+  draft writes them, money in thousands; "Tabloid Story" and "Public
+  Feud" are `tabloid_story` and `public_feud`. The six flags the events
+  set need the flag labels validate requires; the draft has none, so they
+  are TODO(prose) placeholders (the UI never shows them: an event's choice
+  shows "↺ remembered" instead).
+- **The press prints what you said** (Part D, core): an answer's press
+  line prints when it is chosen (core/lines.ts, a line with a `source`),
+  in its choice's paper, placed by the existing tables — a LOUD line as a
+  card's LOUD line, in lane or off by fame; a scandal line as a scandal —
+  and joins frontPages, the early lane's paper count, the fame meter and
+  the year in front pages. A scandal card an answer adds is held, not
+  printed: no headline of its own, nothing going to press. On the desk a
+  printed answer's dek is the player's own reply, then what it did.
+- **Checks**: validate checks the events (fields, months, speakers,
+  chains, a choice without a requirement in every event, papers, a budget
+  of 15); check:preview previews every answer against the reducer and
+  checks each run's event log; desk-states re-recorded with event steps.
+
 ## 2026-10-17 — Round R2, Part 0: the author's decisions on R1's questions
 
 - **The year in front pages** (0.1; core/press.ts `seasonPages`): for each

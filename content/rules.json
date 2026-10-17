@@ -20,6 +20,7 @@
   "thresholdFloor": [7, 6, 5, 4.5],
   "vent": 4,
   "startingResources": { "hype": 0, "craft": 0, "capital": 3, "heat": 0 },
+  "events": { "months": [2, 4, 6, 8, 10, 12], "maxChains": 2, "laneWeight": 2 },
   "startingDeck": [
     { "cardId": "vocal_coaching", "count": 2 },
     { "cardId": "open_mic", "count": 1 },

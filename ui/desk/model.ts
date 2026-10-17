@@ -17,6 +17,7 @@ import {
   fameBand,
   frontPages,
   getCard,
+  getEvent,
   issueNow,
   majorRequirements,
   managerMessages,
@@ -486,6 +487,19 @@ function dek(s: GameState, x: PageItem, history: readonly PlayedStep[]): string 
   if (x.kind !== 'player' || !line) return null;
   const step = history[line.step];
   if (!step) return null;
+  if (line.source) {
+    // An event's answer (round R2, Part D): the player's own reply stands where a card's name does, then what it did.
+    const reply = getEvent(c, line.source.eventId)?.choices[line.source.choice]?.replyKey;
+    const rest = step.events.slice(line.event + 1);
+    const stop = rest.findIndex((e) => e.type === 'draftOffer' || e.type === 'turnStart');
+    const deltas = outcomeOf(stop === -1 ? rest : rest.slice(0, stop)).deltas;
+    const did = (['hype', 'craft', 'heat', 'capital'] as const)
+      .filter((k) => deltas[k] !== 0)
+      .map((k) => t('ui.effect.resource', { delta: signedAmount(k, deltas[k]), resource: resourceName(k) }))
+      .join(' · ');
+    const words = reply ? t(reply) : '';
+    return did ? t('paper.dek', { card: words, effects: did }) : words || null;
+  }
   if (line.kind === 'scandal') {
     const e: GameEvent | undefined = step.events[line.event];
     const cause = e?.type === 'addCard' ? step.events.find((ev) => ev.type === 'scandal' && ev.uid === e.uid) : undefined;

@@ -10,6 +10,7 @@ function actionFor(s:GameState,[kind,i]:Step):Action {
     case 'extra':return {type:'DRAFT_EXTRA_PICK'};
     case 'reroll':return {type:'DRAFT_REROLL'};
     case 'gate':return {type:'CHOOSE_GATE',gateId:s.gateOffer[i]!};
+    case 'event':return {type:'CHOOSE_EVENT',choice:i};
     case 'play':return {type:'PLAY_CARD',uid:s.hand[i]!.uid};
     case 'end':return {type:'END_TURN'};
   }

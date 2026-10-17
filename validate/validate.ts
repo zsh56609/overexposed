@@ -24,6 +24,9 @@ import {
   onceItem,
   playGroup,
   COUNTDOWN_LEVELS,
+  EVENT_CATEGORIES,
+  EVENT_FORMS,
+  EVENT_PRESS_KINDS,
   PROMINENCES,
   REGISTERS,
   SCENE_IDS,
@@ -70,6 +73,7 @@ export interface RawContent {
   readonly press?: unknown;
   readonly managers?: unknown;
   readonly scripts?: unknown;
+  readonly events?: unknown;
 }
 
 export interface ValidationResult {
@@ -115,7 +119,7 @@ const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
-  'seasons',
+  'seasons', 'events',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls', 'laneCards'];
 
@@ -140,7 +144,9 @@ type Owner =
   | { readonly kind: 'card'; readonly id: string }
   | { readonly kind: 'gate'; readonly id: string; readonly act: number }
   /** A manager's month-end effects: from the first month on. */
-  | { readonly kind: 'manager'; readonly id: string };
+  | { readonly kind: 'manager'; readonly id: string }
+  /** An event's answer (round R2): from the season of its first month on. */
+  | { readonly kind: 'event'; readonly id: string; readonly act: number };
 
 class Ctx {
   readonly issues: Issue[] = [];
@@ -882,7 +888,7 @@ function checkReachability(v: Ctx, rules: Obj | null, cards: readonly Obj[]): Re
   for (let changed = true; changed; ) {
     changed = false;
     for (const ref of v.addCardRefs) {
-      const from = ref.owner.kind === 'gate' ? ref.owner.act + 1 : ref.owner.kind === 'manager' ? 1 : (earliest[ref.owner.id] ?? Number.POSITIVE_INFINITY);
+      const from = ref.owner.kind === 'gate' ? ref.owner.act + 1 : ref.owner.kind === 'manager' ? 1 : ref.owner.kind === 'event' ? ref.owner.act : (earliest[ref.owner.id] ?? Number.POSITIVE_INFINITY);
       if (lower(ref.cardId, from)) changed = true;
     }
   }
@@ -1182,6 +1188,8 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   checkManagers(v, raw.managers, rules, raw.endings);
   checkFaces(v, rules, cards);
   checkScripts(v, raw.scripts, rules);
+  const paperIds = new Set(isObj(raw.press) && Array.isArray(raw.press.papers) ? raw.press.papers.map((p) => (isObj(p) ? p.id : undefined)).filter(isStr) : []);
+  checkEvents(v, raw.events, rules, paperIds);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1597,6 +1605,140 @@ function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
     });
   });
   for (const b of bandIds) if (!scripts.some((s) => s.band === b)) v.warn('structure', `${file} band ${String(b)}`, 'has no script');
+}
+
+// ---------------------------------------------------------------------------
+// Events (content/events.json, round R2): the categories that caption them, and each event's months, speaker,
+// chain, messages and choices. Every event has a choice with no requirement — the player can always answer.
+
+const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'choices'];
+const EVENT_CHOICE_FIELDS = ['replyKey', 'requires', 'effects', 'press', 'outcomeKey'];
+/** Events have their own budget (AGENTS.md → Content budget): a ceiling, not a target. */
+const EVENT_BUDGET = 15;
+
+function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: ReadonlySet<string>): void {
+  const file = 'content/events.json';
+  if (raw === undefined) return;
+  if (!isObj(raw)) return v.error('schema', file, 'must be { categories, events }');
+  v.fields(raw, ['categories', 'events'], file);
+  const re = rules && isObj(rules.events) ? rules.events : null;
+  const months: number[] = [];
+  if (!re) v.error('schema', 'rules.events', 'is missing: the months events come in');
+  else {
+    v.fields(re, ['months', 'maxChains', 'laneWeight'], 'rules.events');
+    if (!Array.isArray(re.months) || re.months.length === 0) v.error('schema', 'rules.events.months', 'must be a non-empty list of months');
+    else re.months.forEach((m, i) => v.int(m, `rules.events.months[${i}]`, [1, v.totalTurns]) && months.push(m));
+    v.int(re.maxChains, 'rules.events.maxChains', [0, 10]);
+    v.int(re.laneWeight, 'rules.events.laneWeight', [1, 10]);
+  }
+  const cats = isObj(raw.categories) ? raw.categories : null;
+  if (!cats) v.error('schema', `${file} categories`, 'must be an object, a { nameKey, lineKey } per category');
+  else {
+    v.fields(cats, EVENT_CATEGORIES, `${file} categories`);
+    for (const cat of EVENT_CATEGORIES) {
+      const c = cats[cat];
+      const at = `${file} categories.${cat}`;
+      if (!isObj(c)) {
+        v.error('schema', at, 'is missing');
+        continue;
+      }
+      v.fields(c, ['nameKey', 'lineKey'], at);
+      v.key(c.nameKey, `${at}.nameKey`);
+      v.key(c.lineKey, `${at}.lineKey`);
+    }
+  }
+  const perAct = Math.max(1, Math.round(v.totalTurns / Math.max(1, v.acts)));
+  const events = checkList(v, raw.events, `${file} events`, 'event', (e, where) => {
+    v.fields(e, EVENT_FIELDS, where);
+    if (!(EVENT_CATEGORIES as readonly unknown[]).includes(e.category)) v.error('schema', `${where}.category`, `must be one of ${EVENT_CATEGORIES.join(', ')}, got ${q(e.category)}`);
+    if (!(EVENT_FORMS as readonly unknown[]).includes(e.form)) v.error('schema', `${where}.form`, `must be one of ${EVENT_FORMS.join(', ')}, got ${q(e.form)}`);
+    const sp = isObj(e.speaker) ? e.speaker : null;
+    if (!sp) v.error('schema', `${where}.speaker`, 'must be an object');
+    else {
+      v.fields(sp, ['nameKey', 'labelKey', 'paper', 'letterheadKey', 'signoffKey'], `${where}.speaker`);
+      if (e.form === 'text') {
+        v.key(sp.nameKey, `${where}.speaker.nameKey`);
+        if (sp.labelKey !== undefined) v.key(sp.labelKey, `${where}.speaker.labelKey`);
+        if (sp.paper !== undefined || sp.letterheadKey !== undefined || sp.signoffKey !== undefined) v.error('schema', `${where}.speaker`, 'a text has a sender, not a letterhead');
+        v.key(e.titleKey, `${where}.titleKey`);
+      } else if (e.form === 'letter') {
+        v.key(sp.letterheadKey, `${where}.speaker.letterheadKey`);
+        v.key(sp.signoffKey, `${where}.speaker.signoffKey`);
+        if (sp.paper !== undefined && !paperIds.has(sp.paper as string)) v.error('references', `${where}.speaker.paper`, `no paper with id ${q(sp.paper)}`);
+        if (sp.nameKey !== undefined || sp.labelKey !== undefined) v.error('schema', `${where}.speaker`, 'a letter has a letterhead and a sign-off, not a sender');
+        if (e.titleKey !== undefined) v.error('schema', `${where}.titleKey`, 'a letter has no caption: its letterhead and date line head it');
+      }
+    }
+    if (e.chain !== undefined) {
+      if (!isObj(e.chain)) v.error('schema', `${where}.chain`, 'must be { id, role }');
+      else {
+        v.fields(e.chain, ['id', 'role'], `${where}.chain`);
+        v.id(e.chain.id, `${where}.chain.id`);
+        if (e.chain.role !== 'opener' && e.chain.role !== 'followUp') v.error('schema', `${where}.chain.role`, `must be opener or followUp, got ${q(e.chain.role)}`);
+      }
+    }
+    let firstAct = 1;
+    const w = isObj(e.when) ? e.when : null;
+    if (!w) v.error('schema', `${where}.when`, 'must be { months, condition?, lane? }');
+    else {
+      v.fields(w, ['months', 'condition', 'lane'], `${where}.when`);
+      const m = isObj(w.months) ? w.months : null;
+      if (!m) v.error('schema', `${where}.when.months`, 'must be { from, to? }');
+      else {
+        v.fields(m, ['from', 'to'], `${where}.when.months`);
+        const fromOk = v.int(m.from, `${where}.when.months.from`, [1, v.totalTurns]);
+        const toOk = v.int(m.to, `${where}.when.months.to`, [1, v.totalTurns], { optional: true });
+        const to = toOk ? (m.to as number) : v.totalTurns;
+        if (fromOk) {
+          firstAct = Math.ceil((m.from as number) / perAct);
+          if ((m.from as number) > to) v.error('ranges', `${where}.when.months`, 'from > to: it never comes');
+          else if (months.length > 0 && !months.some((x) => x >= (m.from as number) && x <= to)) v.warn('structure', `${where}.when.months`, 'no event month falls in its window: it never comes');
+        }
+      }
+      if (w.condition !== undefined) checkCondition(v, w.condition, `${where}.when.condition`);
+      if (w.lane !== undefined && !v.lanes.includes(w.lane as string)) v.error('references', `${where}.when.lane`, `no lane ${q(w.lane)} in rules.lanes`);
+    }
+    if (!Array.isArray(e.messageKeys) || e.messageKeys.length === 0) v.error('schema', `${where}.messageKeys`, 'must be a non-empty list of keys');
+    else {
+      const max = e.form === 'letter' ? 4 : 3;
+      if (e.messageKeys.length > max) v.error('ranges', `${where}.messageKeys`, `a ${String(e.form)} holds at most ${max}`);
+      e.messageKeys.forEach((k, i) => v.key(k, `${where}.messageKeys[${i}]`));
+    }
+    const choices = Array.isArray(e.choices) ? e.choices : [];
+    if (choices.length < 2 || choices.length > 3) v.error('ranges', `${where}.choices`, 'an event has two or three choices');
+    const owner: Owner = { kind: 'event', id: String(e.id), act: firstAct };
+    choices.forEach((ch, i) => {
+      const at = `${where}.choices[${i}]`;
+      if (!isObj(ch)) return v.error('schema', at, 'must be an object');
+      v.fields(ch, EVENT_CHOICE_FIELDS, at);
+      v.key(ch.replyKey, `${at}.replyKey`);
+      v.key(ch.outcomeKey, `${at}.outcomeKey`);
+      if (ch.requires !== undefined) checkCondition(v, ch.requires, `${at}.requires`);
+      checkEffects(v, ch.effects, `${at}.effects`, owner);
+      if (ch.press !== undefined) {
+        const p = ch.press;
+        if (!isObj(p)) return v.error('schema', `${at}.press`, 'must be { paper, kind, lineKeys }');
+        v.fields(p, ['paper', 'kind', 'lineKeys'], `${at}.press`);
+        if (!paperIds.has(p.paper as string)) v.error('references', `${at}.press.paper`, `no paper with id ${q(p.paper)}`);
+        if (!(EVENT_PRESS_KINDS as readonly unknown[]).includes(p.kind)) v.error('schema', `${at}.press.kind`, `must be one of ${EVENT_PRESS_KINDS.join(', ')}, got ${q(p.kind)}`);
+        v.keys(p.lineKeys, `${at}.press.lineKeys`);
+      }
+    });
+    if (choices.length > 0 && !choices.some((ch) => isObj(ch) && ch.requires === undefined)) v.error('structure', `${where}.choices`, 'needs a choice with no requirement: the player can always answer');
+  });
+  const chains = new Map<string, { openers: number; followUps: number }>();
+  for (const e of events) {
+    if (!isObj(e.chain) || !isStr(e.chain.id)) continue;
+    const c = chains.get(e.chain.id) ?? { openers: 0, followUps: 0 };
+    if (e.chain.role === 'opener') c.openers++;
+    else c.followUps++;
+    chains.set(e.chain.id, c);
+  }
+  for (const [id, c] of chains) {
+    if (c.openers !== 1) v.error('structure', `${file} chain ${id}`, `has ${c.openers} openers: a chain opens once`);
+    if (c.followUps === 0) v.warn('structure', `${file} chain ${id}`, 'has no follow-up: nothing comes back');
+  }
+  if (events.length > EVENT_BUDGET) v.error('budget', 'event count', `${events.length} is over the budget of ${EVENT_BUDGET}: a ceiling, not a target`);
 }
 
 /** The content budget: a ceiling per kind (CONTENT_BUDGET), not a target. */

@@ -36,6 +36,10 @@ import {
   freeRerollAvailable,
   frontPages,
   getCard,
+  getEvent,
+  isEventMonth,
+  rememberedFlags,
+  runChains,
   lastWord,
   moodOf,
   getGate,
@@ -65,7 +69,7 @@ import {
 } from '../core/index.ts';
 import { validateContent } from '../validate/validate.ts';
 import { loadRawContent } from '../validate/load.ts';
-import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewGate, previewPlay } from '../ui/preview.ts';
+import { addedBy, outcomeOf, previewDraftCard, previewEndTurn, previewEventChoice, previewGate, previewPlay } from '../ui/preview.ts';
 import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
@@ -82,7 +86,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -183,7 +187,7 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   if (!same(pe.perk?.outcome ?? null, realPerk)) report('endTurn perk', seed, s.turn, `preview ${JSON.stringify(pe.perk)}, real ${JSON.stringify(realPerk)}`);
   // What carries is the heat the next month opens with: independent of the events when it opens on a draft
   // or a gate (nothing has drawn yet); otherwise the check's heat and the relief after it.
-  const carried = real.phase === 'draft' || real.phase === 'gate' ? real.resources.heat : end.resources.heat + (realPerk?.deltas.heat ?? 0);
+  const carried = real.phase === 'draft' || real.phase === 'gate' || real.phase === 'event' ? real.resources.heat : end.resources.heat + (realPerk?.deltas.heat ?? 0);
   if (pe.heatAfter !== carried) report('endTurn carry', seed, s.turn, `preview ${pe.heatAfter}, real ${carried}`);
   // Heat carries into a next month unless this month end leads straight to the year's end.
   const yearEnds = real.phase === 'gate' && reduce(real, { type: 'CHOOSE_GATE', gateId: real.gateOffer[0] ?? '' }).phase === 'ended';
@@ -197,6 +201,69 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   counts.copies += realCards.filter((x) => x.cause.kind === 'added').length;
   // The preview never reveals the next turn's draw.
   if (pe.outcome.drawn !== 0) report('endTurn leak', seed, s.turn, `preview reports ${pe.outcome.drawn} next-turn draws`);
+}
+
+/**
+ * An event (round R2): every answer's preview against the real answer — whether it can be chosen and what it still
+ * needs, the resources it moves (independent of the events when the month opens on its offers), the actions it
+ * spends, the line it prints as the run then prints it, in its choice's paper; and "↺ remembered" exactly when it
+ * sets a flag some event reads.
+ */
+function checkEventPhase(s: GameState, seed: number, history: readonly PlayedStep[]): void {
+  const ev = getEvent(s.content, s.event ?? '');
+  if (!ev) return report('event', seed, s.turn, `the event phase holds no event (${s.event})`);
+  counts.events++;
+  if (!isEventMonth(s.content, s.turn)) report('event month', seed, s.turn, `${ev.id} came in a month that is not an event month`);
+  const legal = new Set(legalActions(s).flatMap((a) => (a.type === 'CHOOSE_EVENT' ? [a.choice] : [])));
+  if (legal.size === 0) report('event', seed, s.turn, `${ev.id}: no answer can be chosen`);
+  const lines = { ...readLines(history), lane: establishedLanes(history).at(-1) ?? null };
+  const remembered = rememberedFlags(s.content);
+  ev.choices.forEach((def, choice) => {
+    counts.eventChoices++;
+    const p = previewEventChoice(s, choice, lines);
+    if (p.ok !== legal.has(choice)) report('event legal', seed, s.turn, `${ev.id}/${choice}: preview ok=${p.ok}, legal=${legal.has(choice)}`);
+    const sets = def.effects.some((e) => e.op === 'setFlag' && remembered.has(e.flag));
+    if (p.remembered !== sets) report('event remembered', seed, s.turn, `${ev.id}/${choice}: remembered=${p.remembered}, sets a flag an event reads=${sets}`);
+    if (!p.ok) {
+      if (p.needs.length === 0 || evaluate(def.requires, s)) report('event needs', seed, s.turn, `${ev.id}/${choice}: unavailable, needs ${JSON.stringify(p.needs)}`);
+      return;
+    }
+    const real = reduce(s, { type: 'CHOOSE_EVENT', choice });
+    if (real.event !== null || real.eventLog.at(-1)?.eventId !== ev.id) report('event log', seed, s.turn, `${ev.id}/${choice}: not recorded`);
+    if (real.phase === 'draft') {
+      for (const k of RESOURCE_KEYS) {
+        const delta = real.resources[k] - s.resources[k];
+        if (p.outcome?.deltas[k] !== delta) report('event delta', seed, s.turn, `${ev.id}/${choice} ${k}: preview ${p.outcome?.deltas[k]}, real ${delta}`);
+      }
+    }
+    // Actions: independent of the events when the month opens on its offers (a card drawn may move them).
+    if (real.phase === 'draft' && p.slots !== real.slots - s.slots) report('event slots', seed, s.turn, `${ev.id}/${choice}: preview ${p.slots}, real ${real.slots - s.slots}`);
+    const step: PlayedStep = { id: (history.at(-1)?.id ?? 0) + 1, action: { type: 'CHOOSE_EVENT', choice }, before: s, after: real, events: real.events };
+    const printed = pressLines([...history, step]).filter((l) => l.step === history.length);
+    const fromEvent = printed.filter((l) => l.source !== undefined);
+    if (!same(fromEvent.map((l) => [l.key, l.paper, l.kind]), p.press ? [[p.press.line.key, p.press.paper, p.press.kind === 'scandal' ? 'scandal' : 'play']] : [])) {
+      report('event press', seed, s.turn, `${ev.id}/${choice}: preview ${JSON.stringify(p.press)}, printed ${JSON.stringify(fromEvent)}`);
+    }
+    // A scandal the answer adds is held, not printed: the answer's own line is its story (no "Going to press").
+    if (printed.some((l) => l.source === undefined && l.kind === 'scandal')) report('event scandal', seed, s.turn, `${ev.id}/${choice}: an added scandal printed a line of its own`);
+    if (p.press) counts.eventLines++;
+  });
+}
+
+/** A run's events (round R2): each at most once, in event months, at most rules.events.maxChains chains, follow-ups after their openers. */
+function checkEventLog(s: GameState, seed: number): void {
+  counts.eventRuns++;
+  const ids = s.eventLog.map((r) => r.eventId);
+  if (new Set(ids).size !== ids.length) report('event once', seed, s.turn, `an event came twice: ${ids.join(', ')}`);
+  for (const r of s.eventLog) if (!isEventMonth(s.content, r.turn)) report('event month', seed, r.turn, `${r.eventId} in a month that is not an event month`);
+  const chains = runChains(s);
+  if (chains.length > (s.content.rules.events?.maxChains ?? 0)) report('event chains', seed, s.turn, `${chains.length} chains opened`);
+  for (const r of s.eventLog) {
+    const chain = getEvent(s.content, r.eventId)?.chain;
+    if (chain?.role !== 'followUp') continue;
+    const opener = s.eventLog.find((x) => getEvent(s.content, x.eventId)?.chain?.id === chain.id && getEvent(s.content, x.eventId)?.chain?.role === 'opener');
+    if (!opener || opener.turn >= r.turn) report('event chain', seed, r.turn, `${r.eventId} came without its opener before it`);
+  }
 }
 
 function checkGatePhase(s: GameState, seed: number): void {
@@ -221,9 +288,9 @@ function checkGatePhase(s: GameState, seed: number): void {
     if (!same(p.awardIds, realAwards)) report('gate awards', seed, s.turn, `${gateId}: preview ${JSON.stringify(p.awardIds)}, real ${JSON.stringify(realAwards)}`);
     predicted.push(`${p.majorId}:${p.endingId}|${(p.awardIds ?? []).join()}`);
     if (p.clauses.every((c) => c.met) !== evaluate(getGate(s.content, gateId)?.requires, s)) report('gate clauses', seed, s.turn, `${gateId}: clauses disagree with evaluate`);
-    // Independent of the events: the next season opens on its draft (or the run ends) before anything
-    // else can touch resources, so the real state diff is exactly the gate's branch.
-    if (real.phase === 'draft' || real.phase === 'ended') {
+    // Independent of the events: the next season opens on its event or its draft (or the run ends) before
+    // anything else can touch resources, so the real state diff is exactly the gate's branch.
+    if (real.phase === 'draft' || real.phase === 'event' || real.phase === 'ended') {
       for (const k of RESOURCE_KEYS) {
         const delta = real.resources[k] - s.resources[k];
         if (p.outcome.deltas[k] !== delta) report('gate delta', seed, s.turn, `${gateId} ${k}: preview ${p.outcome.deltas[k]}, real ${delta}`);
@@ -753,12 +820,14 @@ for (let i = 0; i < RUNS; i++) {
     if (s.phase === 'play') checkPlayPhase(s, seed, history);
     else if (s.phase === 'gate') checkGatePhase(s, seed);
     else if (s.phase === 'draft') checkDraftPhase(s, seed);
+    else if (s.phase === 'event') checkEventPhase(s, seed, history);
     const action = choose(s, rng);
     const next = reduce(s, action);
     history.push({ id: history.length + 1, action, before: s, after: next, events: next.events });
     s = next;
   }
   if (s.phase !== 'ended') report('walk', seed, s.turn, 'run did not end');
+  checkEventLog(s, seed);
   checkPages(history, seed);
   checkMessages(history, seed);
   checkPhotos(seed);
@@ -767,7 +836,7 @@ for (let i = 0; i < RUNS; i++) {
 console.log(
   `preview check: ${RUNS} seeded runs, ${counts.states} states — ${counts.plays} card plays (${counts.crossings} cross or cool a line, ${counts.headlines} headlines matched to the feed), ` +
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
-    `${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
+    `${counts.events} events (${counts.eventChoices} answers previewed, ${counts.eventLines} printing a line; ${counts.eventRuns} runs' event logs), ${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +

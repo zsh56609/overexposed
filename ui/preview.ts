@@ -6,8 +6,12 @@
 // draw reports how many cards, never which.
 
 import {
+  choiceRemembered,
+  eventChoiceCheck,
+  eventPress,
   explainCondition,
   getCard,
+  getEvent,
   getGate,
   heatLine,
   legalActions,
@@ -274,6 +278,56 @@ export function previewGate(state: GameState, gateId: string): GatePreview {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Events (round R2)
+
+export interface EventChoicePreview {
+  readonly choice: number;
+  /** Whether it can be chosen now; when not, the clauses it still needs ("Needs …"). */
+  readonly ok: boolean;
+  readonly needs: readonly ClauseReport[];
+  /** What the answer does — its own effects, up to the month going on — from the reducer run on it; null when it can't be chosen. */
+  readonly outcome: Outcome | null;
+  /** Actions it spends (negative) or gives, this month. */
+  readonly slots: number;
+  /** "↺ remembered": it sets a flag some event's condition reads (core/events.ts). */
+  readonly remembered: boolean;
+  /** The line it prints when chosen, as it would print: its showing, paper and subject; null when it prints nothing. */
+  readonly press: { readonly line: LineShow; readonly kind: 'loud' | 'scandal'; readonly paper: string; readonly subjectKey: string | null } | null;
+}
+
+/** One answer to the event waiting, from the reducer run on it: the same events the real answer will have. */
+export function previewEventChoice(state: GameState, choice: number, lines: LinesSoFar): EventChoicePreview {
+  const eventId = state.event ?? '';
+  const check = eventChoiceCheck(state, eventId, choice);
+  const remembered = choiceRemembered(state.content, eventId, choice);
+  const press = eventPress(state.content, eventId, choice);
+  const def = getEvent(state.content, eventId)?.choices[choice];
+  if (!check.ok || !def) {
+    const slots = (def?.effects ?? []).reduce((n, e) => n + (e.op === 'slots' ? e.value : 0), 0);
+    return { choice, ok: false, needs: check.needs, outcome: null, slots, remembered, press: null };
+  }
+  const after = reduce(state, { type: 'CHOOSE_EVENT', choice });
+  const at = after.events.findIndex((e) => e.type === 'eventChosen');
+  const rest = after.events.slice(at + 1);
+  const stop = rest.findIndex((e) => e.type === 'draftOffer' || e.type === 'turnStart');
+  const own = stop === -1 ? rest : rest.slice(0, stop);
+  const slots = own.reduce((n, e) => n + (e.type === 'slots' ? e.delta : 0), 0);
+  // Its line: the next showing of its group, from the run's counter (forked), as it prints with the fame after it.
+  const counted = lines.counter.fork();
+  const taken = after.events.slice(0, at + 1).flatMap((e) => counted.take(e)).find((x) => x.source !== undefined);
+  const subjectKey = pressOf(state.content, '', printContext(after, own, nextEstablishedLane(after, lines.lane))).subjectKey;
+  return {
+    choice,
+    ok: true,
+    needs: [],
+    outcome: outcomeOf(own),
+    slots,
+    remembered,
+    press: press && taken ? { line: taken.line, kind: press.kind, paper: press.paper, subjectKey } : null,
+  };
+}
+
 /** A card on a draft offer can't be played yet: its requirement, live against the current state. */
 export function previewDraftCard(state: GameState, cardId: string): readonly ClauseReport[] {
   return explainCondition(getCard(state.content, cardId)?.requires, state);
@@ -291,6 +345,8 @@ export interface Legal {
   readonly extraPick: boolean;
   readonly reroll: boolean;
   readonly gates: ReadonlySet<string>;
+  /** The event's answers that can be chosen now (round R2), by index. */
+  readonly choices: ReadonlySet<number>;
 }
 
 export function legalOf(state: GameState): Legal {
@@ -298,6 +354,7 @@ export function legalOf(state: GameState): Legal {
   const picks = new Set<string>();
   const gates = new Set<string>();
   const managers = new Set<string>();
+  const choices = new Set<number>();
   let endTurn = false;
   let extraPick = false;
   let reroll = false;
@@ -309,6 +366,7 @@ export function legalOf(state: GameState): Legal {
     else if (a.type === 'DRAFT_REROLL') reroll = true;
     else if (a.type === 'CHOOSE_GATE') gates.add(a.gateId);
     else if (a.type === 'CHOOSE_MANAGER') managers.add(a.managerId);
+    else if (a.type === 'CHOOSE_EVENT') choices.add(a.choice);
   }
-  return { managers, play, endTurn, picks, extraPick, reroll, gates };
+  return { managers, play, endTurn, picks, extraPick, reroll, gates, choices };
 }

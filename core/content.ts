@@ -530,6 +530,18 @@ export interface DraftRules {
 }
 
 /** Run-level tuning numbers. Data, so the heat loop can be tuned without touching code. */
+/**
+ * Events (phase 3; round R2; docs/design/content-expansion.md §5): when they come, and how a run draws them. At the
+ * start of each month listed, before the offers and the draw.
+ */
+export interface EventRules {
+  readonly months: readonly number[];
+  /** Chains a run may open; after that, openers are no longer drawn. */
+  readonly maxChains: number;
+  /** An event with a lane is this many times as likely while that lane is established. */
+  readonly laneWeight: number;
+}
+
 export interface Rules {
   readonly acts: number;
   readonly turnsPerAct: number;
@@ -585,6 +597,8 @@ export interface Rules {
   readonly calendar?: { readonly startMonth: number; readonly startYear: number };
   /** The stat bar's tooltip lines for the stats without tiers (round 2c): money, the countdown, actions. */
   readonly statTips?: StatTips;
+  /** Events (round R2). Absent: no event comes. */
+  readonly events?: EventRules;
 }
 
 /** Tooltip lines for the stats that have no tiers: money, the next-scandal countdown (to go, or to the next once a line is crossed), actions. */
@@ -645,6 +659,71 @@ export interface Content {
   readonly managers?: ManagersDef;
   /** Desk scripts (round 2c), for the visual phase. */
   readonly scripts?: DeskScriptsDef;
+  /** Events (round R2). Absent: none come. */
+  readonly events?: EventsDef;
+}
+
+// ---------------------------------------------------------------------------
+// Events (phase 3; round R2): the world acting on the player. Someone texts, or a letter arrives, and the player
+// answers; some answers come back later (a chain's follow-up reads the flag its opener set). Keys only.
+
+export const EVENT_CATEGORIES = ['personal', 'industry', 'press', 'rival'] as const;
+export type EventCategory = (typeof EVENT_CATEGORIES)[number];
+export const EVENT_FORMS = ['text', 'letter'] as const;
+export type EventForm = (typeof EVENT_FORMS)[number];
+export const EVENT_PRESS_KINDS = ['loud', 'scandal'] as const;
+export type EventPressKind = (typeof EVENT_PRESS_KINDS)[number];
+
+/** Who speaks: a text's sender (a name, and a label under it); a letter's letterhead (a paper's desk, or a house) and sign-off. */
+export interface EventSpeakerDef {
+  readonly nameKey?: string;
+  readonly labelKey?: string;
+  /** A letter on a paper's letterhead: its masthead heads the letter, the letterhead key names the desk. */
+  readonly paper?: string;
+  readonly letterheadKey?: string;
+  readonly signoffKey?: string;
+}
+
+/** What a choice prints, at the moment it is chosen: in its paper, as a LOUD line or a scandal's. */
+export interface EventPressDef {
+  readonly paper: string;
+  readonly kind: EventPressKind;
+  readonly lineKeys: readonly string[];
+}
+
+export interface EventChoiceDef {
+  readonly replyKey: string;
+  /** Unmet: the choice shows, disabled, with what it needs. */
+  readonly requires?: Condition;
+  readonly effects: readonly Effect[];
+  readonly press?: EventPressDef;
+  readonly outcomeKey: string;
+}
+
+export interface EventDef {
+  readonly id: string;
+  readonly category: EventCategory;
+  readonly form: EventForm;
+  /** A text's caption title. A letter has none: its letterhead and date line head it. */
+  readonly titleKey?: string;
+  readonly speaker: EventSpeakerDef;
+  /** A chain's opener, or one of its follow-ups. A one-off has none. */
+  readonly chain?: { readonly id: string; readonly role: 'opener' | 'followUp' };
+  readonly when: {
+    /** The months it may come in, inclusive (`to` defaults to the year's last). */
+    readonly months: { readonly from: number; readonly to?: number };
+    readonly condition?: Condition;
+    /** Its weight doubles (rules.events.laneWeight) while this lane is established. */
+    readonly lane?: string;
+  };
+  /** A text's bubbles (up to three) or a letter's paragraphs (up to four). */
+  readonly messageKeys: readonly string[];
+  readonly choices: readonly EventChoiceDef[];
+}
+
+export interface EventsDef {
+  readonly categories: Readonly<Record<EventCategory, { readonly nameKey: string; readonly lineKey: string }>>;
+  readonly events: readonly EventDef[];
 }
 
 // ---------------------------------------------------------------------------
@@ -675,6 +754,9 @@ export interface ContentIndex {
   readonly scandalSharedTags: readonly string[];
   /** Every non-scandal card id in content order: the pool drafts are offered from (filtered by actMin). */
   readonly draftPool: readonly string[];
+  /** Events in content order (round R2); empty when content has none. */
+  readonly events: readonly EventDef[];
+  readonly eventCategories: EventsDef['categories'] | null;
 }
 
 export function indexContent(content: Content): ContentIndex {
@@ -700,6 +782,8 @@ export function indexContent(content: Content): ContentIndex {
     scripts: content.scripts ?? null,
     scandalIds: content.cards.filter((c) => c.kind === 'scandal').map((c) => c.id),
     draftPool: content.cards.filter((c) => c.kind !== 'scandal').map((c) => c.id),
+    events: content.events?.events ?? [],
+    eventCategories: content.events?.categories ?? null,
   };
 }
 
@@ -712,6 +796,7 @@ export function getGate(index: ContentIndex, id: string): GateDef | undefined {
 }
 
 export const getMajor = (index: ContentIndex, id: string): MajorDef | undefined => index.majors.find((m) => m.id === id);
+export const getEvent = (index: ContentIndex, id: string): EventDef | undefined => index.events.find((e) => e.id === id);
 
 /** A card's face (round 2c): its own, or its lane's default — a scandal's, the scandals'. */
 export function cardFace(index: ContentIndex, id: string): CardFace | null {

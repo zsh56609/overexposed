@@ -3,7 +3,7 @@
 // the run's history — the steps the UI played, or the sim's trace — never from the game RNG, so the preview
 // and the feed count the same way and the preview shows exactly what will print. Ids, keys and numbers only.
 
-import { CoreError, getCard, type ContentIndex } from './content.ts';
+import { CoreError, getCard, getEvent, type ContentIndex } from './content.ts';
 import type { GameEvent, GameState } from './state.ts';
 import { bagKey } from './variants.ts';
 
@@ -29,10 +29,20 @@ export interface LineShow {
 
 export type LineKind = 'play' | 'scandal' | 'inHand';
 
-/** A showing an event causes: a card's headline, a scandal's headline, or a scandal's in-hand line. */
+/** Where an event's answer printed from (round R2, Part D): the event and the choice. */
+export interface LineSource {
+  readonly eventId: string;
+  readonly choice: number;
+}
+
+/**
+ * A showing an event causes: a card's headline, a scandal's headline, a scandal's in-hand line — or an event's
+ * answer printed (round R2): a LOUD line as a card's ('play'), a scandal's as a scandal's, with its `source`.
+ */
 export interface TakenLine {
   readonly kind: LineKind;
   readonly line: LineShow;
+  readonly source?: LineSource;
 }
 
 /**
@@ -43,6 +53,8 @@ export class LineCounter {
   readonly content: ContentIndex;
   readonly seed: number;
   private readonly counts: Map<string, number>;
+  /** Inside an event's answer (round R2): from its eventChosen to the month going on, a scandal it adds is held, not printed. */
+  private inEvent = false;
 
   constructor(content: ContentIndex, seed: number, counts: ReadonlyMap<string, number> = new Map()) {
     this.content = content;
@@ -62,7 +74,9 @@ export class LineCounter {
 
   /** Another counter from here on, leaving this one as it is (a preview's hypothetical). */
   fork(): LineCounter {
-    return new LineCounter(this.content, this.seed, this.counts);
+    const copy = new LineCounter(this.content, this.seed, this.counts);
+    copy.inEvent = this.inEvent;
+    return copy;
   }
 
   /** The next showing of a group with these variants. */
@@ -87,12 +101,25 @@ export class LineCounter {
     return this.next(inHandGroup(cardId), getCard(this.content, cardId)?.inHandKeys);
   }
 
-  /** Advance over one event: the showings it causes, in order. */
+  /**
+   * Advance over one event: the showings it causes, in order. An event's answer prints its own line, if it has
+   * one (round R2, Part D) — a scandal card it adds goes to the discard pile as a scandal held: no headline of its
+   * own, nothing going to press — until the month goes on.
+   */
   take(e: GameEvent): TakenLine[] {
     const isScandal = (id: string) => getCard(this.content, id)?.kind === 'scandal';
+    if (e.type === 'eventChosen') {
+      this.inEvent = true;
+      const press = getEvent(this.content, e.eventId)?.choices[e.choice]?.press;
+      if (!press) return [];
+      const line = this.next(`event:${e.eventId}:${e.choice}`, press.lineKeys);
+      return [{ kind: press.kind === 'scandal' ? 'scandal' : 'play', line, source: { eventId: e.eventId, choice: e.choice } }];
+    }
+    if (e.type === 'draftOffer' || e.type === 'turnStart' || e.type === 'gateOffer' || e.type === 'turnEnd') this.inEvent = false;
     if (e.type === 'play') return [{ kind: 'play', line: this.play(e.cardId) }];
     if (e.type === 'draw' && isScandal(e.cardId)) return [{ kind: 'inHand', line: this.inHand(e.cardId) }];
     if (e.type === 'addCard' && isScandal(e.cardId)) {
+      if (this.inEvent) return [];
       const taken: TakenLine[] = [{ kind: 'scandal', line: this.scandal(e.cardId) }];
       // A scandal added straight to the hand shows its in-hand line too.
       if (e.to === 'hand') taken.push({ kind: 'inHand', line: this.inHand(e.cardId) });
@@ -110,6 +137,8 @@ export interface PrintedLine extends LineShow {
   readonly event: number;
   readonly uid: number;
   readonly cardId: string;
+  /** An event's answer (round R2): it has no card — `cardId` is empty and `uid` −1. */
+  readonly source?: LineSource;
 }
 
 export interface RunLines {
@@ -130,9 +159,10 @@ export function readLines(history: readonly HistoryStep[]): RunLines {
   const inHand = new Map<number, LineShow>();
   history.forEach((step, i) => {
     step.events.forEach((e, j) => {
-      if (e.type !== 'play' && e.type !== 'draw' && e.type !== 'addCard') return;
       for (const taken of counter.take(e)) {
-        if (taken.kind === 'inHand') inHand.set(e.uid, taken.line);
+        if (taken.source) printed.push({ ...taken.line, kind: taken.kind === 'scandal' ? 'scandal' : 'play', step: i, event: j, uid: -1, cardId: '', source: taken.source });
+        else if (e.type !== 'play' && e.type !== 'draw' && e.type !== 'addCard') continue;
+        else if (taken.kind === 'inHand') inHand.set(e.uid, taken.line);
         else printed.push({ ...taken.line, kind: taken.kind, step: i, event: j, uid: e.uid, cardId: e.cardId });
       }
     });
