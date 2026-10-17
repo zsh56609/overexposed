@@ -1,10 +1,13 @@
 // The papers (round V1a; README §2, §7), back left: The Daily Flash, B-Side and Marquee standing on the desk, this
 // month's issue. /core's lead paper stands in front, the other two behind with their mastheads showing; clicking
-// a paper behind pulls it forward — a choice that lasts until the issue or its lead changes. Switching papers
-// re-renders only the papers. Every word, the photograph's scene and drawing, and the box office are the
+// a paper behind pulls it forward. The paper comes to the player (round R1, H3): a play that prints in a paper
+// behind brings that paper forward while the card is carried, with the same motion. The paper in front stays until
+// another play brings a different one forward, the player picks one, or the month ends and the new issue's lead
+// takes the desk. Reduced motion swaps the papers with a short crossfade. Switching papers re-renders only the papers. Every word, the photograph's scene and drawing, and the box office are the
 // adapter's (./model.ts).
 
-import { memo, useCallback, useState, type KeyboardEvent } from 'react';
+import { memo, useCallback, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { motionMode } from '../motion.ts';
 import { isPlaceholder } from '../text.ts';
 import { photoUrl } from './halftone.ts';
 import type { ItemModel, PageModel, PapersModel, RightModel } from './model.ts';
@@ -105,18 +108,37 @@ const Paper = memo(function Paper({ page, pos, forward, label }: { page: PageMod
   );
 });
 
-export const Papers = memo(function Papers({ papers }: { papers: PapersModel | null }) {
-  // The paper the player pulled forward, for the issue and lead it was pulled in.
-  const [pick, setPick] = useState<{ key: string; paper: string } | null>(null);
-  const key = papers ? `${papers.turn}:${papers.lead}` : '';
-  const forward = useCallback((paper: string) => setPick({ key, paper }), [key]);
+/** The paper a play in flight brings forward (ui/desk/model.ts paperForPlay), once per play. */
+export interface IncomingPaper {
+  readonly id: number;
+  readonly paper: string | null;
+}
+
+export const Papers = memo(function Papers({ papers, incoming }: { papers: PapersModel | null; incoming: IncomingPaper | null }) {
+  // The paper in front for this month: the last one a play brought forward or the player pulled forward.
+  const [chosen, setChosen] = useState<{ turn: number; paper: string } | null>(null);
+  const turn = papers?.turn ?? 0;
+  const forward = useCallback((paper: string) => setChosen({ turn, paper }), [turn]);
+  const seen = useRef(0);
+  useLayoutEffect(() => {
+    if (!incoming || incoming.id === seen.current) return;
+    seen.current = incoming.id;
+    if (incoming.paper) setChosen({ turn, paper: incoming.paper });
+  }, [incoming, turn]);
+  const news = useRef<HTMLDivElement>(null);
+  const front = papers && chosen?.turn === papers.turn && papers.pages.some((p) => p.paper === chosen.paper) ? chosen.paper : (papers?.lead ?? '');
+  const shown = useRef(front);
+  useLayoutEffect(() => {
+    if (shown.current === front) return;
+    shown.current = front;
+    if (motionMode() === 'reduced') news.current?.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 150 });
+  }, [front]);
   if (!papers) return null;
-  const front = pick?.key === key && papers.pages.some((p) => p.paper === pick.paper) ? pick.paper : papers.lead;
   const order = [front, ...papers.pages.map((p) => p.paper).filter((p) => p !== front)];
   return (
     <>
       <div className="baseShadow" />
-      <div className="news" data-hook="papers" data-front={front}>
+      <div className="news" data-hook="papers" data-front={front} ref={news}>
         {papers.pages.map((page) => (
           <Paper key={page.paper} page={page} pos={order.indexOf(page.paper)} forward={forward} label={papers.forwardLabel} />
         ))}

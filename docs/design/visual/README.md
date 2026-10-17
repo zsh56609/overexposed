@@ -64,6 +64,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 - The Daily Flash (red banner masthead, ALL CAPS), B-Side (music weekly, sentence case), Marquee (trade paper, Title Case). Mastheads with ears; datelines show the month and year and an issue number; **no founding years**.
 - **Lead paper** stands in front; the other two stand behind with their mastheads visible. Clicking a back paper pulls it forward. **Switching papers re-renders only the papers — never the hand.**
+- **The paper comes to you** (round R1): when a play prints a story in a paper behind, that paper comes forward — the same motion as a click — while the card is carried, so the story prints in front of the player. It stays in front until another play brings a different paper forward, the player picks one, or the month ends (the new issue's lead paper takes the desk). A play that changes more than one paper brings forward the one whose lead changed; if both or neither did, the one with the played card's own story; a play that changes no visible story moves nothing. It never lengthens the play's input hold. Reduced motion: the papers swap under a short crossfade.
 - **Mark my stories** (a setting, on by default): the player's stories carry a red rule in the left margin; the rival's carry a purple one.
 - **Photographs:** only the lead story has one. Halftone, drawn in code (see Porting). Eight scenes: singer at a microphone · the rival with a guitar · festival crowd · paparazzi (red duotone, only when a scandal leads) · red carpet · film set · street in each season (sun, rain, wind, snow) · award under a spotlight. Rule learned: a silhouette needs light behind it, and a picture is recognised by one iconic object.
 - **Photo selection:** every line group carries a scene tag (defined in round 2c); each scene has several variants generated from the same drawing code with different seeds; choose with the shuffle bag; never the same picture on the same paper two months running.
@@ -159,8 +160,8 @@ italic line.
   converges with the phone and the desk. Once down it sits beneath the hand, and the
   nearest hand cards may hide part of it. As it lands its
   line is **printed**: on the front paper a new item, "Just in", appears left to right
-  as if under a press roller, with a brief warm flash and the red margin rule; a paper
-  standing behind lifts for a moment; quiet work is written into the **notebook**.
+  as if under a press roller, with a brief warm flash and the red margin rule; the paper it prints in has
+  come forward while the card was carried (§2); quiet work is written into the **notebook**.
   One action bulb goes dark and the hand closes the gap. **Stat changes are quiet**: a
   small signed figure ("+4", "−£1,000") appears just above the value in its resource's
   colour and fades; the value itself rolls to its new number, briefly tinted — no icons,

@@ -138,11 +138,20 @@
 .desk .endbtn b { display: block; font-weight: 800; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; }
 .desk .endbtn span { display: block; font-weight: 600; font-size: 11px; letter-spacing: .04em; margin-top: 2px; opacity: .85; }
 .desk.crisis .endbtn { background: var(--red); border-color: #FFF3EF; color: #FFF3EF; }
+/* Buttons share one short hover transition (round R1, H4). */
+.desk .endbtn, .desk .stats .deckbtn, .desk .stats .setbtn { transition: background-color .15s, color .15s, border-color .15s, box-shadow .15s; }
 .desk .endbtn:hover, .desk .endbtn:focus-visible { box-shadow: 0 10px 20px rgba(0, 0, 0, .6), 0 0 0 2px rgba(255, 207, 133, .5); outline: none; }
 .desk .endbtn:disabled { opacity: .5; cursor: default; }
 
 /* The floating previews (the plain previews, dressed for the desk): a newsprint slip above the hand. */
 .desk .floating { position: absolute; z-index: 90; pointer-events: none; }
+/* One way to appear (round R1, H4): the stat bar's tooltip's rise and fade, after a brief delay; a quick fade out. */
+.desk .floating.in { animation: desk-pop-in .15s ease-out 70ms both; }
+.desk .floating.out { animation: desk-pop-out .1s ease-in both; }
+@keyframes desk-pop-in { from { opacity: 0; transform: translateY(5px); } }
+@keyframes desk-pop-out { to { opacity: 0; } }
+@keyframes desk-fade-in { from { opacity: 0; } }
+:root[data-motion-resolved='reduced'] .desk .floating.in { animation-name: desk-fade-in; }
 .desk .floating .preview { background: var(--cream); color: var(--ink); border: 1px solid rgba(21, 18, 14, .5); box-shadow: 0 12px 24px rgba(0, 0, 0, .6); padding: 10px 13px 11px; font-size: 12px; line-height: 1.38; }
 .desk .floating .preview.danger { border-color: var(--red); box-shadow: 0 12px 24px rgba(0, 0, 0, .6), inset 3px 0 0 var(--red); }
 .desk .floating .preview h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 15px; margin-bottom: 4px; }

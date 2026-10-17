@@ -11,6 +11,9 @@
   box-shadow: 0 16px 28px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(60, 48, 30, .12);
   left: 0; top: 0; transition: transform .5s; will-change: transform; outline: none;
 }
+/* Reduced motion: the papers swap at once, under a short crossfade (Papers.tsx). */
+:root[data-motion-resolved='reduced'] .desk .pp, :root[data-motion-resolved='off'] .desk .pp { transition: none;
+}
 /* A paper behind stands in shadow: a dark veil (the mockup's brightness .84 and .9), faded on the compositor. */
 .desk .pp::before { content: ""; position: absolute; inset: 0; z-index: 5; background: #000; opacity: var(--shade, 0); transition: opacity .5s; pointer-events: none; }
 .desk .pp::after {

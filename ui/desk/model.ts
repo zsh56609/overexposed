@@ -291,6 +291,27 @@ export function deskIssue(s: GameState, steps: readonly PlayedStep[]): { readonl
   return { issue: frontPages(history).slice(-1)[0] ?? null, history };
 }
 
+/**
+ * The paper a play brings to the front (round R1, H3; README §2): of the papers whose visible stories — the lead
+ * and the row of three — the play changes, the one whose lead changed; when both or neither changed their lead,
+ * the one with the played card's own story. None when the play changes no visible story. Read from the desk's
+ * issue before and after the play, as the desk shows them; `history` is the run before the play.
+ */
+export function paperForPlay(history: readonly PlayedStep[], step: PlayedStep): string | null {
+  if (!step.before || step.before.phase !== 'play' || step.after.phase !== 'play' || !step.events.some((e) => e.type === 'play')) return null;
+  const before = deskIssue(step.before, history).issue;
+  const after = deskIssue(step.after, [...history, step]).issue;
+  if (!before || !after) return null;
+  const id = (x: PageItem): string => (x.line ? `${x.line.step}:${x.line.event}` : `${x.kind}:${x.key ?? ''}`);
+  const visible = (paper: string, issue: MonthPress): string[] => (issue.pages.find((p) => p.paper === paper)?.items ?? []).slice(0, 4).map(id);
+  const changed = after.pages.map((p) => p.paper).filter((paper) => visible(paper, after).join('|') !== visible(paper, before).join('|'));
+  if (changed.length <= 1) return changed[0] ?? null;
+  const leads = changed.filter((paper) => visible(paper, after)[0] !== visible(paper, before)[0]);
+  if (leads.length === 1) return leads[0] ?? null;
+  const own = changed.find((paper) => (after.pages.find((p) => p.paper === paper)?.items ?? []).slice(0, 4).some((x) => x.line?.step === history.length && x.line.kind === 'play'));
+  return own ?? changed[0] ?? null;
+}
+
 export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
   const lane = lines.lane;
   const laneClass: LaneClass = lane === 'music' || lane === 'screen' || lane === 'celebrity' ? lane : 'early';

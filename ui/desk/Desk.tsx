@@ -3,7 +3,7 @@
 // adapter's model (./model.ts) and computes nothing. Whatever is passed as children is drawn over the scene
 // (the plain screens until round V2).
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Bubbles, DeskPlane, Uprights } from './DeskItems.tsx';
 import { Motion } from './Motion.tsx';
 import { Pile } from './Pile.tsx';
@@ -13,8 +13,8 @@ import type { Snapshot } from '../queue.ts';
 import { Hand, type HandFocus } from './Hand.tsx';
 import { IconDefs } from './Icons.tsx';
 import { Mirror } from './Mirror.tsx';
-import { Papers } from './Papers.tsx';
-import type { DeskModel } from './model.ts';
+import { Papers, type IncomingPaper } from './Papers.tsx';
+import { paperForPlay, type DeskModel } from './model.ts';
 import { StatBar } from './StatBar.tsx';
 import './tokens.css';
 import './fonts.css';
@@ -55,12 +55,15 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
 export function Desk({ model, on, children, snap, onTails }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void }) {
   const [toast, showToast] = useToast();
   const view=presentation(snap,model);
+  // The paper a play in flight brings forward (round R1, H3): read once, as the card lifts.
+  const playing = snap.active && !snap.active.plan && snap.active.step.events.some((e) => e.type === 'play') ? snap.active.step : null;
+  const incoming = useMemo<IncomingPaper | null>(() => (playing ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing) } : null), [playing?.id]);
   return (
     <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
-      <Papers papers={model.papers} />
+      <Papers papers={model.papers} incoming={incoming} />
       <Mirror mirror={model.mirror} crisis={model.crisis} />
       <div className="floor" />
       <div className="deskscene">

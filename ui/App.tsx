@@ -126,6 +126,42 @@ function Credits({ onClose }: { onClose: () => void }) {
 }
 
 /**
+ * One way for anything to appear on hover (round R1, H4): a preview rises and fades in after a brief delay — so
+ * sweeping across the hand does not flicker — and fades out quickly when it closes, an input hold included. The
+ * last preview is kept for the fade.
+ */
+function Popover({ anchor, children }: { anchor: Anchor | null; children: ReactNode }) {
+  const last = useRef<{ anchor: Anchor; children: ReactNode } | null>(null);
+  const [leaving, setLeaving] = useState(false);
+  const open = anchor !== null;
+  if (open) last.current = { anchor, children };
+  useLayoutEffect(() => {
+    if (open) {
+      setLeaving(false);
+      return;
+    }
+    // With motion off (the audits), a closed preview goes at once.
+    if (!last.current || motionMode() === 'off') {
+      last.current = null;
+      setLeaving(false);
+      return;
+    }
+    setLeaving(true);
+    const timer = window.setTimeout(() => {
+      last.current = null;
+      setLeaving(false);
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+  const shown = open ? last.current : leaving ? last.current : null;
+  return shown ? (
+    <Floating anchor={shown.anchor} leaving={!open}>
+      {shown.children}
+    </Floating>
+  ) : null;
+}
+
+/**
  * Where a floating preview attaches (decision 6): the hovered element's box, in the play area's own layout
  * pixels — offsets, so the stage's scale never enters into it.
  */
@@ -149,7 +185,7 @@ const FLOAT_GAP = 8;
  * It sits above the element when there is room; a preview taller than that room slides down until it
  * fits, over the element if it must — it never leaves the play area.
  */
-function Floating({ anchor, children }: { anchor: Anchor; children: ReactNode }) {
+function Floating({ anchor, children, leaving = false }: { anchor: Anchor; children: ReactNode; leaving?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const centre = anchor.left + anchor.width / 2;
   const left = Math.min(Math.max(FLOAT_GAP, centre - FLOAT_WIDTH / 2), anchor.areaWidth - FLOAT_WIDTH - FLOAT_GAP);
@@ -160,7 +196,7 @@ function Floating({ anchor, children }: { anchor: Anchor; children: ReactNode })
     el.style.top = `${Math.max(FLOAT_GAP, Math.min(anchor.top - h - FLOAT_GAP, anchor.areaHeight - h - FLOAT_GAP))}px`;
   });
   return (
-    <div className="floating" ref={box} style={{ left, width: FLOAT_WIDTH }}>
+    <div className={`floating ${leaving ? 'out' : 'in'}`} ref={box} style={{ left, width: FLOAT_WIDTH }}>
       {children}
     </div>
   );
@@ -232,16 +268,9 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     <>
       <Desk model={model} on={on} snap={snap} onTails={queue.onTails}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
-        {s.phase === 'play' && card && focus?.kind === 'card' && (
-          <Floating anchor={focus.anchor}>
-            <PlayPreviewView c={c} p={card} />
-          </Floating>
-        )}
-        {!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview && (
-          <Floating anchor={focus.anchor}>
-            <EndTurnPreviewView c={c} p={endPreview} />
-          </Floating>
-        )}
+        <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
+          {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} /> : null}
+        </Popover>
       </Desk>
       {/* The screens around the desk (round V2) in their plain versions, over the dimmed scene — beside the
           desk, never inside it, so none of the desk's styles reach them. */}

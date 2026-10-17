@@ -106,14 +106,9 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
     if (line?.paper) {
       const story = root.querySelector<HTMLElement>(`[data-paper="${line.paper}"] [data-story="${line.step}:${line.event}"]`);
       if (story) animate(story, [{ clipPath: 'inset(0 100% 0 0)', backgroundColor: '#fff0be' }, { clipPath: 'inset(0)', backgroundColor: 'transparent' }], 650);
+      // The paper has come forward while the card was carried (Papers, round R1 H3), so the story prints in front.
       const paper = root.querySelector<HTMLElement>(`[data-paper="${line.paper}"]`);
-      if (paper) {
-        if (!paper.classList.contains('pos0') && mode === 'full') {
-          const own = getComputedStyle(paper).transform;
-          animate(paper, [{ transform: own }, { transform: `${own} translateY(-9px)`, offset: .45 }, { transform: own }], 600);
-        }
-        for (const other of paper.querySelectorAll('[data-story]')) if (other !== story) animate(other, [{ opacity: .4 }, { opacity: 1 }], 220);
-      }
+      if (paper) for (const other of paper.querySelectorAll('[data-story]')) if (other !== story) animate(other, [{ opacity: .4 }, { opacity: 1 }], 220);
     } else if (line) {
       const note = root.querySelector<HTMLElement>('.nb-txt');
       if (note) {

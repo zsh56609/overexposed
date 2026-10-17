@@ -6,6 +6,30 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part H3–H4: the paper comes to you; one way to appear
+
+- **The paper comes to you** (README §2, §9; replaces the back paper's
+  ping): as a card lifts, the desk reads which paper the play changes —
+  the desk's issue before and after it (`paperForPlay`, ui/desk/model.ts)
+  — and that paper comes forward with the click's own motion while the
+  card is carried, so its story prints in front. It stays in front until
+  another play brings a different paper forward, the player picks one,
+  or the month ends. Several papers changed: the one whose lead changed;
+  both or neither: the one with the played card's own story; no visible
+  change: nothing moves. Measured on four recorded states: loud plays
+  bring their paper forward by 0.4 s. A cooling or drawing play that adds
+  or removes a story "going to press" also changes that paper's visible
+  stories, so it comes forward too. The card's input hold is unchanged;
+  reduced motion swaps the papers under a 0.15 s crossfade.
+- **One way to appear**: the hand's previews and END TURN's rise and fade
+  in as the stat bar's tooltip does (0.15 s) after a brief delay (70 ms),
+  so sweeping across the hand does not flicker, and fade out quickly
+  (0.1 s) — also when an input hold hides one; reduced motion fades
+  only. The reaction row rises in the same way. END TURN, the Deck
+  button, the tickets and the screens' buttons share one short hover
+  transition (0.15 s). With motion off, as the audits run, a closed
+  preview goes at once.
+
 ## 2026-10-17 — Round R1, Part H1–H2: one order and icons on every face
 
 - **One order on every face**: the name, the body, then the italic
