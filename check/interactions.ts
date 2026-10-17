@@ -8,7 +8,9 @@
 // - a paper behind comes forward on a click by its masthead, and nothing outside the papers changes;
 // - a scandal shakes and the desk says it can't be played; a card's preview opens on hover; a click plays a card
 //   (one card fewer, one bulb darker); with no actions left a click says so; END TURN's preview opens on hover and
-//   a click ends the month; the deck and House rules open from the stat bar and close (round R1, Part G).
+//   a click ends the month; the deck and House rules open from the stat bar and close (round R1, Part G);
+// - a bubble once shown stays until the month ends (round R3, C2): for each manager, from the title with motion full,
+//   through a month of plays, paper picks and prints, the bubbles shown, sampled every 90 ms, never decrease.
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -76,6 +78,59 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
   await page.evaluate(`document.activeElement?.blur()`);
   await sleep(200);
   out.push(['it closes on blur', !(await on())]);
+  return out;
+}
+
+/**
+ * Round R3, C2: the bubbles stay. For each manager, the author's seed from the title with motion full: BEGIN, the
+ * opening card, the manager, the first offer; then a month of plays, a paper picked by hand between them and each
+ * play's print, the bubbles shown sampled every 90 ms in the page. They never decrease before END TURN.
+ */
+async function bubblesStay(page: Page, url: string): Promise<Result[]> {
+  const out: Result[] = [];
+  const idle = async () => { for (let i = 0; i < 200 && (await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy === '1' || !!document.querySelector('.screen-over.leaving')`)); i++) await sleep(40); };
+  const press = async (selector: string, index = 0) => { const at = await centre(page, selector, index); if (at) await page.click(...at); return !!at; };
+  for (const [index, manager] of ['Dex', 'Mags'].entries()) {
+    await page.navigate(`${url}?seed=20261017`, 1500);
+    await page.evaluate(`delete document.documentElement.dataset.motion`);
+    for (let i = 0; i < 100 && !(await centre(page, '.desk[data-mode="title"] .begin')); i++) await sleep(50);
+    await sleep(400);
+    await press('.desk .begin');
+    await sleep(900);
+    await press('.season-card .into');
+    await sleep(1300);
+    await press('.manager-choice .choose', index);
+    await sleep(700);
+    await idle();
+    await press('.offers .take', 0);
+    await sleep(400);
+    await idle();
+    await page.evaluate(`window.__stay = { max: 0, drops: [] }; window.__stayTimer = setInterval(() => {
+      const n = [...document.querySelectorAll('.desk .bubbles .bub[data-k]')].filter((el) => Number(getComputedStyle(el).opacity) > 0.05).length;
+      if (n < window.__stay.max) window.__stay.drops.push(n + ' after ' + window.__stay.max);
+      window.__stay.max = Math.max(window.__stay.max, n);
+    }, 90);`);
+    let plays = 0;
+    let picks = 0;
+    for (let round = 0; round < 8; round++) {
+      await idle();
+      if (round % 2 === 1 && (await press('.desk .pp.pos1'))) picks++;
+      await sleep(300);
+      const card = await page.evaluate<number>(`[...document.querySelectorAll('.desk .hand .card')].findIndex((c) => c.getAttribute('aria-disabled') === 'false')`);
+      if (card < 0) break;
+      const at = await cardPoint(page, card);
+      if (!at) break;
+      await page.move(...at);
+      await sleep(250);
+      await page.click(...at);
+      plays++;
+      await sleep(1600);
+    }
+    await sleep(1200);
+    const stay = await page.evaluate<{ max: number; drops: string[] }>(`(() => { clearInterval(window.__stayTimer); return window.__stay; })()`);
+    if (stay.max === 0) out.push([`bubbles stay (${manager}): no message this month`, 'skipped']);
+    else out.push([`bubbles stay through ${plays} plays and ${picks} paper picks (${manager}, ${stay.max} shown)${stay.drops.length ? ': dropped ' + stay.drops.slice(0, 3).join(', ') : ''}`, stay.drops.length === 0 && plays > 0]);
+  }
   return out;
 }
 
@@ -252,7 +307,7 @@ try {
     for (const size of sizesFromArgs(process.argv)) {
     const page = await launch(browser, size);
     try {
-      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url))];
+      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url))];
       const passed = results.filter(([, ok]) => ok === true).length;
       const skipped = results.filter(([, ok]) => ok === 'skipped').length;
       console.log(`interactions, ${browser} ${size.width}x${size.height}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);

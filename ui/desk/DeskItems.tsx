@@ -304,28 +304,82 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
 // ---------------------------------------------------------------------------
 // The manager's messages
 
+/** How the month's bubbles come (round R3, C1): once its hand is dealt and the desk is still, one by one. */
+const REVEAL = { first: 250, next: 380 } as const;
+
+/** A message comes in (V1b): the phone shakes and its screen lights — v18's own glow, never a whole-phone filter. */
+function buzz(desk: Element | null) {
+  const phone = desk?.querySelector('.phone');
+  if (!desk || !phone) return;
+  const own = getComputedStyle(phone).transform;
+  phone.animate([{ transform: own }, { transform: `${own} translateX(3px)`, offset: 0.2 }, { transform: `${own} translateX(-2px)`, offset: 0.4 }, { transform: own }], 450);
+  const screen = phone.querySelector('.phone-screen');
+  if (!screen) return;
+  const shadow = getComputedStyle(screen).boxShadow;
+  screen.animate([{ boxShadow: shadow }, { boxShadow: desk.classList.contains('crisis') ? 'inset 0 0 24px rgba(255,120,100,.5)' : 'inset 0 0 22px rgba(170,205,255,.35)', offset: 0.2 }, { boxShadow: shadow }], 450);
+}
+
 /**
  * The messages above the phone (README §5): each two bubbles, labelled with the manager's name. Clicking a
  * bubble opens a row of three reactions below it; choosing one leaves it as a badge on the bubble's corner,
  * choosing it again removes it, another replaces it. A reaction belongs to one bubble of one message — its
  * month and its place — never to its words. UI state only: no rule reads it.
+ *
+ * Round R3: the month's messages wait for a clear desk (C1) — none before its hand is dealt, then one by one once
+ * the desk is still, as the desk's own tails: they hold no input, and the next action brings the rest at once. And a
+ * bubble once shown stays until its month ends (C2): the count shown only grows within a month, and a bubble shown
+ * stays even if the month's list were derived without it.
  */
-export const Bubbles = memo(function Bubbles({ messages, visibleBubbles }: { messages: MessagesModel | null; visibleBubbles?:number }) {
+export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, onTails }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; onTails?: (settle: () => void) => () => void }) {
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (open === null) return;
     const close = () => setOpen(null);
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
   }, [open]);
-  if (!messages || messages.messages.length === 0) return <div className="bubbles" data-hook="bubbles" />;
+  const all = useMemo(() => (messages?.messages ?? []).flatMap((m) => m.bubbles.map((text, i) => ({ k: `${m.id}.${i}`, text }))), [messages]);
+  const month = messages?.month ?? -1;
+  const allowed = visibleBubbles === undefined ? all.length : Math.min(all.length, visibleBubbles);
+  const [shown, setShown] = useState(() => ({ month, n: motionMode() === 'full' ? 0 : allowed }));
+  const n = shown.month === month ? shown.n : 0;
+  useEffect(() => {
+    if (shown.month !== month) {
+      setShown({ month, n: motionMode() === 'full' ? 0 : allowed });
+      return;
+    }
+    if (n >= allowed) return;
+    if (motionMode() !== 'full') {
+      setShown({ month, n: allowed });
+      return;
+    }
+    if (busy) return; // the deal first: they come once the desk is still
+    const id = window.setTimeout(() => {
+      setShown({ month, n: n + 1 });
+      if (n % 2 === 0) buzz(box.current?.closest('.desk') ?? null);
+    }, n === 0 ? REVEAL.first : REVEAL.next);
+    const untail = onTails?.(() => {
+      window.clearTimeout(id);
+      setShown({ month, n: allowed });
+    });
+    return () => {
+      window.clearTimeout(id);
+      untail?.();
+    };
+  }, [month, n, allowed, busy, shown.month, onTails]);
+  // Every bubble this month has shown, so none can go before the month does.
+  const seen = useRef<{ month: number; list: { k: string; text: string }[] }>({ month, list: [] });
+  if (seen.current.month !== month) seen.current = { month, list: [] };
+  const list = all.slice(0, n);
+  for (const x of list) if (!seen.current.list.some((y) => y.k === x.k)) seen.current.list.push(x);
+  for (const x of seen.current.list) if (!list.some((y) => y.k === x.k)) list.push(x);
+  if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" ref={box} />;
   return (
-    <div className="bubbles" data-hook="bubbles">
+    <div className="bubbles" data-hook="bubbles" data-revealing={n < allowed ? '1' : undefined} ref={box}>
       <div className="bub who">{messages.from}</div>
-      {messages.messages.flatMap((m) =>
-        m.bubbles.map((text, i) => {
-          const k = `${m.id}.${i}`;
+      {list.map(({ k, text }) => {
           const mine = rx.get(k);
           return (
             <div
@@ -363,8 +417,7 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles }: { mes
               )}
             </div>
           );
-        }),
-      ).slice(0,visibleBubbles)}
+        })}
     </div>
   );
 });

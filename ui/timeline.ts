@@ -5,7 +5,7 @@
 // dealt — so that, unskipped, a calm month end keeps the next decision waiting at most 4 s, a month with scandals
 // 6 s plus 0.6 s for each scandal after the first, and a season change 5.5 s from the door's choice (with its
 // ACCEPTED stamp). tools/pace.ts measures it over real reducer steps.
-import { getCard, getEvent, managerMessages, type GameEvent } from '../core/index.ts';
+import { getCard, getEvent, type GameEvent } from '../core/index.ts';
 import type { MotionMode, PlayedStep } from './queue.ts';
 export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'signAway' | 'toPhone' | 'lightsOut' | 'dark' | 'settled';
 /** `slots`: an 'actions' beat's actions left this month, as an answer to an event leaves them (round R2). */
@@ -25,8 +25,8 @@ export const PACE = {
   /** A season's card (round R3, A3): it rises in — the dim 0.2 s, the card 0.25 s — and waits for its button. */
   date: 200, season: 300, seasonIn: 450,
   dealLead: 100, dealCard: 90, dealHold: 450, noDeal: 200,
-  /** The manager's bubbles, after the issue is out (after the season's card in a new season). */
-  messagesLead: 150, bubble: 380, bubbleHold: 450,
+  /** The manager's bubbles (round R3, C1): after the month's hand is dealt, one by one, as the desk's own tails. */
+  messagesLead: 250, bubble: 380,
   /** The last door (round R3, B5): the mirror's bulbs go out one after another, then the room goes dark. */
   lightsOut: 700, dark: 450,
 } as const;
@@ -50,7 +50,7 @@ export const EVENT_PACE = {
   effectsLead: 250, effectGap: 120, carry: 620,
   close: 900, closeHold: 380,
 } as const;
-function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode, chosen: number): Timeline {
+function eventTimeline(step: PlayedStep, mode: MotionMode, chosen: number): Timeline {
   const e = step.events[chosen];
   const form = e?.type === 'eventChosen' ? getEvent(step.after.content, e.eventId)?.form : undefined;
   const beats: Beat[] = [{at:0,kind:'eventSend'}];
@@ -71,9 +71,8 @@ function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: M
   beats.push({at:close,kind:'eventClose'});
   const publishAt = close+EVENT_PACE.closeHold;
   beats.push({at:publishAt,kind:'publish'});
-  const existingMessages=managerMessages(history).find(m=>m.turn===step.after.turn)?.messages.length??0;
-  const afterMessages=managerMessages([...history,step]).find(m=>m.turn===step.after.turn)?.messages.length??0;
-  const incomingMessages=Math.max(0,afterMessages-existingMessages);
+  // The month's messages are the desk's own tails now (round R3, C1): no step holds input for them.
+  const existingMessages=0, incomingMessages=0;
   let done = publishAt+PACE.noDeal;
   const start = step.events.findIndex(x=>x.type==='turnStart');
   if(start>=0) {
@@ -84,8 +83,6 @@ function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: M
     });
     done=publishAt+PACE.dealLead+Math.max(0,drawCount-1)*PACE.dealCard+PACE.dealHold;
   }
-  for(let i=0;i<incomingMessages*2;i++) beats.push({at:publishAt+PACE.messagesLead+i*PACE.bubble,kind:'message',bubble:existingMessages*2+i});
-  if(incomingMessages) done=Math.max(done,publishAt+PACE.messagesLead+(incomingMessages*2-1)*PACE.bubble+PACE.bubbleHold);
   beats.push({at:done,kind:'settled'});
   beats.sort((a,b)=>a.at-b.at);
   if(mode==='reduced') {
@@ -99,7 +96,7 @@ function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: M
 export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode): Timeline | null {
   if (step.action?.type === 'CHOOSE_MANAGER' && !step.events.some((e) => e.type === 'resource' || e.type === 'draw')) return signTimeline(mode);
   const chosen = step.events.findIndex(e=>e.type==='eventChosen');
-  if(chosen>=0) return eventTimeline(step,history,mode,chosen);
+  if(chosen>=0) return eventTimeline(step,mode,chosen);
   const end = step.events.findIndex(e=>e.type==='turnEnd');
   const start = step.events.findIndex(e=>e.type==='turnStart');
   const gate = step.events.some(e=>e.type==='gate');
@@ -154,9 +151,9 @@ export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode:
   const publishAt=cursor;
   // The existing model opens messages at draftOffer OR turnStart. Animate that real opening,
   // including months that pause at a draft; the final pick must not announce them a second time.
-  const existingMessages=managerMessages(history).find(m=>m.turn===step.after.turn)?.messages.length??0;
-  const afterMessages=managerMessages([...history,step]).find(m=>m.turn===step.after.turn)?.messages.length??0;
-  const incomingMessages=Math.max(0,afterMessages-existingMessages);
+  // The month's messages are the desk's own tails now (round R3, C1): they come once its hand is dealt and the step
+  // has ended, one by one, and hold no input (ui/desk/DeskItems.tsx Bubbles).
+  const existingMessages=0, incomingMessages=0;
   let done=publishAt+PACE.noDeal; // newly exposed choice/ending consumes a skip, never a second action
   if(start>=0) {
     let drawCount=0;
@@ -167,12 +164,8 @@ export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode:
     });
     done=publishAt+PACE.dealLead+Math.max(0,drawCount-1)*PACE.dealCard+PACE.dealHold;
   }
-  // In a new season its card covers the desk until it lifts; the bubbles follow it. Otherwise they arrive with the deal.
-  let messagesAt=publishAt;
   // A season's card waits for the player (round R3): the step ends once its button can be clicked.
-  if(season) {const ready=seasonAt+PACE.seasonIn;messagesAt=ready;done=Math.max(done,ready);}
-  for(let i=0;i<incomingMessages*2;i++) beats.push({at:messagesAt+PACE.messagesLead+i*PACE.bubble,kind:'message',bubble:existingMessages*2+i});
-  if(incomingMessages) done=Math.max(done,messagesAt+PACE.messagesLead+(incomingMessages*2-1)*PACE.bubble+PACE.bubbleHold);
+  if(season) {const ready=seasonAt+PACE.seasonIn;done=Math.max(done,ready);}
   cursor=Math.max(cursor,done);
   beats.push({at:cursor,kind:'settled'});
   beats.sort((a,b)=>a.at-b.at);

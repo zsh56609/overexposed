@@ -4,7 +4,8 @@ import type { Snapshot } from '../queue.ts';
 import { statBar, type DeskModel } from './model.ts';
 export function presentation(snap: Snapshot, model: DeskModel) {
   const active=snap.active;
-  if(!active?.plan) return {stats:model.stats,phone:model.phone,visibleBubbles:undefined,hiddenCards:[] as number[]};
+  // The month's messages wait for its hand (round R3, C1): before the deal — its season card, event and offers — none.
+  if(!active?.plan) return {stats:model.stats,phone:model.playing?model.phone:{notes:model.phone.notes.filter(k=>k!=='mgr')},visibleBubbles:model.playing?undefined:0,hiddenCards:[] as number[]};
   const {step,plan}=active;
   const elapsed=plan.beats.slice(0,(active.index??0)+1);
   const base=step.before??step.after;
@@ -21,7 +22,10 @@ export function presentation(snap: Snapshot, model: DeskModel) {
   const dealing=published && draws.length>0 && hiddenCards.length>0;
   const outgoing=!published && step.events.some(e=>e.type==='turnEnd');
   const lastBubble=elapsed.filter(b=>b.kind==='message').at(-1)?.bubble;
-  const visibleBubbles=published && plan.incomingMessages>0 ? (lastBubble===undefined?plan.existingMessages*2:lastBubble+1):undefined;
+  // Before publish the month that is ending shows all it had; after, a month not yet dealt shows none, and the step
+  // that deals it brings them one by one.
+  const shownPhase=(published?step.after:base).phase;
+  const visibleBubbles=published && shownPhase!=='play' ? 0 : published && plan.incomingMessages>0 ? (lastBubble===undefined?plan.existingMessages*2:lastBubble+1):undefined;
   let managerCount=0;
   const phone=visibleBubbles===undefined?model.phone:{notes:model.phone.notes.filter(k=>k!=='mgr'||++managerCount<=Math.ceil(visibleBubbles/2))};
   return {stats:outgoing||dealing?{...stats,actions:{...stats.actions,left:0}}:spent!==undefined?{...stats,actions:{...stats.actions,left:spent}}:stats,phone,visibleBubbles,hiddenCards};

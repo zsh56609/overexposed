@@ -101,21 +101,6 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         const card=root.querySelector<HTMLElement>(`.hand .card[data-uid="${beat.uid}"]`);
         if(card)animate(card,[{transform:'translateY(360px)'},{transform:getComputedStyle(card).transform}],450);
       }
-      if(beat.kind==='message') {
-        const bubble=root.querySelectorAll('.bub[data-k]')[beat.bubble!];
-        animate(bubble??null,[{opacity:0,transform:'translateY(14px) scale(.8)'},{opacity:1,transform:'none'}],450);
-        if(beat.bubble!%2===0) {
-          const phone=root.querySelector('.phone');
-          if(phone){
-            const own=getComputedStyle(phone).transform;
-            animate(phone,[{transform:own},{transform:`${own} translateX(3px)`,offset:.2},{transform:`${own} translateX(-2px)`,offset:.4},{transform:own}],450);
-            // v18 lights the screen itself. The whole-phone filter introduced a
-            // measured arrival stall in hardware-composited Firefox.
-            const screen=phone.querySelector('.phone-screen');
-            if(screen){const shadow=getComputedStyle(screen).boxShadow;animate(screen,[{boxShadow:shadow},{boxShadow:root.classList.contains('crisis')?'inset 0 0 24px rgba(255,120,100,.5)':'inset 0 0 22px rgba(170,205,255,.35)',offset:.2},{boxShadow:shadow}],450);}
-          }
-        }
-      }
       for(const e of beat.resourceEvents??[]) {
         const id=e.target==='capital'?'money':e.target;
         const value=root.querySelector<HTMLElement>(`[data-hook="${id==='money'?'value':'number'}-${id}"]`);if(!value)continue;

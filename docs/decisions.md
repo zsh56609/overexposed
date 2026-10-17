@@ -6,6 +6,39 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, Part C: the month, in order
+
+- **C1, the messages wait for a clear desk.** While the month's season
+  card, its event and its offers have the desk, its messages do not show
+  (the phone's lock screen holds them too). Once its hand is dealt and the
+  desk is still, they come one by one — the first 0.25 s after, the rest
+  0.38 s apart, the phone buzzing with each message, each bubble rising in
+  as it did on its beat. They are the desk's own tails now
+  (ui/desk/DeskItems.tsx `Bubbles`), not beats of a step: they hold no
+  input, and the next action brings the rest at once. No step waits for
+  them any more, so the month ends got shorter: unskipped, a calm one at
+  most 2.40 s (was 2.99), one with scandals at most 4.76–6.97 s by count
+  (was 5.59–7.75).
+- **C2, the bubbles stay.** The author saw bubbles vanish after a play or a
+  print; it was not reproduced. Ruled out: the month's messages derived
+  anew after each action (16,559 steps of seeded random runs under both
+  managers: a month's list never changed once opened); Mags, a reaction, a
+  paper picked by hand, the paper that comes forward and each print
+  (Chromium months by real input under both managers, bubbles sampled
+  every 90 ms for presence, visibility and being clear at their centre:
+  none lost, none covered but by the reaction row, which opens over the next
+  bubble by design); the stack pushing old bubbles up (check:overflow holds
+  them clear of the stat bar at the longest text); a hover preview over them
+  (160 previews on the recorded states: none covers a bubble). What could
+  still take a shown bubble away was how R1 counted them: not as the
+  bubbles' own state but recomputed on every render as a slice of the
+  month's list, from the step the queue had active. Now the bubbles keep
+  their own count for the month, which only grows, and keep every bubble
+  shown until the month changes, whatever the next render's list or count.
+  check:interactions asserts it for both managers: from the title with
+  motion full, through a month of plays, paper picks and prints, the
+  bubbles shown never decrease before END TURN.
+
 ## 2026-10-17 — Round R3, Part B: from one scene to the next
 
 - **One set of transitions** (ui/motion.ts `TRANSITION`, ui/style.css):

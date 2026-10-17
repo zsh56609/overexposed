@@ -77,6 +77,12 @@
 .desk .bub:not(.who):hover { transform: scale(1.03); }
 .desk .bub.has-rx { margin-bottom: 9px; z-index: 2; }
 .desk .bub.open { z-index: 10; }
+/* A bubble comes in (round R3, C1): as it did on its beat, now as it mounts. */
+.desk .bub[data-k] { animation: bub-in .45s ease-out both; }
+@keyframes bub-in { from { opacity: 0; transform: translateY(14px) scale(.8); } }
+:root[data-motion-resolved='reduced'] .desk .bub[data-k] { animation: bub-fade .2s ease-out both; }
+@keyframes bub-fade { from { opacity: 0; } }
+:root[data-motion='off'] .desk .bub[data-k] { animation: none; }
 .desk .bub.who { background: transparent; box-shadow: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
 .desk.crisis .bub { background: #5a1f1a; }
 .desk.crisis .bub.who { background: transparent; color: #ffb3a6; }

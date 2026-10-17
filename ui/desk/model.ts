@@ -179,6 +179,8 @@ export interface PhoneModel {
 }
 
 export interface MessagesModel {
+  /** The month the messages are for (round R3, C2: a bubble once shown stays until it ends). */
+  readonly month: number;
   readonly from: string;
   /** This month's messages; a message's id is its month and its place in the month (README §5). */
   readonly messages: readonly { readonly id: string; readonly bubbles: readonly string[] }[];
@@ -592,6 +594,7 @@ function messages(s: GameState, steps: readonly PlayedStep[], frenzy: boolean): 
   if (s.manager === null) return null;
   const month = thisMonth(s, steps);
   return {
+    month: month?.turn ?? s.turn,
     // The manager by their first name, as the mockup labels the bubbles ("Marguerite · Manager"): the full name
     // runs into the mirror's bulbs.
     from: t('ui.phone.from', { name: managerName(s.content, s.manager).split(/\s+/)[0] ?? '' }),
