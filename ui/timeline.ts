@@ -32,7 +32,7 @@ export const PACE = {
 } as const;
 /**
  * Signing (round R3, B3): the other manager's card slides away, the signed one flies to the phone; the month's
- * papers come in where the title paper stood (they arrive as the state is published), then the offers.
+ * papers drop onto the desk (they arrive as the state is published), then the offers.
  */
 export const SIGN = { toPhone: 250, publish: 750, settled: 1300 } as const;
 function signTimeline(mode: MotionMode): Timeline {

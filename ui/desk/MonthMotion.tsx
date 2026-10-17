@@ -92,8 +92,9 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         const button=root.querySelector('.stats .deckbtn'),chip=root.querySelector<HTMLElement>('[data-hook="held"]'),count=root.querySelector<HTMLElement>('[data-hook="held-n"]');
         const desk=root.getBoundingClientRect(),k=desk.width/1280,to=button?.getBoundingClientRect();
         let held=Number(count?.textContent??0);
+        // A tick that comes after the month is published never takes the chip below what it already shows.
         const tick=()=>{
-          held++;if(!chip||!count)return;chip.classList.remove('none');count.textContent=String(held);
+          held++;if(!chip||!count)return;chip.classList.remove('none');count.textContent=String(Math.max(held,Number(count.textContent)||0));
           const delta=document.createElement('span');delta.className='motion-delta delta-held';delta.textContent='+1';
           const r=chip.getBoundingClientRect();delta.style.left=`${(r.x+r.width/2-desk.x)/k}px`;host.current?.appendChild(delta);
           animate(delta,[{opacity:0},{opacity:1,offset:.12},{opacity:0}],1350,0,'forwards');cleanups.current.push(()=>delta.remove());

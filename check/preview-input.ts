@@ -30,7 +30,8 @@ export async function checkPreviewInput(page: Page, url: string) {
     } else if (path==='keyboard') {
       for(let i=0;i<12;i++) { await page.key('Tab'); assert.equal(await visible(page),false,'busy keyboard preview'); }
     } else if (path==='touch') {
-      await page.press(...await card(page,'lay_low'),700);
+      // Held past the 450 ms long-press and let go inside the play's hold (about 0.93 s from the click, 0.2 s gone).
+      await page.press(...await card(page,'lay_low'),600);
       assert.equal(await visible(page),false,'busy held-touch preview');
       assert.equal(await page.evaluate<string>(`document.querySelector('[data-hook="date"]').textContent`),before,'touch skip also ended month');
     }
