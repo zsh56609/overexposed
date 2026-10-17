@@ -224,12 +224,14 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 |---|---|
 | 10/17–18 | R1: the screens around the desk, the hand's feel → **public early build on itch** |
 | 10/19–21 | R2: phase 3, events (prose comes as draft-v9) |
-| 10/22–23 | R3: fixes from play and feedback |
+| 10/22–23 | R3: the author's R1 findings, the opening rebuilt (v0.3) |
 | 10/24 | The playtest build on itch |
-| 10/25–31 | Polish, sound, a retune |
+| 10/25–31 | R4: sound, once the author picks the music; polish, a retune |
 | **11/1** | **Feature freeze** |
 | 11/2–3 | Fixes only, the itch page; **submit 11/3 JST** |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
+
+Versions: R1 v0.1, R2 v0.2, R3 v0.3, the submission v1.0.
 
 Cut for the jam: the 27 once-per-run variants; hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
 
