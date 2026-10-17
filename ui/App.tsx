@@ -11,7 +11,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { createInitialState, establishedLanes, readLines, reduce, type Action, type GameState } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
-import { motionMode, subscribeMotion } from './motion.ts';
+import { finishTransitions, motionMode, subscribeMotion } from './motion.ts';
 import { Desk, type DeskIntro, type DeskMode } from './desk/Desk.tsx';
 import { EndTurnPreviewView, PlayPreviewView } from './desk/Preview.tsx';
 import { cardModel, deskModel } from './desk/model.ts';
@@ -20,7 +20,7 @@ import { t } from './i18n.ts';
 import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readFound } from './collection.ts';
-import { useFontsReady } from './screens/common.tsx';
+import { Over, useFontsReady } from './screens/common.tsx';
 import { ManagerScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
@@ -64,21 +64,61 @@ export function App() {
   const [made] = useState(() => makeRun(seedFromUrl() ?? freshSeed(), 1));
   const [run, setRun] = useState<RunHandle | null>(typeof made === 'string' ? null : made);
   const [error, setError] = useState<string | null>(typeof made === 'string' ? made : null);
-  const restart = useCallback(() => {
+  // PLAY AGAIN (round R3, B6): a fade through ink; the next run's title comes up under it, its bulbs coming on.
+  const [ink, setInk] = useState<'in' | 'out' | null>(null);
+  const timers = useRef<number[]>([]);
+  useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
+  const next = useCallback(() => {
     setRun((prev) => {
       const id = (prev?.id ?? 0) + 1;
       const urlSeed = seedFromUrl();
-      const next = makeRun(urlSeed === null ? freshSeed() : (urlSeed + id - 1) >>> 0, id);
-      if (typeof next === 'string') {
-        setError(next);
+      const made = makeRun(urlSeed === null ? freshSeed() : (urlSeed + id - 1) >>> 0, id);
+      if (typeof made === 'string') {
+        setError(made);
         return prev;
       }
       setError(null);
-      return next;
+      return made;
     });
   }, []);
+  const restart = useCallback(() => {
+    const mode = motionMode();
+    if (mode === 'off') {
+      next();
+      return;
+    }
+    const step = mode === 'reduced' ? 100 : 350;
+    setInk('in');
+    timers.current.push(
+      window.setTimeout(() => {
+        next();
+        setInk('out');
+        timers.current.push(window.setTimeout(() => setInk(null), mode === 'reduced' ? 100 : 500));
+      }, step),
+    );
+  }, [next]);
+  // D7: a click during the fade completes it.
+  useEffect(() => {
+    if (ink === null) return;
+    const done = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      timers.current.forEach((id) => window.clearTimeout(id));
+      timers.current = [];
+      if (ink === 'in') next();
+      setInk(null);
+      finishTransitions();
+    };
+    document.addEventListener('click', done, true);
+    return () => document.removeEventListener('click', done, true);
+  }, [ink, next]);
   if (!run) return <p className="plain error-layer">{error}</p>;
-  return <Run key={run.id} run={run} onRestart={restart} />;
+  return (
+    <>
+      <Run key={run.id} run={run} onRestart={restart} fresh={run.id > 1} />
+      {ink && <div className={`ink ${ink}`} aria-hidden="true" />}
+    </>
+  );
 }
 
 /**
@@ -172,7 +212,11 @@ function seasonOf(s: GameState, answered: number): { readonly act: number; reado
   return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(c, s.seed, s.act)] };
 }
 
-function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
+/** A change of scene before the year (round R3, B1–B2), and how long it runs, in ms. */
+type Scene = 'begin' | 'into';
+const SCENE_MS: Record<Scene, number> = { begin: 520, into: 820 };
+
+function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void; fresh: boolean }) {
   const { queue } = run;
   const snap = useSyncExternalStore(queue.subscribe, queue.getSnapshot);
   const [error, setError] = useState<string | null>(null);
@@ -186,6 +230,35 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const [answered, setAnswered] = useState(1);
   const [found] = useState(readFound);
   const fonts = useFontsReady();
+  // B1, title → opening card; B2, opening card → the manager choice. A click during one completes it (D7).
+  const [scene, setScene] = useState<Scene | null>(null);
+  const sceneTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(sceneTimer.current), []);
+  const play = useCallback((next: Scene, then: () => void) => {
+    then();
+    const mode = motionMode();
+    if (mode === 'off') return;
+    setScene(next);
+    window.clearTimeout(sceneTimer.current);
+    sceneTimer.current = window.setTimeout(() => setScene(null), mode === 'reduced' ? 200 : SCENE_MS[next]);
+  }, []);
+  useEffect(() => {
+    if (scene === null) return;
+    const done = (event: MouseEvent | KeyboardEvent) => {
+      if (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.clearTimeout(sceneTimer.current);
+      finishTransitions();
+      setScene(null);
+    };
+    document.addEventListener('click', done, true);
+    document.addEventListener('keydown', done, true);
+    return () => {
+      document.removeEventListener('click', done, true);
+      document.removeEventListener('keydown', done, true);
+    };
+  }, [scene]);
   useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
   useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
@@ -243,7 +316,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       c,
       found,
       fan,
-      begin: () => setIntro('opening'),
+      begin: () => play('begin', () => setIntro('opening')),
       settings: () => setPanel('settings'),
       credits: () => setPanel('credits'),
       scrapbook: () => setPanel('scrapbook'),
@@ -270,10 +343,15 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const reached = snap.active?.plan ? snap.active.plan.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') : false;
   const season = mode !== 'game' ? null : snap.active ? (reached ? seasonOf(snap.active.step.after, answered) : null) : seasonOf(s, answered);
   const clear = season === null;
+  // Signing (round R3, B3): the step that takes the manager, and its beats so far.
+  const signing = snap.active?.step.action?.type === 'CHOOSE_MANAGER' ? snap.active : null;
+  const signBeats = signing?.plan ? signing.plan.beats.slice(0, (signing.index ?? 0) + 1).map((b) => b.kind) : [];
+  const offers = clear && mode === 'game' && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan;
+  const eventShown = clear && s.phase === 'event' && (!snap.active || answering !== null);
 
   return (
     <>
-      <Desk model={model} on={on} snap={snap} onTails={queue.onTails} mode={mode} intro={introProps}>
+      <Desk model={model} on={on} snap={snap} onTails={queue.onTails} mode={mode} intro={introProps} scene={scene} busy={scene !== null} arriving={signing !== null} fresh={fresh}>
         {/* The hover previews (decisions 2, 21), dressed for the desk: a card's, or the month end's. */}
         <Popover anchor={(s.phase === 'play' && card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && endPreview) ? (focus?.anchor ?? null) : null}>
           {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} lane={lines.lane} slots={s.slots} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} lane={lines.lane} /> : null}
@@ -287,38 +365,25 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         </p>
       )}
       {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name. */}
-      {mode === 'opening' && (
-        <div className="screen-over full">
-          <div className="screen-scrim" />
-          <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(c, s.seed).split('\n\n').slice(1)} go={() => setIntro(null)} />
-        </div>
-      )}
-      {/* The manager choice, dealt onto the desk (round R3). */}
-      {mode === 'manager' && (
-        <div className="screen-over full">
-          <div className="screen-scrim" />
-          <ManagerScreen s={s} legal={legal} act={act} />
-        </div>
-      )}
-      {season && (
-        <div className="screen-over">
-          <div className="screen-scrim" />
-          <SeasonCard key={season.act} date={season.date} season={season.season} paragraphs={season.paragraphs} go={() => setAnswered(season.act)} />
-        </div>
-      )}
-      {clear && mode === 'game' && (s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan && (
-        <div className="screen-over">
-          <div className="screen-scrim" />
-          {s.phase === 'draft' && s.draft && (
-            <OffersScreen key={`${s.turn}:${s.draft.offer.join()}:${s.draft.picksLeft}`} s={s} legal={legal} act={act} lane={lines.lane} season={model.season} words={model.handWords} />
-          )}
-          {s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
-        </div>
-      )}
+      <Over show={mode === 'opening'} full>
+        <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(c, s.seed).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
+      </Over>
+      {/* The manager choice, dealt onto the desk (round R3, B2); signing plays out on it (B3). */}
+      <Over show={mode === 'manager'} full>
+        <ManagerScreen s={s} legal={legal} act={act} beats={signBeats} chosen={signing?.step.action?.type === 'CHOOSE_MANAGER' ? signing.step.action.managerId : null} />
+      </Over>
+      <Over show={season !== null}>
+        {season && <SeasonCard key={season.act} date={season.date} season={season.season} paragraphs={season.paragraphs} go={() => setAnswered(season.act)} />}
+      </Over>
+      <Over show={offers}>
+        {offers && s.phase === 'draft' && s.draft && (
+          <OffersScreen key={`${s.turn}:${s.draft.offer.join()}:${s.draft.picksLeft}`} s={s} legal={legal} act={act} lane={lines.lane} season={model.season} words={model.handWords} />
+        )}
+        {offers && s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
+      </Over>
       {/* An event (round R2, Part C): once the month end has settled, and while its answer plays, until it is published. */}
-      {clear && s.phase === 'event' && (!snap.active || answering !== null) && (
-        <div className="screen-over">
-          <div className="screen-scrim" />
+      <Over show={eventShown}>
+        {eventShown && (
           <EventScreen
             key={`${s.turn}:${s.event}`}
             s={s}
@@ -329,8 +394,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
             lines={lines}
             lane={lines.lane}
           />
-        </div>
-      )}
+        )}
+      </Over>
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
       {panel === 'settings' && <SettingsPanel overDesk={mode === 'game'} onClose={close} />}
       {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}

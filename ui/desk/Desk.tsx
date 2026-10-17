@@ -78,7 +78,12 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
   return [toast, show];
 }
 
-export function Desk({ model, on, children, snap, onTails, mode = 'game', intro = null, busy = false }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void; mode?: DeskMode; intro?: DeskIntro | null; busy?: boolean }) {
+/**
+ * The desk. Round R3: `mode` (which desk), `scene` (a change of scene before the year: the fan leaving, the title
+ * paper sliding off), `arriving` (signing: the month's papers, the stat bar and the mirror's notes coming in), `fresh`
+ * (the title after PLAY AGAIN: the mirror's bulbs coming on).
+ */
+export function Desk({ model, on, children, snap, onTails, mode = 'game', intro = null, busy = false, scene = null, arriving = false, fresh = false }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void; mode?: DeskMode; intro?: DeskIntro | null; busy?: boolean; scene?: 'begin' | 'into' | null; arriving?: boolean; fresh?: boolean }) {
   const [toast, showToast] = useToast();
   const view=presentation(snap,model);
   // Mark my stories (House rules, round R1 G3): the red margin rule on the player's stories.
@@ -98,12 +103,12 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', intro 
   );
   const game = mode === 'game';
   return (
-    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${arriving ? ' arriving' : ''}${fresh && mode === 'title' ? ' lights-on' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
       {/* The night before the year (round R3): the title paper where the month's papers stand, until the manager is chosen. */}
-      {game ? <Papers papers={model.papers} incoming={incoming} /> : intro && <TitlePaper c={intro.c} season={model.season} />}
+      {game ? <Papers papers={model.papers} incoming={incoming} /> : intro && (mode !== 'manager' || scene === 'into') && <TitlePaper c={intro.c} season={model.season} off={mode === 'manager'} />}
       {game || !intro ? (
         <Mirror mirror={model.mirror} crisis={model.crisis} />
       ) : (
@@ -126,16 +131,14 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', intro 
       {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} />}
       <div className="dim" />
       {game && model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
-      {mode === 'title' && intro && (
-        <>
-          <TitleFan cards={intro.fan} words={model.handWords} />
-          <TitleControls onBegin={intro.begin} onSettings={intro.settings} onCredits={intro.credits} />
-        </>
-      )}
+      {intro && (mode === 'title' || (mode === 'opening' && scene === 'begin')) && <TitleFan cards={intro.fan} words={model.handWords} leaving={mode === 'opening'} />}
+      {mode === 'title' && intro && <TitleControls onBegin={intro.begin} onSettings={intro.settings} onCredits={intro.credits} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">
         {toast.text}
       </div>
       {game && <StatBar stats={view.stats} season={model.season} onDeck={on.deck} onSettings={on.settings} />}
+      {/* The last door (round R3, B5): the room goes dark before the awards night. */}
+      <div className="night" aria-hidden="true" />
       {children}
     </div>
   );

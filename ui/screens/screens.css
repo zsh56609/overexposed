@@ -36,8 +36,18 @@
 .scr.season-card .go:hover, .scr.season-card .go:focus-visible { box-shadow: 0 10px 20px rgba(0, 0, 0, .6), 0 0 0 2px rgba(255, 207, 133, .5); outline: none; }
 
 /* ---------------------------------------------------------------- The manager choice (shot 13) */
-/* Dealt onto the desk since round R3: the desk under the dim is its background. */
+/* Dealt onto the desk since round R3: the desk under the dim is its background. B2: the heading fades in, the two
+   cards are dealt onto the desk. B3: after SIGNED the other card slides away (the signed one flies to the phone,
+   Opening.tsx). */
 .manager-choice { overflow: hidden; color: #EDE6D6; }
+.manager-choice .mgHead, .manager-choice .mgFoot { animation: tr-dim .3s .1s ease-out both; transition: opacity .25s; }
+.manager-choice .biz { animation: tr-deal .5s cubic-bezier(.2, .7, .3, 1) both; }
+.manager-choice .biz:nth-child(1) { --deal-x: -260px; --deal-r: -14deg; animation-delay: .16s; }
+.manager-choice .biz:nth-child(2) { --deal-x: 260px; --deal-r: 14deg; animation-delay: .28s; }
+@keyframes tr-deal { from { opacity: 0; transform: translate(var(--deal-x, 0), 420px) rotate(var(--deal-r, 0)); } }
+.manager-choice.away .mgHead, .manager-choice.away .mgFoot { opacity: 0; }
+.manager-choice .biz.gone { animation: tr-away .4s ease-in forwards; }
+@keyframes tr-away { to { opacity: 0; transform: translateY(280px) rotate(12deg); } }
 .manager-choice .mgHead { position: absolute; left: 0; right: 0; top: 66px; text-align: center; z-index: 5; }
 .manager-choice .mgHead small { display: block; font-weight: 800; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: #ffcf85; margin-bottom: 10px; }
 .manager-choice .mgHead h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 40px; color: #EDE6D6; line-height: 1.05; }
@@ -251,7 +261,7 @@
 .event-screen .evcap small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: #ffcf85; }
 .event-screen .evcap b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.1; margin-top: 6px; }
 .event-screen .evcap i { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.4; color: #bfb3a0; margin-top: 8px; }
-.event-screen .phone-big { position: absolute; left: 470px; top: 22px; width: 340px; height: 624px; border-radius: 40px; background: #0b0d10; box-shadow: 0 0 0 3px #2a2d33, 0 30px 50px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); animation: ev-phone-up .45s cubic-bezier(.22, .61, .36, 1) both; }
+.event-screen .phone-big { position: absolute; left: 470px; top: 22px; width: 340px; height: 624px; border-radius: 40px; background: #0b0d10; box-shadow: 0 0 0 3px #2a2d33, 0 30px 50px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); }
 .event-screen .ph-screen { position: absolute; inset: 12px; border-radius: 29px; background: #10151b; overflow: hidden; display: flex; flex-direction: column; }
 .event-screen .ph-top { flex: none; padding: 18px 16px 11px; border-bottom: 1px solid rgba(255, 255, 255, .08); display: flex; align-items: center; gap: 10px; color: #eef3f6; }
 .event-screen .ph-av { width: 34px; height: 34px; border-radius: 50%; background: #3b6ea5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex: none; }
@@ -288,7 +298,7 @@
 .ev-text.leaving .phone-big { transition: transform .38s ease-in, opacity .38s ease-in; transform: translateY(90px) rotate(-1.5deg); opacity: 0; }
 .ev-text.leaving .evcap { transition: opacity .3s; opacity: 0; }
 /* A letter: it lands slightly turned; a letterhead in the sender's style, a typed body, the choices as tick boxes. */
-.event-screen .letter { position: absolute; left: 380px; top: 40px; width: 520px; min-height: 500px; display: flex; flex-direction: column; background: #faf7ef; color: #1c1712; padding: 30px 40px 32px; transform: rotate(1.2deg); box-shadow: 0 26px 40px rgba(0, 0, 0, .65); animation: ev-letter-land .45s cubic-bezier(.22, .61, .36, 1) both; }
+.event-screen .letter { position: absolute; left: 380px; top: 40px; width: 520px; min-height: 500px; display: flex; flex-direction: column; background: #faf7ef; color: #1c1712; padding: 30px 40px 32px; transform: rotate(1.2deg); box-shadow: 0 26px 40px rgba(0, 0, 0, .65); }
 .event-screen .letter::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: #c8281c; }
 .event-screen .letter.lh-bside::before { background: #2c6863; }
 .event-screen .letter:is(.lh-marquee, .lh-house)::before { background: #15120E; height: 3px; }
@@ -333,7 +343,16 @@
 /* Reduced motion: no travel, crossfades only. */
 :root[data-motion-resolved='reduced'] .ev-text.leaving .phone-big { transform: rotate(-1.5deg); }
 :root[data-motion-resolved='reduced'] .ev-letter.leaving .letter { transform: rotate(1.2deg); }
-@keyframes ev-phone-up { from { opacity: 0; transform: translateY(140px) rotate(-1.5deg); } }
-@keyframes ev-letter-land { from { opacity: 0; transform: translateY(-40px) rotate(-3deg) scale(1.04); } }
 @keyframes ev-pop { from { opacity: 0; transform: translateY(8px); } }
 @keyframes ev-blink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+
+/* ---------------------------------------------------------------- One set of transitions (round R3, B4–B5)
+   The panels open as everything over the desk opens: the dim 0.2 s, the content 0.25 s; they close in 0.15 s. The
+   awards night comes up out of the dark the last door left. */
+.scr.ov > .scrim { animation: tr-dim .2s ease-out both; }
+.scr.ov > :not(.scrim) { animation: tr-rise .25s ease-out both; }
+.scr.ov.leaving { animation: tr-out .15s ease-in forwards; pointer-events: none; }
+.scr.awards-night { animation: tr-up .6s ease-out both; }
+@keyframes tr-up { from { opacity: 0; } }
+:root[data-motion-resolved='reduced'] .scr.awards-night { animation-duration: .2s; }
+:root[data-motion='off'] .scr.ov, :root[data-motion='off'] .scr.awards-night { animation: none !important; }

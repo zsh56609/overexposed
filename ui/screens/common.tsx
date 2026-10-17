@@ -1,7 +1,7 @@
 // What the screens around the desk share (round R1; README §8–§9): the header pattern, the endings found as
 // dots, the stamp a choice wears before it is made, and the fonts the title waits for.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { motionMode } from '../motion.ts';
 import { t } from '../i18n.ts';
 import { isPlaceholder } from '../text.ts';
@@ -59,6 +59,48 @@ export function useStampedChoice<T>(act: (choice: T) => void): readonly [T | nul
     [chosen, act],
   );
   return [chosen, choose];
+}
+
+/**
+ * What opens over the desk (round R3, B4): the dim fades in (0.2 s) and the content rises and fades in (0.25 s) —
+ * ui/style.css — and the content is there to be used at once: an entrance holds no input. When it closes it fades
+ * out (0.15 s), its last content kept, inert, that long; with motion off it goes at once.
+ */
+export function Over({ show, full = false, children }: { show: boolean; full?: boolean; children?: ReactNode }) {
+  const last = useRef<ReactNode>(null);
+  const [gone, setGone] = useState(!show);
+  if (show) last.current = children;
+  useLayoutEffect(() => {
+    if (show) {
+      setGone(false);
+      return;
+    }
+    if (motionMode() === 'off') {
+      last.current = null;
+      setGone(true);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      last.current = null;
+      setGone(true);
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [show]);
+  const cls = `screen-over${full ? ' full' : ''}`;
+  if (show)
+    return (
+      <div className={cls}>
+        <div className="screen-scrim" />
+        {children}
+      </div>
+    );
+  if (gone || last.current === null) return null;
+  return (
+    <div className={`${cls} leaving`} aria-hidden="true">
+      <div className="screen-scrim" />
+      {last.current}
+    </div>
+  );
 }
 
 /** The game's three faces are loaded before the title shows (round R1); a font that never comes is waited for 3 s. */

@@ -3,29 +3,53 @@
 // Every label is the mockup's, approved; every card, ending and goal line comes from content. Over the desk a panel
 // starts below the stat bar, which stays in view; Escape or a click on the dimmed scene closes it.
 
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import type { CardInstance, GameState, SeasonId } from '../../core/index.ts';
 import { content } from '../content.ts';
 import { CardPicture } from '../desk/Hand.tsx';
 import { offerCardModel, type HandWords } from '../desk/model.ts';
 import licenceUrl from '../fonts/OFL.txt?url';
 import { t } from '../i18n.ts';
+import { motionMode } from '../motion.ts';
 import { setSetting, useSettings, type Settings } from '../settings.ts';
 import { cardName } from '../text.ts';
 
 export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits';
 
+/**
+ * A panel over the scene. It opens as everything over the desk opens and closes in 0.15 s (round R3, B4): its close
+ * button, a click on the dim and Escape all fade it out first; with motion off it goes at once.
+ */
 function Overlay({ id, label, overDesk, onClose, children }: { id: PanelId; label: string; overDesk: boolean; onClose: () => void; children: ReactNode }) {
+  const [leaving, setLeaving] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  const close = useCallback(() => {
+    if (motionMode() === 'off') {
+      onClose();
+      return;
+    }
+    setLeaving(true);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(onClose, 150);
+  }, [onClose]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') close();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, [close]);
+  // The panel's own close button (in its header) closes through the fade too.
+  const onClickCapture = (e: MouseEvent) => {
+    if (!(e.target instanceof Element) || !e.target.closest('.closeb')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    close();
+  };
   return (
-    <div className={`scr ov p-${id}${id === 'deck' ? ' deck-viewer' : ''}${overDesk ? ' over-desk' : ''}`} data-panel={id} role="dialog" aria-label={label}>
-      <div className="scrim" onClick={onClose} />
+    <div className={`scr ov p-${id}${id === 'deck' ? ' deck-viewer' : ''}${overDesk ? ' over-desk' : ''}${leaving ? ' leaving' : ''}`} data-panel={id} role="dialog" aria-label={label} onClickCapture={onClickCapture}>
+      <div className="scrim" onClick={close} />
       {children}
     </div>
   );

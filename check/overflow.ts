@@ -324,8 +324,10 @@ const DRIVE = (runs: number) => `(async () => {
     let guard = 0;
     while (!document.querySelector('.ending') && guard++ < 800) {
       seen.states++;
-      const phase = document.querySelector('.season-card') ? 'season' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
+      const phase = document.querySelector('.desk[data-mode="title"]') ? 'title' : document.querySelector('.season-card') ? 'season' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'gate' : document.querySelector('.event-screen') ? 'event' : 'play';
       window.__auditProgress = { run, guard, phase, states:seen.states, previews:seen.previews, tips:seen.tips };
+      // PLAY AGAIN leads back to the title (round R3, B6): audited, then BEGIN starts the next run.
+      if (phase === 'title') { note(__deskAudit('title')); document.querySelector('.desk .begin').click(); await sleep(8); continue; }
       if (phase === 'season') { plain('season card'); note(__deskAudit('season card')); document.querySelector('.season-card .into').click(); await sleep(8); continue; }
       if (phase === 'manager') { plain('manager'); note(__deskAudit('manager')); const take = [...document.querySelectorAll('.manager-choice .choose')]; take[run % take.length].click(); await sleep(8); continue; }
       note(__deskAudit(phase));

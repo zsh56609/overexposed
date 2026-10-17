@@ -68,6 +68,18 @@ try {
   coverage.add(`${step.action?.type}->${step.after.phase}`);
   // An answer (round R2): the reply goes, theirs comes back, its effects land between the two and the phone going
   // down or the letter leaving; only then is it published. A scandal it adds is carried to the pile, never lifted.
+  // Round R3, Part B: signing plays out (the other card away, the signed one to the phone) before the month is
+  // published; the last door puts the lights out and the room dark before the awards night.
+  if(step.action?.type==='CHOOSE_MANAGER'){
+    const at=(k:string)=>plan.beats.find(b=>b.kind===k)?.at??-1;
+    assert.ok(at('signAway')===0&&at('signAway')<at('toPhone')&&at('toPhone')<at('publish'),'signing plays out of order');
+    coverage.add('signing');
+  }
+  if(step.after.phase==='ended'){
+    const at=(k:string)=>plan.beats.find(b=>b.kind===k)?.at??-1;
+    assert.ok(at('lightsOut')>=0&&at('lightsOut')<at('dark')&&at('dark')<at('publish'),'the lights do not go out before the awards night');
+    coverage.add('lights-out');
+  }
   if(step.action?.type==='CHOOSE_EVENT'){
     const at=(k:string)=>plan.beats.find(b=>b.kind===k)?.at??-1;
     assert.ok(at('eventSend')===0&&at('eventSend')<at('eventReply')&&at('eventReply')<at('eventClose')&&at('eventClose')<at('publish'),'an answer plays out of order');
@@ -99,6 +111,6 @@ try {
   }
  }
 } finally {mock.timers.reset();}
-for(const required of ['scandals:0','scandals:1','scandals:2','copycat','mags-relief','season','END_TURN->draft','END_TURN->play','END_TURN->gate','END_TURN->event','CHOOSE_GATE->draft','CHOOSE_GATE->ended','CHOOSE_GATE->event','CHOOSE_EVENT->draft','CHOOSE_EVENT->play','event-text','event-letter','event-scandal','event-actions','DRAFT_PICK->play'])assert.ok(coverage.has(required),`missing ${required}`);
+for(const required of ['scandals:0','scandals:1','scandals:2','copycat','mags-relief','season','END_TURN->draft','END_TURN->play','END_TURN->gate','END_TURN->event','CHOOSE_GATE->draft','CHOOSE_GATE->ended','CHOOSE_GATE->event','CHOOSE_EVENT->draft','CHOOSE_EVENT->play','event-text','event-letter','event-scandal','event-actions','signing','lights-out','DRAFT_PICK->play'])assert.ok(coverage.has(required),`missing ${required}`);
 console.log(`timeline: ${cases.size} real reducer steps, ${boundaries} before/after beat skips, ordered resources, actual draws, UID dedup, publication and stale callbacks, events answered in order — PASS`);
 console.log([...coverage].sort().join(', '));

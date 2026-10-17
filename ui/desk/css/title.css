@@ -43,3 +43,28 @@
 .desk .title-links { position: absolute; right: 22px; top: 688px; width: 212px; display: flex; justify-content: center; gap: 22px; z-index: 70; }
 .desk .title-links .link { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: #d9cdb8; text-decoration: underline; text-underline-offset: 3px; padding: 4px 0; }
 .desk .title-links .link:hover, .desk .title-links .link:focus-visible { color: #ffcf85; outline: none; }
+
+/* Changes of scene (round R3, Part B). B1: the fan slides down off the desk. B2: the title paper slides off to the
+   left. B3: the month's papers come in where it stood, the stat bar and the mirror's notes with them. B5: the bulbs go
+   out one after another and the room goes dark. B6: after PLAY AGAIN, the title's bulbs come on. */
+.desk .title-fan.leaving .card { animation: tr-fan-off .45s cubic-bezier(.5, 0, .75, 0) both; animation-delay: calc(var(--n, 0) * 25ms); }
+@keyframes tr-fan-off { to { transform: translateY(420px) rotate(var(--rot)); opacity: 0; } }
+.desk .titlepaper.off, .desk .title-shadow.off { animation: tr-paper-off .55s cubic-bezier(.55, 0, .8, .3) both; }
+@keyframes tr-paper-off { to { transform: translateX(-780px) rotate(-8deg); opacity: 0; } }
+.desk.arriving .news, .desk.arriving .baseShadow { animation: tr-papers-in .5s cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes tr-papers-in { from { transform: translateX(-700px) rotate(-5deg); opacity: 0; } }
+.desk.arriving .stats, .desk.arriving .mirror .today, .desk.arriving .mirror .sticky { animation: tr-dim .45s ease-out both; }
+.desk .night { position: absolute; inset: 0; z-index: 145; background: #050403; opacity: 0; pointer-events: none; transition: opacity .45s ease-in; }
+.desk.dark .night { opacity: 1; }
+.desk.lights-out .bulb { animation: tr-bulb-out .14s ease-in both; animation-delay: calc(var(--i, 0) * 36ms); }
+@keyframes tr-bulb-out { to { filter: brightness(.22) saturate(.2); box-shadow: none; } }
+.desk.lights-on .bulb { animation: tr-bulb-on .3s ease-out both; animation-delay: calc(.3s + var(--i, 0) * 45ms); }
+@keyframes tr-bulb-on { from { filter: brightness(.22) saturate(.2); box-shadow: none; } }
+/* Reduced motion: no travel — each a crossfade of at most 0.2 s; off: none. */
+:root[data-motion-resolved='reduced'] .desk .title-fan.leaving .card, :root[data-motion-resolved='reduced'] .desk .titlepaper.off, :root[data-motion-resolved='reduced'] .desk .title-shadow.off { animation: tr-out .2s ease-out both; }
+:root[data-motion-resolved='reduced'] .desk.arriving .news, :root[data-motion-resolved='reduced'] .desk.arriving .baseShadow { animation: tr-fade .2s ease-out both; }
+:root[data-motion-resolved='reduced'] .desk.arriving .stats, :root[data-motion-resolved='reduced'] .desk.arriving .mirror .today, :root[data-motion-resolved='reduced'] .desk.arriving .mirror .sticky { animation-duration: .2s; }
+:root[data-motion-resolved='reduced'] .desk.lights-out .bulb, :root[data-motion-resolved='reduced'] .desk.lights-on .bulb { animation-duration: .2s; animation-delay: 0s; }
+:root[data-motion-resolved='reduced'] .desk .night { transition-duration: .2s; }
+:root[data-motion='off'] .desk :is(.title-fan .card, .titlepaper, .title-shadow, .news, .baseShadow, .stats, .mirror .today, .mirror .sticky, .bulb) { animation: none !important; }
+:root[data-motion='off'] .desk .night { transition: none; }

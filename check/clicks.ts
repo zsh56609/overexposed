@@ -178,7 +178,10 @@ const DRIVE = (runs: number) => `(async () => {
       window.__auditProgress={run,guard,states:stats.states,controls:stats.controls,previews:stats.hovers,phase:document.querySelector('.manager-choice,.draft,.gates,.event-screen,.hand')?.className};
       stats.states++;
       reachable();
-      if (document.querySelector('.season-card')) {
+      if (document.querySelector('.desk[data-mode="title"]')) {
+        // PLAY AGAIN leads back to the title (round R3, B6): BEGIN starts the next run.
+        document.querySelector('.desk .begin').click();
+      } else if (document.querySelector('.season-card')) {
         // A season's card waits for its button (round R3).
         stats.seasonCards++;
         document.querySelector('.season-card .into').click();

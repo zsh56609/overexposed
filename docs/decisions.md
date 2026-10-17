@@ -6,6 +6,42 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, Part B: from one scene to the next
+
+- **One set of transitions** (ui/motion.ts `TRANSITION`, ui/style.css):
+  every transition is a CSS animation whose keyframes are named `tr-…`.
+  Reduced motion makes each a crossfade of at most 0.2 s; motion off, none
+  (the checks measure where things settle).
+- **B4, what opens over the desk** — the offers, the doors, an event, a
+  season card, the manager choice, the panels: the dim fades in in 0.2 s,
+  the content rises and fades in in 0.25 s (`Over` in
+  ui/screens/common.tsx; the panels' `Overlay`); on the way out, 0.15 s,
+  the last content kept, inert, that long. The content can be used at
+  once: an entrance holds no input, so no transition lengthens a hold. The
+  event's own phone-up and letter-landing entrances (0.45 s) give way to
+  the shared one.
+- **B1** BEGIN: the fan slides down off the desk, the desk dims, the
+  opening card rises in. **B2** "Into spring": the card fades, the title
+  paper slides off to the left, the two manager cards are dealt onto the
+  desk and the heading fades in. Both are the screen's own, 0.52 s and
+  0.82 s, and the desk counts as busy while they run; a click during one
+  completes it at once and does nothing else (D7).
+- **B3** signing is the manager's step's own timeline (ui/timeline.ts
+  `SIGN`): the other card slides away, the signed one flies to the phone
+  and fades into it (0.6 s), the month is published at 0.75 s — its three
+  papers come in where the title paper stood, with the stat bar and the
+  mirror's notes — and the step ends at 1.3 s; then the offers. A click
+  skips it, as any step.
+- **B5** the last door: its step puts the mirror's bulbs out one after
+  another (0.7 s), then the room goes dark (0.45 s), before the state is
+  published; the awards night fades up out of the dark on "One year
+  later.". **B6** PLAY AGAIN: a fade through ink (0.35 s); the next run's
+  title comes up under it and its bulbs come on one after another. A click
+  during the fade completes it.
+- **Checks**: check:queue checks signing's beats in order and the lights
+  going out before the awards night; check:clicks and check:overflow begin
+  the next run at the title PLAY AGAIN leads to.
+
 ## 2026-10-17 — Round R3, Part A: the opening
 
 - **Versions** (the author, R3): R1's build is v0.1, R2's v0.2, this round's

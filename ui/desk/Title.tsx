@@ -30,13 +30,14 @@ function useTitlePhoto(season: SeasonId): string | null {
   return url;
 }
 
-export const TitlePaper = memo(function TitlePaper({ c, season }: { c: ContentIndex; season: SeasonId }) {
+/** The title paper; `off` while it slides off the desk to the left (round R3, B2). */
+export const TitlePaper = memo(function TitlePaper({ c, season, off = false }: { c: ContentIndex; season: SeasonId; off?: boolean }) {
   const photo = useTitlePhoto(season);
   const date = calendarDate(c, 1);
   return (
     <>
-      <div className="baseShadow title-shadow" />
-      <div className="titlepaper" data-hook="titlepaper">
+      <div className={`baseShadow title-shadow${off ? ' off' : ''}`} />
+      <div className={`titlepaper${off ? ' off' : ''}`} data-hook="titlepaper">
         <div className="mhrow">
           <span className="ear left">{t('ui.title.ear', { season: seasonName(c, 1), year: date.year })}</span>
           <div className="mh">
@@ -110,15 +111,16 @@ export const TitleNotes = memo(function TitleNotes({ c, found, open }: { c: Cont
   );
 });
 
-/** Five faces fanned at the front, as a hand of five lies: drawn by the card component, never played. */
-export const TitleFan = memo(function TitleFan({ cards, words }: { cards: readonly HandCardModel[]; words: HandWords }) {
+/** Five faces fanned at the front, as a hand of five lies: drawn by the card component, never played; `leaving`
+ * while they slide down off the desk (round R3, B1). */
+export const TitleFan = memo(function TitleFan({ cards, words, leaving = false }: { cards: readonly HandCardModel[]; words: HandWords; leaving?: boolean }) {
   const places = fan(cards.length);
   return (
-    <div className="hand title-fan" data-hook="title-fan" aria-hidden="true" style={{ ['--strip' as string]: '150px' }}>
+    <div className={`hand title-fan${leaving ? ' leaving' : ''}`} data-hook="title-fan" aria-hidden="true" style={{ ['--strip' as string]: '150px' }}>
       {cards.map((card, i) => {
         const at = places[i] ?? { left: 0, rot: 0, lift: 0 };
         return (
-          <div key={card.cardId} className={`card ${FACE_CLASS[card.face]}`} data-card={card.cardId} style={{ left: at.left, zIndex: 10 + i, ['--rot' as string]: `${at.rot}deg`, ['--lift' as string]: `${at.lift}px` }}>
+          <div key={card.cardId} className={`card ${FACE_CLASS[card.face]}`} data-card={card.cardId} style={{ left: at.left, zIndex: 10 + i, ['--rot' as string]: `${at.rot}deg`, ['--lift' as string]: `${at.lift}px`, ['--n' as string]: i }}>
             <CardInk card={card} words={words} />
           </div>
         );

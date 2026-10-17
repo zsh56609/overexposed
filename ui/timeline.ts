@@ -7,7 +7,7 @@
 // ACCEPTED stamp). tools/pace.ts measures it over real reducer steps.
 import { getCard, getEvent, managerMessages, type GameEvent } from '../core/index.ts';
 import type { MotionMode, PlayedStep } from './queue.ts';
-export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'settled';
+export type BeatKind = 'lift' | 'land' | 'endPress' | 'stamp' | 'resources' | 'scandalLift' | 'scandalFlip' | 'scandalCarry' | 'impact' | 'sweep' | 'date' | 'season' | 'publish' | 'deal' | 'message' | 'gate' | 'draft' | 'eventSend' | 'eventReply' | 'eventClose' | 'actions' | 'signAway' | 'toPhone' | 'lightsOut' | 'dark' | 'settled';
 /** `slots`: an 'actions' beat's actions left this month, as an answer to an event leaves them (round R2). */
 export interface Beat { readonly at: number; readonly kind: BeatKind; readonly uid?: number; readonly event?: number; readonly bubble?: number; readonly resourceEvents?: readonly Extract<GameEvent,{type:'resource'}>[]; readonly slots?: number }
 export interface Timeline { readonly beats: readonly Beat[]; readonly duration: number; readonly incomingMessages: number; readonly existingMessages: number }
@@ -27,7 +27,19 @@ export const PACE = {
   dealLead: 100, dealCard: 90, dealHold: 450, noDeal: 200,
   /** The manager's bubbles, after the issue is out (after the season's card in a new season). */
   messagesLead: 150, bubble: 380, bubbleHold: 450,
+  /** The last door (round R3, B5): the mirror's bulbs go out one after another, then the room goes dark. */
+  lightsOut: 700, dark: 450,
 } as const;
+/**
+ * Signing (round R3, B3): the other manager's card slides away, the signed one flies to the phone; the month's
+ * papers come in where the title paper stood (they arrive as the state is published), then the offers.
+ */
+export const SIGN = { toPhone: 250, publish: 750, settled: 1300 } as const;
+function signTimeline(mode: MotionMode): Timeline {
+  const beats: Beat[] = [{ at: 0, kind: 'signAway' }, { at: SIGN.toPhone, kind: 'toPhone' }, { at: SIGN.publish, kind: 'publish' }, { at: SIGN.settled, kind: 'settled' }];
+  if (mode === 'reduced') return { beats: beats.map((b, i) => ({ ...b, at: i * 150 })), duration: (beats.length - 1) * 150, existingMessages: 0, incomingMessages: 0 };
+  return { beats, duration: SIGN.settled, existingMessages: 0, incomingMessages: 0 };
+}
 /**
  * An event's answer (round R2, Part C): the player's bubble or tick, then — after a few typing dots — their reply,
  * or the SENT stamp and the outcome; the answer's effects land; the phone goes down, or the letter leaves; then
@@ -85,6 +97,7 @@ function eventTimeline(step: PlayedStep, history: readonly PlayedStep[], mode: M
   return {beats,duration:done,existingMessages,incomingMessages};
 }
 export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode): Timeline | null {
+  if (step.action?.type === 'CHOOSE_MANAGER' && !step.events.some((e) => e.type === 'resource' || e.type === 'draw')) return signTimeline(mode);
   const chosen = step.events.findIndex(e=>e.type==='eventChosen');
   if(chosen>=0) return eventTimeline(step,history,mode,chosen);
   const end = step.events.findIndex(e=>e.type==='turnEnd');
@@ -135,6 +148,8 @@ export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode:
   const season=!!step.before && step.after.act!==step.before.act && step.after.phase!=='ended';
   const seasonAt=cursor;
   if(season) {beats.push({at:cursor,kind:'season'});cursor+=PACE.season;}
+  // The year's last door: the lights go out before the awards night comes up (round R3, B5).
+  if(step.after.phase==='ended') {beats.push({at:cursor,kind:'lightsOut'});cursor+=PACE.lightsOut;beats.push({at:cursor,kind:'dark'});cursor+=PACE.dark;}
   beats.push({at:cursor,kind:'publish'});
   const publishAt=cursor;
   // The existing model opens messages at draftOffer OR turnStart. Animate that real opening,
