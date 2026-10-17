@@ -146,20 +146,20 @@ const DRIVE = (runs: number) => `(async () => {
         const take = [...document.querySelectorAll('.manager-choice .choose')].filter((b) => !b.disabled);
         take[run % take.length].click();
       } else if (document.querySelector('.draft')) {
-        // Dex knows someone (round 2c, F1): at most one extra card, labelled with the manager's line, inside its card.
+        // Dex knows someone (round 2c, F1): at most one extra card, its paper-clipped tag (round R1) the manager's line, on its card.
         stats.drafts++;
-        const extras = [...document.querySelectorAll('.draft .card.extra')];
+        const extras = [...document.querySelectorAll('.draft .dslot.extra')];
         if (extras.length > 0) stats.extraDrafts++;
         if (extras.length > 1) note('a draft shows ' + extras.length + ' extra cards');
         for (const x of extras) {
-          const lab = x.querySelector('.extra-label');
+          const lab = x.querySelector('.dtag');
           const text = (lab && lab.textContent) || '';
           if (!text || text.startsWith('manager.') || text.startsWith('TODO')) note('an extra card labelled "' + text + '"');
           const a = lab && lab.getBoundingClientRect();
           const b = x.getBoundingClientRect();
-          if (a && (a.left < b.left - 0.5 || a.right > b.right + 0.5 || a.top < b.top - 0.5 || a.bottom > b.bottom + 0.5)) note('an extra card label outside its card');
+          if (a && (a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)) note('an extra card tag not on its card');
         }
-        if (document.querySelectorAll('.draft .card.offer').length > 4) note('a draft shows more than four cards');
+        if (document.querySelectorAll('.draft .dslot').length > 4) note('a draft shows more than four cards');
         // Now and then an extra pick or a reroll when there is one to take, and a look at the deck.
         const [extra, reroll] = [...document.querySelectorAll('.draft > .row > button')];
         const roll = rand(8);

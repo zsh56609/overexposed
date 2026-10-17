@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Parts C and D: the offers and the doors
+
+- **The offers** (README §9, shot 15): "<Month Year> · offers" / "Take
+  one." / "The rest go to someone else." over the dimmed desk, the stat
+  bar in view. The offered cards wear the hand's faces at 1.1× (the face
+  rules in hand.css now also apply under `.faces`); four cards fit at full
+  size. Dex's extra card wears the paper-clipped tag, its words content's
+  offer label. A click stamps TAKEN and the others fade. The tickets: "Take
+  one more £N" and "Reroll the offer £N" — the free reroll's label from
+  content — greyed out when not legal, and "You have £N".
+- **No story preview on an offer**: /core has no query for the line an
+  offered card would print (D8 was never built), so nothing shows there.
+- **"Take one." stays after "Take one more"**: the mockup has no other
+  title, and the greyed ticket says what was bought.
+- **The doors** (shots 16, 17): two invitations with a double gold rule and
+  opposite tilts; "You're invited", the gate's name and flavour; each
+  requirement as ✓/✗, the stat's icon and the threshold in its colour, then
+  "(you have N)" — never the stat's name (README §9, newer than shot 16,
+  which still prints "30+ hype"); a requirement without a stat in plain
+  words; "If you pass · if you fail" as the cards' value chips (an effect
+  that is no plain value in words); Likely or Unlikely from the reducer's
+  own preview; a click stamps ACCEPTED and the other fades.
+- **The last door**: "Winter · the last door" / "The last door of the
+  year." / "Either way, the year ends as …" when both doors end the year
+  alike — otherwise each invitation names its ending with the existing
+  line — and "On the night" with the awards each choice wins, always,
+  from the final-gate preview.
+
 ## 2026-10-17 — Round R1, Part B: the title and the manager choice
 
 - **As mockups/screens.html sets them**, every label verbatim: the title's

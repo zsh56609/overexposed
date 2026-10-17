@@ -56,8 +56,8 @@ async function screens(page: Page, url: string): Promise<string[]> {
       break;
     }
     if (screen === 'draft') {
-      const n = await page.evaluate<number>(`document.querySelectorAll('.draft .card.offer').length`);
-      const picks = await page.evaluate<string>(`document.querySelector('.draft h2')?.textContent ?? ''`);
+      const n = await page.evaluate<number>(`document.querySelectorAll('.draft .dslot').length`);
+      const picks = await page.evaluate<string>(`document.querySelector('.draft')?.dataset.picks ?? ''`);
       if (!seen.has(`draft${n}`)) {
         seen.add(`draft${n}`);
         saved.push(await shot(`draft-${n}-offers`));

@@ -4,20 +4,16 @@
 // viewer). The human is still a persona: the screen comes from state.phase, what is clickable from
 // legalActions, every preview from the reducer run on a hypothetical, every number from /core.
 
-import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import {
-  cardFace,
   createInitialState,
   establishedLanes,
-  freeRerollAvailable,
   getCard,
-  getGate,
   getManager,
   lastWord,
   majorOf,
   readLines,
   reduce,
-  rerollCost,
   rivalArc,
   RESOURCE_KEYS,
   scandalCount,
@@ -33,30 +29,23 @@ import { Desk } from './desk/Desk.tsx';
 import { deskModel } from './desk/model.ts';
 import licenceUrl from './fonts/OFL.txt?url';
 import { t, tp } from './i18n.ts';
-import { legalOf, previewDraftCard, previewGate, previewPlay, type EndTurnPreview, type GatePreview, type Legal, type Outcome, type PlayPreview } from './preview.ts';
+import { legalOf, previewPlay, type EndTurnPreview, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue, type PlayedStep } from './queue.ts';
 import { readFound, recordEnding } from './collection.ts';
 import { useFontsReady } from './screens/common.tsx';
 import { ManagerScreen, TitleScreen, type TitleLink } from './screens/Opening.tsx';
+import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import {
   awardCitation,
   awardName,
   blockerText,
   cardName,
-  cardFlavor,
-  offerLabels,
   cardRuleLines,
   cardText,
-  costLabel,
-  clauseLine,
-  effectsText,
-  endingPair,
   majorName,
   minorName,
   minorText,
   flagName,
-  gateFlavor,
-  gateName,
   heatText,
   isPlaceholder,
   lineText,
@@ -64,7 +53,6 @@ import {
   mastheadName,
   money,
   resourceName,
-  seasonName,
   signedAmount,
   zoneName,
 } from './text.ts';
@@ -275,10 +263,10 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       {(s.phase === 'draft' || s.phase === 'gate') && !snap.active?.plan && (
         <div className="screen-over">
           <div className="screen-scrim" />
-          <div className="plain panel">
-            {s.phase === 'draft' && <DraftPanel s={s} legal={legal} act={act} />}
-            {s.phase === 'gate' && <GatePanel s={s} legal={legal} act={act} />}
-          </div>
+          {s.phase === 'draft' && s.draft && (
+            <OffersScreen key={`${s.turn}:${s.draft.offer.join()}:${s.draft.picksLeft}`} s={s} legal={legal} act={act} lane={lines.lane} season={model.season} words={model.handWords} />
+          )}
+          {s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
         </div>
       )}
       {deckOpen && (
@@ -409,125 +397,6 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
         </p>
       )}
       {p.carries && <p className="muted">{t('ui.preview.endCarry', { n: p.heatAfter })}</p>}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Draft
-
-/** The reroll button's label: the manager's free label while their free reroll lasts (round 2b), else the price. */
-function rerollLabel(s: GameState): string {
-  const key = getManager(s.content, s.manager)?.perk.freeRerollKey;
-  return freeRerollAvailable(s) && key ? t(key) : t('ui.draft.reroll', { cost: money(rerollCost(s)) });
-}
-
-function DraftPanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Action) => void }) {
-  const c = s.content;
-  const cfg = c.rules.draft;
-  if (!s.draft) return null;
-  const extraLabels = offerLabels(s);
-  return (
-    <div className="draft">
-      <div className="row">
-        <h2 className="grow">{tp('ui.draft.title', s.draft.picksLeft, { n: s.draft.picksLeft })}</h2>
-        <button disabled={!legal.extraPick} onClick={() => act({ type: 'DRAFT_EXTRA_PICK' })}>
-          {t('ui.draft.extraPick', { cost: money(cfg.extraPickCost) })}
-        </button>
-        <button className="reroll" disabled={!legal.reroll} onClick={() => act({ type: 'DRAFT_REROLL' })}>
-          {rerollLabel(s)}
-        </button>
-      </div>
-      <div className="cards" style={{ '--n': s.draft.offer.length } as CSSProperties}>
-        {s.draft.offer.map((id) => {
-          const clauses = previewDraftCard(s, id);
-          return (
-            <div key={id} className={`card offer face-${cardFace(c, id) ?? 'none'}${extraLabels.has(id) ? ' extra' : ''}`}>
-              {extraLabels.has(id) && <span className="extra-label">{extraLabels.get(id)}</span>}
-              <span className="card-head">
-                <strong>{cardName(c, id)}</strong>
-                {costLabel(c, id) && <span className="muted">{costLabel(c, id)}</span>}
-              </span>
-              <span>{cardText(c, id)}</span>
-              {cardFlavor(c, id) && <span className={prose(cardFlavor(c, id) ?? '', 'flavor')}>{cardFlavor(c, id)}</span>}
-              <div className="req">
-                <span className="muted">{t('ui.draft.requires')}</span>
-                {clauses.length ? (
-                  <ul className="inline">
-                    {clauses.map((clause, i) => (
-                      <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                        {clauseLine(clause)}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span>{t('ui.draft.free')}</span>
-                )}
-              </div>
-              <button className="take" disabled={!legal.picks.has(id)} onClick={() => act({ type: 'DRAFT_PICK', cardId: id })}>
-                {t('ui.draft.take')}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Gate
-
-const awardList = (c: ContentIndex, p: GatePreview): string => (p.awardIds ?? []).map((id) => awardName(c, id)).join(' · ');
-
-function GatePanel({ s, legal, act }: { s: GameState; legal: Legal; act: (a: Action) => void }) {
-  const c = s.content;
-  const previews = s.gateOffer.map((id) => previewGate(s, id));
-  const pair = (p: GatePreview) => (p.majorId !== null && p.endingId !== null ? endingPair(c, p.majorId, p.endingId) : '');
-  // The run's last choice is an informed one (decision 11). The ending: one plain line when every option
-  // gives the same one, otherwise on each option. Awards are the ending screen's to reveal — shown on each
-  // option only when the options bring different ones, because then they bear on the choice (decision 23).
-  const ending = previews[0]?.endingId ?? null;
-  const sameEnding = ending !== null && previews.length > 1 && previews.every((p) => p.endingId === ending);
-  const awardsDiffer = ending !== null && new Set(previews.map((p) => (p.awardIds ?? []).join())).size > 1;
-  return (
-    <div className="gates">
-      <h2>{t('ui.gate.title', { season: seasonName(c, s.act) })}</h2>
-      {sameEnding && previews[0] && <p className="leads">{t('ui.gate.eitherWay', { ending: pair(previews[0]) })}</p>}
-      <div className="gate-row">
-        {previews.map((p) => {
-          const id = p.gateId;
-          const gate = getGate(c, id);
-          const flavor = gateFlavor(c, s.seed, id);
-          return (
-            <div key={id} className="gate">
-              <div className="gate-head">
-                <h3>{gateName(c, id)}</h3>
-                <span className={p.passes ? 'pass' : 'alarm'}>{t(p.passes ? 'ui.gate.nowPass' : 'ui.gate.nowFail')}</span>
-              </div>
-              <p className={prose(flavor, 'flavor')}>{flavor}</p>
-              <div className="req">
-                <span className="muted">{t('ui.gate.requires')}</span>
-                <ul className="inline">
-                  {p.clauses.map((clause, i) => (
-                    <li key={i} className={clause.met ? 'met' : 'unmet'}>
-                      {clauseLine(clause)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <p className="branches">
-                {t('ui.gate.onPass')}: {effectsText(c, gate?.onPass ?? [])} · {t('ui.gate.onFail')}: {effectsText(c, gate?.onFail ?? [])}
-              </p>
-              {!sameEnding && p.endingId !== null && <p className="leads">{t('ui.gate.leadsTo', { ending: pair(p) })}</p>}
-              {awardsDiffer && <p className="leads">{t('ui.gate.awards', { awards: awardList(c, p) })}</p>}
-              <button className="take" disabled={!legal.gates.has(id)} onClick={() => act({ type: 'CHOOSE_GATE', gateId: id })}>
-                {t('ui.gate.choose', { gate: gateName(c, id) })}
-              </button>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 }

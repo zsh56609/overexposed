@@ -91,3 +91,66 @@
 .scr .stamp { position: absolute; right: 20px; top: 150px; z-index: 3; border: 3px solid #D92B1F; color: #D92B1F; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 26px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 12px; transform: rotate(-14deg) scale(1.6); opacity: 0; transition: opacity .25s, transform .35s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; background: rgba(255, 255, 255, .04); }
 .manager-choice .biz.chosen .stamp { opacity: .92; transform: rotate(-14deg) scale(1); }
 .manager-choice .mgFoot { position: absolute; left: 0; right: 0; top: 664px; text-align: center; font-size: 12px; color: #8a7d6c; letter-spacing: .04em; }
+
+/* ---------------------------------------------------------------- The header over the dimmed desk (README §9) */
+.scr .ovh { position: absolute; left: 0; right: 0; text-align: center; color: #EDE6D6; }
+.scr .ovh small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: #ffcf85; }
+.scr .ovh b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 36px; line-height: 1.05; margin-top: 6px; }
+.scr .ovh i { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 15px; color: #bfb3a0; margin-top: 6px; }
+
+/* Card faces outside the hand (the offers, the deck): the hand's faces (hand.css, under .faces), laid out here. */
+.scr .faces { --strip: 150px; }
+.scr .faces .card.card { cursor: inherit; box-shadow: 0 14px 26px rgba(0, 0, 0, .55); }
+.scr .r-hype { color: var(--val-hype); }
+.scr .r-craft { color: var(--val-craft); }
+.scr .r-heat { color: var(--val-heat); }
+.scr .r-gain { color: var(--val-gain); }
+.scr .r-cost { color: var(--val-cost); }
+.scr .r-draw, .scr .r-text, .scr .r-flag { color: inherit; }
+.scr .ic { width: 12px; height: 12px; flex: none; }
+
+/* ---------------------------------------------------------------- The offers (shot 15) */
+.offers .drow { position: absolute; left: 0; right: 0; top: 188px; display: flex; justify-content: center; gap: 40px; }
+.offers .dslot { position: relative; width: 186px; height: 252px; transform: scale(1.1); transform-origin: 50% 0; transition: opacity .4s; }
+.offers .lift { position: relative; display: block; width: 186px; height: 252px; cursor: pointer; transition: transform .42s cubic-bezier(.22, .61, .36, 1); }
+.offers:not(.done) .dslot:hover .lift, .offers:not(.done) .lift:focus-visible { transform: translateY(-13px); transition-delay: 70ms; }
+.offers .dtag { position: absolute; right: 6px; top: -24px; z-index: 96; background: #fbf6e6; color: #2a241c; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; padding: 4px 10px 5px 20px; transform: rotate(5deg); box-shadow: 0 4px 8px rgba(0, 0, 0, .45); white-space: nowrap; pointer-events: none; transition: transform .42s cubic-bezier(.22, .61, .36, 1); }
+.offers .dtag::before { content: ""; position: absolute; left: 6px; top: -7px; width: 6px; height: 21px; border: 2px solid #a7adb3; border-radius: 4px; }
+.offers:not(.done) .dslot:hover .dtag { transform: translateY(-13px) rotate(5deg); transition-delay: 70ms; }
+.offers .stampT { position: absolute; left: 50%; top: 44%; z-index: 99; transform: translate(-50%, -50%) rotate(-14deg) scale(1.8); border: 3px solid #D92B1F; color: #D92B1F; background: rgba(236, 230, 217, .88); font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 24px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 12px; opacity: 0; transition: all .3s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
+.offers .dslot.taken .stampT { opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(1); }
+.offers.done .dslot:not(.taken) { opacity: .22; }
+.offers .tickets { position: absolute; left: 0; right: 0; top: 536px; display: flex; justify-content: center; gap: 18px; align-items: center; }
+.scr .tkt { font-weight: 800; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #15120E; background: #ece6d9; padding: 10px 18px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0 50%); }
+.scr .tkt:hover:not(:disabled) { background: #fff6e0; }
+.scr .tkt:disabled { opacity: .38; }
+.scr .tkt em { font-style: normal; color: #b3261e; margin-left: 6px; }
+.offers .have { font-size: 11px; color: #bfb3a0; letter-spacing: .04em; }
+
+/* ---------------------------------------------------------------- The season's doors (shots 16, 17) */
+.doors .grow { position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; align-items: flex-start; gap: 56px; }
+.doors .inv { position: relative; width: 384px; min-height: 300px; background: #f6f0e2; color: #1c1712; padding: 26px 30px 22px; cursor: pointer; box-shadow: inset 0 0 0 7px #f6f0e2, inset 0 0 0 8px #b8924a, inset 0 0 0 11px #f6f0e2, inset 0 0 0 12px #b8924a, 0 18px 30px rgba(0, 0, 0, .6); transition: transform .3s ease, opacity .4s; }
+.doors .inv:nth-child(1) { transform: rotate(-1.4deg); }
+.doors .inv:nth-child(2) { transform: rotate(1.2deg); }
+.doors:not(.done) .inv:hover, .doors:not(.done) .inv:focus-visible { transform: rotate(0) translateY(-8px); }
+.doors .inv .ivk { font-size: 9px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; color: #9a7433; text-align: center; }
+.doors .inv .ivt { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 30px; text-align: center; margin-top: 4px; line-height: 1.05; }
+.doors .inv .ivf { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 13px; line-height: 1.35; text-align: center; margin: 8px 4px 0; color: #4a4136; }
+.doors .inv .sec { margin-top: 14px; margin-bottom: 3px; font-size: 8.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #9a7433; }
+.doors .inv .rq { display: flex; align-items: center; gap: 5px; min-height: 19px; font-size: 12px; font-weight: 700; }
+.doors .inv .rq i { font-style: normal; font-weight: 900; width: 10px; flex: none; }
+.doors .inv .rq.ok i { color: #2e7d32; }
+.doors .inv .rq.no i { color: #b8281c; }
+.doors .inv .rq .n { font-weight: 500; color: #6b6155; margin-left: 2px; }
+.doors .inv .oc { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 2px; font-size: 12px; font-weight: 800; align-items: center; min-height: 19px; }
+.doors .inv .oc span { display: flex; align-items: center; gap: 3px; }
+.doors .inv .oc em { font-style: normal; font-size: 8.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #6b6155; }
+.doors .inv .ends { margin-top: 10px; font-size: 11.5px; font-weight: 700; line-height: 1.4; }
+.doors .inv .night { margin-top: 12px; border-top: 1px solid rgba(154, 116, 51, .4); padding-top: 8px; font-size: 11.5px; line-height: 1.45; }
+.doors .inv .night b { display: block; font-size: 8.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #9a7433; margin-bottom: 2px; }
+.doors .odds { position: absolute; right: 18px; top: 20px; transform: rotate(12deg); border: 2.5px solid; padding: 1px 8px; font-weight: 900; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; opacity: .85; }
+.doors .odds.y { color: #2e7d32; }
+.doors .odds.n { color: #b8281c; }
+.doors .inv .acc { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%) rotate(-12deg) scale(1.8); border: 3px solid #2e7d32; color: #2e7d32; background: rgba(246, 240, 226, .88); font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 26px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 14px; opacity: 0; transition: all .3s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
+.doors .inv.chosen .acc { opacity: 1; transform: translate(-50%, -50%) rotate(-12deg) scale(1); }
+.doors.done .inv:not(.chosen) { opacity: .22; }

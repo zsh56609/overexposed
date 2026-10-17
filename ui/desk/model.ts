@@ -25,7 +25,9 @@ import {
   reduce,
   statTiers,
   type CardFace,
+  type ContentIndex,
   type CountdownLevel,
+  type Effect,
   type FrontPage,
   type GameEvent,
   type GameState,
@@ -50,6 +52,7 @@ import {
   clauseText,
   conditionText,
   dateLine,
+  effectText,
   flagName,
   lineText,
   majorGoal,
@@ -560,22 +563,52 @@ const PLAIN_OPS = new Set(['resource', 'draw', 'slots', 'setFlag']);
  * A card's effects as values (round V1a, 0.3): icon and number in the resource's colour — craft's icon the
  * stat bar's, by the established lane; drawing is "Draw N"; extra actions and a flag set in their words.
  */
+/** One effect as a value chip, in the card's value language; null for an effect that is no plain value. */
+function chip(e: Effect, lane: string | null): ValueChip | null {
+  if (e.op === 'draw') return { kind: 'draw', icon: 'cards', text: t('ui.card.draw', { n: e.count }) };
+  if (e.op === 'resource') {
+    if (e.target === 'capital') return { kind: e.value >= 0 ? 'gain' : 'cost', icon: null, text: signedMoney(e.value) };
+    if (e.target === 'hype') return { kind: 'hype', icon: 'star', text: signed(e.value) };
+    if (e.target === 'craft') return { kind: 'craft', icon: lane === 'screen' ? 'clap' : 'note', text: signed(e.value) };
+    return { kind: 'heat', icon: 'flame', text: signed(e.value) };
+  }
+  if (e.op === 'setFlag') return { kind: 'flag', icon: null, text: flagName(e.flag) };
+  if (e.op === 'slots') return { kind: 'text', icon: null, text: tp('ui.effect.slots', e.value, { delta: signed(e.value) }) };
+  return null;
+}
+
 function chips(s: GameState, cardId: string, lane: string | null): ValueChip[] | null {
   const card = getCard(s.content, cardId);
   const effects = card?.effects ?? [];
   if (!card || !effects.every((e) => PLAIN_OPS.has(e.op))) return null;
-  return effects.map((e): ValueChip => {
-    if (e.op === 'draw') return { kind: 'draw', icon: 'cards', text: t('ui.card.draw', { n: e.count }) };
-    if (e.op === 'resource') {
-      if (e.target === 'capital') return { kind: e.value >= 0 ? 'gain' : 'cost', icon: null, text: signedMoney(e.value) };
-      if (e.target === 'hype') return { kind: 'hype', icon: 'star', text: signed(e.value) };
-      if (e.target === 'craft') return { kind: 'craft', icon: lane === 'screen' ? 'clap' : 'note', text: signed(e.value) };
-      return { kind: 'heat', icon: 'flame', text: signed(e.value) };
-    }
-    if (e.op === 'setFlag') return { kind: 'flag', icon: null, text: flagName(e.flag) };
-    if (e.op === 'slots') return { kind: 'text', icon: null, text: tp('ui.effect.slots', e.value, { delta: signed(e.value) }) };
-    return { kind: 'text', icon: null, text: cardText(s.content, cardId) };
-  });
+  return effects.map((e): ValueChip => chip(e, lane) ?? { kind: 'text', icon: null, text: cardText(s.content, cardId) });
+}
+
+/** A door's outcomes (round R1): each effect as a value chip, or in words when it is no plain value. */
+export function effectChips(c: ContentIndex, effects: readonly Effect[], lane: string | null): ValueChip[] {
+  return effects.map((e): ValueChip => chip(e, lane) ?? { kind: 'text', icon: null, text: effectText(c, e) });
+}
+
+/** A card on an offer or in the deck viewer (round R1): the hand's face, values and requirement — nothing about playing it now. */
+export function offerCardModel(s: GameState, cardId: string, lane: string | null, uid = -1): HandCardModel {
+  const c = s.content;
+  const def = getCard(c, cardId);
+  const scandal = def?.kind === 'scandal';
+  const values = scandal ? [{ kind: 'text' as const, icon: null, text: t('ui.card.cantPlay') }] : chips(s, cardId, lane);
+  return {
+    uid,
+    cardId,
+    face: cardFace(c, cardId) ?? 'notebook',
+    scandal,
+    name: cardName(c, cardId),
+    values,
+    rules: scandal ? cardRuleLines(c, cardId).join(' ') || null : values === null ? cardText(c, cardId) : null,
+    needs: !scandal && values !== null && def?.requires ? capitalised(t('ui.card.needs', { cond: conditionText(c, def.requires) })) : null,
+    flavour: scandal ? null : cardFlavor(c, cardId),
+    cost: def?.cost ?? 1,
+    playable: !scandal,
+    why: scandal ? 'scandal' : null,
+  };
 }
 
 const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
