@@ -16,6 +16,7 @@ import { Mirror } from './Mirror.tsx';
 import { Papers, type IncomingPaper } from './Papers.tsx';
 import { paperForPlay, type DeskModel } from './model.ts';
 import { StatBar } from './StatBar.tsx';
+import { useSettings } from '../settings.ts';
 import './tokens.css';
 import './fonts.css';
 import './css/scene.css';
@@ -27,12 +28,12 @@ import './css/hand.css';
 import './css/motion.css';
 
 /** "Mark my stories" (README §2): a House rules setting, on by default; round V2 gives it its switch. */
-const MARK_MY_STORIES = true;
-
 /** What the player can do on the desk: each is a dispatch or a UI toggle in App, never a rule. */
 export interface DeskActions {
-  /** Open the deck (its plain screen until round V2). */
+  /** Open the deck's panel (round R1, G1). */
   readonly deck: () => void;
+  /** Open House rules (round R1, G3). */
+  readonly settings: () => void;
   readonly play: (uid: number) => void;
   readonly end: () => void;
   /** What the hover previews describe: a card, the month end, or nothing. */
@@ -55,11 +56,13 @@ function useToast(): [{ readonly text: string; readonly on: boolean }, (text: st
 export function Desk({ model, on, children, snap, onTails }: { model: DeskModel; on: DeskActions; children?: ReactNode; snap: Snapshot; onTails: (settle: () => void) => () => void }) {
   const [toast, showToast] = useToast();
   const view=presentation(snap,model);
+  // Mark my stories (House rules, round R1 G3): the red margin rule on the player's stories.
+  const marks = useSettings().markStories;
   // The paper a play in flight brings forward (round R1, H3): read once, as the card lifts.
   const playing = snap.active && !snap.active.plan && snap.active.step.events.some((e) => e.type === 'play') ? snap.active.step : null;
   const incoming = useMemo<IncomingPaper | null>(() => (playing ? { id: playing.id, paper: paperForPlay(snap.steps.filter((x) => x.id !== playing.id), playing) } : null), [playing?.id]);
   return (
-    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${MARK_MY_STORIES ? ' marks' : ''}`} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
+    <div className={`desk ${model.season} lane-${model.lane}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}`} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy ? "1" : "0"} data-step={snap.steps.length} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
       <div className="wallpaper" />
       <div className="lightpool" />
@@ -83,7 +86,7 @@ export function Desk({ model, on, children, snap, onTails }: { model: DeskModel;
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">
         {toast.text}
       </div>
-      <StatBar stats={view.stats} season={model.season} onDeck={on.deck} />
+      <StatBar stats={view.stats} season={model.season} onDeck={on.deck} onSettings={on.settings} />
       {children}
     </div>
   );

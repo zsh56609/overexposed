@@ -6,6 +6,40 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R1, Part G: the deck, the scrapbook, House rules, the credits
+
+- **Four panels over the scene** (README §9; mockups/vanity.html, shots
+  20–22), in ui/screens/Panels.tsx: over the desk a panel starts below the
+  stat bar, which stays in view; over the title and the awards night it
+  covers the stage and stands where it would on the desk. Escape or a
+  click on the dimmed scene closes any of them; each has its own close
+  button with the mockup's label.
+- **The deck**: the mockup's panel, its minis the hand's own faces at
+  0.42, sorted by name in two sections, "Still to draw" and "Played"; a
+  scandal is its red face. Deviation: a deck grown past the panel's room
+  (four rows of ten) takes the next smaller step (0.36, 0.3, 0.25, 0.2)
+  rather than scroll — nothing on the stage scrolls (decision 17). Cards
+  in the hand are on the desk, so neither section lists them.
+- **The endings scrapbook**: the green board, a column a major with its
+  name and goal line, the found minors as taped clippings, the rest as
+  dashed "Not found yet" outlines; reached from the title and the awards
+  night. The endings found are also kept for the session, so the board
+  shows this year's ending when the browser refuses storage.
+- **House rules**: Mark my stories (on) and Reduce motion (off), kept in
+  this browser (ui/settings.ts). Reduce motion asks for the existing
+  reduced mode through the same switch the OS preference and the audits
+  use; with it off, the OS preference decides again. Sound stays hidden
+  until the game has sound. A whole row is its switch. Reached from the
+  title and a small gear button beside Deck in the stat bar (drawn in
+  code, no third-party icon).
+- **The credits**, in House rules' style: the game's name as the kicker,
+  "Credits", the two fonts' notices and the licence link — the existing
+  approved words.
+- **The plain screens are gone**: the deck viewer and the credits were
+  the last; ui/style.css keeps the frame, the stage, the base resets, the
+  offers' and doors' layer and the error line, and 44 i18n keys only the
+  plain screens used were removed.
+
 ## 2026-10-17 — Round R1, Part H3–H4: the paper comes to you; one way to appear
 
 - **The paper comes to you** (README §2, §9; replaces the back paper's

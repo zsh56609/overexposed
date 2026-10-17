@@ -224,18 +224,18 @@ const DRIVE = (runs: number) => `(async () => {
   const plain = (where) => { seen.screens[where] = (seen.screens[where] || 0) + 1; note(__plainAudit(where)); };
   const over = (el) => { el.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); };
   const out = (el) => { el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); };
-  const deck = async () => {
-    const b = document.querySelector('.desk .deckbtn'); if (!b) return;
-    b.click(); await sleep(4); seen.deckViews++; plain('deck');
-    document.querySelector('.deck-viewer .row button')?.click(); await sleep(4);
+  // A panel (round R1, Part G): opened from its button, audited, closed from its own.
+  const panel = async (opener, id, where = id) => {
+    const b = document.querySelector(opener); if (!b) return;
+    b.click(); await shown('.p-' + id); plain(where);
+    document.querySelector('.p-' + id + ' .closeb').click(); await shown('.p-' + id, false);
   };
+  const deck = async () => { seen.deckViews++; await panel('.desk .deckbtn', 'deck'); };
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
   document.head.appendChild(still);
   plain('title');
-  document.querySelector('.credits-open')?.click(); await sleep(10);
-  plain('credits');
-  document.querySelector('.plain.credits button')?.click(); await sleep(10);
+  for (const id of ['scrapbook', 'settings', 'credits']) await panel('.title-screen .' + id + '-open', id);
   document.querySelector('button.big').click();
   await sleep(40);
   for (let run = 0; run < ${runs}; run++) {
@@ -268,6 +268,7 @@ const DRIVE = (runs: number) => `(async () => {
         const b = [...document.querySelectorAll('.desk .bub:not(.who)')].at(-1); if (b) { b.click(); await sleep(4); seen.bubbles++; note(__deskAudit('reaction row')); document.body.click(); await sleep(2); }
       }
       if (rand(12) === 0) await deck();
+      else if (rand(16) === 0) await panel('.desk .setbtn', 'settings', 'settings over the desk');
       const playable = cards.filter((c) => c.getAttribute('aria-disabled') !== 'true');
       if (playable.length && rand(6)) playable[rand(playable.length)].click();
       else {
@@ -279,6 +280,7 @@ const DRIVE = (runs: number) => `(async () => {
     }
     if (!document.querySelector('.ending')) throw new Error('audit reached 800-action guard: '+JSON.stringify(window.__auditProgress));
     plain('ending');
+    await panel('.awards-night .scrapbook-open', 'scrapbook', 'scrapbook over the awards night');
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }

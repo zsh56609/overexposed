@@ -18,9 +18,11 @@ const FAN: readonly (readonly [number, number, number, boolean])[] = [
   [22, 478, 470, false],
 ];
 
-export type TitleLink = 'scrapbook' | 'settings' | 'credits';
+/** The title's small links (round R1, Part G), each to its panel. */
+const LINKS = ['scrapbook', 'settings', 'credits'] as const;
+type TitleLink = (typeof LINKS)[number];
 
-export function TitleScreen({ seed, found, onBegin, open, links }: { seed: number; found: ReadonlySet<string>; onBegin: () => void; open: (panel: TitleLink) => void; links: readonly TitleLink[] }) {
+export function TitleScreen({ seed, found, onBegin, open }: { seed: number; found: ReadonlySet<string>; onBegin: () => void; open: (panel: TitleLink) => void }) {
   const opening = openingText(content, seed);
   const label: Record<TitleLink, string> = { scrapbook: t('ui.title.scrapbook'), settings: t('ui.title.settings'), credits: t('ui.title.credits') };
   return (
@@ -44,7 +46,7 @@ export function TitleScreen({ seed, found, onBegin, open, links }: { seed: numbe
       </button>
       <FoundDots minors={content.endings.minors} found={found} />
       <nav className="links">
-        {links.map((link) => (
+        {LINKS.map((link) => (
           <button key={link} className={`link ${link}-open`} onClick={() => open(link)}>
             {label[link]}
           </button>

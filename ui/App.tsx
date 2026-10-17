@@ -14,21 +14,19 @@ import {
   reduce,
   RESOURCE_KEYS,
   type Action,
-  type CardInstance,
   type ContentIndex,
-  type GameState,
 } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { motionMode, subscribeMotion } from './motion.ts';
 import { Desk } from './desk/Desk.tsx';
 import { deskModel } from './desk/model.ts';
-import licenceUrl from './fonts/OFL.txt?url';
 import { t, tp } from './i18n.ts';
 import { legalOf, previewPlay, type EndTurnPreview, type Outcome, type PlayPreview } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readFound } from './collection.ts';
 import { useFontsReady } from './screens/common.tsx';
-import { ManagerScreen, TitleScreen, type TitleLink } from './screens/Opening.tsx';
+import { ManagerScreen, TitleScreen } from './screens/Opening.tsx';
+import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import {
@@ -92,36 +90,18 @@ function Title({ onStart, error }: { onStart: (seed: number) => void; error: str
   // The run to come is chosen now, so the opening premise is that run's variant (decision 15, revised).
   const [seed] = useState(() => urlSeed ?? freshSeed());
   const [found] = useState(readFound);
-  const [panel, setPanel] = useState<TitleLink | null>(null);
+  // The scrapbook, House rules or the credits, over the title (round R1, Part G).
+  const [panel, setPanel] = useState<PanelId | null>(null);
+  const close = useCallback(() => setPanel(null), []);
   if (!ready) return <div className="scr title-screen" />;
-  if (panel === 'credits') return <Credits onClose={() => setPanel(null)} />;
   return (
     <>
-      <TitleScreen seed={seed} found={found} onBegin={() => onStart(seed)} open={setPanel} links={['credits']} />
+      <TitleScreen seed={seed} found={found} onBegin={() => onStart(seed)} open={setPanel} />
+      {panel === 'scrapbook' && <ScrapbookPanel found={found} overDesk={false} onClose={close} />}
+      {panel === 'settings' && <SettingsPanel overDesk={false} onClose={close} />}
+      {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}
       {error && <p className="plain error-layer">{error}</p>}
     </>
-  );
-}
-
-/**
- * The credits (round V1a): every third-party asset the game ships, as the jam requires — the two font
- * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts).
- */
-function Credits({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="plain full credits">
-      <h1>{t('ui.credits.title')}</h1>
-      <h2>{t('ui.credits.fonts')}</h2>
-      <p>{t('credits.font.playfair')}</p>
-      <p>{t('credits.font.franklin')}</p>
-      <p>
-        {t('ui.credits.licence')}{' '}
-        <a href={licenceUrl} target="_blank" rel="noreferrer">
-          {t('ui.credits.read')}
-        </a>
-      </p>
-      <button onClick={onClose}>{t('ui.credits.close')}</button>
-    </div>
   );
 }
 
@@ -207,7 +187,9 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const snap = useSyncExternalStore(queue.subscribe, queue.getSnapshot);
   const [error, setError] = useState<string | null>(null);
   const [focus, setFocus] = useState<Focus>(null);
-  const [deckOpen, setDeckOpen] = useState(false);
+  // The deck, House rules (over the desk) or the scrapbook (over the awards night): round R1, Part G.
+  const [panel, setPanel] = useState<PanelId | null>(null);
+  const close = useCallback(() => setPanel(null), []);
   useLayoutEffect(() => { if (snap.busy) setFocus(null); }, [snap.busy]);
   useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
@@ -243,7 +225,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // What the desk can ask for: stable, so a part that did not change does not render again.
   const on = useMemo(
     () => ({
-      deck: () => setDeckOpen(true),
+      deck: () => setPanel('deck'),
+      settings: () => setPanel('settings'),
       play: (uid: number) => act({ type: 'PLAY_CARD', uid }),
       end: () => act({ type: 'END_TURN' }),
       focus: (next: Focus) => setFocus(queue.busy ? null : next),
@@ -252,7 +235,12 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   );
 
   if (s.phase === 'ended')
-    return <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={null} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />;
+    return (
+      <>
+        <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
+        {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} overDesk={false} onClose={close} />}
+      </>
+    );
   if (s.phase === 'manager')
     return (
       <>
@@ -272,8 +260,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           {s.phase === 'play' && card && focus?.kind === 'card' ? <PlayPreviewView c={c} p={card} /> : endPreview ? <EndTurnPreviewView c={c} p={endPreview} /> : null}
         </Popover>
       </Desk>
-      {/* The screens around the desk (round V2) in their plain versions, over the dimmed scene — beside the
-          desk, never inside it, so none of the desk's styles reach them. */}
+      {/* The screens around the desk (round R1), over the dimmed scene — beside the desk, never inside it, so none
+          of the desk's styles reach them. */}
       {error && (
         <p className="plain error-layer">
           {t('ui.error.title')}: {error}
@@ -288,11 +276,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           {s.phase === 'gate' && <DoorsScreen key={`${s.turn}:${s.gateOffer.join()}`} s={s} legal={legal} act={act} lane={lines.lane} />}
         </div>
       )}
-      {deckOpen && (
-        <div className="plain deck-layer">
-          <DeckViewer s={s} onClose={() => setDeckOpen(false)} />
-        </div>
-      )}
+      {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
+      {panel === 'settings' && <SettingsPanel overDesk onClose={close} />}
     </>
   );
 }
@@ -419,59 +404,3 @@ function EndTurnPreviewView({ c, p }: { c: ContentIndex; p: EndTurnPreview }) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Deck viewer (decision 12): read-only, sorted by name, never the draw order.
-
-function grouped(c: ContentIndex, cards: readonly CardInstance[]) {
-  const counts = new Map<string, number>();
-  for (const card of cards) counts.set(card.cardId, (counts.get(card.cardId) ?? 0) + 1);
-  return [...counts]
-    .map(([id, n]) => ({ id, n, name: cardName(c, id), scandal: getCard(c, id)?.kind === 'scandal' }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function DeckViewer({ s, onClose }: { s: GameState; onClose: () => void }) {
-  const c = s.content;
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-  const lists = [
-    { key: 'deck', title: t('ui.deck.deck', { n: s.deck.length }), cards: grouped(c, s.deck) },
-    { key: 'discard', title: t('ui.deck.discard', { n: s.discard.length }), cards: grouped(c, s.discard) },
-  ];
-  return (
-    <div className="deck-viewer" role="dialog" aria-label={t('ui.deck.title')}>
-      <div className="row">
-        <h2 className="grow">{t('ui.deck.title')}</h2>
-        <span className="muted">{t('ui.deck.order')}</span>
-        <button onClick={onClose}>{t('ui.deck.close')}</button>
-      </div>
-      <div className="deck-lists">
-        {lists.map((list) => (
-          <section key={list.key}>
-            <h3>{list.title}</h3>
-            {list.cards.length === 0 ? (
-              <p className="muted">{t('ui.deck.empty')}</p>
-            ) : (
-              <ul>
-                {list.cards.map((entry) => (
-                  <li key={entry.id} className={entry.scandal ? 'lead' : undefined}>
-                    {t('ui.deck.count', { n: entry.n, card: entry.name })}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Ending

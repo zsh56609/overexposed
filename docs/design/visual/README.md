@@ -123,7 +123,7 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
 
 Every screen happens *in the dressing room*: the scene dims behind it and the stat
 bar stays visible, so the player always sees what they have while they choose.
-The action bulbs remain visible during choices. The Deck & discard button stays in the stat bar until V2 places it. Photographs are drawn and cached on first need.
+The action bulbs remain visible during choices. The Deck & discard button and a small gear for House rules sit in the stat bar (round R1). Photographs are drawn and cached on first need.
 Header pattern: amber small-caps kicker (usually the date), a Playfair title, an
 italic line.
 
@@ -186,6 +186,7 @@ italic line.
   minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
   "Endings found · N of 14".
 - **Settings — "House rules".** Mark my stories (on), Sound (on), Reduce motion (off).
+  Sound stays hidden until the game has sound (round R1). Credits share this panel's style.
 
 ## Porting notes
 

@@ -35,6 +35,12 @@ export function IconDefs() {
           <rect x="3" y="4" width="18" height="5" fill="currentColor" />
           <path d="M6 12.5h6M6 16h6M14.5 12.5h3.5M14.5 16h3.5" stroke="currentColor" strokeWidth="1.6" />
         </symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" strokeWidth="3.4" />
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+            <rect key={a} x="10.3" y="1.8" width="3.4" height="4.6" rx=".5" fill="currentColor" transform={`rotate(${a} 12 12)`} />
+          ))}
+        </symbol>
         <symbol id="i-flame" viewBox="0 0 24 24">
           <path fill="currentColor" d="M12 2c1.2 3.6 5.5 5.3 5.5 10.6A5.5 5.5 0 0 1 6.5 12.6c0-2.8 1.6-4.3 2.4-6.2.9 2 1.6 3 2.9 3.4C12.2 7 11 5.2 12 2z" />
         </symbol>

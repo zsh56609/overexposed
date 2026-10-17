@@ -37,11 +37,14 @@ async function screens(page: Page, url: string): Promise<string[]> {
   const click = (selector: string, index = 0) => page.evaluate<boolean>(`(() => { const el = document.querySelectorAll(${JSON.stringify(selector)})[${index}]; if (!el || el.disabled) return false; el.click(); return true; })()`);
   await page.navigate(`${url}?seed=${flag('seed', '3319043840')}`, 3000);
   saved.push(await shot('title'));
-  await click('.credits-open');
-  await sleep(300);
-  saved.push(await shot('credits'));
-  await click('.plain.credits button');
-  await sleep(200);
+  // The title's three panels (round R1, Part G).
+  for (const id of ['scrapbook', 'settings', 'credits']) {
+    await click(`.title-screen .${id}-open`);
+    await sleep(300);
+    saved.push(await shot(id));
+    await click(`.p-${id} .closeb`);
+    await sleep(200);
+  }
   await click('button.big');
   await sleep(400);
   saved.push(await shot('manager'));
@@ -71,7 +74,7 @@ async function screens(page: Page, url: string): Promise<string[]> {
         await click('.desk .deckbtn');
         await sleep(300);
         saved.push(await shot('deck'));
-        await click('.deck-viewer .row button');
+        await click('.p-deck .closeb');
         await sleep(200);
       }
       // An extra pick once there is money for it; a reroll once; then a card.

@@ -214,3 +214,54 @@
 @keyframes awards-pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes awards-flash { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes awards-bulbs { 0%, 69% { opacity: 0; } 70% { opacity: .5; } 73% { opacity: 0; } 78% { opacity: .4; } 81% { opacity: 0; } 86% { opacity: .35; } 89% { opacity: 0; } 100% { opacity: 0; } }
+
+/* ---------------------------------------------------------------- The panels: the deck, the scrapbook, House rules, credits (shots 20–22) */
+/* Over the desk a panel starts below the stat bar, which stays in view; over the title and the awards night it
+   covers the stage, the panel at the same place on the stage. */
+.scr.ov { z-index: 160; --top: 46px; }
+.scr.ov.over-desk { top: 46px; --top: 0px; }
+.ov .scrim { position: absolute; inset: 0; background: rgba(8, 6, 4, .74); backdrop-filter: blur(2.5px); }
+.ov .pnh { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
+.ov .pnh small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: #ffcf85; }
+.ov .pnh b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; margin-top: 4px; }
+.scr .closeb { flex: none; font-weight: 800; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid #5a4f42; color: #cfc4b2; padding: 7px 12px; }
+.scr .closeb:hover { border-color: #EDE6D6; color: #EDE6D6; }
+/* The deck: mini faces, the hand's own at 0.42 (a deck past the panel takes a smaller step, Panels.tsx). */
+.ov .panel { position: absolute; left: 170px; top: calc(var(--top) + 40px); width: 940px; background: #15120E; border: 1px solid rgba(255, 220, 170, .2); box-shadow: 0 30px 50px rgba(0, 0, 0, .7); color: #EDE6D6; padding: 22px 28px; }
+.ov .dsec { margin-top: 14px; }
+.ov .dsec h4 { margin: 0 0 8px; font-size: 9.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #9c8e7b; }
+.ov .mgrid { display: flex; flex-wrap: wrap; gap: 8px; }
+.ov .mini { position: relative; flex: none; width: calc(186px * var(--ms)); height: calc(252px * var(--ms)); }
+.ov .mini .sc { position: absolute; left: 0; top: 0; width: 186px; height: 252px; transform: scale(var(--ms)); transform-origin: 0 0; }
+.scr .mini .card.card { pointer-events: none; box-shadow: none; }
+/* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
+.ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; min-height: 540px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
+.ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 18px; }
+.ov .col h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; margin: 0 0 4px; color: #f3ead4; }
+.ov .col .gl { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; color: #b9c4b6; margin-bottom: 14px; min-height: 32px; }
+.ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 9px 10px 10px; margin-bottom: 17px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
+.ov .clip::before { content: ""; position: absolute; left: 50%; top: -7px; width: 36px; height: 12px; margin-left: -18px; background: rgba(255, 240, 200, .55); transform: rotate(-3deg); }
+.ov .clip small { display: block; font-size: 7px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b8281c; }
+.ov .clip b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 15px; line-height: 1.1; margin-top: 2px; }
+.ov .clip i { display: block; height: 3px; background: rgba(21, 18, 14, .25); margin-top: 6px; }
+.ov .clip i + i { width: 68%; }
+.ov .clip.miss { background: transparent; border: 1.5px dashed rgba(237, 230, 214, .32); box-shadow: none; color: rgba(237, 230, 214, .42); text-align: center; padding: 15px 10px; }
+.ov .clip.miss::before { display: none; }
+.ov .clip.miss b { font-size: 21px; margin: 0; }
+.ov .clip.miss small { color: rgba(237, 230, 214, .36); }
+/* House rules and the credits: a narrow panel of rows; a whole row is its switch. */
+.ov .set { position: absolute; left: 420px; top: calc(var(--top) + 96px); width: 440px; background: #15120E; border: 1px solid rgba(255, 220, 170, .2); box-shadow: 0 30px 50px rgba(0, 0, 0, .7); padding: 22px 26px 10px; color: #EDE6D6; }
+.ov .set .pnh b { font-size: 24px; }
+.scr .srow { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; padding: 13px 0; border-top: 1px solid rgba(255, 220, 170, .1); text-align: left; }
+.ov .set .pnh + .srow { margin-top: 14px; }
+.ov .srow b { display: block; font-size: 14px; font-weight: 800; }
+.ov .srow .sw > span { display: block; font-size: 11.5px; color: #9c8e7b; margin-top: 2px; }
+.ov .tog { position: relative; flex: none; width: 40px; height: 22px; border-radius: 11px; background: #3a332b; transition: background .2s; }
+.ov .tog::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #cfc4b2; transition: left .2s; }
+.ov .srow:hover .tog:not(.on) { background: #4a4238; }
+.ov .tog.on { background: #c8281c; }
+.ov .tog.on::after { left: 21px; background: #fff; }
+.ov .crow { margin-top: 14px; padding: 13px 0 12px; border-top: 1px solid rgba(255, 220, 170, .1); }
+.ov .crow b { display: block; font-size: 14px; font-weight: 800; }
+.ov .crow span { display: block; font-size: 11.5px; line-height: 1.45; color: #9c8e7b; margin-top: 6px; overflow-wrap: anywhere; }
+.ov .crow a { color: #ffcf85; }

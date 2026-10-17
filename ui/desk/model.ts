@@ -78,7 +78,7 @@ import {
 export const PHOTO_VARIANTS = 3;
 
 export type LaneClass = 'music' | 'screen' | 'celebrity' | 'early';
-export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'cards';
+export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'cards' | 'gear';
 
 export interface StatCellModel {
   readonly id: 'hype' | 'craft' | 'heat' | 'next' | 'money';
@@ -96,8 +96,9 @@ export interface StatBarModel {
   readonly cells: readonly StatCellModel[];
   readonly actions: { readonly total: number; readonly left: number; readonly tipHeader: string; readonly tipLine: string };
   readonly when: { readonly date: string; readonly marks: readonly ('past' | 'now' | 'next')[]; readonly tipHeader: string; readonly tipLine: string };
-  /** The deck's button (the deck itself is a screen of round V2). */
+  /** The deck's button, and House rules' (round R1, G1 and G3). */
   readonly deck: string;
+  readonly settings: string;
 }
 
 export interface NoteReq {
@@ -378,6 +379,7 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
       tipLine: dateLine(c, s.turn),
     },
     deck: t('ui.deck.open'),
+    settings: t('ui.title.settings'),
   };
 }
 

@@ -41,7 +41,7 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const blocked = {};
   const note = (m) => { blocked[m] = (blocked[m] || 0) + 1; };
-  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0 };
+  const stats = { runs: 0, states: 0, hovers: 0, targets: 0, points: 0, drafts: 0, extraDrafts: 0, controls: 0, byScreen: {}, extraPicks: 0, rerolls: 0, deckViews: 0, settingsViews: 0 };
   const POINTS = [[0.5, 0.5], [0.12, 0.12], [0.88, 0.12], [0.12, 0.88], [0.88, 0.88]];
   const name = (el, cards, end) => (el === end ? 'END TURN' : 'card ' + (cards.indexOf(el) + 1) + ' of ' + cards.length);
   const describe = (el) => !el ? 'nothing' : el.tagName.toLowerCase() + (el.className ? '.' + String(el.className.baseVal ?? el.className).trim().split(/\\s+/).join('.') : '') + (el.closest('.floating') ? ' (inside .floating)' : '');
@@ -77,16 +77,19 @@ const DRIVE = (runs: number) => `(async () => {
     return null;
   };
   // Assertion 1: every control for a legal action, inside the stage and hit at its centre.
-  const screenOf = () => document.querySelector('.deck-viewer') ? 'deck' : document.querySelector('.plain.credits') ? 'credits' : document.querySelector('.plain.title, .title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
+  // A panel (round R1, Part G) is the screen while it is open: the deck, the scrapbook, House rules, the credits.
+  const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.title-screen') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
     title: ['button.big', '.title-screen .link'],
-    credits: ['.plain.credits button'],
+    credits: ['.p-credits .closeb', '.p-credits a'],
+    scrapbook: ['.p-scrapbook .closeb'],
+    settings: ['.p-settings .closeb', '.p-settings .srow'],
+    deck: ['.p-deck .closeb'],
     manager: ['.manager-choice .choose'],
-    draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn'],
-    doors: ['.gates .take', '.desk .deckbtn'],
-    hand: ['.desk .endbtn', '.desk .deckbtn'],
-    deck: ['.deck-viewer .row button'],
-    ending: ['button.play-again'],
+    draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn', '.desk .setbtn'],
+    doors: ['.gates .take', '.desk .deckbtn', '.desk .setbtn'],
+    hand: ['.desk .endbtn', '.desk .deckbtn', '.desk .setbtn'],
+    ending: ['button.play-again', '.awards-night .link'],
   };
   const reachable = () => {
     const screen = screenOf();
@@ -115,24 +118,43 @@ const DRIVE = (runs: number) => `(async () => {
       if (!top || !(top === card || card.contains(top))) note('hand: card ' + (cards.indexOf(card) + 1) + ' of ' + cards.length + ' is covered at its centre by ' + describe(top));
     }
   };
-  const openDeck = async () => {
-    const b = document.querySelector('.desk .deckbtn');
-    if (!b) return;
+  // A panel opens from its button, every control in it is reached, and it closes from its own button.
+  const visit = async (opener, id) => {
+    const b = document.querySelector(opener);
+    if (!b) { note('no button opens ' + id); return false; }
     b.click(); await sleep(4);
-    stats.deckViews++;
+    if (!document.querySelector('.p-' + id)) { note(opener + ' does not open ' + id); return false; }
     reachable();
-    document.querySelector('.deck-viewer .row button')?.click(); await sleep(4);
-    if (document.querySelector('.deck-viewer')) note('the deck viewer does not close');
+    return true;
+  };
+  const close = async (id) => {
+    document.querySelector('.p-' + id + ' .closeb')?.click(); await sleep(4);
+    if (document.querySelector('.p-' + id)) note('the ' + id + ' panel does not close');
+  };
+  const openDeck = async () => {
+    if (!(await visit('.desk .deckbtn', 'deck'))) return;
+    stats.deckViews++;
+    await close('deck');
+  };
+  // House rules over the desk: Mark my stories turns the red margin rule off and on again (left as it was).
+  const openSettings = async () => {
+    if (!(await visit('.desk .setbtn', 'settings'))) return;
+    stats.settingsViews++;
+    const mark = document.querySelector('.p-settings .srow[data-setting="markStories"]');
+    const before = document.querySelector('.desk').classList.contains('marks');
+    mark.click(); await sleep(4);
+    if (document.querySelector('.desk').classList.contains('marks') === before) note('Mark my stories does not reach the desk');
+    mark.click(); await sleep(4);
+    if (document.querySelector('.desk').classList.contains('marks') !== before) note('Mark my stories does not turn back');
+    await close('settings');
   };
   // Transitions are presentation: the check measures where things settle, not where they are mid-glide.
   const still = document.createElement('style');
   still.textContent = '*, *::before, *::after { transition: none !important; }';
   document.head.appendChild(still);
-  // The title and its credits.
+  // The title and its three panels: the scrapbook, House rules, the credits.
   reachable();
-  document.querySelector('.credits-open')?.click(); await sleep(10);
-  reachable();
-  document.querySelector('.plain.credits button')?.click(); await sleep(10);
+  for (const id of ['scrapbook', 'settings', 'credits']) if (await visit('.title-screen .' + id + '-open', id)) await close(id);
   document.querySelector('button.big').click();
   await sleep(40);
   for (let run = 0; run < ${runs}; run++) {
@@ -189,6 +211,7 @@ const DRIVE = (runs: number) => `(async () => {
           await sleep(1);
         }
         if (rand(12) === 0) await openDeck();
+        else if (rand(16) === 0) await openSettings();
         const playable = cards.filter((c) => c.getAttribute('aria-disabled') !== 'true');
         if (playable.length && rand(6)) playable[rand(playable.length)].click();
         else end.click();
@@ -197,6 +220,11 @@ const DRIVE = (runs: number) => `(async () => {
     }
     stats.states++;
     reachable();
+    // The awards night's scrapbook holds this year's ending among the found.
+    if (await visit('.awards-night .scrapbook-open', 'scrapbook')) {
+      if (!document.querySelector('.p-scrapbook .clip:not(.miss)')) note('the scrapbook shows no ending found after a year');
+      await close('scrapbook');
+    }
     stats.runs++;
     document.querySelector('button.play-again')?.click();
     await sleep(20);
@@ -204,7 +232,7 @@ const DRIVE = (runs: number) => `(async () => {
   return { ...stats, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
 })()`;
 
-type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; blocked: [string, number][] };
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; blocked: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5190, strictPort: false } });
 await server.listen();
@@ -225,7 +253,7 @@ try {
           .map(([k, n]) => `${k} ${n}`)
           .join(', ');
         console.log(
-          `click-through check, ${tag}: ${out.runs} runs, ${out.states} states — ${out.controls} controls reached (${screens}; ${out.extraPicks} extra picks, ${out.rerolls} rerolls, ${out.deckViews} deck views), ` +
+          `click-through check, ${tag}: ${out.runs} runs, ${out.states} states — ${out.controls} controls reached (${screens}; ${out.extraPicks} extra picks, ${out.rerolls} rerolls, ${out.deckViews} deck views, ${out.settingsViews} House rules over the desk), ` +
             `${out.hovers} previews opened, ${out.targets} targets hit-tested at ${out.points} points, ${out.drafts} drafts (${out.extraDrafts} with Dex's extra card, labelled) (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
         );
         for (const [what, n] of out.blocked.slice(0, 20)) console.log(`BLOCKED ${n}x  ${what}`);

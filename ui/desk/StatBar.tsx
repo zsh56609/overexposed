@@ -16,7 +16,7 @@ const tipLeft = (el: HTMLElement): number => Math.min(el.offsetLeft, 1280 - 252)
 
 const PILL: Record<string, string> = { calm: '', amber: ' warn', red: ' close', crossed: ' over' };
 
-export const StatBar = memo(function StatBar({ stats, season, onDeck }: { stats: StatBarModel; season: SeasonId; onDeck: () => void }) {
+export const StatBar = memo(function StatBar({ stats, season, onDeck, onSettings }: { stats: StatBarModel; season: SeasonId; onDeck: () => void; onSettings: () => void }) {
   const [tip, setTip] = useState<{ id: TipId; left: number } | null>(null);
   // The last tooltip shown stays in the DOM while it fades out.
   const [last, setLast] = useState<{ id: TipId; left: number } | null>(null);
@@ -100,10 +100,16 @@ export const StatBar = memo(function StatBar({ stats, season, onDeck }: { stats:
             ))}
           </span>
         </div>
-        <button className="deckbtn" onClick={onDeck}>
-          <Icon id="cards" />
-          <span>{stats.deck}</span>
-        </button>
+        <div className="btns">
+          <button className="deckbtn" onClick={onDeck}>
+            <Icon id="cards" />
+            <span>{stats.deck}</span>
+          </button>
+          {/* House rules (round R1, G3), beside the deck. */}
+          <button className="setbtn" onClick={onSettings} aria-label={stats.settings}>
+            <Icon id="gear" />
+          </button>
+        </div>
         <div className="when" {...bind('when')}>
           <span className="strip">
             {stats.when.marks.map((m, i) => (
