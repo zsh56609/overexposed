@@ -43,3 +43,6 @@ html[data-motion-resolved="reduced"] .desk .hand .card:hover,html[data-motion-re
 html[data-motion-resolved="reduced"] .desk .today:hover { transform:rotate(-3deg); }
 html[data-motion-resolved="reduced"] .desk .sticky:hover { transform:rotate(var(--r,0deg)); }
 html[data-motion-resolved="reduced"] .desk .bub:hover { transform:none; }
+
+/* The scandals held ticking up (round R3, D1), in the quiet stat-delta style. */
+.desk .motion-delta.delta-held { color: #ff8a7a; }

@@ -9,7 +9,7 @@ import { isPlaceholder } from '../text.ts';
 import { Icon, keyboardFocus, SeasonMark } from './Icons.tsx';
 import type { StatBarModel, StatCellModel } from './model.ts';
 
-type TipId = StatCellModel['id'] | 'actions' | 'when';
+type TipId = StatCellModel['id'] | 'actions' | 'when' | 'held';
 
 /** Where the tooltip stands: under its cell, kept on the stage (the mockup's 1280 − 252). */
 const tipLeft = (el: HTMLElement): number => Math.min(el.offsetLeft, 1280 - 252);
@@ -61,6 +61,7 @@ export const StatBar = memo(function StatBar({ stats, season, onDeck, onSettings
   const text = (id: TipId): { header: string; line: string } => {
     if (id === 'actions') return { header: stats.actions.tipHeader, line: stats.actions.tipLine };
     if (id === 'when') return { header: stats.when.tipHeader, line: stats.when.tipLine };
+    if (id === 'held') return { header: stats.held.tipHeader, line: stats.held.tipLine };
     const cell = stats.cells.find((c) => c.id === id);
     return { header: cell?.tipHeader ?? '', line: cell?.tipLine ?? '' };
   };
@@ -101,9 +102,16 @@ export const StatBar = memo(function StatBar({ stats, season, onDeck, onSettings
           </span>
         </div>
         <div className="btns">
-          <button className="deckbtn" onClick={onDeck}>
+          {/* The scandals held, from the first one (round R3, D1): a red newspaper chip, and its tooltip on the button. */}
+          <button className="deckbtn" onClick={onDeck} {...(stats.held.n > 0 ? bind('held') : {})}>
             <Icon id="cards" />
             <span>{stats.deck}</span>
+            <span className={`held${stats.held.n > 0 ? '' : ' none'}`} data-hook="held">
+              <Icon id="paper" />
+              <b data-hook="held-n" data-final={stats.held.n}>
+                {stats.held.n}
+              </b>
+            </span>
           </button>
           {/* House rules (round R1, G3), beside the deck. */}
           <button className="setbtn" onClick={onSettings} aria-label={stats.settings}>

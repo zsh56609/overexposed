@@ -22,7 +22,7 @@ import { EventQueue } from './queue.ts';
 import { readFound } from './collection.ts';
 import { Over, useFontsReady } from './screens/common.tsx';
 import { ManagerScreen } from './screens/Opening.tsx';
-import { CreditsPanel, DeckPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
+import { CreditsPanel, DeckPanel, NumbersPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
 import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
@@ -327,8 +327,9 @@ function Run({ run, onRestart, fresh }: { run: RunHandle; onRestart: () => void;
   if (s.phase === 'ended')
     return (
       <>
-        <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
+        <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} openNumbers={() => setPanel('numbers')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
         {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} overDesk={false} onClose={close} />}
+        {panel === 'numbers' && <NumbersPanel s={s} steps={snap.steps} onClose={close} />}
       </>
     );
   // The title waits for the game's faces (round R1): a font that never comes is waited for 3 s.

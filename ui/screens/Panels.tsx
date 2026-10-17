@@ -4,17 +4,19 @@
 // starts below the stat bar, which stays in view; Escape or a click on the dimmed scene closes it.
 
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
-import type { CardInstance, GameState, SeasonId } from '../../core/index.ts';
+import { establishedLanes, scandalCount, type CardInstance, type GameState, type SeasonId } from '../../core/index.ts';
 import { content } from '../content.ts';
-import { CardPicture } from '../desk/Hand.tsx';
+import { CardPicture, Value } from '../desk/Hand.tsx';
+import { IconDefs } from '../desk/Icons.tsx';
 import { offerCardModel, type HandWords } from '../desk/model.ts';
 import licenceUrl from '../fonts/OFL.txt?url';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import { setSetting, useSettings, type Settings } from '../settings.ts';
-import { cardName } from '../text.ts';
+import type { PlayedStep } from '../queue.ts';
+import { cardName, flagName, money } from '../text.ts';
 
-export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits';
+export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits' | 'numbers';
 
 /**
  * A panel over the scene. It opens as everything over the desk opens and closes in 0.15 s (round R3, B4): its close
@@ -202,6 +204,56 @@ export function SettingsPanel({ overDesk, onClose }: { overDesk: boolean; onClos
  * The credits, in House rules' style: every third-party asset the game ships, as the jam requires — the two font
  * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts).
  */
+/**
+ * The year's numbers (round R3, D2): over the awards night, centred, in the panels' style, closed by its button, Escape
+ * or a click outside. Every number is a stat bar chip in its colour; the words are the ending's own keys.
+ */
+export function NumbersPanel({ s, steps, onClose }: { s: GameState; steps: readonly PlayedStep[]; onClose: () => void }) {
+  const events = steps.flatMap((step) => step.events);
+  const peak = Math.max(s.resources.hype, ...events.flatMap((e) => (e.type === 'turnEnd' ? [e.resources.hype] : [])));
+  const lane = establishedLanes(steps).slice(-1)[0] ?? null;
+  const flags = Object.keys(s.flags);
+  const r = s.resources;
+  return (
+    <Overlay id="numbers" label={t('ui.awards.numbers')} overDesk={false} onClose={onClose}>
+      <IconDefs />
+      <div className="set numbers">
+        <Head kicker={t('ui.title.name')} title={t('ui.awards.numbers')} close={t('ui.credits.close')} onClose={onClose} />
+        <div className="nrow">
+          <b>{t('ui.ending.peak')}</b>
+          <span className="chips">
+            <Value v={{ kind: 'hype', icon: 'star', text: String(peak) }} />
+          </span>
+        </div>
+        <div className="nrow">
+          <b>{t('ui.ending.yearEnd')}</b>
+          <span className="chips">
+            <Value v={{ kind: 'hype', icon: 'star', text: String(r.hype) }} />
+            <Value v={{ kind: 'craft', icon: lane === 'screen' ? 'clap' : 'note', text: String(r.craft) }} />
+            <Value v={{ kind: 'heat', icon: 'flame', text: String(r.heat) }} />
+            <Value v={{ kind: 'gain', icon: null, text: money(r.capital) }} />
+          </span>
+        </div>
+        <div className="nrow">
+          <span className="chips">
+            <Value v={{ kind: 'scandal', icon: 'paper', text: String(scandalCount(s)) }} />
+          </span>
+          <b>{t('ui.ending.scandals')}</b>
+        </div>
+        <div className="nrow">
+          <b>{flags.length ? t('ui.ending.flags', { flags: flags.map(flagName).join(', ') }) : t('ui.ending.noFlags')}</b>
+        </div>
+        <div className="nrow">
+          <b>{t('ui.ending.doors', { passed: s.gateHistory.filter((g) => g.passed).length, total: s.gateHistory.length })}</b>
+        </div>
+        <div className="nrow">
+          <b>{t('ui.ending.played', { n: events.filter((e) => e.type === 'play').length })}</b>
+        </div>
+      </div>
+    </Overlay>
+  );
+}
+
 export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
   return (
     <Overlay id="credits" label={t('ui.credits.title')} overDesk={overDesk} onClose={onClose}>

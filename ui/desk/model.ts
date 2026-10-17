@@ -24,6 +24,7 @@ import {
   playCheck,
   pressLines,
   reduce,
+  scandalCount,
   statTiers,
   type CardFace,
   type Condition,
@@ -101,6 +102,8 @@ export interface StatBarModel {
   /** The deck's button, and House rules' (round R1, G1 and G3). */
   readonly deck: string;
   readonly settings: string;
+  /** The scandals held — deck, hand and discard — on the deck's button, and its tooltip (round R3, D1). */
+  readonly held: { readonly n: number; readonly tipHeader: string; readonly tipLine: string };
 }
 
 export interface NoteReq {
@@ -109,6 +112,8 @@ export interface NoteReq {
   readonly mark: string;
   readonly icon: 'star' | 'paper' | null;
   readonly text: string;
+  /** A scandal clause's "(you have N)", as the doors show it (round R3, D1). */
+  readonly have?: string;
 }
 
 export interface MirrorNote {
@@ -385,6 +390,7 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
     },
     deck: t('ui.deck.open'),
     settings: t('ui.title.settings'),
+    held: { n: scandalCount(s), tipHeader: t('ui.tip.held', { n: scandalCount(s) }), tipLine: t('ui.tip.heldLine') },
   };
 }
 
@@ -393,15 +399,20 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
 
 const NOTE_ORDER: readonly NoteColour[] = ['yellow', 'green', 'blue', 'pink'];
 
-/** A goals-board clause in the stat bar's words, on a sticky note: never "(you have N)" — README §3. */
+/**
+ * A goals-board clause in the stat bar's words, on a sticky note (README §3). Its number stays off the note but for a
+ * scandal clause's "(you have N)", as the doors show it (round R3, D1): the stat bar shows no count of scandals held.
+ */
 function noteReq(clause: MajorClause): NoteReq {
   const mark = (met: boolean) => t(met ? 'ui.note.met' : 'ui.note.unmet');
   if (clause.state !== undefined) return { met: false, mark: mark(false), icon: 'star', text: t(`goals.note.${clause.state}`) };
   if ('range' in clause) {
     const { min, max } = clause.range;
     if (clause.tierKey && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'star', text: t('goals.note.hypeMin', { tier: t(clause.tierKey), min }) };
-    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMax', { n: max }) };
-    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMin', { n: min }) };
+    // The scandals held, beside a scandal clause (round R3, D1): the one count the stat bar does not show.
+    const have = clause.key === 'scandalCount' && 'value' in clause ? t('ui.doors.have', { n: clause.value }) : undefined;
+    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMax', { n: max }), have };
+    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMin', { n: min }), have };
   }
   return { met: clause.met, mark: mark(clause.met), icon: null, text: clauseText(clause) };
 }

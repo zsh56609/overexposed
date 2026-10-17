@@ -92,6 +92,7 @@ const DRIVE = (runs: number) => `(async () => {
     scrapbook: ['.p-scrapbook .closeb'],
     settings: ['.p-settings .closeb', '.p-settings .srow'],
     deck: ['.p-deck .closeb'],
+    numbers: ['.p-numbers .closeb'],
     manager: ['.manager-choice .choose'],
     draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn', '.desk .setbtn'],
     doors: ['.gates .take', '.desk .deckbtn', '.desk .setbtn'],
@@ -255,6 +256,8 @@ const DRIVE = (runs: number) => `(async () => {
       if (!document.querySelector('.p-scrapbook .clip:not(.miss)')) note('the scrapbook shows no ending found after a year');
       await close('scrapbook');
     }
+    // The year's numbers, in their own panel (round R3, D2).
+    if (await visit('.awards-night .numbers-toggle', 'numbers')) await close('numbers');
     stats.runs++;
     document.querySelector('button.play-again')?.click();
     await sleep(20);

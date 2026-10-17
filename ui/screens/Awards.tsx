@@ -5,13 +5,13 @@
 // folded away. Everything comes from content and /core; no rule is computed here.
 
 import { useEffect, useMemo, useState } from 'react';
-import { lastWord, majorOf, rivalArc, scandalCount, seasonPages, yearAwards, type GameState } from '../../core/index.ts';
+import { lastWord, majorOf, rivalArc, seasonPages, yearAwards, type GameState } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
 import { recordEnding } from '../collection.ts';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
-import { awardCitation, awardName, flagName, majorName, managerName, mastheadName, minorName, minorText, money, pageItemText, seasonName } from '../text.ts';
+import { awardCitation, awardName, majorName, managerName, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
 import { FoundDots, prose } from './common.tsx';
 
 /** How long the night's reveal runs (the mockup's sequence); a click during it shows everything at once. */
@@ -22,17 +22,18 @@ interface AwardsProps {
   readonly steps: readonly PlayedStep[];
   readonly onRestart: () => void;
   readonly openScrapbook: (() => void) | null;
+  /** The year's numbers, in their own panel (round R3, D2). */
+  readonly openNumbers: () => void;
   /** The queue's state, for the checks: the ending is a presentation like the desk. */
   readonly busy: boolean;
   readonly beat: string;
 }
 
-export function AwardsNight({ s, steps, onRestart, openScrapbook, busy, beat }: AwardsProps) {
+export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, busy, beat }: AwardsProps) {
   const c = s.content;
   const id = s.endingId ?? '';
   const majorId = majorOf(c, id) ?? '';
   const [found] = useState(() => recordEnding(id));
-  const [numbers, setNumbers] = useState(false);
   const [revealed, setRevealed] = useState(() => motionMode() !== 'full');
   useEffect(() => {
     if (revealed) return;
@@ -45,9 +46,6 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, busy, beat }: 
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
   const rival = rivalArc(c, s.seed);
   const last = lastWord(s);
-  const events = steps.flatMap((step) => step.events);
-  const peakHype = Math.max(s.resources.hype, ...events.flatMap((e) => (e.type === 'turnEnd' ? [e.resources.hype] : [])));
-  const flags = Object.keys(s.flags);
   const delay = (sec: number) => ({ animationDelay: `${sec}s` });
   return (
     <div
@@ -144,23 +142,11 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, busy, beat }: 
               {t('ui.title.scrapbook')}
             </button>
           )}
-          <button className="link numbers-toggle" aria-expanded={numbers} onClick={() => setNumbers((open) => !open)}>
+          <button className="link numbers-toggle" onClick={openNumbers}>
             {t('ui.awards.numbers')}
           </button>
         </nav>
       </div>
-      {numbers && (
-        <div className="numbers" role="region" aria-label={t('ui.awards.numbers')}>
-          <ul>
-            <li>{t('ui.ending.peakHype', { n: peakHype })}</li>
-            <li>{t('ui.ending.final', { ...s.resources, capital: money(s.resources.capital) })}</li>
-            <li>{t('ui.ending.scandals', { n: scandalCount(s) })}</li>
-            <li>{flags.length ? t('ui.ending.flags', { flags: flags.map(flagName).join(', ') }) : t('ui.ending.noFlags')}</li>
-            <li>{t('ui.ending.gates', { passed: s.gateHistory.filter((g) => g.passed).length, total: s.gateHistory.length })}</li>
-            <li>{t('ui.ending.played', { n: events.filter((e) => e.type === 'play').length })}</li>
-          </ul>
-        </div>
-      )}
       <div className="flashbulb" data-deco="1" />
     </div>
   );

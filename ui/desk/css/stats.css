@@ -94,3 +94,8 @@
 @media (prefers-reduced-motion: reduce) {
   .desk .stats .pill.over { animation: none; }
 }
+
+/* The scandals held on the Deck & Discard button (round R3, D1): a red newspaper chip, from the first one. */
+.desk .stats .deckbtn .held { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 1px 6px 1px 5px; border-radius: 9px; background: var(--red); color: #FFF3EF; font-size: 10px; font-weight: 800; letter-spacing: 0; line-height: 1.3; }
+.desk .stats .deckbtn .held.none { display: none; }
+.desk .stats .deckbtn .held svg { width: 10px; height: 10px; flex: none; }

@@ -6,6 +6,32 @@ rules).
 
 ---
 
+## 2026-10-17 — Round R3, Part D: what the player cannot see
+
+- **D1, scandals held.** The Deck & Discard button carries a red newspaper
+  chip with /core's `scandalCount` — deck, hand and discard — from the
+  first one, and the stat bar's tooltip on the button: "Scandals you hold:
+  {n}." over "They come back when your deck is shuffled, and holding them
+  brings the next one sooner." (the approved sentence, split at its first
+  full stop into the shared header and line). At the month end the pile is
+  swept toward the button, not off the desk: each card flies to it and
+  shrinks away, and the chip ticks up as a scandal goes in, with a "+1" in
+  the quiet stat-delta style. On the mirror a scandal clause shows "(you
+  have {n})" (`ui.doors.have`, the doors' words), on its own line under
+  the clause: the note's lines are one line each, and the clause and the
+  count together do not fit the note.
+- **D2, the numbers.** "The numbers" on the awards night opens a centred
+  panel in the panels' style (`NumbersPanel`), closed by its button,
+  Escape or a click outside, in place of the list under the link. Every
+  number is a stat bar chip in the stat bar's colours: Peak ★; Year end ★,
+  craft with the lane's icon, 🔥 and £; 📰 n Scandals held; Milestones; Doors
+  passed {passed} of {total}; Cards played {n}. New keys `ui.ending.peak`,
+  `ui.ending.yearEnd`, `ui.ending.doors` (for `ui.ending.gates`);
+  `ui.ending.scandals` loses its number to the chip; `ui.ending.peakHype`
+  and `ui.ending.final` give way to the chips.
+- The Milestones list every flag held, so the six event flags' labels — the
+  TODO(prose) placeholders R2 listed — now show there when held.
+
 ## 2026-10-17 — Round R3, Part C: the month, in order
 
 - **C1, the messages wait for a clear desk.** While the month's season

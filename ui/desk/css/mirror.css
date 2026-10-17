@@ -49,3 +49,7 @@
 @media (prefers-reduced-motion: reduce) {
   .desk .bulb.flicker { animation: none; }
 }
+
+/* A scandal clause's "(you have N)" (round R3, D1), on its own line under the clause. */
+.desk .sticky .req:has(.have) { height: auto; flex-wrap: wrap; }
+.desk .sticky .req .have { flex-basis: 100%; padding-left: 11px; font-size: 7.4px; font-weight: 600; color: #6b5f50; line-height: 10px; }

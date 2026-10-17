@@ -87,11 +87,30 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         }
       }
       if(beat.kind==='impact'&&!reduced) animate(root,[{transform:'translate(0)'},{transform:'translate(3px,2px)',offset:.2},{transform:'translate(-2px,-1px)',offset:.4},{transform:'translate(1px,1px)',offset:.65},{transform:'translate(0)'}],400);
-      if(beat.kind==='sweep') root.querySelectorAll<HTMLElement>('.motion-pile .plane,[data-scandal-plane]').forEach((plane,i)=>{
-        const face=plane.firstElementChild;
-        if(reduced) {const a=plane.animate([{opacity:1},{opacity:0}],{duration:150,fill:'forwards'});cleanups.current.push(()=>a.cancel());}
-        else if(face){ const own=getComputedStyle(face).transform;animate(face,[{transform:own,opacity:1},{transform:`translate(260px,20px) ${own}`,opacity:0}],550,i*80,'forwards'); }
-      });
+      // The month's pile goes to the Deck & Discard button (round R3, D1), and the scandals held tick up as one goes in.
+      if(beat.kind==='sweep') {
+        const button=root.querySelector('.stats .deckbtn'),chip=root.querySelector<HTMLElement>('[data-hook="held"]'),count=root.querySelector<HTMLElement>('[data-hook="held-n"]');
+        const desk=root.getBoundingClientRect(),k=desk.width/1280,to=button?.getBoundingClientRect();
+        let held=Number(count?.textContent??0);
+        const tick=()=>{
+          held++;if(!chip||!count)return;chip.classList.remove('none');count.textContent=String(held);
+          const delta=document.createElement('span');delta.className='motion-delta delta-held';delta.textContent='+1';
+          const r=chip.getBoundingClientRect();delta.style.left=`${(r.x+r.width/2-desk.x)/k}px`;host.current?.appendChild(delta);
+          const a=delta.animate([{opacity:0},{opacity:1,offset:.12},{opacity:0}],{duration:reduced?400:1350,fill:'forwards'});cleanups.current.push(()=>{a.cancel();delta.remove();});
+        };
+        root.querySelectorAll<HTMLElement>('.motion-pile .plane,[data-scandal-plane]').forEach((plane,i)=>{
+          const face=plane.firstElementChild as HTMLElement|null;
+          const scandal=plane.hasAttribute('data-scandal-plane');
+          if(reduced) {const a=plane.animate([{opacity:1},{opacity:0}],{duration:150,fill:'forwards'});cleanups.current.push(()=>a.cancel());if(scandal)tick();return;}
+          if(!face)return;
+          const from=face.getBoundingClientRect();
+          const dx=to?(to.x+to.width/2-(from.x+from.width/2))/k:260,dy=to?(to.y+to.height/2-(from.y+from.height/2))/k:20;
+          const ownPlane=getComputedStyle(plane).transform,ownFace=getComputedStyle(face).transform;
+          animate(plane,[{transform:ownPlane},{transform:`translate(${dx}px,${dy}px) ${ownPlane}`}],550,i*80,'forwards');
+          animate(face,[{transform:ownFace,opacity:1},{transform:`${ownFace} scale(.3)`,opacity:0}],550,i*80,'forwards');
+          if(scandal){const id=window.setTimeout(tick,i*80+550);cleanups.current.push(()=>window.clearTimeout(id));}
+        });
+      }
       if(beat.kind==='date') animate(root.querySelector('[data-hook="date"]'),[{transform:'rotateX(0)'},{transform:'rotateX(90deg)',offset:.5},{transform:'rotateX(0)'}],520);
       if(beat.kind==='publish') root.querySelectorAll('.pp').forEach(p=>animate(p,[{opacity:0},{opacity:1}],800));
       // The last door (round R3, B5): the bulbs go out in quick succession, then the room goes dark.

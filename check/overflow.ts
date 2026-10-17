@@ -374,6 +374,7 @@ const DRIVE = (runs: number) => `(async () => {
     if (!document.querySelector('.ending')) throw new Error('audit reached 800-action guard: '+JSON.stringify(window.__auditProgress));
     plain('ending');
     await panel('.awards-night .scrapbook-open', 'scrapbook', 'scrapbook over the awards night');
+    await panel('.awards-night .numbers-toggle', 'numbers', 'the numbers over the awards night');
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }

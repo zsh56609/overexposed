@@ -67,6 +67,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
                   <i>{r.mark}</i>
                   {r.icon && <Icon id={r.icon} className={r.icon === 'star' ? 'rh' : 'rs'} />}
                   <span>{r.text}</span>
+                  {r.have && <span className="have">{r.have}</span>}
                 </div>
               ))}
             </div>

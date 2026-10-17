@@ -190,8 +190,6 @@
 .awards-night .links { display: flex; gap: 20px; margin-top: -4px; }
 .awards-night .link { color: #8a7d6c; }
 .awards-night .link:hover { color: #ffcf85; }
-.awards-night .numbers { position: absolute; left: 680px; top: 380px; z-index: 8; width: 420px; padding: 14px 18px; background: #15120E; border: 1px solid rgba(255, 220, 170, .2); box-shadow: 0 20px 36px rgba(0, 0, 0, .7); text-align: left; font-size: 12px; line-height: 1.6; color: #cfc4b2; }
-.awards-night .numbers ul { margin: 0; padding-left: 16px; }
 .awards-night .flashbulb { position: absolute; inset: 0; z-index: 9; background: #fff; opacity: 0; pointer-events: none; }
 /* The reveal, as the mockup sequences it; a click during it, or reduced motion, shows the night at once. */
 .awards-night.play .rv { opacity: 0; animation: awards-rise .7s ease-out both; }
@@ -356,3 +354,16 @@
 @keyframes tr-up { from { opacity: 0; } }
 :root[data-motion-resolved='reduced'] .scr.awards-night { animation-duration: .2s; }
 :root[data-motion='off'] .scr.ov, :root[data-motion='off'] .scr.awards-night { animation: none !important; }
+
+/* The year's numbers (round R3, D2): a narrow panel; every number a stat bar chip in the stat bar's colours. */
+.ov .set.numbers { top: 150px; padding-bottom: 16px; }
+.ov .numbers .nrow { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(255, 220, 170, .1); font-size: 13px; }
+.ov .numbers .nrow > b { font-weight: 700; }
+.ov .numbers .chips { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 14px; font-weight: 800; }
+.ov .numbers .chips > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.ov .numbers .chips svg { width: 13px; height: 13px; flex: none; }
+.ov .numbers .r-hype { color: var(--icon-hype); }
+.ov .numbers .r-craft { color: var(--icon-craft); }
+.ov .numbers .r-heat { color: var(--icon-heat); }
+.ov .numbers .r-gain { color: var(--icon-money); }
+.ov .numbers .r-scandal { color: var(--icon-scandal); }
