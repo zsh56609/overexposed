@@ -186,13 +186,13 @@ italic line.
   minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
   "Endings found · N of 14".
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
-  (off). Sound effects carries the effects and the room around the desk; Music the six tracks — switched
-  back on, the game's current track comes back (round R4). Credits share this panel's style: the fonts,
+  (off). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
+  track comes back (round R4). Credits share this panel's style: the fonts,
   the music (Holizna, CC0 1.0, linked to Holizna's OpenGameArt page) and how the sound is made.
 
 ### 10. Sound (round R4)
 
-Every effect and the room are the author's module (`docs/design/sound/overexposed-sound.js`, copied to
+Every effect is the author's module (`docs/design/sound/overexposed-sound.js`, copied to
 `ui/sound/oxsound.js` with one added export line; validate holds the two equal): synthesized in code from a
 fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `public/audio/music/`.
 
@@ -202,7 +202,7 @@ fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `p
   when it exhausts a scandal. A number: a tick per step it rolls (at most every 50 ms); cash or spend for
   money, heat as heat rises, a low line when the heat tier rises into Breaking or Frenzy. The month end: a
   button at END TURN, a stamp for PRINTED, paper and scandal for a scandal's headline and its card, one deal
-  as the pile flies to Deck & Discard, the month as the date turns, the season as its card arrives, paper as
+  as the month's pile slides off the desk (R5), the month as the date turns, the season as its card arrives, paper as
   the papers drop, a deal for each card dealt (a shuffle first after the deck is shuffled). Signing: two
   picks, the cards leaving. An answer: send and a bubble on the phone; a letter's SENT stamp.
 - **The screens' own sounds.** A hand card under the mouse (mouse only, at most every 60 ms); the stamps
@@ -210,9 +210,9 @@ fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `p
   deck (a deal); the doors laid out; a panel opening and closing; the phone's buzz and each bubble; a letter
   landing; BEGIN's flash; Continue, the tickets and PLAY AGAIN (a button); on the awards night an ovation
   as it names The Breakthrough or Overexposed, and applause for each plaque, 0.3 s apart.
-- **The room.** Whenever the desk is on stage, under its overlays too, with the season's weather from the
-  Flash's ear: rain in spring, wind in autumn and winter, the room alone in summer. It changes with the
-  season card. None on the title or the awards night.
+- **No ambience** (round R6). R4 put the room's tone under the desk, with the season's weather; on ordinary
+  speakers it read as hum rather than a room, and the music carries the mood. The weather stays where it is
+  seen, in the Flash's ear; the module's ambience API is unused.
 - **Music.** One track at a time, at one gain (`MUSIC_GAIN`). BEGIN fades spring in (2 s). The scandal
   track comes at the first impact (2.5 s), plays through the next month, and the season's track comes back
   at the date of the next month end that prints none — never at months 3, 6 and 9, whose season card

@@ -7,7 +7,7 @@ import { useSyncExternalStore } from 'react';
 
 export interface Settings {
   readonly markStories: boolean;
-  /** The effects and the room's ambience (round R4, B5). */
+  /** The effects (round R4, B5; the room's ambience it also covered went in round R6). */
   readonly soundEffects: boolean;
   /** The six tracks (round R4, B5). */
   readonly music: boolean;

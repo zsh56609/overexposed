@@ -235,7 +235,7 @@ function Switch({ id, label, line }: { id: keyof Settings; label: string; line: 
   );
 }
 
-/** House rules (round R1, G3): since round R4 (B5), the game's sound too — the effects with the room, and the music. */
+/** House rules (round R1, G3): since round R4 (B5), the game's sound too — the effects, and the music. */
 export function SettingsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
   return (
     <Overlay id="settings" label={t('ui.settings.title')} overDesk={overDesk} onClose={onClose}>

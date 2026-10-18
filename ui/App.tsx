@@ -29,7 +29,7 @@ import { SeasonCard } from './screens/Season.tsx';
 import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
 import { direct, seasonTrack } from './sound/director.ts';
-import { ambience, cue, cues, music, prepareSound, startSound } from './sound/sound.ts';
+import { cue, cues, music, prepareSound, startSound } from './sound/sound.ts';
 
 // ---------------------------------------------------------------------------
 // Seeds: every run replays from its seed; ?seed=123 in the URL replays one.
@@ -298,11 +298,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   useEffect(() => {
     if (intro === 'opening' && scene === null) prepareSound();
   }, [intro, scene]);
-  // The room (B3): whenever the desk is on stage, under its overlays too, with its season's weather — the season
-  // card's from its arrival, as the music changes; none on the title, the opening card or the awards night.
-  const roomAct = snap.active?.plan?.beats.slice(0, (snap.active.index ?? 0) + 1).some((b) => b.kind === 'season') ? snap.active.step.after.act : snap.state.act;
-  const roomSeason = intro === null && snap.state.phase !== 'ended' ? (snap.state.content.rules.seasons?.[roomAct - 1] ?? null) : null;
-  useEffect(() => ambience(roomSeason), [roomSeason]);
   useEffect(()=>{let previous=motionMode();return subscribeMotion(()=>{const next=motionMode();if(next!==previous&&queue.busy)queue.skip();previous=next;});},[queue]);
   useEffect(() => {
     const skip = (event: MouseEvent | KeyboardEvent) => {

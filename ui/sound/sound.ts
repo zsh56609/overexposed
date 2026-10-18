@@ -1,12 +1,14 @@
-// Sound and music (round R4, Part B). The effects and the ambience are the author's module (./oxsound.js): every
-// effect synthesized in code from a fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0), one at
-// a time, through two <audio> elements, each with its own gain into the module's music bus. Nothing sounds before the
+// Sound and music (round R4, Part B). The effects are the author's module (./oxsound.js): every effect synthesized in
+// code from a fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0), one at a time, through two
+// <audio> elements, each with its own gain into the module's music bus. No ambience since round R6: the room's tone and
+// the season's weather read as hum on ordinary speakers, and the music carries the mood; the module's ambience API is
+// unused (the weather stays where it is seen, in the Flash's ear). Nothing sounds before the
 // first BEGIN click — browsers allow audio only after a gesture — and a play the browser refuses leaves the game
 // silent, never an error. With `?cues` in the URL every cue is logged on window.__cues for the checks (B7); with
 // `?mute` the sound never starts: the checks that replay a run reach the desk before the module's render worker has
 // delivered its samples (see startSound).
 
-import { OXSound, type OXAmbience } from './oxsound.js';
+import { OXSound } from './oxsound.js';
 import { settings, subscribeSettings } from '../settings.ts';
 
 /** The sounds the game asks for: the module's names (B2's table). */
@@ -18,13 +20,10 @@ export type Cue =
 export type Track = 'spring' | 'summer' | 'autumn' | 'winter' | 'scandal' | 'awards';
 
 /**
- * The music's level (B4): a track at this gain comes out about -32 LUFS, a little under a busy month of effects with
- * the room (-30 LUFS). One number; the author tunes it by ear.
+ * The music's level (B4): a track at this gain comes out about -32 LUFS, under a busy month of effects. One number;
+ * the author tunes it by ear.
  */
 export const MUSIC_GAIN = 0.25;
-
-/** The weather the Flash's ear names, under the room (B3): spring's showers rain, autumn's wind and winter's snow wind. */
-export const WEATHER: Readonly<Record<string, OXAmbience | null>> = { spring: 'rain', summer: null, autumn: 'wind', winter: 'wind' };
 
 declare global {
   interface Window {
@@ -83,29 +82,6 @@ export function cues(name: Cue, count: number, gap: number): () => void {
     else timers.push(window.setTimeout(() => cue(name), i * gap));
   }
   return () => timers.forEach((t) => window.clearTimeout(t));
-}
-
-// ---------------------------------------------------------------------------------------------------- the room
-
-let room = false;
-let weather: OXAmbience | null = null;
-
-/** The room whenever the desk is on stage, under its overlays too, with the season's weather; none elsewhere. */
-export function ambience(season: string | null): void {
-  if (!live()) return; // the desk comes up only after BEGIN, the gesture
-  const wantRoom = season !== null;
-  const wantWeather = season === null ? null : (WEATHER[season] ?? null);
-  try {
-    if (wantRoom !== room) OXSound.ambience('room', wantRoom);
-    if (wantWeather !== weather) {
-      if (weather) OXSound.ambience(weather, false);
-      if (wantWeather) OXSound.ambience(wantWeather, true);
-    }
-  } catch {
-    // silent
-  }
-  room = wantRoom;
-  weather = wantWeather;
 }
 
 // ---------------------------------------------------------------------------------------------------- the music
@@ -226,7 +202,6 @@ function apply(): void {
   const s = settings();
   try {
     OXSound.volume('sfx', s.soundEffects ? 1 : 0);
-    OXSound.volume('amb', s.soundEffects ? 0.7 : 0);
   } catch {
     // silent
   }
@@ -267,8 +242,9 @@ function unlock(): void {
 /**
  * The first BEGIN click (B1): the audio graph, from the gesture. Later calls do nothing. With `?mute` it never starts:
  * a replay reaches the desk within milliseconds of BEGIN, before the module's render worker has delivered the samples
- * (5–6 s), so its first sounds would render on the main thread — on module v6 the rain loop at Continue is a 300–380 ms
- * task — and the checks that replay measure motion and timing. The cues are still logged.
+ * (5–6 s), so its first sampled sounds (the offers' deals, a door, a letter) render on the main thread — short since
+ * the room went (R6) — and the audio context made here can itself take long where a headless Chrome is slow to open
+ * its audio; the checks that replay measure motion and timing. The cues are still logged.
  */
 export function startSound(): void {
   if (live() || MUTE) return;

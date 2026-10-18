@@ -45,8 +45,8 @@ CC0 asks for no credit; the game gives it anyway, in its credits.
 
 ### Sound effects
 
-None third-party. Every sound effect and the room's ambience is synthesized in
-code, with AI assistance (`docs/design/sound/overexposed-sound.js`, copied to
+None third-party. Every sound effect is synthesized in code, with AI
+assistance (`docs/design/sound/overexposed-sound.js`, copied to
 `ui/sound/oxsound.js`): no recordings and no audio-generation models.
 
 ## Development-only browser checks

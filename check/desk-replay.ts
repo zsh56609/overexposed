@@ -94,10 +94,12 @@ export const badKeyframes = (page: Page) =>
 let navigationId=0;
 /** Loads a page and waits until it is ready: by default the game's title (its BEGIN); `test` for another page. */
 export async function openReady(page:Page,url:string,test=`!!document.querySelector('.title-screen .begin')`):Promise<void> {
-  // Muted (round R4; the reason as round R5 found it): a replay reaches the desk within milliseconds of BEGIN, before
-  // the sound's render worker has delivered the samples, so its first sounds would render on the main thread (the rain
-  // loop at Continue, a 300–380 ms task). The checks that hear the game (check:clicks, check:interactions' month)
-  // load it as a player does.
+  // Muted (round R4; the reason as round R6 leaves it): a replay reaches the desk within milliseconds of BEGIN, before
+  // the sound's render worker has delivered the samples, so its first sampled sounds — the offers' deals, a door, a
+  // letter — render on the main thread. Since the room went (R6) they are short (no task over 50 ms in three replays
+  // with the sound on); what stays is BEGIN's own work, the audio context made in its click — 55–90 ms here, seconds
+  // where a headless Chrome is slow to open its audio. The checks that hear the game (check:clicks, check:interactions'
+  // month) load it as a player does.
   const target=new URL(url);target.searchParams.set('auditLoad',String(++navigationId));target.searchParams.set('mute','1');
   await page.navigate(target.href,0);
   const start=Date.now();let last='';

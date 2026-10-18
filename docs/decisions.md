@@ -6,6 +6,33 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R6, Part A: no ambience
+
+- **A1**: playing v0.5, the author found that the room's tone and the
+  season's weather (rain in spring, wind in autumn and winter; R4, B3) read
+  as hum on ordinary speakers rather than as a room, and the music already
+  carries the mood. The game starts no ambience: `ambience()` and `WEATHER`
+  are gone from `ui/sound/sound.ts`, and so is the 'amb' bus's volume in
+  `apply()`; App no longer calls it, and the room's season (`roomSeason`)
+  went with it. The module stays exactly as the author's (validate holds the
+  copy equal); its ambience API is simply unused. The weather stays where
+  it is seen, in the Flash's ear. House rules' Sound effects covers the
+  effects alone: its line is the author's "Cards, papers and the phone."
+  `MUSIC_GAIN` stays 0.25; its comment no longer measures the music
+  against the room.
+- **A2**: the words around it say what is left — the sound layer's header
+  and comments, `ui/settings.ts`, House rules' comment, the visual README
+  §10 (which also said R3's flight to Deck & Discard for the sweep, R2's
+  slide again since R5), CREDITS.md and status.md. The replays stay muted;
+  `openReady`'s reason now names what a replay still renders on the main
+  thread before the worker has delivered: the first sampled sounds (the
+  offers' deals, a door, a letter), short since the room went — three
+  replays with the sound on showed no task over 50 ms after BEGIN — and
+  BEGIN's own audio context, 55–90 ms here, seconds where a headless Chrome
+  is slow to open its audio.
+- **A3**: no check expects an ambience; check:clicks plays with the sound
+  on, with no console error.
+
 ## 2026-10-18 — Round R5, Part C: v0.5
 
 - `package.json` is 0.5.0; the credits read "v0.5". The itch zip,
@@ -249,7 +276,8 @@ rules).
 - **B3, the room** under the desk from the opening card's Continue to the
   awards night, with the weather of the season shown (`WEATHER`), changing
   with the season card. Sound effects off mutes the effects' and the room's
-  buses; on again restores the module's own levels.
+  buses; on again restores the module's own levels. *(Superseded in R6,
+  Part A: the game starts no ambience.)*
 - **B4, music.** Two `<audio>` elements, each through its own gain into the
   music bus, at `MUSIC_GAIN` 0.25. The director keeps where the music is: the
   scandal track at a step's first impact; at a month end that printed none,
