@@ -171,6 +171,13 @@ const PLAIN = `window.__plainAudit = (where) => {
       }
     }
   }
+  // The awards night (round R5, B5): PLAY AGAIN as wide as the last front page above it, both edges within 1 px.
+  const again = document.querySelector('.awards-night .play-again');
+  const lastPage = [...document.querySelectorAll('.awards-night .fp')].at(-1);
+  if (again && lastPage) {
+    const a = again.getBoundingClientRect(), p = lastPage.getBoundingClientRect();
+    if (Math.abs(a.left - p.left) > 1 || Math.abs(a.right - p.right) > 1) add('PLAY AGAIN at ' + a.left.toFixed(1) + '-' + a.right.toFixed(1) + ', the last front page at ' + p.left.toFixed(1) + '-' + p.right.toFixed(1));
+  }
   return out;
 };`;
 

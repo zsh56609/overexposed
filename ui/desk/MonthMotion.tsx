@@ -4,6 +4,7 @@ import type { Snapshot } from '../queue.ts';
 import { t } from '../i18n.ts';
 import { lineText, mastheadName, signedAmount } from '../text.ts';
 import { tick } from '../sound/sound.ts';
+import { composeTransforms } from '../motion.ts';
 import { CardPicture } from './Hand.tsx';
 import { cardModel, type DeskModel } from './model.ts';
 import { PILE_SLOTS, planeFace } from './Pile.tsx';
@@ -54,7 +55,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         root.querySelectorAll<HTMLElement>('.hand .card').forEach((c,i)=>{
           const own=getComputedStyle(c).transform;
           if(reduced) {const a=c.animate([{opacity:1},{opacity:0}],{duration:150,fill:'forwards'});cleanups.current.push(()=>a.cancel());}
-          else animate(c,[{transform:own,opacity:1},{transform:`translateY(360px) ${own}`,opacity:0}],500,i*70,'forwards');
+          else animate(c,[{transform:own,opacity:1},{transform:composeTransforms('translateY(360px)',own),opacity:0}],500,i*70,'forwards');
         });
       }
       if(beat.kind==='stamp') {
@@ -88,10 +89,12 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         }
       }
       if(beat.kind==='impact'&&!reduced) animate(root,[{transform:'translate(0)'},{transform:'translate(3px,2px)',offset:.2},{transform:'translate(-2px,-1px)',offset:.4},{transform:'translate(1px,1px)',offset:.65},{transform:'translate(0)'}],400);
-      // The month's pile goes to the Deck & Discard button (round R3, D1), and the scandals held tick up as one goes in.
+      // The month's pile slides off to the right along the desk and fades, card after card (round R5, B4: R2's sweep,
+      // in place of R3's flight to the Deck & Discard button, which read as the cards scattering into the room); the
+      // scandals held tick up as each scandal card's slide ends.
       if(beat.kind==='sweep') {
-        const button=root.querySelector('.stats .deckbtn'),chip=root.querySelector<HTMLElement>('[data-hook="held"]'),count=root.querySelector<HTMLElement>('[data-hook="held-n"]');
-        const desk=root.getBoundingClientRect(),k=desk.width/1280,to=button?.getBoundingClientRect();
+        const chip=root.querySelector<HTMLElement>('[data-hook="held"]'),count=root.querySelector<HTMLElement>('[data-hook="held-n"]');
+        const desk=root.getBoundingClientRect(),k=desk.width/1280;
         let held=Number(count?.textContent??0);
         // A tick that comes after the month is published never takes the chip below what it already shows.
         const tick=()=>{
@@ -105,11 +108,8 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
           const scandal=plane.hasAttribute('data-scandal-plane');
           if(reduced) {const a=plane.animate([{opacity:1},{opacity:0}],{duration:150,fill:'forwards'});cleanups.current.push(()=>a.cancel());if(scandal)tick();return;}
           if(!face)return;
-          const from=face.getBoundingClientRect();
-          const dx=to?(to.x+to.width/2-(from.x+from.width/2))/k:260,dy=to?(to.y+to.height/2-(from.y+from.height/2))/k:20;
-          const ownPlane=getComputedStyle(plane).transform,ownFace=getComputedStyle(face).transform;
-          animate(plane,[{transform:ownPlane},{transform:`translate(${dx}px,${dy}px) ${ownPlane}`}],550,i*80,'forwards');
-          animate(face,[{transform:ownFace,opacity:1},{transform:`${ownFace} scale(.3)`,opacity:0}],550,i*80,'forwards');
+          const own=getComputedStyle(face).transform;
+          animate(face,[{transform:own,opacity:1},{transform:composeTransforms('translate(260px,20px)',own),opacity:0}],550,i*80,'forwards');
           if(scandal){const id=window.setTimeout(tick,i*80+550);cleanups.current.push(()=>window.clearTimeout(id));}
         });
       }

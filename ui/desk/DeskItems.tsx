@@ -7,7 +7,7 @@
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { isPlaceholder } from '../text.ts';
-import { motionMode, useMotionMode } from '../motion.ts';
+import { composeTransforms, motionMode, useMotionMode } from '../motion.ts';
 import { cue } from '../sound/sound.ts';
 import { crumple, sheetA, sheetB } from './drawings.ts';
 import type { DeskLabels, LaneClass, MessagesModel, PhoneModel, ScriptModel } from './model.ts';
@@ -368,7 +368,7 @@ function buzz(desk: Element | null): Animation[] {
   const phone = desk?.querySelector('.phone');
   if (!desk || !phone) return [];
   const own = getComputedStyle(phone).transform;
-  const shake = phone.animate([{ transform: own }, { transform: `${own} translateX(3px)`, offset: 0.2 }, { transform: `${own} translateX(-2px)`, offset: 0.4 }, { transform: own }], 450);
+  const shake = phone.animate([{ transform: own }, { transform: composeTransforms(own, 'translateX(3px)'), offset: 0.2 }, { transform: composeTransforms(own, 'translateX(-2px)'), offset: 0.4 }, { transform: own }], 450);
   return [shake, ...glowPhone(desk)];
 }
 

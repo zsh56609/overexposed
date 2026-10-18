@@ -6,6 +6,75 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R5, Part B: fixes from playing and checking v0.4
+
+- **B1, the manager's month end where it does nothing.** `monthEndEffects`
+  stopped at turnStart, draftOffer, gateOffer or ending, but not at
+  eventOffered: at the ends of months 1, 5, 7 and 11, whose next month opens
+  on an event, it returned [eventOffered], which counted as an effect. The
+  END TURN preview showed the perk row with no value for either manager
+  (Dex has no month-end perk at all), and Mags got a month-end line there:
+  of 1,300 lines over runSeeds(20260929, 200) with the random persona, 777
+  followed an eventOffered. Now a month end's manager effects stop at the
+  first of turnStart, draftOffer, eventOffered, gateOffer and ending, one
+  list (`MONTH_END_STOPS`) beside `monthEndEffects` in core/manager.ts.
+  The perk's effects are untouched: endings, awards and tiers do not move.
+  check:preview gains an oracle with its own literal list, which neither
+  calls `monthEndEffects` nor imports the list: the END TURN preview's perk
+  row and a month-end line appear exactly when the manager has a month-end
+  perk, the month is one it acts in (when it names them), and the span
+  after turnEnd holds a non-warning event. On the engine before the fix it
+  reports 330 mismatches in 20 runs; after it, none. sim:variants moved
+  only monthEnd:guardian (6.41 to 2.55 a run, at most 3), and validate's
+  warnings fell to 27, all the cut once-per-run variants. No new prose.
+- **B2, TAKEN leaves with its card.** The stamp is the `.lift`'s sibling in
+  the offer's slot, so the flight (`flyToDeck`) left it alone on the empty
+  slot, from about 0.6 to 1.0 s after the press. The flight now carries a
+  copy of it, in the same place and at the same angle on the face, and the
+  slot's is hidden; the flight also starts at the size the offers show the
+  card (1.1×), where R4's copy started at its own size. Reduced motion and
+  off are unchanged: no flight, the screen leaves whole. check:interactions,
+  where it takes an offer at full motion: 200 ms into the flight (760 ms
+  after the press), no stamp on the slot and one in the flight.
+- **B3, the phone shakes.** `buzz` composed `${own} translateX(3px)` with the
+  phone's computed transform, 'none': 'none translateX(3px)' is invalid
+  CSS, and the browser dropped the keyframe — the shake V1b gave an incoming
+  message never moved. One helper, `composeTransforms` (ui/motion.ts), in
+  which 'none' adds nothing, now composes every keyframe built on a computed
+  transform: the phone's shake, the hand dropping at END TURN, B4's sweep.
+  check:motion and check:interactions wrap Element.prototype.animate after
+  every load (`watchKeyframes`, check/desk-replay.ts) and fail on any
+  keyframe value CSS.supports rejects under its property's CSS name
+  (offset, easing and composite left out), naming the element and the
+  value; the record lives in the tab's sessionStorage across loads.
+- **B4, the month's pile leaves to the right.** R3's D1 sent every card of
+  the pile, and every new scandal card, to the Deck & Discard button,
+  shrinking to 0.3: on the desk it read as the cards scattering into the
+  room. The sweep is R2's again (512f6c4): each card's face slides right
+  along the desk, translate(260px, 20px), and fades, 550 ms, 80 ms apart;
+  no shrink, no flight. The held chip still ticks +1 as each scandal card's
+  slide ends; the sweep keeps its one deal sound. Reduced motion and off are
+  unchanged. The offer taken still flies to Deck & Discard: one new card
+  going into the deck.
+- **B5, PLAY AGAIN as wide as the paper above it**: it was sized by its text,
+  233.6 px under a 226 px front page. It now takes the front pages' width
+  (`--fp-width`), both edges on the last page's, its words centred (as much
+  leading space as the letter-spacing trails). check:overflow, in its
+  awards-night states (runs and replays): both edges within 1 px.
+- **B6, no change** (the author's question, decided): the scrapbook's
+  awards stay visible when not won. Endings hide what has not been found
+  because an ending's name gives its story away. An award is a goal: its
+  name and how it is won give the next run a target, and show what the game
+  counts (hype in a month, craft at the year's end, scandals held).
+- **B7, the notes say scandals the doors' way**: the mark, the scandal icon
+  and the threshold, "6+" and "5 or fewer" (`ui.doors.min`,
+  `ui.doors.max`); `goals.note.scandalsMin` and `goals.note.scandalsMax`
+  go. The notes' colours stay as they are, on purpose: the icons carry the
+  stat's colour and ✓/✗ the met state, while the words stay in ink. A door
+  colours its threshold on a large pale card; a note's words are 7.8 px on
+  four pastels, where the hype gold would read at 3.5–4.4:1 and the scandal
+  red at 3.7–4.8:1, against 10.5:1 and more in ink.
+
 ## 2026-10-18 — Round R5, Part A: the sound module, version 6
 
 - **A1**: the author's module v6 (SHA-256 c1777be8…) is copied to
@@ -1142,6 +1211,8 @@ r3-title-v2.html; r3-title.png is deleted).
 - **The notes speak the stat bar's language**: ✓ or ✗ (their own keys,
   `ui.note.met` and `ui.note.unmet`), the icon, and the words — "Known ·
   80+", "5 or fewer scandals", "Already known" — never "(you have N)".
+  *(The scandal words superseded in R5, B7: "5 or fewer", "6+", as the
+  doors say them.)*
 - **In a frenzy**: the mockup's pattern of dark, harsh and flickering
   bulbs, the red glass, and a red clipping on the glass. The README does
   not say what the clipping reads; the mockup's sample repeats the

@@ -22,7 +22,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createServer } from 'vite';
 import { browsersFromArgs, sizesFromArgs, launch, type Page } from './browser.ts';
-import { cardPoint, centre, loadStates, reach, ROOT } from './desk-replay.ts';
+import { badKeyframes, cardPoint, centre, loadStates, reach, ROOT, watchKeyframes } from './desk-replay.ts';
 
 const BROWSERS = browsersFromArgs(process.argv);
 const en = JSON.parse(readFileSync(join(ROOT, 'i18n', 'en.json'), 'utf8')) as Record<string, string>;
@@ -78,6 +78,7 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
     out.push([`hover eases: ${label}, ${Number.isNaN(f) ? 'no hover move' : `${Math.round(f * 100)}% of the way`} at ${delay + 60} ms`, f > 0.02 && f < 0.98]);
   };
   await page.navigate(`${url}?seed=20261017`, 1500);
+  await watchKeyframes(page);
   await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
   for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
   await sleep(400);
@@ -91,8 +92,18 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
   await sleep(2700);
   await idle();
   await eases('an offer', '.offers .dslot:nth-child(2) .lift', '.offers .dslot:nth-child(2) .lift', 70);
+  // TAKEN leaves with its card (round R5, B2): 200 ms into the flight, which starts 560 ms after the press, the slot
+  // shows no stamp and the flight holds one.
+  const pressed = Date.now();
   await press('.offers .take', 0);
-  await sleep(1600);
+  await sleep(Math.max(0, 760 - (Date.now() - pressed)));
+  const taken = await page.evaluate<{ slot: boolean; flight: boolean }>(`(() => {
+    const s = document.querySelector('.offers .dslot.taken .stampT');
+    const shows = !!s && getComputedStyle(s).visibility !== 'hidden' && Number(getComputedStyle(s).opacity) > 0.05;
+    return { slot: shows, flight: !!document.querySelector('.offer-flight .stampT') };
+  })()`);
+  out.push([`TAKEN leaves with its card: ${taken.slot ? 'a stamp on the slot' : 'none on the slot'}, ${taken.flight ? 'one in the flight' : 'none in the flight'}`, !taken.slot && taken.flight]);
+  await sleep(840);
   await idle();
   for (let i = 0; i < 30 && (await page.evaluate<boolean>(`!!document.querySelector('.offers .take')`)); i++) { await press('.offers .take', 0); await sleep(1600); await idle(); }
   await sleep(600);
@@ -159,6 +170,7 @@ async function monthCues(page: Page, url: string): Promise<Result[]> {
     out.push([`${what}: a deal for each card dealt (${deals} for ${n})`, step !== '' && deals === n]);
   };
   await page.navigate(`${url}?seed=20261017&cues`, 1500);
+  await watchKeyframes(page);
   await page.evaluate(`delete document.documentElement.dataset.motion`);
   for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
   await sleep(400);
@@ -287,6 +299,7 @@ async function bubblesStay(page: Page, url: string): Promise<Result[]> {
   const press = async (selector: string, index = 0) => { const at = await centre(page, selector, index); if (at) await page.click(...at); return !!at; };
   for (const [index, manager] of ['Dex', 'Mags'].entries()) {
     await page.navigate(`${url}?seed=20261017`, 1500);
+    await watchKeyframes(page);
     await page.evaluate(`delete document.documentElement.dataset.motion`);
     for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
     await sleep(400);
@@ -503,6 +516,9 @@ try {
     const page = await launch(browser, size);
     try {
       const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
+      // Every keyframe animated over the runs, CSS-valid (round R5, B3): the phone's shake, the hand, the month's pile.
+      const rejected = await badKeyframes(page);
+      results.push([`no keyframe value CSS rejects${rejected.length ? `: ${rejected.slice(0, 3).map((b) => `${b.element} ${b.property}: ${b.value}`).join('; ')}` : ''}`, rejected.length === 0]);
       const passed = results.filter(([, ok]) => ok === true).length;
       const skipped = results.filter(([, ok]) => ok === 'skipped').length;
       console.log(`interactions, ${browser} ${size.width}x${size.height}: ${passed} of ${results.length - skipped} pass${skipped ? `, ${skipped} skipped` : ''}`);

@@ -14,7 +14,8 @@
 //                the countdown's level against its thresholds; the date, the season line and the date's
 //                tooltip against the month (round 2c).
 // After each run: the front pages and the manager's messages are pure functions of history (round 2b),
-// and the feed prints every message and every month-end perk line.
+// and the feed prints every message and every month-end perk line. The manager's month end (round R5, B1), by an
+// oracle of the check's own: the END TURN preview's perk row, and a month-end line, exactly where the perk acted.
 // The desk (round V1a): at every state, every number and word the desk's adapter (ui/desk/model.ts) gives
 // the scene against /core; before each END TURN, the issue on the desk is the month END TURN prints.
 // Exit code 1 on any mismatch. --runs=60 by default, as every round runs it; --runs=300 for a release candidate.
@@ -86,7 +87,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, perkRows: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -98,6 +99,22 @@ const turnEndOf = (events: readonly GameEvent[]) => events.find((e) => e.type ==
  * What the real feed code prints for a hypothetical next step, read off the whole history as the UI's queue
  * holds it: a line's variant depends on every showing before it (decision 15, revised).
  */
+/**
+ * Where a month end's manager perk acted (round R5, B1), read without the engine's monthEndEffects or its list: the
+ * events after the turnEnd up to the first that opens the year's next part — with this list of the check's own — hold
+ * something besides warnings, the manager has a month-end perk, and the month is one it acts in (when it names them).
+ */
+const OPENS_NEXT: readonly string[] = ['turnStart', 'draftOffer', 'eventOffered', 'gateOffer', 'ending'];
+function perkActed(before: GameState, events: readonly GameEvent[]): boolean {
+  const end = events.findIndex((e) => e.type === 'turnEnd');
+  if (end < 0) return false;
+  const after = events.slice(end + 1);
+  const cut = after.findIndex((e) => OPENS_NEXT.includes(e.type));
+  const span = cut < 0 ? after : after.slice(0, cut);
+  const perk = getManager(before.content, before.manager)?.perk;
+  return !!perk?.monthEnd && (!perk.monthEndTurns || perk.monthEndTurns.includes(before.turn)) && span.some((e) => e.type !== 'warning');
+}
+
 function feedFor(history: readonly PlayedStep[], action: Action, s: GameState, real: GameState) {
   const id = (history.at(-1)?.id ?? 0) + 1;
   return feedLines([...history, { id, action, before: s, after: real, events: real.events }]).filter((l) => l.id.startsWith(`${id}.`));
@@ -181,6 +198,10 @@ function checkPlayPhase(s: GameState, seed: number, history: readonly PlayedStep
   const leads = feedFor(history, { type: 'END_TURN' }, s, real).filter((l) => l.kind === 'lead').map((l) => [l.text, l.paper, l.subjectKey]);
   const previewLeads = pe.scandalCards.map((x) => [lineText(s.content, x.line, x.cardId, x.press.subjectKey), x.press.paper, x.press.subjectKey]);
   if (!same(previewLeads, leads)) report('endTurn headlines', seed, s.turn, `preview ${JSON.stringify(previewLeads)}, feed ${JSON.stringify(leads)}`);
+  // The manager's month-end row (round R5, B1): shown exactly where the perk acts, by the oracle above.
+  const acted = perkActed(s, real.events);
+  if ((pe.perk !== null) !== acted) report('endTurn perk row', seed, s.turn, `${pe.perk ? 'a perk row where the perk does nothing' : 'no perk row where the perk acts'}`);
+  if (acted) counts.perkRows++;
   // The manager's month-end effects (round 2b): after the check, told apart, and in what carries over.
   const perkEvents = monthEndEffects(real.events);
   const realPerk = perkEvents.some((e) => e.type !== 'warning') ? outcomeOf(perkEvents) : null;
@@ -486,6 +507,13 @@ function checkMessages(history: readonly PlayedStep[], seed: number): void {
   }
   const perk = monthEndLines(history);
   counts.perkLines += perk.length;
+  // A month-end line (round R5, B1) at every month end where the perk acted, by the oracle, and at no other.
+  const lineAt = new Set(perk.map((l) => l.step));
+  history.forEach((step, i) => {
+    if (step.action?.type !== 'END_TURN' || !step.before) return;
+    const acted = perkActed(step.before, step.events);
+    if (lineAt.has(i) !== acted) report('month-end line', seed, step.before.turn, acted ? 'no month-end line where the perk acted' : 'a month-end line where the perk did nothing');
+  });
   if (!same(perk, monthEndLines(history))) report('message purity', seed, 12, 'month-end lines differ on the same history');
   const feed = feedLines(history);
   const shown = feed.filter((l) => l.kind === 'message').length;
@@ -842,7 +870,7 @@ console.log(
     `${counts.events} events (${counts.eventChoices} answers previewed, ${counts.eventLines} printing a line; ${counts.eventRuns} runs' event logs), ${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
-    `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines) re-read, ${counts.lastWords} last words, ` +
+    `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines, each where the perk acted, and ${counts.perkRows} END TURN previews with its row) re-read, ${counts.lastWords} last words, ` +
     `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
     `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers; ${counts.handCards} cards in the fan, ${counts.valueCards} faces of values) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,

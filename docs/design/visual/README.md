@@ -75,7 +75,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 - Bulb frame. In a frenzy some bulbs flicker or go dark and a red clipping of the month’s latest scandal headline is stuck to the glass.
 - **Black card** (taped, slight tilt): "If the year ended today" · major · minor.
-- **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows its goal line and its requirements **in the stat bar's language**: `✓/✗` + icon + tier word + number — "★ Known · 80+", "📰 5 or fewer scandals", "📰 6 or more scandals". The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
+- **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows its goal line and its requirements **in the stat bar's language**: `✓/✗` + icon + tier word + number — "★ Known · 80+" — and a scandal clause the doors' way, the icon and the threshold: "📰 5 or fewer", "📰 6+" (round R5). The words stay in ink: the icons carry the stat's colour, ✓/✗ the met state. The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
 - Notes and the black card scale up slightly on hover (×1.05, ×1.04).
 
 ### 4. The desk

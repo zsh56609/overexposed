@@ -110,8 +110,9 @@
 .offers .dtag { position: absolute; right: 6px; top: -24px; z-index: 96; background: #fbf6e6; color: #2a241c; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; padding: 4px 10px 5px 20px; transform: rotate(5deg); box-shadow: 0 4px 8px rgba(0, 0, 0, .45); white-space: nowrap; pointer-events: none; transition: transform .42s cubic-bezier(.22, .61, .36, 1); }
 .offers .dtag::before { content: ""; position: absolute; left: 6px; top: -7px; width: 6px; height: 21px; border: 2px solid #a7adb3; border-radius: 4px; }
 .offers:not(.done) .dslot:hover .dtag { transform: translateY(-13px) rotate(5deg); transition-delay: 70ms; }
-.offers .stampT { position: absolute; left: 50%; top: 44%; z-index: 99; transform: translate(-50%, -50%) rotate(-14deg) scale(1.8); border: 3px solid #D92B1F; color: #D92B1F; background: rgba(236, 230, 217, .88); font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 24px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 12px; opacity: 0; transition: all .3s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
-.offers .dslot.taken .stampT { opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(1); }
+.offers .stampT, .offer-flight .stampT { position: absolute; left: 50%; top: 44%; z-index: 99; transform: translate(-50%, -50%) rotate(-14deg) scale(1.8); border: 3px solid #D92B1F; color: #D92B1F; background: rgba(236, 230, 217, .88); font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 24px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 12px; opacity: 0; transition: all .3s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
+/* TAKEN, stamped on the card; in the offer's flight to Deck & Discard it rides on the copy, as stamped (round R5, B2). */
+.offers .dslot.taken .stampT, .offer-flight .stampT { opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(1); }
 .offers.done .dslot:not(.taken) { opacity: .22; }
 .offers .tickets { position: absolute; left: 0; right: 0; top: 536px; display: flex; justify-content: center; gap: 18px; align-items: center; }
 .scr .tkt { font-weight: 800; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #15120E; background: #ece6d9; padding: 10px 18px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0 50%); }
@@ -172,8 +173,10 @@
 :is(.awards-night, .ov .book) .pl .n { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 17px; line-height: 1.1; color: #FFF3DC; margin-top: 4px; }
 :is(.awards-night, .ov .book) .pl .c { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 10.5px; line-height: 1.35; color: #bfb09a; margin-top: 5px; }
 .awards-night .a-rev { top: 420px; }
+/* The front pages' width, which PLAY AGAIN takes too (round R5, B5). */
+.awards-night { --fp-width: 226px; }
 .awards-night .review { position: absolute; left: 100px; right: 100px; top: 440px; z-index: 5; display: flex; justify-content: center; gap: 16px; }
-.awards-night .fp { flex: 0 0 226px; height: 112px; overflow: hidden; background: #EDE6D6; color: #15120E; padding: 9px 11px; position: relative; box-shadow: 0 12px 20px rgba(0, 0, 0, .6); text-align: left; }
+.awards-night .fp { flex: 0 0 var(--fp-width); height: 112px; overflow: hidden; background: #EDE6D6; color: #15120E; padding: 9px 11px; position: relative; box-shadow: 0 12px 20px rgba(0, 0, 0, .6); text-align: left; }
 .awards-night .fp::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgba(21, 18, 14, .1) 1px, transparent 0); background-size: 4px 4px; pointer-events: none; }
 .awards-night .fp > * { position: relative; }
 .awards-night .fp .m { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid #15120E; padding-bottom: 2px; }
@@ -191,6 +194,9 @@
 .awards-night .a-bottom { position: absolute; right: 164px; top: 568px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; text-align: right; }
 .scr .again { padding: 14px 42px; background: #EDE6D6; color: #15120E; font-weight: 800; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(255, 220, 160, .18); }
 .scr .again:hover { background: #ffcf85; }
+/* PLAY AGAIN as wide as the last front page above it, both edges on its edges, its words centred — the letter-spacing
+   trails the last letter, so as much again leads the first (round R5, B5). */
+.awards-night .a-bottom .again { box-sizing: border-box; width: var(--fp-width); padding: 14px 0 14px .2em; text-align: center; }
 .awards-night .found b { color: #bfb3a0; }
 /* A plaque won for the first time (round R4, A7). */
 .awards-night .pl .new { position: absolute; right: 10px; top: 9px; padding: 2px 6px 1px; background: #ffcf85; color: #15120E; font-size: 8px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }

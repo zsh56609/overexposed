@@ -587,8 +587,6 @@
   "paper.marquee.film.9": "Borrowed Crowns",
   "paper.marquee.film.10": "The Understudy's Daughter",
   "goals.note.hypeMin": "{tier} · {min}+",
-  "goals.note.scandalsMax": "{n} or fewer scandals",
-  "goals.note.scandalsMin": "{n} or more scandals",
   "goals.note.known": "Already known",
   "ui.note.met": "✓",
   "ui.note.unmet": "✗",

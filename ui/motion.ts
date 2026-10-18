@@ -28,6 +28,13 @@ export const useMotionMode=()=>useSyncExternalStore(subscribeMotion,motionMode);
  */
 export const TRANSITION = { dim: 200, rise: 250, out: 150, crossfade: 200 } as const;
 
+/**
+ * Transforms composed in order (round R5, B3), an element's computed one among them: 'none' adds nothing. Written as
+ * `${own} translateX(3px)` an untransformed element's keyframe reads 'none translateX(3px)', which CSS rejects and the
+ * browser drops — the phone never shook.
+ */
+export const composeTransforms = (...parts: readonly string[]): string => parts.filter((p) => p !== '' && p !== 'none').join(' ') || 'none';
+
 /** The changes of scene running now: every transition is a CSS animation whose keyframes are named tr-…. */
 export function runningTransitions(): Animation[] {
   if (typeof document === 'undefined' || !('getAnimations' in document)) return [];

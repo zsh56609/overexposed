@@ -1,6 +1,6 @@
 import { createServer } from 'vite';
 import { launch, browsersFromArgs, sizesFromArgs } from './browser.ts';
-import { ROOT } from './desk-replay.ts';
+import { badKeyframes, ROOT } from './desk-replay.ts';
 import { checkD7 } from './motion.ts';
 import { checkPreviewInput } from './preview-input.ts';
 import { checkBoundaryInput, checkMonthEntry, checkMonthInput, checkOsMotion, checkPileInput } from './month-input.ts';
@@ -18,6 +18,9 @@ try {
     else if(process.argv.includes('--pile-only'))await checkPileInput(page,url);
     else if(process.argv.includes('--boundaries-only'))await checkBoundaryInput(page,url);
     else {if(!process.argv.includes('--month-only')){await checkMonthEntry(page,url);await checkD7(page,url);await checkPreviewInput(page,url);await checkPileInput(page,url);await checkBoundaryInput(page,url);await checkOsMotion(page,url);}await checkMonthInput(page,url);}
+    // Every keyframe the runs animated, CSS-valid (round R5, B3): one CSS rejects is dropped without a word.
+    const rejected=await badKeyframes(page);
+    if(rejected.length)throw Error(`${rejected.length} keyframe value(s) CSS rejects, first: ${rejected.slice(0,3).map(b=>`${b.element} ${b.property}: ${b.value}`).join('; ')}`);
     mkdirSync('check/out',{recursive:true});writeFileSync(diagnosticFile,JSON.stringify(page.diagnostics,null,2));
     const candidates=page.diagnostics.filter(line=>line.startsWith('pageerror:')||line.startsWith('error:')||line.includes('Runtime.exceptionThrown')||/"type":"error"|"level":"error"/.test(line));
     const favicon=candidates.filter(line=>line.includes('/favicon.ico')&&line.includes('404'));

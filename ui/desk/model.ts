@@ -402,6 +402,7 @@ const NOTE_ORDER: readonly NoteColour[] = ['yellow', 'green', 'blue', 'pink'];
 /**
  * A goals-board clause in the stat bar's words, on a sticky note (README §3). Its number stays off the note but for a
  * scandal clause's "(you have N)", as the doors show it (round R3, D1): the stat bar shows no count of scandals held.
+ * A scandal clause says its threshold the doors' way (round R5, B7): the mark, the scandal icon, "6+" or "5 or fewer".
  */
 function noteReq(clause: MajorClause): NoteReq {
   const mark = (met: boolean) => t(met ? 'ui.note.met' : 'ui.note.unmet');
@@ -411,8 +412,8 @@ function noteReq(clause: MajorClause): NoteReq {
     if (clause.tierKey && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'star', text: t('goals.note.hypeMin', { tier: t(clause.tierKey), min }) };
     // The scandals held, beside a scandal clause (round R3, D1): the one count the stat bar does not show.
     const have = clause.key === 'scandalCount' && 'value' in clause ? t('ui.doors.have', { n: clause.value }) : undefined;
-    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMax', { n: max }), have };
-    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('goals.note.scandalsMin', { n: min }), have };
+    if (clause.key === 'scandalCount' && max !== undefined && min === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('ui.doors.max', { n: max }), have };
+    if (clause.key === 'scandalCount' && min !== undefined && max === undefined) return { met: clause.met, mark: mark(clause.met), icon: 'paper', text: t('ui.doors.min', { n: min }), have };
   }
   return { met: clause.met, mark: mark(clause.met), icon: null, text: clauseText(clause) };
 }

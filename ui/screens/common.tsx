@@ -79,13 +79,16 @@ export function useStampedChoice<T>(act: (choice: T) => void): readonly [T | nul
 }
 
 /**
- * The offer you take flies to Deck & Discard (round R4, A3e) — the flight the month's pile takes since R3, D1 — instead
- * of vanishing with the screen: a copy of its face flies there and shrinks away, the face itself hidden as it goes.
- * Full motion only: reduced motion has no travel, and the face leaves with the screen.
+ * The offer you take flies to Deck & Discard (round R4, A3e) instead of vanishing with the screen: one new card going
+ * into the deck. A copy of its face flies there and shrinks away, the face itself hidden as it goes; it starts at the
+ * size the offers show it (1.1×, screens.css). Its TAKEN stamp is on the card, so it leaves with it (round R5, B2): in
+ * the flight, in the same place and at the same angle on the face, and the slot keeps nothing. Full motion only:
+ * reduced motion has no travel, and the face and its stamp leave with the screen.
  */
 export function flyToDeck(lift: Element | null): void {
   if (motionMode() !== 'off') cue('deal'); // its sound with reduced motion too: the card still goes
   const face = lift?.querySelector<HTMLElement>('.card');
+  const stamp = lift?.parentElement?.querySelector<HTMLElement>('.stampT') ?? null;
   const stage = document.querySelector('.stage');
   const deck = document.querySelector('.desk .stats .deckbtn');
   if (!face || !stage || !deck || motionMode() !== 'full') return;
@@ -93,21 +96,31 @@ export function flyToDeck(lift: Element | null): void {
   const k = box.width / 1280;
   const a = face.getBoundingClientRect();
   const b = deck.getBoundingClientRect();
+  // The face's own size, centred where it stands on the stage, and the scale it stands at.
+  const w = face.offsetWidth;
+  const h = face.offsetHeight;
+  const s = w ? a.width / k / w : 1;
+  const cx = (a.left + a.width / 2 - box.left) / k;
+  const cy = (a.top + a.height / 2 - box.top) / k;
   const fly = document.createElement('div');
   fly.className = 'faces offer-flight';
-  fly.style.cssText = `left:${(a.left - box.left) / k}px;top:${(a.top - box.top) / k}px;width:${a.width / k}px;height:${a.height / k}px`;
+  fly.style.cssText = `left:${cx - w / 2}px;top:${cy - h / 2}px;width:${w}px;height:${h}px`;
   const copy = face.cloneNode(true) as HTMLElement;
   copy.style.cssText = 'position:relative;left:0;top:0;transform:none;pointer-events:none';
   fly.appendChild(copy);
+  if (stamp) {
+    fly.appendChild(stamp.cloneNode(true));
+    stamp.style.visibility = 'hidden';
+  }
   stage.appendChild(fly);
   face.style.visibility = 'hidden';
-  const dx = (b.left + b.width / 2 - (a.left + a.width / 2)) / k;
-  const dy = (b.top + b.height / 2 - (a.top + a.height / 2)) / k;
+  const dx = (b.left + b.width / 2 - box.left) / k - cx;
+  const dy = (b.top + b.height / 2 - box.top) / k - cy;
   const flight = fly.animate(
     [
-      { transform: 'none', opacity: 1 },
-      { transform: `translate(${dx}px, ${dy}px) rotate(-8deg) scale(.16)`, opacity: 1, offset: 0.85 },
-      { transform: `translate(${dx}px, ${dy}px) rotate(-8deg) scale(.12)`, opacity: 0 },
+      { transform: `scale(${s})`, opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(-8deg) scale(${0.16 * s})`, opacity: 1, offset: 0.85 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(-8deg) scale(${0.12 * s})`, opacity: 0 },
     ],
     { duration: 560, easing: 'cubic-bezier(.45, 0, .25, 1)', fill: 'forwards' },
   );

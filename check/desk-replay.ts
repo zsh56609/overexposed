@@ -57,6 +57,39 @@ export const PLAY_STEPS = (steps: readonly Step[]) => `(async (steps) => {
   return 'ok';
 })(${JSON.stringify(steps)})`;
 
+/**
+ * Runs in a page once it has loaded (round R5, B3): Element.prototype.animate wrapped, so every keyframe value is
+ * checked with CSS.supports under its property's CSS name (boxShadow is box-shadow; offset, easing and composite left
+ * out). A value CSS rejects is one the browser drops without a word — 'none translateX(3px)' kept the phone from ever
+ * shaking — and it is kept in the tab's sessionStorage, so it outlives the page's next load until a check reads it.
+ */
+const WATCH_KEYFRAMES = `(() => {
+  if (Element.prototype.animate.__watched) return;
+  const native = Element.prototype.animate;
+  const skip = new Set(['offset', 'easing', 'composite']);
+  const cssName = (p) => (p === 'cssFloat' ? 'float' : p.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()));
+  const label = (el) => el.tagName.toLowerCase() + (el.getAttribute('class') ? '.' + el.getAttribute('class').trim().split(/\\s+/).join('.') : '');
+  const watched = function (keyframes, options) {
+    try {
+      const frames = Array.isArray(keyframes) ? keyframes : keyframes ? [keyframes] : [];
+      const bad = [];
+      for (const f of frames) for (const [k, v] of Object.entries(f || {})) {
+        if (skip.has(k) || v === null || v === undefined) continue;
+        for (const x of Array.isArray(v) ? v : [v]) if (!CSS.supports(cssName(k), String(x))) bad.push({ element: label(this), property: cssName(k), value: String(x) });
+      }
+      if (bad.length) sessionStorage.setItem('__badKeyframes', JSON.stringify(JSON.parse(sessionStorage.getItem('__badKeyframes') || '[]').concat(bad).slice(-50)));
+    } catch {}
+    return native.call(this, keyframes, options);
+  };
+  watched.__watched = true;
+  Element.prototype.animate = watched;
+})()`;
+/** Watches the page's keyframes (WATCH_KEYFRAMES): again after every load. */
+export const watchKeyframes = (page: Page): Promise<unknown> => page.evaluate(WATCH_KEYFRAMES);
+/** The keyframe values CSS rejected in this tab since the last reading, which it clears. */
+export const badKeyframes = (page: Page) =>
+  page.evaluate<{ element: string; property: string; value: string }[]>(`(() => { try { const all = JSON.parse(sessionStorage.getItem('__badKeyframes') || '[]'); sessionStorage.removeItem('__badKeyframes'); return all; } catch { return []; } })()`);
+
 /** Loads the game on the state's seed and replays its steps; the page settles before it returns. */
 let navigationId=0;
 /** Loads a page and waits until it is ready: by default the game's title (its BEGIN); `test` for another page. */
@@ -71,7 +104,7 @@ export async function openReady(page:Page,url:string,test=`!!document.querySelec
   while(Date.now()-start<15000){
     try {
       const ready=await page.evaluate<boolean>(`location.href===${JSON.stringify(target.href)}&&document.readyState==='complete'&&(${test})&&document.fonts.status==='loaded'`,2000);
-      if(ready)return;
+      if(ready){await watchKeyframes(page);return;}
     }catch(error){last=String(error);} // A navigation can replace the execution context between samples.
     await new Promise(r=>setTimeout(r,50));
   }

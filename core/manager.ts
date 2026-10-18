@@ -206,14 +206,21 @@ export function lastWord(s: { readonly content: ContentIndex; readonly manager: 
 }
 
 /**
- * A month end's manager effects, in a step's events: after its turnEnd, up to the next month's opening, the
- * season's gate, or the ending (the reducer's order: core/reducer.ts endTurn).
+ * What opens the year's next part after a month end, and so ends the month end's manager effects: the next month —
+ * its turnStart, or first its offers or its event (round R5, B1: months 2, 4, 6, 8, 10 and 12 open on an event) —
+ * the season's gate, or the ending. One list, beside monthEndEffects.
+ */
+export const MONTH_END_STOPS: readonly GameEvent['type'][] = ['turnStart', 'draftOffer', 'eventOffered', 'gateOffer', 'ending'];
+
+/**
+ * A month end's manager effects, in a step's events: after its turnEnd, up to the first of MONTH_END_STOPS (the
+ * reducer's order: core/reducer.ts endTurn). Between them lie only the perk's effects and lenient-mode warnings.
  */
 export function monthEndEffects(events: readonly GameEvent[]): readonly GameEvent[] {
   const end = events.findIndex((e) => e.type === 'turnEnd');
   if (end === -1) return [];
   const rest = events.slice(end + 1);
-  const stop = rest.findIndex((e) => e.type === 'turnStart' || e.type === 'draftOffer' || e.type === 'gateOffer' || e.type === 'ending');
+  const stop = rest.findIndex((e) => MONTH_END_STOPS.includes(e.type));
   return stop === -1 ? rest : rest.slice(0, stop);
 }
 
