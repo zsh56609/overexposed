@@ -6,6 +6,26 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R5, Part C: v0.5
+
+- `package.json` is 0.5.0; the credits read "v0.5". The itch zip,
+  `overexposed-v0.5.zip`, replaces v0.4: built from a clean export of the
+  round's last source commit, packed as in R4 (`index.html assets audio`).
+- AGENTS.md: only §7's version list changes, gaining "R5 v0.5".
+- The acceptance is AGENTS.md §8's for a release candidate, with
+  check:interactions in the same nine configurations (B2 and B3 check
+  there), A3's worker probe once on the production build (dist/ served,
+  Chromium), and sim:compare against R4's baseline (`sim/out/r4-v04`):
+  every file identical.
+- Found in the acceptance: check:interactions' door hover read 0 % once in
+  WebKit at 1280×720. An animation's time moves on only at a frame, and
+  headless WebKit's come about 70 ms apart here, so a read 60 ms after the
+  hover can fall before the next frame and see the transition at its
+  start. The mid read now waits for the next frame after the 60 ms (one
+  frame later: about 16 ms in Chromium and Firefox).
+- B8 came in during the acceptance; the acceptance ran again from the
+  start on the code with it.
+
 ## 2026-10-18 — Round R5, Part B: fixes from playing and checking v0.4
 
 - **B1, the manager's month end where it does nothing.** `monthEndEffects`

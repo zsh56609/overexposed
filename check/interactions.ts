@@ -63,6 +63,9 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
     // style is read at once: the hover is taken in now, and its transition runs from now, in every browser.
     await matrix(sel);
     await sleep(delay + 60);
+    // Read at the next frame (round R5): an animation's time moves on only at a frame, and headless WebKit's come about
+    // 70 ms apart here, so a read between two frames can still see the transition at its start.
+    await page.evaluate(`new Promise((done) => requestAnimationFrame(() => done(0)))`);
     const mid = await matrix(sel);
     await sleep(900);
     const end = await matrix(sel);

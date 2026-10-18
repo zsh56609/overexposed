@@ -1,9 +1,10 @@
 # Status
 
-As of 2026-10-18: round R4 is done — what the author found in v0.3 (hovers that ease, signing, one way to leave and
-arrive over the desk, the awards collected, the craft icon by card), sound and music, and the author's answers to
-the R2 and R3 questions. Its build is v0.4, the 10/24 playtest build, a release candidate. **Read this first; update
-it at the end of every session** (AGENTS.md → Session rules).
+As of 2026-10-18: round R5 is done — version 6 of the sound module (its samples rendered in a worker) and the fixes
+found playing and checking v0.4: the manager's month end where it does nothing, TAKEN leaving with its card, the
+phone's shake, the month's pile leaving to the right, PLAY AGAIN as wide as its paper, the notes' scandal lines, and
+the page ink from its first paint. Its build is v0.5, which replaces v0.4 on itch: a release candidate. **Read this
+first; update it at the end of every session** (AGENTS.md → Session rules).
 
 Overexposed is a deck-building career sim for the Game Gauntlet SIM Jam, played in the browser: one year as a young
 singer, 12 months in four seasons. Fast hype builds heat, heat crystallises into scandal cards, and scandals clog the
@@ -12,7 +13,7 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-18-r4.md](reports/2026-10-18-r4.md).
+[reports/2026-10-18-r5.md](reports/2026-10-18-r5.md).
 
 ## Built
 
@@ -26,11 +27,12 @@ Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); th
 | Screens (R1, R3, R4, `ui/screens/`) | The manager choice (dealt onto the desk since R3), the season cards, the offers, the doors and the last door, the awards night with the year in four front pages, and five panels — the deck, the scrapbook (its Endings and Awards pages, R4), House rules (`ui/settings.ts`), the credits and the numbers (R3). One dim under every overlay, kept between overlays; everything over the desk leaves as one piece (R4). No plain screen is left |
 | Events (R2) | A text comes up on the phone, message by message; a letter lands on the desk, typed, with tick boxes. Answering is a step of its own: the reply, their answer or the SENT stamp, the effects landing, then the month opens with the paper that printed it in front. A dev page, `check/events.html`, shows every event and two at the schema's limits for the checks |
 | The opening (R3, amended) | The title is one photograph, the whole stage (`ui/screens/Title.tsx`): the singer in a spotlight, drawn once by the photo worker light on ink, the name developing, flashes popping near the edges. BEGIN's white flash brings spring's card over it, dimmed; "Continue" takes it to dark and brings the desk up, its bulbs lighting, the manager cards dealt; signing slides both cards off the stage, the phone glowing once, and drops the month's papers onto the desk (R4); every season card waits for "Continue" (`ui/screens/Season.tsx`). One set of transitions (`ui/motion.ts`, `tr-…` keyframes); the last door puts the bulbs out; PLAY AGAIN fades through ink. The manager's messages come after the deal as the desk's tails and stay till the month ends; the scandals held show on the Deck & Discard button. The build's version (`package.json`) is in the credits |
-| Sound (R4, `ui/sound/`) | The author's effects and the room, synthesized in code (`oxsound.js`, a copy validate holds equal to `docs/design/sound/`), played with their beats by `director.ts` — a D7 skip plays none of the skipped beats' sounds; the room under the desk with the season's weather. Holizna's six tracks (CC0 1.0, `public/audio/music/`), one at a time: spring from BEGIN, the scandal track while scandals print, each season's with its card, the night's own. House rules switch Sound effects and Music; `?cues` logs every cue for the checks |
+| Sound (R4, R5, `ui/sound/`) | The author's effects and the room, synthesized in code (`oxsound.js`, module v6, a copy validate holds equal to `docs/design/sound/`; its sampled sounds rendered in a worker after BEGIN), played with their beats by `director.ts` — a D7 skip plays none of the skipped beats' sounds; the room under the desk with the season's weather. Holizna's six tracks (CC0 1.0, `public/audio/music/`), one at a time: spring from BEGIN, the scandal track while scandals print, each season's with its card, the night's own. House rules switch Sound effects and Music; `?cues` logs every cue for the checks |
 
 ## Next
 
-1. **Now:** the v0.4 zip on itch — the 10/24 playtest build (built outside the repo; see the R4 report).
+1. **Now:** the v0.5 zip on itch, in place of v0.4 — the 10/24 playtest build (built outside the repo; see the R5
+   report).
 2. **10/25–31:** polish and a retune, from what the playtest finds. **11/1:** feature freeze.
    **11/2–3:** fixes only, the itch page; submit 11/3 JST (v1.0). Deadline 11/5 04:00 JST — treat 11/4 as the real one.
 
