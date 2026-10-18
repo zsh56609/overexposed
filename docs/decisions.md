@@ -108,14 +108,15 @@ rules).
   fits), no longer in the title's effect after mount, and the desk
   photos' warm-up waits until it is drawn; the spotlight's 0.6 s arrival
   and the name's develop are unchanged. Measured from navigation in
-  Chromium at 1280×720, the built game served locally (this machine
-  draws fast; the author's saw the name at 0.9 s): v0.4 painted cream at
-  152 ms, the name at 272 ms, the photograph from 364 ms, settled by
-  891 ms; now the first frame is ink (116 ms), the first not dark is the
-  title with its name (226 ms), the photograph from 318 ms, settled by
-  848 ms. From the last door: v0.4 showed two cream frames after the dark
-  (2136 ms) and the night faded in out of them; now the dark runs into the
-  night (954 ms on), which lights up out of it.
+  Chromium at 1280×720, the built game served locally, the median of three
+  runs (this machine draws fast; the author's saw the name at 0.9 s): v0.4
+  painted cream at 25 ms, the name at 224 ms, the photograph from 342 ms,
+  settled by 871 ms; now every frame before the title is ink, and the
+  first not dark is the title with its name, at 210 ms; the photograph
+  from 307 ms, settled by 824 ms. From the last door: v0.4 showed one or
+  two cream frames after the dark (about 2.12 s) and the night faded in
+  out of them; now the dark runs into the night, which lights up out of
+  it.
 
 ## 2026-10-18 — Round R5, Part A: the sound module, version 6
 
