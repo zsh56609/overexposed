@@ -1,9 +1,8 @@
 # Status
 
-As of 2026-10-18: round R5 is done — version 6 of the sound module (its samples rendered in a worker) and the fixes
-found playing and checking v0.4: the manager's month end where it does nothing, TAKEN leaving with its card, the
-phone's shake, the month's pile leaving to the right, PLAY AGAIN as wide as its paper, the notes' scandal lines, and
-the page ink from its first paint. Its build is v0.5, which replaces v0.4 on itch: a release candidate. **Read this
+As of 2026-10-18: round R6 is done — the room's ambience goes (the room tone and the season's weather read as hum on
+ordinary speakers; the music carries the mood). Its build is v0.6, which replaces v0.5 on itch: a release candidate.
+Round R5 before it brought version 6 of the sound module and the fixes found playing and checking v0.4. **Read this
 first; update it at the end of every session** (AGENTS.md → Session rules).
 
 Overexposed is a deck-building career sim for the Game Gauntlet SIM Jam, played in the browser: one year as a young
@@ -13,7 +12,7 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-18-r5.md](reports/2026-10-18-r5.md).
+[reports/2026-10-18-r6.md](reports/2026-10-18-r6.md).
 
 ## Built
 
@@ -31,7 +30,7 @@ Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); th
 
 ## Next
 
-1. **Now:** the v0.5 zip on itch, in place of v0.4 — the 10/24 playtest build (built outside the repo; see the R5
+1. **Now:** the v0.6 zip on itch, in place of v0.5 — the 10/24 playtest build (built outside the repo; see the R6
    report).
 2. **10/25–31:** polish and a retune, from what the playtest finds. **11/1:** feature freeze.
    **11/2–3:** fixes only, the itch page; submit 11/3 JST (v1.0). Deadline 11/5 04:00 JST — treat 11/4 as the real one.
@@ -43,8 +42,8 @@ in code); the year in review as its own phase.
 
 - Real Safari and iPad (the author's, C5): the itch embed at 1280×720, fullscreen on — and listen: Safari starts sound
   only from a click, and Playwright's WebKit on Windows has no Web Audio, so the checks never heard it.
-- The sound's levels: the music's is one number, `MUSIC_GAIN` (0.25) in `ui/sound/sound.ts`; the effects' and the
-  room's are the module's own.
+- The sound's levels: the music's is one number, `MUSIC_GAIN` (0.25) in `ui/sound/sound.ts`; the effects' are the
+  module's own. No ambience since R6.
 - The module (v6) renders its sampled sounds in a worker after BEGIN, 5–6 s, while the opening card is read and a
   manager chosen; a sound played before the worker has delivered it renders on first use, on the main thread. The
   checks that replay a run reach the desk within milliseconds of BEGIN, so they load it muted (`?mute`).

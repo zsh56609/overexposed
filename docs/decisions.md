@@ -6,6 +6,17 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R6, Part B: v0.6
+
+- `package.json` is 0.6.0; the credits read "v0.6". The itch zip,
+  `overexposed-v0.6.zip`, replaces v0.5: built from a clean export of the
+  round's last source commit, packed as in R5 (`index.html assets audio`).
+- AGENTS.md: only §7's version list changes, gaining "R6 v0.6"; §10's
+  disclosure stays as it is.
+- The acceptance is AGENTS.md §8's for a release candidate, with
+  check:interactions in the same nine configurations. No content or rule
+  changed, so no sim:compare.
+
 ## 2026-10-18 — Round R6, Part A: no ambience
 
 - **A1**: playing v0.5, the author found that the room's tone and the
