@@ -3,7 +3,8 @@
 // a time, through two <audio> elements, each with its own gain into the module's music bus. Nothing sounds before the
 // first BEGIN click — browsers allow audio only after a gesture — and a play the browser refuses leaves the game
 // silent, never an error. With `?cues` in the URL every cue is logged on window.__cues for the checks (B7); with
-// `?mute` the sound never starts (the checks that replay a run: see startSound).
+// `?mute` the sound never starts: the checks that replay a run reach the desk before the module's render worker has
+// delivered its samples (see startSound).
 
 import { OXSound, type OXAmbience } from './oxsound.js';
 import { settings, subscribeSettings } from '../settings.ts';
@@ -265,8 +266,9 @@ function unlock(): void {
 
 /**
  * The first BEGIN click (B1): the audio graph, from the gesture. Later calls do nothing. With `?mute` it never starts:
- * the checks that replay a run race into its first seconds, while the module renders its samples on the main thread
- * (long tasks of up to about 90 ms), and they measure motion and timing; the cues are still logged.
+ * a replay reaches the desk within milliseconds of BEGIN, before the module's render worker has delivered the samples
+ * (5–6 s), so its first sounds would render on the main thread — on module v6 the rain loop at Continue is a 300–380 ms
+ * task — and the checks that replay measure motion and timing. The cues are still logged.
  */
 export function startSound(): void {
   if (live() || MUTE) return;
@@ -282,7 +284,10 @@ export function startSound(): void {
   unlock();
 }
 
-/** Once the opening card has settled, never during BEGIN's flash: the sampled sounds, rendered ahead of first play. */
+/**
+ * Once the opening card has settled, never during BEGIN's flash: the sampled sounds, rendered ahead of first play — in
+ * the module's worker (5–6 s, while the opening card is read and a manager chosen), else in idle moments.
+ */
 export function prepareSound(): void {
   if (!live()) return;
   try {

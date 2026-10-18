@@ -6,6 +6,30 @@ rules).
 
 ---
 
+## 2026-10-18 — Round R5, Part A: the sound module, version 6
+
+- **A1**: the author's module v6 (SHA-256 c1777be8…) is copied to
+  `ui/sound/oxsound.js` with the one added line `export { OXSound };`, as
+  in R4; validate's check of the copy holds as it is. v6 renders the
+  sampled sounds in a worker built from its own generators (a Blob URL),
+  builds the theatre's reverb once prepare() is done or first needed, and
+  has no CommonJS line: the build's COMMONJS_VARIABLE_IN_ESM warning is
+  gone (R4's note on it is marked superseded).
+- **A2**: the replays keep their mute (`openReady`), for the right reason:
+  a replay reaches the desk within milliseconds of BEGIN, before the worker
+  has delivered the samples, so its first sounds render on the main thread
+  (on v6 the rain loop at Continue gives a 300–380 ms task). Corrected in
+  `ui/sound/sound.ts`, `openReady`, `oxsound.d.ts` and status.md; R4's
+  decision keeps its text with a note.
+- **A3**: the worker never fails silently. check:clicks, which plays as a
+  player does, wraps `window.Worker` before BEGIN and counts the workers
+  made from a blob: URL (the photo workers are files): where the page has
+  an AudioContext, within 15 s of BEGIN one is made, answers every message
+  it is sent and is terminated; where it has none (Playwright's WebKit on
+  Windows), none is made. The dev server neither bundles nor minifies the
+  module, which builds the worker's source from its own functions' text,
+  so the same probe runs once on the production build (Part C).
+
 ## 2026-10-18 — Round R4, Part D: v0.4, the playtest build
 
 - `package.json` is 0.4.0; the credits read "v0.4". The itch zip,
@@ -25,7 +49,8 @@ rules).
   58 %, 173 ms 87 %, 317 ms all the way).
 - The module's own CommonJS guard (`typeof module !== 'undefined'`) draws
   one build warning, COMMONJS_VARIABLE_IN_ESM; it is harmless in the
-  browser and the copy is never edited.
+  browser and the copy is never edited. *(Superseded in R5, Part A: module
+  v6 has no CommonJS line, and the build no warning.)*
 - Found in the acceptance, and fixed:
   - A3d's old stack of papers stayed 0.52 s after a D7 skip; a skip must land
     the settled desk at once. `Papers` takes the queue's skip count: a skip
@@ -51,7 +76,10 @@ rules).
     does: check:clicks' runs, check:interactions' month, bubbles and hovers,
     and the real-input run. Real play gives the renders the opening card's
     reading time; moving them off the main thread is a change to the
-    author's module, so it is left to the author.
+    author's module, so it is left to the author. *(Reason corrected in R5,
+    Part A: module v6 renders in a worker; a replay reaches the desk within
+    milliseconds of BEGIN, before the worker has delivered the samples, so
+    its first sounds render on the main thread. The mute stays.)*
 
 ## 2026-10-18 — Round R4, Part C: answers to the R2 and R3 questions
 

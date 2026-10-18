@@ -8,7 +8,11 @@ export type OXAmbience = 'room' | 'rain' | 'wind';
 export interface OXSoundApi {
   /** Creates the audio graph (from a gesture: browsers start audio only after one); again, resumes it. */
   init(ctx?: BaseAudioContext, opts?: { readonly raw?: boolean }): BaseAudioContext;
-  /** Renders the sampled sounds ahead of their first play, one per idle moment (once). */
+  /**
+   * Renders the sampled sounds ahead of their first play (once): in a worker built from the module's own generators,
+   * else, or if it fails, in idle moments. A sound played before its render is delivered renders on first use, on the
+   * main thread. The theatre's reverb is built once this is done, or when first needed.
+   */
   prepare(): void;
   /** Plays one sound; `when` is a context time, default now. An unknown name plays nothing. */
   play(name: string, when?: number): void;

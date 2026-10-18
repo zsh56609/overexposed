@@ -43,11 +43,12 @@ in code); the year in review as its own phase.
   only from a click, and Playwright's WebKit on Windows has no Web Audio, so the checks never heard it.
 - The sound's levels: the music's is one number, `MUSIC_GAIN` (0.25) in `ui/sound/sound.ts`; the effects' and the
   room's are the module's own.
-- The module renders its sampled sounds on the main thread after BEGIN: 58 renders in idle callbacks, long tasks of
-  83–95 ms among them in Chrome. Real play spends that time on the opening card; a fast clicker may feel a hitch in the
-  first seconds. Rendering them in a worker would end it — a change to the module, so the author's call.
-- A prose gap: Mags's month-end lines (`monthEnd:guardian`) have 3 variants and come 6.4 times a run; validate asks
-  for 4. The 27 once-per-run groups stay cut for the jam.
+- The module (v6) renders its sampled sounds in a worker after BEGIN, 5–6 s, while the opening card is read and a
+  manager chosen; a sound played before the worker has delivered it renders on first use, on the main thread. The
+  checks that replay a run reach the desk within milliseconds of BEGIN, so they load it muted (`?mute`).
+- Mags's month-end lines (`monthEnd:guardian`): R5's B1 stops the manager's month end at the event that opens the
+  next month, so they come only after real relief, 2.55 times a run, within their 3 variants. The 27 once-per-run
+  groups stay cut for the jam.
 - The bubbles that went away (R3, C2): not reproduced. The bubbles now keep their own count, which only grows in a
   month, and check:interactions holds it for both managers; if one still goes, the month and the click before it find
   it.

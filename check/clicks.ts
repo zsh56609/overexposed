@@ -22,7 +22,9 @@
 // measures where things settle.
 // With the sound on (round R4, B7) — the browsers let it start without a gesture (check/browser.ts) — the runs log no
 // console error, and the first run asks the server for no track before May but spring's, and the scandal track's
-// once a scandal is held.
+// once a scandal is held. The sound's render worker never fails silently (round R5, A3): where the page has an
+// AudioContext, within 15 s of BEGIN one worker from a blob: URL is made, answers every message it is sent and is
+// terminated; where it has none, none is made.
 //
 // Runs the Vite dev server in-process. Usage:
 //   node check/clicks.ts [--runs=4] [--sizes=1280x720,800x450,844x390m] [--browsers=chrome,firefox]
@@ -168,6 +170,9 @@ const DRIVE = (runs: number) => `(async () => {
   reachable();
   const TITLE_OPENS = { scrapbook: '.title-screen .scrapbook-open', settings: '.title-screen .settings-open', credits: '.title-screen .credits-open' };
   for (const id of ['scrapbook', 'settings', 'credits']) if (await visit(TITLE_OPENS[id], id)) await close(id);
+  // The sound's render worker (round R5, A3): every worker made from a blob: URL, what it is sent and what it answers.
+  ${WATCH_WORKERS}
+  const beginAt = performance.now();
   document.querySelector('.title-screen .begin').click();
   await sleep(40);
   // The opening card (round R3): spring's, before the manager.
@@ -271,7 +276,7 @@ const DRIVE = (runs: number) => `(async () => {
     await sleep(20);
   }
   month(${runs});
-  return { ...stats, months, blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
+  return { ...stats, months, workers: window.__workers.map((w) => ({ ...w, made: w.made - beginAt, ended: w.ended === null ? null : w.ended - beginAt })), audio: typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined', blocked: Object.entries(blocked).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /**
@@ -321,7 +326,7 @@ const EVENT_PAGE = `(async () => {
 })()`;
 
 type Month = { at: number; run: number; turn: number; held: number };
-type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; seasonCards: number; months: Month[]; blocked: [string, number][] };
+type Out = { runs: number; states: number; hovers: number; targets: number; points: number; drafts: number; extraDrafts: number; controls: number; byScreen: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; settingsViews: number; events: number; unaffordable: number; seasonCards: number; months: Month[]; workers: Watched[]; audio: boolean; blocked: [string, number][] };
 
 /** Every request for a track the server answers (round R4, B7): which, and when. */
 const tracks: { at: number; file: string }[] = [];
@@ -357,6 +362,37 @@ function earlyTracks(months: readonly Month[]): { asked: string[]; wrong: string
   return { asked: [...asked], wrong: [...wrong] };
 }
 
+/** A worker the page made (round R5, A3), as WATCH_WORKERS records it: times in ms from BEGIN. */
+type Watched = { url: string; made: number; sent: number; answered: number; ended: number | null };
+
+/**
+ * Runs in the page before BEGIN: window.Worker wrapped, so every worker from a blob: URL — the sound's render worker;
+ * the photo workers are files — is recorded with the messages it is sent, those it answers, and when it is terminated.
+ */
+const WATCH_WORKERS = `window.__workers = [];
+  const NativeWorker = window.Worker;
+  if (NativeWorker) window.Worker = class extends NativeWorker {
+    constructor(url, options) {
+      super(url, options);
+      const rec = { url: String(url), made: performance.now(), sent: 0, answered: 0, ended: null };
+      this.__watched = rec;
+      if (rec.url.startsWith('blob:')) window.__workers.push(rec);
+      this.addEventListener('message', () => { rec.answered++; });
+    }
+    postMessage(...args) { this.__watched.sent++; return super.postMessage(...args); }
+    terminate() { if (this.__watched.ended === null) this.__watched.ended = performance.now(); return super.terminate(); }
+  };`;
+
+/** The render worker's account (round R5, A3): one, made, answering all it is sent and terminated within 15 s of BEGIN
+ * where the page has an AudioContext; none where it has not. */
+function renderWorker(workers: readonly Watched[], audio: boolean): { ok: boolean; line: string } {
+  if (!audio) return { ok: workers.length === 0, line: workers.length === 0 ? 'no AudioContext, none made' : `no AudioContext, yet ${workers.length} made` };
+  const w = workers[0];
+  if (workers.length !== 1 || !w) return { ok: false, line: `${workers.length} made from blob: URLs, not one` };
+  const ok = w.made <= 15_000 && w.sent > 0 && w.answered === w.sent && w.ended !== null && w.ended <= 15_000;
+  return { ok, line: `made ${(w.made / 1000).toFixed(2)} s after BEGIN, answered ${w.answered} of ${w.sent} messages, terminated ${w.ended === null ? 'never' : `at ${(w.ended / 1000).toFixed(2)} s`}` };
+}
+
 /** A console error or an uncaught one, from what a browser reported (warnings are not). */
 const isError = (line: string): boolean => /"type":"error"|exceptionThrown|"level":"error"|^pageerror|^error:/.test(line);
 
@@ -389,10 +425,13 @@ try {
         // The sound (round R4, B7): no console error over the runs; before May only spring's track, and the scandal's.
         const errors = page.diagnostics.filter(isError).slice(errorsBefore);
         const early = earlyTracks(out.months);
+        const worker = renderWorker(out.workers, out.audio);
         console.log(`click-through check, ${tag}: sound on — ${errors.length} console errors; before May the first run asked for ${early.asked.join(', ') || 'no track'}`);
         for (const e of errors.slice(0, 5)) console.log(`CONSOLE  ${e.slice(0, 300)}`);
         for (const w of early.wrong) console.log(`TRACK TOO EARLY  ${w}`);
         if (errors.length > 0 || early.wrong.length > 0) failed = true;
+        console.log(`click-through check, ${tag}: the render worker — ${worker.line}`);
+        if (!worker.ok) failed = true;
         // Every event on its own page (round R2): its replies, and one it can't afford.
         await page.navigate(`${url}check/events.html`, 3000);
         const ev = await auditStep<{ events: number; states: number; replies: number; disabled: number; blocked: string[] }>(page, `clicks ${tag} events`, EVENT_PAGE, 120_000);
