@@ -1,15 +1,32 @@
 import { SCENE_IDS, SEASON_IDS } from '../../core/index.ts';
 import { t } from '../i18n.ts';
+import { STAGE_HEIGHT, STAGE_WIDTH } from '../Stage.tsx';
 import { cachePhotoBlob, photoUrl, renderTitleCanvas, type PhotoJob } from './halftone.ts';
 
 let title: Promise<string> | null = null;
 let titleReady: string | null = null;
+
+/** The widest title photograph drawn: a 4K screen's. */
+const WIDEST = 3840;
+
+/**
+ * The title photograph's size: the stage's on the screen, in device pixels. The stage fits the window (ui/Stage.tsx),
+ * so it is known from the window before anything mounts (round R5, B8).
+ */
+function titleSize(): { readonly w: number; readonly h: number } {
+  const scale = Math.min(window.innerWidth / STAGE_WIDTH, window.innerHeight / STAGE_HEIGHT) || 1;
+  const w = Math.round(Math.min(WIDEST, Math.max(STAGE_WIDTH / 4, STAGE_WIDTH * scale * (window.devicePixelRatio || 1))));
+  return { w, h: Math.round((w * STAGE_HEIGHT) / STAGE_WIDTH) };
+}
+
 /**
  * The title's photograph (round R3, amended): drawn once, at the screen's pixel size, in the worker where there is
- * one (else on the page when it is idle), and kept for the page's life — PLAY AGAIN finds it ready.
+ * one (else on the page when it is idle), and kept for the page's life — PLAY AGAIN finds it ready. Requested as the
+ * app starts (round R5, B8: ui/main.tsx), before the title mounts; the desk photos' warm-up waits for it.
  */
-export function titlePhoto(w: number, h: number): Promise<string> {
+export function titlePhoto(): Promise<string> {
   return (title ??= new Promise<string>((resolve) => {
+    const { w, h } = titleSize();
     const keep = (url: string) => {
       titleReady = url;
       resolve(url);

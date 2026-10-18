@@ -4,7 +4,6 @@
    offers and the doors stand in, and the error line. The plain screens of layer 2 were removed in round R1. */
 
 :root {
-  --page: #f4f1ea;
   --ink: #15120e;
   --rule: #b9b2a3;
   --muted: #6b6457;
@@ -12,7 +11,10 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--page); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* Nothing behind a screen is ever the page's colour: the page and the stage are ink wherever nothing covers them (round
+   R5, B8) — the first paint (index.html carries it inline, before this sheet loads), and the awards night lighting up
+   out of the dark. */
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--ink); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 /* The stage: 1280×720, scaled to fit and centred by ui/Stage.tsx; the frame letterboxes it. */
 /* The frame is the scene's dark around the stage; neither may ever scroll (README: overflow: clip). */
@@ -20,7 +22,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--page);
 .stage {
   position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
   transform: translate(-50%, -50%); transform-origin: center; overflow: hidden; overflow: clip;
-  background: var(--page); color: var(--ink); font: 20px/1.3 system-ui, sans-serif;
+  background: var(--ink); color: var(--ink); font: 20px/1.3 system-ui, sans-serif;
 }
 
 button { font: inherit; cursor: pointer; }

@@ -8,7 +8,6 @@ import { memo, useEffect, useState } from 'react';
 import type { ContentIndex } from '../../core/index.ts';
 import { t } from '../i18n.ts';
 import { titlePhoto, titlePhotoNow } from '../desk/photo-preload.ts';
-import { STAGE_HEIGHT, STAGE_WIDTH } from '../Stage.tsx';
 import './title.css';
 
 /**
@@ -24,18 +23,16 @@ const FLASHES = [
   { x: 96, y: 66, r: 104, at: 12.8 },
 ] as const;
 
-/** The widest photograph drawn: a 4K screen's. */
-const WIDEST = 3840;
-
-/** The photograph, drawn once for the page at the stage's pixel size (until then the ink shows through). */
+/**
+ * The photograph, drawn once for the page at the stage's pixel size (until then the ink shows through). Requested as
+ * the app starts (round R5, B8: ui/main.tsx), so the title usually finds it drawn, or on its way.
+ */
 function useTitlePhoto(): string | null {
   const [url, setUrl] = useState<string | null>(titlePhotoNow);
   useEffect(() => {
     if (url) return;
     let live = true;
-    const box = document.querySelector('.stage')?.getBoundingClientRect();
-    const w = Math.round(Math.min(WIDEST, Math.max(STAGE_WIDTH / 4, (box?.width || STAGE_WIDTH) * (window.devicePixelRatio || 1))));
-    void titlePhoto(w, Math.round((w * STAGE_HEIGHT) / STAGE_WIDTH)).then((u) => {
+    void titlePhoto().then((u) => {
       if (live) setUrl(u);
     });
     return () => {

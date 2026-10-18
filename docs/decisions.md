@@ -74,6 +74,28 @@ rules).
   colours its threshold on a large pale card; a note's words are 7.8 px on
   four pastels, where the hype gold would read at 3.5–4.4:1 and the scandal
   red at 3.7–4.8:1, against 10.5:1 and more in ink.
+- **B8, nothing behind a screen is ever the page's cream.** html, body and
+  the stage took `--page` (#f4f1ea), which showed wherever nothing covered
+  the stage: the first paint, before the app mounts, and the awards night,
+  which fades in from opacity 0 over the stage and so came out of cream.
+  The page and the stage are ink (#15120e) now, and `--page` is gone;
+  index.html carries the ink inline, so it holds before the stylesheet
+  loads. desk:shots (every recorded state and a run's screens, 55 shots)
+  and desk:compare (13), before and after, pixel by pixel: no pixel of the
+  old cream changed anywhere, so nothing relied on it, and nothing needed
+  a background of its own. The title's photograph is requested as the app
+  starts (`titlePhoto()` takes its size from the window, which the stage
+  fits), no longer in the title's effect after mount, and the desk
+  photos' warm-up waits until it is drawn; the spotlight's 0.6 s arrival
+  and the name's develop are unchanged. Measured from navigation in
+  Chromium at 1280×720, the built game served locally (this machine
+  draws fast; the author's saw the name at 0.9 s): v0.4 painted cream at
+  152 ms, the name at 272 ms, the photograph from 364 ms, settled by
+  891 ms; now the first frame is ink (116 ms), the first not dark is the
+  title with its name (226 ms), the photograph from 318 ms, settled by
+  848 ms. From the last door: v0.4 showed two cream frames after the dark
+  (2136 ms) and the night faded in out of them; now the dark runs into the
+  night (954 ms on), which lights up out of it.
 
 ## 2026-10-18 — Round R5, Part A: the sound module, version 6
 
