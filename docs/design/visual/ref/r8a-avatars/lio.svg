@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Lio">
+<!-- Overexposed, R8a avatar "lio": drawn in code, flat colour; brows and nose only. -->
+<rect width="100" height="100" fill="#36296a"/>
+<circle cx="80" cy="24" r="26" fill="#4ad3e6" opacity=".22"/>
+<circle cx="18" cy="76" r="22" fill="#e04fa4" opacity=".18"/>
+<path d="M42.5 56 L42.5 74 Q50 80 57.5 74 L57.5 56 Z" fill="#dcab80"/>
+<path d="M12.0 100 C12.0 88 22.0 78 37 75 Q50 80 63 75 C78.0 78 88.0 88 88.0 100 Z" fill="#24232c"/>
+<path d="M36 76 C40 84 60 84 64 76" fill="none" stroke="#33323d" stroke-width="5"/>
+<path d="M44 82 L43 95 M56 82 L57 95" stroke="#d9d9e2" stroke-width="1.6" stroke-linecap="round"/>
+<ellipse cx="33.6" cy="46" rx="3.8" ry="5.4" fill="#efc49c"/><ellipse cx="66.4" cy="46" rx="3.8" ry="5.4" fill="#efc49c"/><path d="M33 43.6 Q31.6 46 33.2 48.4" fill="none" stroke="#d39e75" stroke-width="1.3" stroke-linecap="round"/><path d="M67 43.6 Q68.4 46 66.8 48.4" fill="none" stroke="#d39e75" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M33.5 43 C33.5 29 40.5 22.5 50 22.5 C59.5 22.5 66.5 29 66.5 43 C66.5 56 59.5 64.5 50 64.5 C40.5 64.5 33.5 56 33.5 43 Z" fill="#efc49c"/>
+<path d="M32.6 44 C31 28 39 19.5 50.5 19.5 C62 19.5 69.5 27 68.4 42 L66.6 41 C65.6 36 63.6 33 61 31.4 C56 36 46 38.6 36.4 38.4 C35 40 34.4 42 34.2 45 Z" fill="#18171d"/>
+<path d="M61 31.4 C58 36.4 52 40 44.6 40.6 C49.6 37.6 53 34.4 55.4 30.4 Z" fill="#18171d"/>
+<path d="M41 25.6 C46 22.8 55 22.6 60 25.4" fill="none" stroke="#3a3946" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M28 74 C28 62 72 62 72 74" fill="none" stroke="#2c2c35" stroke-width="3.4"/>
+<g><rect x="25" y="68" width="13" height="15" rx="6" fill="#2f2f39"/><rect x="62" y="68" width="13" height="15" rx="6" fill="#2f2f39"/><rect x="27.5" y="70.5" width="8" height="10" rx="4" fill="#4ad3e6"/><rect x="64.5" y="70.5" width="8" height="10" rx="4" fill="#4ad3e6"/></g>
+<g fill="#18171d" stroke="#18171d" stroke-width=".7" stroke-linejoin="round"><path d="M40.00 41.55 Q43.80 39.25 47.80 39.75 L47.80 42.65 Q43.80 41.15 40.00 42.45 Z"/><path d="M60.00 41.55 Q56.20 39.25 52.20 39.75 L52.20 42.65 Q56.20 41.15 60.00 42.45 Z"/></g>
+<path d="M50.6 46 Q48.8 50.8 50 52 Q51 52.6 52.2 51.8" fill="none" stroke="#c88f68" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -83,7 +83,7 @@
 :root[data-motion-resolved='reduced'] .desk .bub[data-k] { animation: bub-fade .2s ease-out backwards; }
 @keyframes bub-fade { from { opacity: 0; } }
 :root[data-motion='off'] .desk .bub[data-k] { animation: none; }
-.desk .bub.who { background: transparent; box-shadow: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
+.desk .bub.who { display: flex; align-items: center; gap: 7px; background: transparent; box-shadow: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
 .desk.crisis .bub { background: #5a1f1a; }
 .desk.crisis .bub.who { background: transparent; color: #ffb3a6; }
 .desk .rx { position: absolute; left: -9px; bottom: -12px; font-size: 12px; line-height: 1; background: #0f151b; border: 1px solid rgba(255, 255, 255, .2); border-radius: 10px; padding: 2px 4px; box-shadow: 0 3px 6px rgba(0, 0, 0, .5); animation: desk-rxPop .22s cubic-bezier(.3, 1.6, .5, 1); }

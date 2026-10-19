@@ -18,6 +18,7 @@ import {
   frontPages,
   getCard,
   getEvent,
+  getManager,
   issueNow,
   majorRequirements,
   managerMessages,
@@ -26,6 +27,7 @@ import {
   reduce,
   scandalCount,
   statTiers,
+  type AvatarId,
   type CardFace,
   type Condition,
   type ContentIndex,
@@ -187,6 +189,8 @@ export interface MessagesModel {
   /** The month the messages are for (round R3, C2: a bubble once shown stays until it ends). */
   readonly month: number;
   readonly from: string;
+  /** The manager's face (round R8a): it begins the name row. */
+  readonly avatar: AvatarId | null;
   /** This month's messages; a message's id is its month and its place in the month (README §5). */
   readonly messages: readonly { readonly id: string; readonly bubbles: readonly string[] }[];
   /** The tapback row: calm ❤️ 😂 👍, in a frenzy 💔 😭 👍. */
@@ -610,6 +614,7 @@ function messages(s: GameState, steps: readonly PlayedStep[], frenzy: boolean): 
     // The manager by their first name, as the mockup labels the bubbles ("Marguerite · Manager"): the full name
     // runs into the mirror's bulbs.
     from: t('ui.phone.from', { name: managerName(s.content, s.manager).split(/\s+/)[0] ?? '' }),
+    avatar: getManager(s.content, s.manager)?.avatar ?? null,
     messages: (month?.messages ?? []).map((m, i) => ({ id: `${month?.turn ?? s.turn}.${i}`, bubbles: messageBubbles(s.manager as string, m) })),
     reactions: t(frenzy ? 'ui.react.frenzy' : 'ui.react.calm').split(' '),
   };

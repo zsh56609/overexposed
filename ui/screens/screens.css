@@ -66,7 +66,11 @@
 .manager-choice .m-veteran .bcard { background: #141414; color: #e8dcc0; transform: rotate(-2.5deg); }
 .manager-choice .m-veteran .bcard::after { content: none; }
 .manager-choice .m-veteran .bcard::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(214, 180, 110, .4); pointer-events: none; }
-.manager-choice .bcard > span { display: block; }
+.manager-choice .bcard > span, .manager-choice .bcard .hd > span { display: block; }
+/* Each card's face (round R8a): 56 px at its top right, inside the card (right 22 px, top 20 px), its ring in the card's
+   own gold or brown. It floats, so the name, the role and the quote run beside it and wrap rather than under it. */
+.manager-choice .bcard .hd .face { float: right; margin: -2px -2px 8px 10px; --face-ring: rgba(154, 106, 58, .5); }
+.manager-choice .m-veteran .bcard .hd .face { --face-ring: rgba(214, 180, 110, .7); }
 .manager-choice .bcard .nm { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 700; font-size: 26px; line-height: 1.15; }
 .manager-choice .m-veteran .bcard .nm { font-family: 'Libre Franklin', system-ui, sans-serif; font-style: normal; font-weight: 800; font-size: 20px; letter-spacing: .22em; text-transform: uppercase; }
 .manager-choice .bcard .role { font-size: 10px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; opacity: .7; margin-top: 5px; }
@@ -187,7 +191,7 @@
 .awards-night .fp.red .h { color: #D92B1F; }
 .awards-night .fp .mini { position: absolute; right: 11px; bottom: 9px; width: 62px; height: 46px; object-fit: cover; }
 .awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 420px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
-.awards-night .lastword small { font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
+.awards-night .lastword small { display: flex; align-items: center; gap: 7px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
 .awards-night .lastword .bub { max-width: 420px; background: #1f2a35; color: #eef3f6; font-size: 12px; line-height: 1.35; padding: 7px 12px; border-radius: 12px 12px 12px 3px; box-shadow: 0 6px 12px rgba(0, 0, 0, .4); }
 /* The bottom block stands right-aligned on the front pages' right edge (round R4, A6): the mirror of the manager's last
    word, which stands on their left edge. Four pages of 226 px, 16 px apart, centred: 164 px in from either side. */
@@ -293,7 +297,9 @@
 .event-screen .phone-big { position: absolute; left: 470px; top: 22px; width: 340px; height: 624px; border-radius: 40px; background: #0b0d10; box-shadow: 0 0 0 3px #2a2d33, 0 30px 50px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); }
 .event-screen .ph-screen { position: absolute; inset: 12px; border-radius: 29px; background: #10151b; overflow: hidden; display: flex; flex-direction: column; }
 .event-screen .ph-top { flex: none; padding: 18px 16px 11px; border-bottom: 1px solid rgba(255, 255, 255, .08); display: flex; align-items: center; gap: 10px; color: #eef3f6; }
-.event-screen .ph-av { width: 34px; height: 34px; border-radius: 50%; background: #3b6ea5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex: none; }
+.event-screen .ph-av { width: 40px; height: 40px; border-radius: 50%; background: #3b6ea5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex: none; }
+/* The sender's face (round R8a): the portrait fills the circle, its ring faint on the dark header. */
+.event-screen .ph-av.has-face { background: none; --face-ring: rgba(255, 255, 255, .1); }
 .event-screen .ph-top b { display: block; font-size: 14px; }
 .event-screen .ph-top small { display: block; font-size: 10.5px; color: #8fa1b2; }
 .event-screen .thread { flex: 1; min-height: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }

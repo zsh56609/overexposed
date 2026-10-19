@@ -6,6 +6,7 @@
 // metronome, the phone's buzz — and V1b adds the rest.
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { Face } from '../Face.tsx';
 import { isPlaceholder } from '../text.ts';
 import { composeTransforms, motionMode, useMotionMode } from '../motion.ts';
 import { cue } from '../sound/sound.ts';
@@ -443,7 +444,10 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
   if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box} />;
   return (
     <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box}>
-      <div className="bub who">{messages.from}</div>
+      <div className="bub who">
+        {messages.avatar && <Face id={messages.avatar} size={22} />}
+        <span>{messages.from}</span>
+      </div>
       {list.map(({ k, text }) => {
           const mine = rx.get(k);
           return (

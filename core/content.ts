@@ -23,6 +23,13 @@ export type CardFace = (typeof CARD_FACES)[number];
 export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy', 'tvshow', 'studio', 'arena', 'podium'] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
+/**
+ * The faces (round R8a; docs/design/visual/ref/r8a-avatars/, drawn into ui/avatars.ts): the people who text the
+ * player, and the managers. A text's speaker and a manager name one; a letter has none — its letterhead is its face.
+ */
+export const AVATAR_IDS = ['mum', 'sam', 'alex', 'juno', 'lio', 'priya', 'dana', 'photographer', 'veteran', 'guardian'] as const;
+export type AvatarId = (typeof AVATAR_IDS)[number];
+
 /** The seasons the scene can light (round V1a; docs/design/visual/README.md): one per act, in content. */
 export const SEASON_IDS = ['spring', 'summer', 'autumn', 'winter'] as const;
 export type SeasonId = (typeof SEASON_IDS)[number];
@@ -458,6 +465,8 @@ export interface ManagerDef {
   readonly quoteKey: string;
   readonly descriptionKey: string;
   readonly tagKey: string;
+  /** Their face (round R8a): on their business card, beside their name above the bubbles and on the awards night. */
+  readonly avatar: AvatarId;
   readonly perk: ManagerPerk;
   /** The choice screen's sample message and its label. */
   readonly sample: { readonly labelKey: string; readonly key: string };
@@ -688,6 +697,8 @@ export type EventPressKind = (typeof EVENT_PRESS_KINDS)[number];
 export interface EventSpeakerDef {
   readonly nameKey?: string;
   readonly labelKey?: string;
+  /** A text's sender's face (round R8a), in the phone's header. A letter has none: its letterhead is its face. */
+  readonly avatar?: AvatarId;
   /** A letter on a paper's letterhead: its masthead heads the letter, the letterhead key names the desk. */
   readonly paper?: string;
   readonly letterheadKey?: string;

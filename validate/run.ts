@@ -3,7 +3,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
-import { CHECKS, checkBoundaries, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { AVATAR_IDS } from '../core/index.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -20,6 +21,12 @@ try {
 issues.push(...checkBoundaries(readSources(SOURCE_DIRS)));
 const text = (path: string) => (existsSync(join(ROOT, path)) ? readFileSync(join(ROOT, path), 'utf8') : null);
 issues.push(...checkSoundModule(text('docs/design/sound/overexposed-sound.js'), text('ui/sound/oxsound.js')));
+// The faces (round R8a): the strings ui/avatars.ts holds, against the author's files.
+const faces = await import('../ui/avatars.ts').then(
+  (m: { AVATARS: Readonly<Record<string, string>> }) => m.AVATARS,
+  () => null,
+);
+issues.push(...checkAvatars(Object.fromEntries(AVATAR_IDS.map((id) => [id, text(`docs/design/visual/ref/r8a-avatars/${id}.svg`)])), faces));
 
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');

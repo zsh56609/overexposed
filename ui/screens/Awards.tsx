@@ -5,9 +5,10 @@
 // folded away. Everything comes from content and /core; no rule is computed here.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getMajor, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState } from '../../core/index.ts';
+import { getMajor, getManager, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
 import { recordAwards, recordEnding } from '../collection.ts';
+import { Face } from '../Face.tsx';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
@@ -97,6 +98,8 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
   const rival = rivalArc(c, s.seed);
   const last = lastWord(s);
+  // The manager's face begins the last word's name row (round R8a), 22 px, as on the desk.
+  const lastFace = last ? getManager(c, last.manager)?.avatar : undefined;
   const delay = (sec: number) => ({ animationDelay: `${sec}s` });
   return (
     <div
@@ -175,7 +178,10 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
       </div>
       {last && (
         <div className="lastword rv" style={delay(4.6)}>
-          <small>{t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })}</small>
+          <small>
+            {lastFace && <Face id={lastFace} size={22} />}
+            {t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })}
+          </small>
           {last.bubbles.map((key) => (
             <div key={key} className={prose(t(key), 'bub')}>
               {t(key)}

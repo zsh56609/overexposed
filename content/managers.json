@@ -8,6 +8,7 @@
       "quoteKey": "manager.veteran.quote",
       "descriptionKey": "manager.veteran.description",
       "tagKey": "manager.veteran.tag",
+      "avatar": "veteran",
       "perk": {
         "nameKey": "manager.veteran.perk.name",
         "effectKey": "manager.veteran.perk.effect.d2",
@@ -59,6 +60,7 @@
       "quoteKey": "manager.guardian.quote",
       "descriptionKey": "manager.guardian.description",
       "tagKey": "manager.guardian.tag",
+      "avatar": "guardian",
       "perk": {
         "nameKey": "manager.guardian.perk.name",
         "effectKey": "manager.guardian.perk.effect.m1",

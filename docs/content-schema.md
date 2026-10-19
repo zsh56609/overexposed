@@ -202,8 +202,10 @@ Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
 - `choice`: the choice screen's `kickerKey`, `titleKey`, `subtitleKey`,
   `footerKey`.
 - `managers`: `id`, `nameKey`, `roleKey`, `quoteKey`, `descriptionKey`,
-  `tagKey`; `sample` (`labelKey`, `key`), the choice screen's sample text;
-  `perk`, and `lines`.
+  `tagKey`; `avatar` (round R8a), their face — on their business card,
+  beside their name above the bubbles, on the awards night; `sample`
+  (`labelKey`, `key`), the choice screen's sample text; `perk`, and
+  `lines`.
 - `perk`: `nameKey`, `effectKey` (its rule, plain like a card's), and what
   it does — data the engine applies:
   - `extraOffer` (round 2c): N more cards on every draft offer, drawn
@@ -288,9 +290,17 @@ a `{ nameKey, lineKey }` for each of `personal`, `industry`, `press`,
 - `id`; `category`; `form` — `text` (the phone: up to three bubbles) or
   `letter` (up to four paragraphs); `titleKey` (a text's caption title; a
   letter has none).
-- `speaker`: a text's `nameKey` and optional `labelKey`; a letter's
+- `speaker`: a text's `nameKey`, optional `labelKey` and `avatar` (round
+  R8a), the sender's face in the phone's header; a letter's
   `letterheadKey` (the desk on a paper's letterhead, with `paper`; or the
-  house, in plain serif) and `signoffKey`.
+  house, in plain serif) and `signoffKey` — and no `avatar`: its
+  letterhead is its face.
+
+An `avatar` is one of the closed list in `core/content.ts`, `AVATAR_IDS`:
+`mum`, `sam`, `alex`, `juno`, `lio`, `priya`, `dana`, `photographer`,
+`veteran`, `guardian` — the author's portraits
+(`docs/design/visual/ref/r8a-avatars/`), held unchanged as strings in
+`ui/avatars.ts`, never image files.
 - `chain` (optional): `{ id, role }`, `opener` or `followUp`. A chain has
   one opener; a follow-up reads the flag its opener's answer set.
 - `when`: `months` `{ from, to? }` (inclusive; `to` defaults to the
@@ -334,6 +344,7 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - opportunity cards in the starting deck; an act with an empty draft pool
 - awards: fields, conditions, ending ids, a fallback award, at most 8
 - events: months, speaker and form, chains (one opener each), conditions, lanes, rival arcs (ids in `press.rival.arcs`), a weight from 1 to 5, messages and choices (one with no requirement), the event budget
+- the faces (round R8a): every text's speaker and every manager names an `avatar` in `AVATAR_IDS`, a letter none; `ui/avatars.ts` holds one portrait for each, equal to its file in `docs/design/visual/ref/r8a-avatars/`, on a 100×100 box, their ids unique across the ten
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
 - variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)

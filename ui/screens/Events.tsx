@@ -14,6 +14,7 @@ import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import { previewEventChoice, type EventChoicePreview, type Legal, type LinesSoFar } from '../preview.ts';
 import type { BeatKind } from '../timeline.ts';
+import { Face } from '../Face.tsx';
 import { calendarLabel, mastheadName } from '../text.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
 import { cue } from '../sound/sound.ts';
@@ -177,7 +178,8 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
       <div className="phone-big">
         <div className="ph-screen">
           <div className="ph-top">
-            <div className="ph-av">{Array.from(name)[0] ?? ''}</div>
+            {/* Their face (round R8a); a sender without one keeps the initial. */}
+            <div className={`ph-av${ev.speaker.avatar ? ' has-face' : ''}`}>{ev.speaker.avatar ? <Face id={ev.speaker.avatar} size={40} /> : (Array.from(name)[0] ?? '')}</div>
             <div>
               <b>{name}</b>
               {label && <small>{label}</small>}

@@ -6,6 +6,35 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a, Part B: faces
+
+- The people who text the player and the managers get faces (the author's
+  ten portraits, `docs/design/visual/ref/r8a-avatars/`): in colour, never
+  newsprint grey, with brows and a nose but no eyes or mouth. Mum is a
+  sunflower — her own photo is her garden, and the player's family stays
+  unpictured; the photographer is the phone's grey placeholder, the number
+  never saved; Dex and Mags wear their business cards' colours.
+- They are code, not files in the zip (AGENTS.md §6; the favicon was inlined
+  for the same reason): `ui/avatars.ts` holds the ten SVGs unchanged, as
+  strings; `ui/Face.tsx` shows one as an image from a data URI with an empty
+  alt (a name is always printed beside it), in a circle with a 1 px ring
+  whose colour is the place's. A new validate check, "the faces", holds each
+  string equal to its file, on a 100×100 box, and their ids unique across
+  the ten.
+- Content says whose face: a text's `speaker.avatar` and each manager's
+  `avatar`, ids from a closed list in `core/content.ts` (`AVATAR_IDS`), as
+  `SCENE_IDS` is. Validate: every text's speaker has one, every one named
+  exists, and a letter has none — its letterhead is its face.
+- Where they show: a text's phone header (40 px, from the 34 px initial,
+  ring `rgba(255,255,255,.1)`); the bubbles' name row (22 px, 7 px before
+  "Marguerite · Manager", the row still right-aligned; in a frenzy only the
+  name changes colour); each business card's top right (56 px, right 22 px,
+  top 20 px, ring `rgba(214,180,110,.7)` on Dex's, `rgba(154,106,58,.5)` on
+  Mags's) — it floats, so the name, the role and the quote wrap beside it,
+  and check:overflow's plain-screen audit now fails a card whose text runs
+  under its face, measured with the card's tilt off; and the awards night's
+  last word (22 px, as on the desk). "How he texts" stays as it is.
+
 ## 2026-10-20 — Round R8a, Part A: the photographs (R7b)
 
 - R7b's drawings merged: `ui/desk/halftone.ts` had not changed since

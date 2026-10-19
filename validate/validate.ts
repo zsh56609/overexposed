@@ -27,6 +27,7 @@ import {
   COUNTDOWN_LEVELS,
   EVENT_CATEGORIES,
   EVENT_FORMS,
+  AVATAR_IDS,
   EVENT_PRESS_KINDS,
   PROMINENCES,
   REGISTERS,
@@ -55,6 +56,7 @@ export const CHECKS = {
   budget: 'content budget (ceilings)',
   boundaries: 'code boundaries (CLAUDE.md §0)',
   sound: "the sound module: the author's, copied unchanged",
+  avatars: "the faces: the author's ten portraits, unchanged",
 } as const;
 export type CheckId = keyof typeof CHECKS;
 
@@ -1477,7 +1479,12 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
 // engine applies — and a line group per message trigger.
 
 const MANAGERS_FIELDS = ['choice', 'managers', 'messages'];
-const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
+const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'avatar', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
+
+/** A face (round R8a): one of the portraits in core/content.ts's closed list, AVATAR_IDS. */
+function checkAvatar(v: Ctx, x: unknown, where: string): void {
+  if (!(AVATAR_IDS as readonly unknown[]).includes(x)) v.error('references', where, `must be one of ${AVATAR_IDS.join(', ')}, got ${q(x)}`);
+}
 const PERK_FIELDS = ['nameKey', 'effectKey', 'freeRerollsPerAct', 'freeRerollKey', 'extraOffer', 'extraOfferKey', 'monthEnd', 'monthEndKeys', 'monthEndTurns'];
 const MESSAGES_FIELDS = ['perMonth', 'priority', 'highFrom', 'knownAxis', 'signedFlag', 'viralFlag', 'stuck', 'hard', 'quietAfter'];
 
@@ -1519,6 +1526,8 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
   const managers = checkList(v, raw.managers, `${file} managers`, 'manager', (m, where) => {
     v.fields(m, MANAGER_FIELDS, where);
     for (const f of ['nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey'] as const) v.key(m[f], `${where}.${f}`);
+    // Their face (round R8a): on their card, beside their name above the bubbles, on the awards night.
+    checkAvatar(v, m.avatar, `${where}.avatar`);
     const sample = m.sample;
     if (!isObj(sample)) v.error('schema', `${where}.sample`, 'must be { labelKey, key }');
     else {
@@ -1702,10 +1711,12 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
     const sp = isObj(e.speaker) ? e.speaker : null;
     if (!sp) v.error('schema', `${where}.speaker`, 'must be an object');
     else {
-      v.fields(sp, ['nameKey', 'labelKey', 'paper', 'letterheadKey', 'signoffKey'], `${where}.speaker`);
+      v.fields(sp, ['nameKey', 'labelKey', 'avatar', 'paper', 'letterheadKey', 'signoffKey'], `${where}.speaker`);
       if (e.form === 'text') {
         v.key(sp.nameKey, `${where}.speaker.nameKey`);
         if (sp.labelKey !== undefined) v.key(sp.labelKey, `${where}.speaker.labelKey`);
+        // Every text's sender has a face (round R8a), in the phone's header.
+        checkAvatar(v, sp.avatar, `${where}.speaker.avatar`);
         if (sp.paper !== undefined || sp.letterheadKey !== undefined || sp.signoffKey !== undefined) v.error('schema', `${where}.speaker`, 'a text has a sender, not a letterhead');
         v.key(e.titleKey, `${where}.titleKey`);
       } else if (e.form === 'letter') {
@@ -1713,6 +1724,7 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
         v.key(sp.signoffKey, `${where}.speaker.signoffKey`);
         if (sp.paper !== undefined && !paperIds.has(sp.paper as string)) v.error('references', `${where}.speaker.paper`, `no paper with id ${q(sp.paper)}`);
         if (sp.nameKey !== undefined || sp.labelKey !== undefined) v.error('schema', `${where}.speaker`, 'a letter has a letterhead and a sign-off, not a sender');
+        if (sp.avatar !== undefined) v.error('schema', `${where}.speaker.avatar`, 'a letter has no face: its letterhead is its face');
         if (e.titleKey !== undefined) v.error('schema', `${where}.titleKey`, 'a letter has no caption: its letterhead and date line head it');
       }
     }
@@ -1849,6 +1861,39 @@ export function checkSoundModule(reference: string | null, copy: string | null):
   const norm = (text: string) => text.replace(/\r\n/g, '\n').replace(/\n*$/, '\n');
   if (norm(copy) !== `${norm(reference)}export { OXSound };\n`) return err('differs from docs/design/sound/overexposed-sound.js beyond its added last line: copy the reference again');
   return [];
+}
+
+/**
+ * The faces (round R8a): ui/avatars.ts holds the author's portraits, docs/design/visual/ref/r8a-avatars/<id>.svg, one
+ * for each of core's AVATAR_IDS and no more, unchanged — line endings aside, each agrees with its file — each drawn on
+ * a 100×100 box, and their ids unique across the ten.
+ */
+export function checkAvatars(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
+  const issues: Issue[] = [];
+  const err = (where: string, message: string) => issues.push({ level: 'error', check: 'avatars', where, message });
+  if (copies === null) {
+    err('ui/avatars.ts', 'missing: the faces, the reference files as strings');
+    return issues;
+  }
+  const norm = (text: string) => text.replace(/\r\n/g, '\n');
+  for (const id of AVATAR_IDS) {
+    const reference = references[id] ?? null;
+    const copy = copies[id];
+    const where = `ui/avatars.ts ${id}`;
+    if (reference === null) err(where, `docs/design/visual/ref/r8a-avatars/${id}.svg, the reference, is missing`);
+    else if (copy === undefined) err(where, 'missing: copy its reference here');
+    else if (norm(copy) !== norm(reference)) err(where, `differs from docs/design/visual/ref/r8a-avatars/${id}.svg: copy the reference again`);
+    if (copy !== undefined && !/^<svg[^>]*\sviewBox="0 0 100 100"/.test(copy)) err(where, 'must be drawn on a 100×100 box (viewBox="0 0 100 100")');
+  }
+  for (const id of Object.keys(copies)) if (!(AVATAR_IDS as readonly string[]).includes(id)) err(`ui/avatars.ts ${id}`, `no face ${q(id)} in core's AVATAR_IDS`);
+  const owners = new Map<string, string>();
+  for (const [id, svg] of Object.entries(copies))
+    for (const m of svg.matchAll(/\sid="([^"]+)"/g)) {
+      const was = owners.get(m[1] as string);
+      if (was !== undefined) err(`ui/avatars.ts ${id}`, `id ${q(m[1])} is ${was}'s too: ids are unique across the faces`);
+      else owners.set(m[1] as string, id);
+    }
+  return issues;
 }
 
 export function checkBoundaries(files: readonly { readonly path: string; readonly text: string }[]): Issue[] {

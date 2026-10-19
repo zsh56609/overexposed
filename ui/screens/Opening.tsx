@@ -5,6 +5,7 @@
 import { useLayoutEffect } from 'react';
 import type { Action, GameState } from '../../core/index.ts';
 import { glowPhone } from '../desk/DeskItems.tsx';
+import { Face } from '../Face.tsx';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { Legal } from '../preview.ts';
@@ -40,9 +41,13 @@ export function ManagerScreen({ s, legal, act, beats = [], chosen: signed = null
         {m.managers.map((mg) => (
           <div key={mg.id} className={`biz m-${mg.id}${chosen === mg.id ? ` chosen${following ? ' gone' : ''}` : away ? ' gone' : ''}`}>
             <button className="bcard choose" data-manager={mg.id} disabled={!legal.managers.has(mg.id)} onClick={() => choose(mg.id)}>
-              <span className="nm">{t(mg.nameKey)}</span>
-              <span className="role">{t(mg.roleKey)}</span>
-              <span className="q">{t(mg.quoteKey)}</span>
+              {/* Their face at the card's top right (round R8a): the name, the role and the quote wrap beside it. */}
+              <span className="hd">
+                <Face id={mg.avatar} size={56} />
+                <span className="nm">{t(mg.nameKey)}</span>
+                <span className="role">{t(mg.roleKey)}</span>
+                <span className="q">{t(mg.quoteKey)}</span>
+              </span>
               <span className="desc">{t(mg.descriptionKey)}</span>
               <span className="perk">
                 <b>{t(mg.perk.nameKey)}</b>

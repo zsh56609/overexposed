@@ -187,6 +187,22 @@ const PLAIN = `window.__plainAudit = (where) => {
   }
   const foot = document.querySelector('.p-credits .ver');
   if (foot && lines(foot) > 1) add('the credits\\' foot wraps:' + text(foot));
+  // The business cards' faces (round R8a): no text on a card runs under its face — the name, the role and the quote
+  // wrap beside it. Measured with the card's own tilt off, so a line's box is the line itself, then the tilt put back.
+  for (const card of document.querySelectorAll('.manager-choice .bcard')) {
+    const face = card.querySelector('.face');
+    if (!face) { add('a business card without its face'); continue; }
+    const was = [card.style.transform, card.style.transition];
+    card.style.transition = 'none';
+    card.style.transform = 'none';
+    const f = face.getBoundingClientRect();
+    for (const el of card.querySelectorAll('.nm, .role, .q, .desc, .perk, .tag')) {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      if ([...range.getClientRects()].some((b) => b.width >= 1 && b.right > f.left + 0.5 && b.left < f.right - 0.5 && b.bottom > f.top + 0.5 && b.top < f.bottom - 0.5)) add('a business card\\'s text runs under its face:' + text(el));
+    }
+    [card.style.transform, card.style.transition] = was;
+  }
   return out;
 };`;
 

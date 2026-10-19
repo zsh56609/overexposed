@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Marguerite Ashby">
+<!-- Overexposed, R8a avatar "guardian": drawn in code, flat colour; brows and nose only. -->
+<rect width="100" height="100" fill="#f1e5cc"/>
+<circle cx="84" cy="80" r="26" fill="#e8d7b6" opacity=".8"/>
+<circle cx="33" cy="52" r="7.6" fill="#aaa59f"/>
+<circle cx="67" cy="52" r="7.6" fill="#aaa59f"/>
+<circle cx="31.4" cy="42" r="8.6" fill="#aaa59f"/>
+<circle cx="68.6" cy="42" r="8.6" fill="#aaa59f"/>
+<circle cx="35" cy="31.6" r="9" fill="#aaa59f"/>
+<circle cx="65" cy="31.6" r="9" fill="#aaa59f"/>
+<circle cx="43" cy="24.4" r="9.2" fill="#aaa59f"/>
+<circle cx="57" cy="24.4" r="9.2" fill="#aaa59f"/>
+<circle cx="50" cy="22.4" r="9" fill="#aaa59f"/>
+<path d="M42.5 56 L42.5 74 Q50 80 57.5 74 L57.5 56 Z" fill="#e2b495"/>
+<path d="M12.0 100 C12.0 88 22.0 79 37 76 Q50 81 63 76 C78.0 79 88.0 88 88.0 100 Z" fill="#8fa982"/>
+<path d="M44 78 L50 100 L56 78 Z" fill="#f4efe4"/>
+<path d="M36 74 C42 80 58 80 64 74 C66 78 64 82 60 83 C54 85 46 85 40 83 C36 82 34 78 36 74 Z" fill="#c8623a"/>
+<path d="M53 82 L58 97 L51.4 96 L49 83 Z" fill="#b2532e"/>
+<path d="M40 79 Q50 82.6 60 79" fill="none" stroke="#a9492a" stroke-width="1.2"/>
+<ellipse cx="33.6" cy="46" rx="3.8" ry="5.4" fill="#f2ccb0"/><ellipse cx="66.4" cy="46" rx="3.8" ry="5.4" fill="#f2ccb0"/><path d="M33 43.6 Q31.6 46 33.2 48.4" fill="none" stroke="#d9a585" stroke-width="1.3" stroke-linecap="round"/><path d="M67 43.6 Q68.4 46 66.8 48.4" fill="none" stroke="#d9a585" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M33.5 43 C33.5 29 40.5 22.5 50 22.5 C59.5 22.5 66.5 29 66.5 43 C66.5 56 59.5 64.5 50 64.5 C40.5 64.5 33.5 56 33.5 43 Z" fill="#f2ccb0"/>
+<circle cx="38.4" cy="31.2" r="6.4" fill="#cbc7c2"/>
+<circle cx="45.6" cy="27.6" r="6.6" fill="#cbc7c2"/>
+<circle cx="53.6" cy="27.4" r="6.6" fill="#cbc7c2"/>
+<circle cx="61" cy="30.6" r="6.2" fill="#cbc7c2"/>
+<circle cx="34.8" cy="38.6" r="4.4" fill="#cbc7c2"/>
+<circle cx="65.4" cy="38" r="4.4" fill="#cbc7c2"/>
+<path d="M40.4 30 Q43.4 27.4 47 28.4 M51.8 26 Q55.4 25.2 58.4 27.6" fill="none" stroke="#aaa59f" stroke-width="1.4" stroke-linecap="round"/>
+<g fill="#ec9f86" opacity="0.38"><ellipse cx="40.5" cy="53" rx="4.2" ry="2.6"/><ellipse cx="59.5" cy="53" rx="4.2" ry="2.6"/></g>
+<g fill="#8f8982" stroke="#8f8982" stroke-width=".7" stroke-linejoin="round"><path d="M39.80 37.95 Q43.20 33.30 47.80 34.25 L47.80 36.95 Q43.20 35.10 39.80 38.85 Z"/><path d="M60.20 37.95 Q56.80 33.30 52.20 34.25 L52.20 36.95 Q56.80 35.10 60.20 38.85 Z"/></g>
+<g fill="none" stroke="#6b4429" stroke-width="2"><circle cx="42.6" cy="45" r="5.6"/><circle cx="57.4" cy="45" r="5.6"/><path d="M48.2 44.4 Q50 43.2 51.8 44.4"/><path d="M37 44 L34 43 M63 44 L66 43"/></g>
+<path d="M48.4 50.4 Q50 52.4 51.8 50.4" fill="none" stroke="#cd9476" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -31,6 +31,8 @@ h1, h2, h3, p { margin: 0; }
 h1 { font-size: 1.6em; }
 h2, h3 { font-size: 1em; }
 ul, ol { margin: 0; padding-left: 1.1em; }
+/* A face (round R8a; ui/Face.tsx): a portrait in a circle, its 1 px ring the place's own colour. */
+.face { display: block; flex: none; border-radius: 50%; box-shadow: 0 0 0 1px var(--face-ring, rgba(255, 255, 255, .1)); }
 /* Prose the author has not written yet: visible, never silent (decision 15). */
 .placeholder { color: var(--muted); font-style: normal; font-weight: normal; outline: 1px dashed var(--muted); outline-offset: 1px; }
 
