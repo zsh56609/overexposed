@@ -19,6 +19,7 @@ import {
   getCard,
   getEvent,
   getManager,
+  SCENE_DRAWINGS,
   issueNow,
   majorRequirements,
   managerMessages,
@@ -79,8 +80,8 @@ import {
   zoneName,
 } from '../text.ts';
 
-/** How many drawings each photograph scene has (README §2: several variants of the same drawing). */
-export const PHOTO_VARIANTS = 3;
+/** How many drawings each photograph scene has (README §2: several variants of the same drawing): core's. */
+export const PHOTO_VARIANTS = SCENE_DRAWINGS;
 
 export type LaneClass = 'music' | 'screen' | 'celebrity' | 'early';
 export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'cards' | 'gear' | 'bulb';
@@ -214,10 +215,12 @@ export interface DeskLabels {
 }
 
 export interface ValueChip {
-  /** `flag`: what the card marks the player as ("Went viral"), in the flag's own words. */
-  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'scandal' | 'action' | 'text';
+  /** `flag`: what the card marks the player as ("Went viral"), in the flag's own words; `add`: a card added. */
+  readonly kind: 'hype' | 'craft' | 'heat' | 'gain' | 'cost' | 'draw' | 'flag' | 'scandal' | 'action' | 'text' | 'add';
   readonly icon: IconId | null;
   readonly text: string;
+  /** Before the icon (round R8a): a card added's sign, "+" or "+2×". */
+  readonly lead?: string;
 }
 
 /**
@@ -655,10 +658,16 @@ export function craftLane(c: ContentIndex, cardId: string, career: string | null
 const capitalised = (text: string): string => text.charAt(0).toLocaleUpperCase('en') + text.slice(1);
 
 /**
+ * A card added that is no scandal (round R8a, D1): a short chip, not a sentence — "+", the cards icon, the card's name;
+ * "+2×" for more. The same on the faces, the replies, the previews and the doors; a scandal added keeps its newspaper.
+ */
+export const addChip = (c: ContentIndex, cardId: string, count: number): ValueChip => ({ kind: 'add', lead: count > 1 ? `+${count}×` : '+', icon: 'cards', text: cardName(c, cardId) });
+
+/**
  * One effect as value chips (round V1a, 0.3; every number an icon and a number since round R1, H2): a resource in
- * its colour — craft's icon the stat bar's, by the established lane; drawing "Draw N"; scandals removed as the
- * countdown's newspaper in scandal red; a flag set in its own words; what is no number in a short phrase of the
- * existing words ("Remove a Stunt card", "Add a Studio Session to your discard pile").
+ * its colour — craft's icon the stat bar's, by the established lane; drawing "Draw N"; scandals removed or added as the
+ * countdown's newspaper in scandal red; a card added as its chip (round R8a); a flag set in its own words; what is no
+ * number in a short phrase of the existing words ("Remove a Stunt card").
  */
 function effectChip(c: ContentIndex, e: Effect, lane: string | null, self?: string): ValueChip[] {
   switch (e.op) {
@@ -678,7 +687,8 @@ function effectChip(c: ContentIndex, e: Effect, lane: string | null, self?: stri
       return [{ kind: 'text', icon: null, text: tp('ui.face.exhaust', e.count ?? 1, { count: e.count ?? 1, tag: capitalised(tagName(e.tag)) }) }];
     case 'addCard':
       if (e.cardId === self) return [{ kind: 'text', icon: null, text: capitalised(t('ui.effect.copySelf', { zone: zoneName(e.to) })) }];
-      return [{ kind: 'text', icon: null, text: tp('ui.face.add', e.count ?? 1, { count: e.count ?? 1, card: cardName(c, e.cardId), zone: zoneName(e.to) }) }];
+      if (getCard(c, e.cardId)?.kind === 'scandal') return [scandalChip(e.count ?? 1)];
+      return [addChip(c, e.cardId, e.count ?? 1)];
     case 'conditional':
       return [{ kind: 'text', icon: null, text: capitalised(effectText(c, e, self)) }];
   }
@@ -800,7 +810,10 @@ export function outcomeChips(c: ContentIndex, o: Outcome, lane: string | null, o
   const removed = o.exhausted.filter(scandal).length;
   if (added) chips.push(scandalChip(added));
   if (removed) chips.push(scandalChip(-removed));
-  for (const a of o.added) if (!scandal(a.cardId)) words.push(tp('ui.face.add', 1, { count: 1, card: cardName(c, a.cardId), zone: zoneName(a.to) }));
+  // The cards added that are no scandal, each card once, with how many (round R8a, D1).
+  const cards = new Map<string, number>();
+  for (const a of o.added) if (!scandal(a.cardId)) cards.set(a.cardId, (cards.get(a.cardId) ?? 0) + 1);
+  for (const [cardId, n] of cards) chips.push(addChip(c, cardId, n));
   for (const id of o.exhausted) if (!scandal(id)) words.push(t('ui.preview.exhausted', { card: cardName(c, id) }));
   if (opts.flags !== false) for (const f of o.flags) words.push(t('ui.preview.flag', { flag: flagName(f) }));
   return { chips, words };

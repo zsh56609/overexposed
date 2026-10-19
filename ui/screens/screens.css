@@ -29,6 +29,9 @@
 /* ---------------------------------------------------------------- A season's card (round R3, A2–A3)
    The month and year, the season, its opener — or spring's opening — over the dimmed desk; it waits for its button. */
 .scr.season-card { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #EDE6D6; padding: 0 160px 24px; }
+/* The season's photograph (round R8a, D2): an oval of 400×200 above the date, its scene light on ink, drawn at 560×200
+   and showing its middle 400; rings from the inside: 1.5 px of cream, 5 px of ink, 1 px of fainter cream. */
+.scr.season-card .sc-photo { flex: none; width: 400px; height: 200px; border-radius: 50%; margin-bottom: 26px; background: #15120E center / 560px 200px no-repeat; box-shadow: 0 0 0 1.5px rgba(237, 230, 214, .55), 0 0 0 6.5px #15120E, 0 0 0 7.5px rgba(237, 230, 214, .25); }
 .scr.season-card small { font-size: 10px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; color: #ffcf85; margin-bottom: 12px; }
 .scr.season-card h2 { margin: 0; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 64px; line-height: 1; }
 .scr.season-card p { margin: 14px 0 0; max-width: 600px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.45; color: #d9cdb8; }
@@ -103,7 +106,7 @@
 .scr .r-heat { color: var(--val-heat); }
 .scr .r-gain { color: var(--val-gain); }
 .scr .r-cost { color: var(--val-cost); }
-.scr .r-draw, .scr .r-text, .scr .r-flag { color: inherit; }
+.scr .r-draw, .scr .r-text, .scr .r-flag, .scr .r-add { color: inherit; }
 .scr .ic { width: 12px; height: 12px; flex: none; }
 
 /* ---------------------------------------------------------------- The offers (shot 15) */
@@ -126,11 +129,17 @@
 .offers .have { font-size: 11px; color: #bfb3a0; letter-spacing: .04em; }
 
 /* ---------------------------------------------------------------- The season's doors (shots 16, 17) */
-.doors .grow { position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; align-items: flex-start; gap: 56px; }
-.doors .inv { position: relative; width: 384px; min-height: 300px; background: #f6f0e2; color: #1c1712; padding: 26px 30px 22px; cursor: pointer; box-shadow: inset 0 0 0 7px #f6f0e2, inset 0 0 0 8px #b8924a, inset 0 0 0 11px #f6f0e2, inset 0 0 0 12px #b8924a, 0 18px 30px rgba(0, 0, 0, .6); transition: transform .3s ease, opacity .4s; }
+/* The two doors are always the same height (round R8a, D1): the row stretches the shorter to the taller, and each has a
+   floor — the height of one with two lines of flavour, one requirement and one line of branches — so most doors of the
+   year are one size and only the year's last, with their ending and awards lines, grow. */
+.doors .grow { position: absolute; left: 0; right: 0; top: 150px; display: flex; justify-content: center; align-items: stretch; gap: 56px; }
+.doors .inv { position: relative; width: 384px; min-height: 350px; background: #f6f0e2; color: #1c1712; padding: 26px 30px 22px; cursor: pointer; box-shadow: inset 0 0 0 7px #f6f0e2, inset 0 0 0 8px #b8924a, inset 0 0 0 11px #f6f0e2, inset 0 0 0 12px #b8924a, 0 18px 30px rgba(0, 0, 0, .6); transition: transform .3s ease, opacity .4s; }
 .doors .inv:nth-child(1) { transform: rotate(-1.4deg); }
 .doors .inv:nth-child(2) { transform: rotate(1.2deg); }
 .doors:not(.done) .inv:hover, .doors:not(.done) .inv:focus-visible { transform: rotate(0) translateY(-8px); }
+/* Every door's photograph (round R8a, D1): an oval above "You're invited", its scene printed as the papers print theirs,
+   filling the oval at 300 px wide; framed as the invitation is — 1 px of gold, 3 px of the card's cream, 1 px of gold. */
+.doors .inv .ivp { width: 164px; height: 96px; margin: 0 auto 14px; border-radius: 50%; border: 1px solid #b8924a; box-shadow: 0 0 0 3px #f6f0e2, 0 0 0 4px #b8924a; background: #ece6d9 50% 46% / 300px auto no-repeat; }
 .doors .inv .ivk { font-size: 9px; font-weight: 800; letter-spacing: .26em; text-transform: uppercase; color: #9a7433; text-align: center; }
 .doors .inv .ivt { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 30px; text-align: center; margin-top: 4px; line-height: 1.05; }
 .doors .inv .ivf { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 13px; line-height: 1.35; text-align: center; margin: 8px 4px 0; color: #4a4136; }

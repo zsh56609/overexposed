@@ -6,6 +6,45 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a, Part D: doors and seasons
+
+- D1, every door has a photograph: an oval of 164×96 above "You're
+  invited", its scene printed as the papers print theirs (`photoUrl`, the
+  papers' cell — the warm-up has drawn them all), filling the oval at
+  300 px wide, framed as the invitation is. Content names it: each gate's
+  `photo`, `{ scene, drawing }`, as the author set them; `SCENE_DRAWINGS`
+  (3) moves to `core/content.ts` so validate can hold the drawing to 0–2,
+  and every door must have one.
+- The two doors are always the same height: the row stretches the shorter,
+  and each has a floor of 350 px (from 300) — about the height of one with
+  two lines of flavour, one requirement and one line of branches with the
+  oval (340 px in Chromium here, 348 in the author's trial), so most doors
+  are one size and only the year's last grow.
+- A card a door adds is a chip, not a sentence: "+", the cards icon, the
+  card's name, "+2×" for more (`addChip`, a chip's new `lead`); the same on
+  the faces, the replies and the previews, a scandal added keeping its
+  newspaper chip. On a face the chip is set as words are (10.5 px) and its
+  name may wrap: in a hand of eight, Demo Tape's would not fit on one line.
+  `ui.face.add.one` and `.other` go: nothing reads them.
+- check:overflow's plain-screen audit fails doors of unequal height and an
+  odds stamp within 4 px of its oval — measured in the card's own frame,
+  the oval with its ring as an ellipse and the stamp as its turned
+  rectangle. Its drive reports each run's doors and lays the year's last
+  doors out at their longest (the longest "ends the year as" line and the
+  six longest award names, the game's own words over the real ones, taken
+  away again) to hold them on the stage at both sizes.
+- D2, the season cards after spring show their season's scene above the
+  date, light on ink (`renderLightCanvas`): an oval of 400×200 showing the
+  middle of a 560×200 drawing, both times the stage's factor (scale × device
+  pixel ratio, `stageFactor()`, which the title's size now shares), the dot
+  cell 3.6 times it. Content names them: `rules.seasonScenes`, a scene by
+  season (summer the arena, autumn the street, winter the carpet); validate
+  holds every key a season, every value a scene, and none for the first
+  season, whose card is the opening. They are drawn ahead in the photo
+  worker with the papers' photographs, after the title's, and kept for the
+  page's life; check/photo-worker.ts compares the worker's ovals with the
+  page's, pixel for pixel.
+
 ## 2026-10-20 — Round R8a, Part C: the desk
 
 - C1, the phone on the desk is the texts' phone: `.phone-big`'s proportions

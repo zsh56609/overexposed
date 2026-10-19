@@ -8,6 +8,8 @@ import { cue } from '../sound/sound.ts';
 import { prose } from './common.tsx';
 
 export interface SeasonCardProps {
+  /** The season's photograph (round R8a, D2): its scene light on ink, in an oval above the date. Spring's has none. */
+  readonly photo?: string | null;
   /** "March 2027". */
   readonly date: string;
   /** The season's name, "Spring". */
@@ -16,9 +18,10 @@ export interface SeasonCardProps {
   readonly go: () => void;
 }
 
-export function SeasonCard({ date, season, paragraphs, go }: SeasonCardProps) {
+export function SeasonCard({ photo = null, date, season, paragraphs, go }: SeasonCardProps) {
   return (
     <div className="scr season-card" data-screen="season">
+      {photo && <div className="sc-photo" aria-hidden="true" style={{ backgroundImage: `url("${photo}")` }} />}
       <small>{date}</small>
       <h2 className={prose(season)}>{season}</h2>
       {paragraphs.map((p, i) => (

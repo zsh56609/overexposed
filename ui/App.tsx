@@ -27,6 +27,7 @@ import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
 import { SeasonCard } from './screens/Season.tsx';
+import { seasonPhotoUrl } from './desk/photo-preload.ts';
 import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
 import { direct, seasonTrack } from './sound/director.ts';
@@ -229,10 +230,12 @@ function Floating({ anchor, children, leaving = false }: { anchor: Anchor; child
  * The season card a state shows, if its season's card has not been answered yet (round R3, A3). Seasons come in
  * order and each card is answered before the year goes on, so a season other than the last answered is a new one.
  */
-function seasonOf(s: GameState, answered: number): { readonly act: number; readonly date: string; readonly season: string; readonly paragraphs: readonly string[] } | null {
+function seasonOf(s: GameState, answered: number): { readonly act: number; readonly photo: string | null; readonly date: string; readonly season: string; readonly paragraphs: readonly string[] } | null {
   if (s.phase === 'ended' || s.act === answered) return null;
   const c = s.content;
-  return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(s, s.act)] };
+  // The season's photograph (round R8a, D2): drawn ahead by the warm-up; spring's card, the opening, has none.
+  const id = c.rules.seasons?.[s.act - 1];
+  return { act: s.act, photo: id ? seasonPhotoUrl(id) : null, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(s, s.act)] };
 }
 
 /** The actions taken over the desk: their steps keep the dim up until the month opens onto it (round R4, A3c). */
@@ -467,7 +470,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         <ManagerScreen s={s} legal={legal} act={act} beats={signBeats} chosen={signing?.step.action?.type === 'CHOOSE_MANAGER' ? signing.step.action.managerId : null} />
       </Over>
       <Over show={season !== null}>
-        {season && <SeasonCard key={season.act} date={season.date} season={season.season} paragraphs={season.paragraphs} go={() => setAnswered(season.act)} />}
+        {season && <SeasonCard key={season.act} photo={season.photo} date={season.date} season={season.season} paragraphs={season.paragraphs} go={() => setAnswered(season.act)} />}
       </Over>
       <Over show={offers}>
         {offers && s.phase === 'draft' && s.draft && (

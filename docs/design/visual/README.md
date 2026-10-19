@@ -144,6 +144,26 @@ italic line.
   threshold, the number in the icon's colour — "★ 64+ (you have 104)" — never the
   stat's name; a condition without a stat ("Signed to a label") is plain text. The last door adds **On the night** (the awards that choice
   wins) and the header states the ending either way. Clicking accepts (ACCEPTED stamp).
+  - **Every door has a photograph** (round R8a): an oval of 164×96 above "You're invited", its scene printed as the
+    papers print theirs (`photoUrl`, the papers' cell), filling the oval at 300 px wide (50% across, 46% down), framed
+    as the invitation is — 1 px of gold `#b8924a`, 3 px of the card's cream, 1 px of gold. Content names it: each
+    gate's `photo`, a scene and one of its three drawings (the audition the singer, the showcase the crowd, the
+    festival and the arena tour the arena, session work the studio, the label deal the press conference, the
+    residency the singer mirrored, the award show the trophy). The Likely / Unlikely stamp stays where it was, clear
+    of the oval (about 18 px at its nearest).
+  - **The two doors are always the same height**: the row stretches the shorter to the taller, and each has a floor
+    of 350 px — about the height of one with two lines of flavour, one requirement and one line of branches — so most
+    doors of the year are one size; only the year's last, with their ending and awards lines, grow (on the stage at
+    their longest, at 1280×720 and 844×390).
+  - **A card a door adds is a short chip**, not a sentence: "+", the cards icon, the card's name ("+2×" for more) —
+    the same chip on the faces, the replies and the previews; a scandal added keeps its newspaper chip.
+- **Season cards after spring** (round R8a): the season's scene above the date, printed light on ink as the title's
+  photograph is (`renderLightCanvas`): an oval of 400×200 showing the middle 400 of a drawing at 560×200 — both
+  times the stage's own factor, its scale on the screen × the device pixel ratio, as the title's is reckoned, the dot
+  cell 3.6 times it — ringed, from the inside, 1.5 px of cream at .55, 5 px of ink, 1 px of cream at .25. Content
+  names the scenes (`rules.seasonScenes`): summer the arena, autumn the street in autumn, winter the red carpet.
+  Spring's card opens the year over the title's photograph and has none. They are drawn ahead with the papers'
+  photographs, in the worker after the title's, so a card never waits for its photograph.
 - **Events (phase 3) — two presentations, chosen by the voice.**
   - *People who text* — the manager, friends, family, the rival: the phone comes up
     and their messages arrive **one at a time**, each after a few typing dots; the

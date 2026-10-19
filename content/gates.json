@@ -6,7 +6,8 @@
     "flavorKeys": ["gate.audition.flavor.1", "gate.audition.flavor.2"],
     "requires": { "craft": { "min": 18 } },
     "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
-    "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
+    "onFail": [{ "op": "resource", "target": "hype", "value": -10 }],
+    "photo": { "scene": "singer", "drawing": 0 }
   },
   {
     "id": "gate_showcase",
@@ -18,7 +19,8 @@
       { "op": "addCard", "cardId": "studio_session", "to": "discard", "count": 1 },
       { "op": "resource", "target": "hype", "value": 4 }
     ],
-    "onFail": [{ "op": "resource", "target": "heat", "value": 4 }]
+    "onFail": [{ "op": "resource", "target": "heat", "value": 4 }],
+    "photo": { "scene": "crowd", "drawing": 0 }
   },
   {
     "id": "gate_festival",
@@ -30,7 +32,8 @@
       { "op": "resource", "target": "hype", "value": 6 },
       { "op": "resource", "target": "capital", "value": 3 }
     ],
-    "onFail": [{ "op": "resource", "target": "heat", "value": 3 }]
+    "onFail": [{ "op": "resource", "target": "heat", "value": 3 }],
+    "photo": { "scene": "arena", "drawing": 0 }
   },
   {
     "id": "gate_session_work",
@@ -42,7 +45,8 @@
       { "op": "resource", "target": "capital", "value": 4 },
       { "op": "resource", "target": "craft", "value": 3 }
     ],
-    "onFail": [{ "op": "resource", "target": "capital", "value": -2 }]
+    "onFail": [{ "op": "resource", "target": "capital", "value": -2 }],
+    "photo": { "scene": "studio", "drawing": 0 }
   },
   {
     "id": "gate_label_deal",
@@ -54,7 +58,8 @@
       { "op": "setFlag", "flag": "signed_label" },
       { "op": "resource", "target": "capital", "value": 6 }
     ],
-    "onFail": [{ "op": "resource", "target": "hype", "value": -8 }]
+    "onFail": [{ "op": "resource", "target": "hype", "value": -8 }],
+    "photo": { "scene": "podium", "drawing": 0 }
   },
   {
     "id": "gate_residency",
@@ -66,7 +71,8 @@
       { "op": "resource", "target": "craft", "value": 6 },
       { "op": "addCard", "cardId": "studio_session", "to": "deck", "count": 1 }
     ],
-    "onFail": [{ "op": "resource", "target": "capital", "value": -3 }]
+    "onFail": [{ "op": "resource", "target": "capital", "value": -3 }],
+    "photo": { "scene": "singer", "drawing": 1 }
   },
   {
     "id": "gate_arena_tour",
@@ -75,7 +81,8 @@
     "flavorKeys": ["gate.arena_tour.flavor.1", "gate.arena_tour.flavor.2"],
     "requires": { "hype": { "min": 64 }, "flags": { "all": ["signed_label"] } },
     "onPass": [{ "op": "resource", "target": "hype", "value": 15 }],
-    "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
+    "onFail": [{ "op": "resource", "target": "hype", "value": -10 }],
+    "photo": { "scene": "arena", "drawing": 2 }
   },
   {
     "id": "gate_award_show",
@@ -84,6 +91,7 @@
     "flavorKeys": ["gate.award_show.flavor.1", "gate.award_show.flavor.2"],
     "requires": { "craft": { "min": 47 }, "hype": { "min": 30 }, "scandalCount": { "max": 6 } },
     "onPass": [{ "op": "resource", "target": "craft", "value": 10 }],
-    "onFail": [{ "op": "resource", "target": "hype", "value": -6 }]
+    "onFail": [{ "op": "resource", "target": "hype", "value": -6 }],
+    "photo": { "scene": "trophy", "drawing": 0 }
   }
 ]

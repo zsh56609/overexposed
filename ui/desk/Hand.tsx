@@ -184,10 +184,11 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
   );
 });
 
-/** A value on a face: icon and number in the resource's colour, or its words. */
+/** A value on a face: icon and number in the resource's colour, or its words; a card added leads with its sign. */
 export function Value({ v }: { v: ValueChip }) {
   return (
     <span className={`r-${v.kind}`}>
+      {v.lead}
       {v.icon && <Icon id={v.icon} />}
       {v.text}
     </span>

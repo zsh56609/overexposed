@@ -651,8 +651,6 @@
   "ui.face.slots.other": "{delta} actions",
   "ui.face.exhaust.one": "Remove a {tag} card",
   "ui.face.exhaust.other": "Remove {count} {tag} cards",
-  "ui.face.add.one": "Add a {card} to your {zone}",
-  "ui.face.add.other": "Add {count}× {card} to your {zone}",
   "ui.face.flag.signed_label": "Signed",
   "ui.face.flag.went_viral": "Went viral",
   "ui.card.cantPlay": "Can't be played",

@@ -35,7 +35,7 @@
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln.br .hd { flex: none; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .ch { flex: 1 1 auto; min-width: min-content; flex-wrap: wrap; gap: 2px 9px; }
 /* A value never breaks inside ("+£2,000"); words wrap. */
-:is(.desk :is(.hand, .motion-face), .faces) .card .ln span:not(.r-text) { white-space: nowrap; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln span:not(.r-text, .r-add) { white-space: nowrap; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-text { white-space: normal; min-width: 0; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln:not(.br, .lbl) .ch { gap: 3px 10px; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln svg { width: 15px; height: 15px; flex: none; }
@@ -43,6 +43,9 @@
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .lb { font-size: 10px; font-weight: 700; letter-spacing: .01em; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .ar { font-weight: 400; opacity: .7; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-text { font-size: 10.5px; font-weight: 600; line-height: 1.25; }
+/* A card added (round R8a, D1): "+", the cards icon and its name, a chip set as words are, so a long name wraps. */
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-add { font-size: 10.5px; font-weight: 600; line-height: 1.25; white-space: normal; min-width: 0; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-add svg { width: 12px; height: 12px; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .fl { width: min(114px, 100%); margin-top: 13px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
 /* An opportunity's label: a small sticker in the top right corner, where the cost bulbs sit (below them on a card
    that has them); in a fan it shows on the front card and on hover, as the bulbs do. */
@@ -61,7 +64,7 @@
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-heat { color: var(--val-heat); }
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-gain { color: var(--val-gain); }
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-cost { color: var(--val-cost); }
-:is(.desk :is(.hand, .motion-face), .faces) .card .r-draw, :is(.desk :is(.hand, .motion-face), .faces) .card .r-text { color: inherit; }
+:is(.desk :is(.hand, .motion-face), .faces) .card .r-draw, :is(.desk :is(.hand, .motion-face), .faces) .card .r-text, :is(.desk :is(.hand, .motion-face), .faces) .card .r-add { color: inherit; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .r-scandal { color: var(--val-cost); }
 /* On a scandal's red face its rules' values read in the dark faces' light colours, the red ones in cream. */
 :is(.desk :is(.hand, .motion-face), .faces) .f-scandal .r-hype { color: var(--val-dark-hype); }

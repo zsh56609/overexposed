@@ -32,6 +32,7 @@ import {
   PROMINENCES,
   REGISTERS,
   SCENE_IDS,
+  SCENE_DRAWINGS,
   SEASON_IDS,
   NOTE_COLOURS,
   SCRIPT_LINE_KINDS,
@@ -106,7 +107,7 @@ const CARD_FIELDS = [
   'id', 'kind', 'cost', 'nameKey', 'textKey', 'flavorKey', 'face', 'headlineKeys', 'laneText', 'register', 'inHandKeys',
   'playable', 'tags', 'actMin', 'requires', 'effects', 'onDraw', 'onEndOfTurn', 'lane',
 ];
-const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail'];
+const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail', 'photo'];
 const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
 const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note'];
@@ -123,7 +124,7 @@ const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
-  'seasons', 'events',
+  'seasons', 'seasonScenes', 'events',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls', 'laneCards'];
 
@@ -340,6 +341,17 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
         if (!(SEASON_IDS as readonly unknown[]).includes(s)) v.error('schema', `rules.seasons[${i}]`, `must be one of ${SEASON_IDS.join(', ')}, got ${q(s)}`);
       });
     v.seasons = Array.isArray(raw.seasons) ? raw.seasons.filter(isStr) : [];
+  }
+  // The season cards' photographs (round R8a): a scene by season; the first season's card is the opening, with none.
+  if (raw.seasonScenes !== undefined) {
+    if (!isObj(raw.seasonScenes)) v.error('schema', 'rules.seasonScenes', 'must map a season to a scene');
+    else
+      for (const [season, scene] of Object.entries(raw.seasonScenes)) {
+        const where = `rules.seasonScenes.${season}`;
+        if (!v.seasons.includes(season)) v.error('references', where, `no season ${q(season)} in rules.seasons`);
+        else if (season === v.seasons[0]) v.error('structure', where, "the first season's card is the opening, over the title's photograph: it has none");
+        if (!(SCENE_IDS as readonly unknown[]).includes(scene)) v.error('references', where, `must be one of ${SCENE_IDS.join(', ')}, got ${q(scene)}`);
+      }
   }
   if (raw.actOpenerKeys !== undefined) {
     if (!Array.isArray(raw.actOpenerKeys)) v.error('schema', 'rules.actOpenerKeys', 'must be an array: one list of opener variants per act');
@@ -699,6 +711,14 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
     for (const field of ['onPass', 'onFail'] as const) {
       if (g[field] === undefined) v.error('schema', `${where}.${field}`, `gates need "${field}" (may be [])`);
       else checkEffects(v, g[field], `${where}.${field}`, owner);
+    }
+    // Every door has a photograph (round R8a): a scene and one of its drawings.
+    const photo = g.photo;
+    if (!isObj(photo)) v.error('schema', `${where}.photo`, 'every door has a photograph: { scene, drawing }');
+    else {
+      v.fields(photo, ['scene', 'drawing'], `${where}.photo`);
+      if (!(SCENE_IDS as readonly unknown[]).includes(photo.scene)) v.error('references', `${where}.photo.scene`, `must be one of ${SCENE_IDS.join(', ')}, got ${q(photo.scene)}`);
+      v.int(photo.drawing, `${where}.photo.drawing`, [0, SCENE_DRAWINGS - 1]);
     }
   });
 }

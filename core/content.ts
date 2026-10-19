@@ -22,6 +22,8 @@ export type CardFace = (typeof CARD_FACES)[number];
  */
 export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy', 'tvshow', 'studio', 'arena', 'podium'] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
+/** The drawings every scene has: as drawn, mirrored, closer (README §2). A door names one (round R8a). */
+export const SCENE_DRAWINGS = 3;
 
 /**
  * The faces (round R8a; docs/design/visual/ref/r8a-avatars/, drawn into ui/avatars.ts): the people who text the
@@ -175,6 +177,11 @@ export interface GateDef {
   readonly requires: Condition;
   readonly onPass: readonly Effect[];
   readonly onFail: readonly Effect[];
+  /**
+   * The door's photograph (round R8a): an oval above "You're invited", a scene and one of its drawings
+   * (0 … SCENE_DRAWINGS − 1), printed as the papers print theirs.
+   */
+  readonly photo?: { readonly scene: SceneId; readonly drawing: number };
 }
 
 /**
@@ -568,6 +575,11 @@ export interface Rules {
   readonly actNameKeys: readonly string[];
   /** The season each act is (round V1a): the scene's light and the stat bar's marks. One per act. */
   readonly seasons?: readonly SeasonId[];
+  /**
+   * The season cards' photographs (round R8a): a scene by season, printed light on ink above the card's date. The first
+   * season's card is the opening, over the title's photograph: it has none.
+   */
+  readonly seasonScenes?: Readonly<Partial<Record<SeasonId, SceneId>>>;
   /** Each act's season opener variants (decision 15), one list per act; one variant per run. */
   readonly actOpenerKeys?: readonly (readonly string[])[];
   /** The opening premise's variants, shown on the title screen; one per run. */

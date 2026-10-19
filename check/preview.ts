@@ -75,7 +75,7 @@ import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
-import { calendarLabel, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
+import { calendarLabel, cardName, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
 import { deskIssue, deskModel, PHOTO_VARIANTS } from '../ui/desk/model.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 60);
@@ -723,10 +723,19 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
       if (hc.lines.filter((l) => l.arrow).length !== branches) bad(`${h.cardId}: ${hc.lines.filter((l) => l.arrow).length} branch lines for ${branches} branches`);
       const shown = hc.lines.flatMap((l) => l.chips);
       for (const e of effects.flatMap((x) => (x.op === 'conditional' ? [...x.then, ...(x.else ?? [])] : [x]))) {
+        // A card added (round R8a, D1): a scandal as the newspaper and its count; any other as "+" (or "+2×"), the
+        // cards icon and its name — never a sentence. A card copying itself keeps its words.
+        const adds = e.op === 'addCard' && e.cardId !== h.cardId ? e : null;
+        const scandalAdd = adds !== null && getCard(c, adds.cardId)?.kind === 'scandal';
+        if (adds && !scandalAdd) {
+          const n = adds.count ?? 1;
+          if (!shown.some((v) => v.kind === 'add' && v.icon === 'cards' && v.text === cardName(c, adds.cardId) && v.lead === (n > 1 ? `+${n}×` : '+'))) bad(`${h.cardId}: no chip for the card it adds, ${JSON.stringify(e)}`);
+          continue;
+        }
         const want =
-          e.op === 'resource' ? (e.target === 'capital' ? money(Math.abs(e.value)) : String(Math.abs(e.value))) : e.op === 'draw' ? String(e.count) : e.op === 'setFlag' ? t(`flag.${e.flag}.positive`) : e.op === 'exhaustTag' && e.tag === 'scandal' ? String(e.count ?? 1) : null;
+          e.op === 'resource' ? (e.target === 'capital' ? money(Math.abs(e.value)) : String(Math.abs(e.value))) : e.op === 'draw' ? String(e.count) : e.op === 'setFlag' ? t(`flag.${e.flag}.positive`) : e.op === 'exhaustTag' && e.tag === 'scandal' ? String(e.count ?? 1) : scandalAdd ? String(adds.count ?? 1) : null;
         if (want === null) continue;
-        const kind = e.op === 'resource' ? (e.target === 'capital' ? (e.value >= 0 ? 'gain' : 'cost') : e.target) : e.op === 'exhaustTag' ? 'scandal' : null;
+        const kind = e.op === 'resource' ? (e.target === 'capital' ? (e.value >= 0 ? 'gain' : 'cost') : e.target) : e.op === 'exhaustTag' || scandalAdd ? 'scandal' : null;
         if (!shown.some((v) => v.text.includes(want) && (kind === null || v.kind === kind))) bad(`${h.cardId}: no value for ${JSON.stringify(e)}`);
       }
     }

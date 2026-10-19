@@ -144,8 +144,43 @@ const AUDIT = `window.__deskAudit = (where) => {
   return out;
 };`;
 
+/**
+ * Runs in the page: the season's doors (round R8a, D1) — each invitation's height and where its bottom falls on the
+ * stage, and how clear its odds stamp stands of its photograph's oval: measured in the card's own frame (offsets ignore
+ * the card's tilt), the oval with its 4 px ring as an ellipse, the stamp as its turned rectangle, their least distance
+ * sampled along the stamp's edges (negative: the stamp is on the oval).
+ */
+const DOORS_MEASURE = `window.__doorsMeasure = () => {
+  const st = document.querySelector('.stage').getBoundingClientRect();
+  const k = st.height / 720;
+  const invs = [...document.querySelectorAll('.doors .inv')];
+  const clearance = [];
+  for (const d of invs) {
+    const odds = d.querySelector('.odds'), oval = d.querySelector('.ivp');
+    if (!odds || !oval) continue;
+    const a = oval.offsetWidth / 2 + 4, b = oval.offsetHeight / 2 + 4;
+    const cx = oval.offsetLeft + oval.offsetWidth / 2, cy = oval.offsetTop + oval.offsetHeight / 2;
+    const m = new DOMMatrix(getComputedStyle(odds).transform);
+    const w = odds.offsetWidth, h = odds.offsetHeight, ox = odds.offsetLeft + w / 2, oy = odds.offsetTop + h / 2;
+    const at = (x, y) => [ox + m.a * x + m.c * y, oy + m.b * x + m.d * y];
+    const poly = [at(-w / 2, -h / 2), at(w / 2, -h / 2), at(w / 2, h / 2), at(-w / 2, h / 2)];
+    let least = Infinity;
+    for (let i = 0; i < 4; i++) {
+      const [x0, y0] = poly[i], [x1, y1] = poly[(i + 1) % 4];
+      for (let s = 0; s <= 40; s++) {
+        const x = x0 + ((x1 - x0) * s) / 40, y = y0 + ((y1 - y0) * s) / 40;
+        if (((x - cx) / a) ** 2 + ((y - cy) / b) ** 2 <= 1) least = Math.min(least, -1);
+        for (let deg = 0; deg < 360; deg += 2) least = Math.min(least, Math.hypot(x - cx - a * Math.cos((deg * Math.PI) / 180), y - cy - b * Math.sin((deg * Math.PI) / 180)));
+      }
+    }
+    clearance.push(least);
+  }
+  return { heights: invs.map((d) => d.offsetHeight), bottoms: invs.map((d) => (d.getBoundingClientRect().bottom - st.top) / k), clearance };
+};`;
+
 /** Runs in the page: the plain screens' audit — nothing off the stage, nothing cut off by a box hiding its overflow. */
-const PLAIN = `window.__plainAudit = (where) => {
+const PLAIN = `${DOORS_MEASURE}
+window.__plainAudit = (where) => {
   const out = [];
   const add = (m) => out.push(where + ': ' + m);
   const stage = document.querySelector('.stage').getBoundingClientRect();
@@ -202,6 +237,12 @@ const PLAIN = `window.__plainAudit = (where) => {
       if ([...range.getClientRects()].some((b) => b.width >= 1 && b.right > f.left + 0.5 && b.left < f.right - 0.5 && b.bottom > f.top + 0.5 && b.top < f.bottom - 0.5)) add('a business card\\'s text runs under its face:' + text(el));
     }
     [card.style.transform, card.style.transition] = was;
+  }
+  // The season's doors (round R8a, D1): the two always the same height; each odds stamp clear of its oval.
+  if (document.querySelector('.doors .inv')) {
+    const dm = __doorsMeasure();
+    if (dm.heights.length === 2 && Math.abs(dm.heights[0] - dm.heights[1]) > 0.5) add('the doors differ in height: ' + dm.heights.join(' and '));
+    for (const c of dm.clearance) if (c < 4) add('an odds stamp ' + (c < 0 ? 'stands on' : 'stands ' + c.toFixed(1) + ' px from') + ' its photograph');
   }
   return out;
 };`;
@@ -364,7 +405,33 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const issues = {};
   const note = (l) => { for (const m of l) issues[m] = (issues[m] || 0) + 1; };
-  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0 };
+  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0, doors: { pairs: 0, apart: 0, tallest: 0, bottom: 0, clear: Infinity, worst: 0, worstBottom: 0 } };
+  const longest = { ends: null, night: null };
+  const lastDoors = async () => {
+    if (longest.ends === null) {
+      const core = await import('/core/index.ts');
+      const text = await import('/ui/text.ts');
+      const { t } = await import('/ui/i18n.ts');
+      const { content } = await import('/ui/content.ts');
+      const c = core.indexContent(content);
+      longest.ends = c.minors.map((m) => t('ui.gate.leadsTo', { ending: text.endingPair(c, m.major, m.id) })).sort((x, y) => y.length - x.length)[0];
+      longest.night = c.awards.map((a) => text.awardName(c, a.id)).sort((x, y) => y.length - x.length).slice(0, 6).join(' · ');
+      longest.label = t('ui.doors.night');
+    }
+    const added = [], hidden = [];
+    for (const inv of document.querySelectorAll('.doors .inv')) {
+      for (const el of inv.querySelectorAll('.ends, .night')) { hidden.push(el); el.style.display = 'none'; }
+      const ends = document.createElement('div'); ends.className = 'ends'; ends.textContent = longest.ends;
+      const night = document.createElement('div'); night.className = 'night'; const b = document.createElement('b'); b.textContent = longest.label; night.append(b, longest.night);
+      inv.querySelector('.oc').after(ends, night); added.push(ends, night);
+    }
+    plain('the last doors at their longest');
+    const dm = __doorsMeasure();
+    seen.doors.worst = Math.max(seen.doors.worst, ...dm.heights);
+    seen.doors.worstBottom = Math.max(seen.doors.worstBottom, ...dm.bottoms);
+    for (const el of added) el.remove();
+    for (const el of hidden) el.style.display = '';
+  };
   const plain = (where) => { seen.screens[where] = (seen.screens[where] || 0) + 1; note(__plainAudit(where)); };
   const over = (el) => { el.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); };
   const out = (el) => { el.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, pointerType: 'mouse' })); };
@@ -412,7 +479,16 @@ const DRIVE = (runs: number) => `(async () => {
         await sleep(6);
         continue;
       }
-      if (phase === 'gate') { plain('doors'); const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue; }
+      if (phase === 'gate') {
+        plain('doors');
+        const dm = __doorsMeasure();
+        if (dm.heights.length === 2) { seen.doors.pairs++; seen.doors.apart = Math.max(seen.doors.apart, Math.abs(dm.heights[0] - dm.heights[1])); }
+        seen.doors.tallest = Math.max(seen.doors.tallest, ...dm.heights);
+        seen.doors.bottom = Math.max(seen.doors.bottom, ...dm.bottoms);
+        seen.doors.clear = Math.min(seen.doors.clear, ...dm.clearance);
+        if (document.querySelector('.doors .inv .ends, .doors .inv .night')) await lastDoors();
+        const take = [...document.querySelectorAll('.gates .take')].filter((b) => !b.disabled); take[rand(take.length)].click(); await sleep(6); continue;
+      }
       // An event (round R2): its screen audited, then a reply it can afford; while the answer plays, nothing to take.
       if (phase === 'event') {
         plain('event'); note(__eventAudit('event'));
@@ -448,7 +524,7 @@ const DRIVE = (runs: number) => `(async () => {
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
@@ -465,7 +541,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -494,6 +570,12 @@ try {
         console.log(
           `overflow check, ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
             `hands of up to ${out.maxHand}; screens ${screens} (${out.extraPicks} extra picks, ${out.rerolls} rerolls); ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
+        );
+        // The doors (round R8a, D1): each pair's heights, the tallest and where it ends, the stamps' clearance.
+        const d = out.doors;
+        console.log(
+          `overflow check, ${tag}: doors — ${d.pairs} pairs, each pair's heights ${d.apart <= 0.5 ? 'equal' : `apart by up to ${d.apart} px`}; the tallest ${d.tallest} px, ending at y ${Math.round(d.bottom)}; ` +
+            `the year's last doors at their longest (the longest ending line, six awards) ${d.worst} px, ending at y ${Math.round(d.worstBottom)} of 720; the odds stamps ${d.clear.toFixed(1)} px or more from the photographs`,
         );
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
         if (out.issues.length > 0) failed = true;

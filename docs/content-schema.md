@@ -80,11 +80,12 @@ Conditions use one shape everywhere:
   "nameKey": "gate.audition.name",
   "requires": { "craft": { "min": 18 } },
   "onPass": [{ "op": "resource", "target": "capital", "value": 3 }],
-  "onFail": [{ "op": "resource", "target": "hype", "value": -10 }]
+  "onFail": [{ "op": "resource", "target": "hype", "value": -10 }],
+  "photo": { "scene": "singer", "drawing": 0 }
 }
 ```
 
-`flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
+`photo` (round R8a): the door's photograph, an oval above "You're invited" — a `scene` (one of the twelve, below under `scenes`) and a `drawing`, 0 to 2: as drawn, mirrored, closer (`SCENE_DRAWINGS`). Every door has one; validate checks both. `flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ## Endings — `content/endings.json`
@@ -269,6 +270,12 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
 - `seasons` (round V1a): one season id per act, in order — `spring`,
   `summer`, `autumn` or `winter` — the light on the desk and the weather
   in a paper's ear. The names players read stay in `actNameKeys`.
+- `seasonScenes` (round R8a): the season cards' photographs — a scene by
+  season id, `{ "summer": "arena", "autumn": "street", "winter": "carpet" }`,
+  printed light on ink above the card's date (the street in the card's own
+  season). The first season's card is the opening, over the title's
+  photograph: validate holds that it has none, that every key is a season
+  in `seasons` and every value a scene.
 
 ## Desk scripts — `content/scripts.json`
 
