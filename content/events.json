@@ -113,7 +113,7 @@
         },
         {
           "replyKey": "event.sam_interview.c.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 2 }, { "op": "resource", "target": "heat", "value": 4 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 1 }, { "op": "resource", "target": "heat", "value": 4 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.sam_interview.c.press.1"] },
           "outcomeKey": "event.sam_interview.c.outcome"
         }
@@ -188,7 +188,7 @@
       "titleKey": "event.juno_hello.title",
       "speaker": { "nameKey": "event.speaker.juno.name" },
       "chain": { "id": "juno", "role": "opener" },
-      "when": { "months": { "from": 4, "to": 8 } },
+      "when": { "months": { "from": 4, "to": 8 }, "weight": 3 },
       "messageKeys": ["event.juno_hello.message.1", "event.juno_hello.message.2"],
       "choices": [
         {
@@ -243,7 +243,11 @@
       "choices": [
         {
           "replyKey": "event.juno_soundalike.a.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 6 }, { "op": "resource", "target": "heat", "value": 4 }],
+          "effects": [
+            { "op": "resource", "target": "hype", "value": 6 },
+            { "op": "resource", "target": "heat", "value": 4 },
+            { "op": "setFlag", "flag": "juno_feud" }
+          ],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_soundalike.a.press.1"] },
           "outcomeKey": "event.juno_soundalike.a.outcome"
         },
@@ -261,20 +265,215 @@
       ]
     },
     {
+      "id": "juno_interview",
+      "category": "rival",
+      "form": "text",
+      "titleKey": "event.juno_interview.title",
+      "speaker": { "nameKey": "event.speaker.juno.name" },
+      "when": { "months": { "from": 6, "to": 8 }, "condition": { "flags": { "any": ["juno_cowrite", "juno_declined"] } } },
+      "messageKeys": ["event.juno_interview.message.1", "event.juno_interview.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.juno_interview.a.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 2 }],
+          "outcomeKey": "event.juno_interview.a.outcome"
+        },
+        {
+          "replyKey": "event.juno_interview.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 3 }],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_interview.b.press.1"] },
+          "outcomeKey": "event.juno_interview.b.outcome"
+        },
+        {
+          "replyKey": "event.juno_interview.c.reply",
+          "effects": [{ "op": "resource", "target": "craft", "value": 2 }],
+          "outcomeKey": "event.juno_interview.c.outcome"
+        }
+      ]
+    },
+    {
+      "id": "juno_shortlist",
+      "category": "rival",
+      "form": "text",
+      "titleKey": "event.juno_shortlist.title",
+      "speaker": { "nameKey": "event.speaker.juno.name" },
+      "when": {
+        "months": { "from": 12, "to": 12 },
+        "condition": { "hype": { "min": 30 }, "flags": { "not": ["juno_feud"] } },
+        "rival": ["breakthrough"],
+        "weight": 3
+      },
+      "messageKeys": ["event.juno_shortlist.message.1", "event.juno_shortlist.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.juno_shortlist.a.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 1 }],
+          "outcomeKey": "event.juno_shortlist.a.outcome"
+        },
+        {
+          "replyKey": "event.juno_shortlist.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 5 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_shortlist.b.press.1"] },
+          "outcomeKey": "event.juno_shortlist.b.outcome"
+        },
+        { "replyKey": "event.juno_shortlist.c.reply", "effects": [], "outcomeKey": "event.juno_shortlist.c.outcome" }
+      ]
+    },
+    {
+      "id": "juno_carpet",
+      "category": "rival",
+      "form": "text",
+      "titleKey": "event.juno_carpet.title",
+      "speaker": { "nameKey": "event.speaker.juno.name" },
+      "when": {
+        "months": { "from": 12, "to": 12 },
+        "condition": { "flags": { "not": ["juno_feud"] } },
+        "rival": ["crossover"],
+        "weight": 3
+      },
+      "messageKeys": ["event.juno_carpet.message.1", "event.juno_carpet.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.juno_carpet.a.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_carpet.a.press.1"] },
+          "outcomeKey": "event.juno_carpet.a.outcome"
+        },
+        {
+          "replyKey": "event.juno_carpet.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 2 }],
+          "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.juno_carpet.b.press.1"] },
+          "outcomeKey": "event.juno_carpet.b.outcome"
+        },
+        { "replyKey": "event.juno_carpet.c.reply", "effects": [], "outcomeKey": "event.juno_carpet.c.outcome" }
+      ]
+    },
+    {
+      "id": "juno_video",
+      "category": "rival",
+      "form": "text",
+      "titleKey": "event.juno_video.title",
+      "speaker": { "nameKey": "event.speaker.juno.name" },
+      "when": {
+        "months": { "from": 12, "to": 12 },
+        "condition": { "flags": { "any": ["juno_cowrite", "juno_declined"], "not": ["juno_feud"] } },
+        "rival": ["crash"],
+        "weight": 3
+      },
+      "messageKeys": ["event.juno_video.message.1", "event.juno_video.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.juno_video.a.reply",
+          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "heat", "value": -2 }],
+          "outcomeKey": "event.juno_video.a.outcome"
+        },
+        {
+          "replyKey": "event.juno_video.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 3 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_video.b.press.1"] },
+          "outcomeKey": "event.juno_video.b.outcome"
+        },
+        { "replyKey": "event.juno_video.c.reply", "effects": [], "outcomeKey": "event.juno_video.c.outcome" }
+      ]
+    },
+    {
+      "id": "juno_unsigned",
+      "category": "rival",
+      "form": "text",
+      "titleKey": "event.juno_unsigned.title",
+      "speaker": { "nameKey": "event.speaker.juno.name" },
+      "when": {
+        "months": { "from": 12, "to": 12 },
+        "condition": { "flags": { "any": ["juno_cowrite", "juno_declined"], "not": ["juno_feud"] } },
+        "rival": ["fade"],
+        "weight": 3
+      },
+      "messageKeys": ["event.juno_unsigned.message.1", "event.juno_unsigned.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.juno_unsigned.a.reply",
+          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }],
+          "outcomeKey": "event.juno_unsigned.a.outcome"
+        },
+        {
+          "replyKey": "event.juno_unsigned.b.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "craft", "value": 2 },
+            { "op": "resource", "target": "hype", "value": 2 }
+          ],
+          "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_unsigned.b.press.1"] },
+          "outcomeKey": "event.juno_unsigned.b.outcome"
+        },
+        { "replyKey": "event.juno_unsigned.c.reply", "effects": [], "outcomeKey": "event.juno_unsigned.c.outcome" }
+      ]
+    },
+    {
       "id": "mum_sunday",
       "category": "personal",
       "form": "text",
       "titleKey": "event.mum_sunday.title",
       "speaker": { "nameKey": "event.speaker.mum.name" },
-      "when": { "months": { "from": 2, "to": 11 } },
+      "chain": { "id": "home", "role": "opener" },
+      "when": { "months": { "from": 2, "to": 8 } },
       "messageKeys": ["event.mum_sunday.message.1", "event.mum_sunday.message.2"],
       "choices": [
         {
           "replyKey": "event.mum_sunday.a.reply",
-          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "heat", "value": -3 }],
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "heat", "value": -4 },
+            { "op": "setFlag", "flag": "went_home" }
+          ],
           "outcomeKey": "event.mum_sunday.a.outcome"
         },
-        { "replyKey": "event.mum_sunday.b.reply", "effects": [], "outcomeKey": "event.mum_sunday.b.outcome" }
+        {
+          "replyKey": "event.mum_sunday.b.reply",
+          "effects": [{ "op": "setFlag", "flag": "missed_dinner" }],
+          "outcomeKey": "event.mum_sunday.b.outcome"
+        }
+      ]
+    },
+    {
+      "id": "mum_gran",
+      "category": "personal",
+      "form": "text",
+      "titleKey": "event.mum_gran.title",
+      "speaker": { "nameKey": "event.speaker.mum.name" },
+      "chain": { "id": "home", "role": "followUp" },
+      "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["went_home"] } } },
+      "messageKeys": ["event.mum_gran.message.1", "event.mum_gran.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.mum_gran.a.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "hype", "value": 1 },
+            { "op": "resource", "target": "heat", "value": -1 }
+          ],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.mum_gran.a.press.1"] },
+          "outcomeKey": "event.mum_gran.a.outcome"
+        },
+        { "replyKey": "event.mum_gran.b.reply", "effects": [], "outcomeKey": "event.mum_gran.b.outcome" }
+      ]
+    },
+    {
+      "id": "mum_quiet",
+      "category": "personal",
+      "form": "text",
+      "titleKey": "event.mum_quiet.title",
+      "speaker": { "nameKey": "event.speaker.mum.name" },
+      "chain": { "id": "home", "role": "followUp" },
+      "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["missed_dinner"] } } },
+      "messageKeys": ["event.mum_quiet.message.1", "event.mum_quiet.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.mum_quiet.a.reply",
+          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "heat", "value": -3 }],
+          "outcomeKey": "event.mum_quiet.a.outcome"
+        },
+        { "replyKey": "event.mum_quiet.b.reply", "effects": [], "outcomeKey": "event.mum_quiet.b.outcome" },
+        { "replyKey": "event.mum_quiet.c.reply", "effects": [], "outcomeKey": "event.mum_quiet.c.outcome" }
       ]
     },
     {
@@ -283,15 +482,53 @@
       "form": "text",
       "titleKey": "event.producer_room.title",
       "speaker": { "nameKey": "event.speaker.lio.name", "labelKey": "event.speaker.lio.label" },
-      "when": { "months": { "from": 2, "to": 9 }, "lane": "music" },
+      "chain": { "id": "lio", "role": "opener" },
+      "when": { "months": { "from": 2, "to": 8 }, "lane": "music" },
       "messageKeys": ["event.producer_room.message.1", "event.producer_room.message.2"],
       "choices": [
         {
           "replyKey": "event.producer_room.a.reply",
-          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }],
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "craft", "value": 4 },
+            { "op": "setFlag", "flag": "lio_session" }
+          ],
           "outcomeKey": "event.producer_room.a.outcome"
         },
         { "replyKey": "event.producer_room.b.reply", "effects": [], "outcomeKey": "event.producer_room.b.outcome" }
+      ]
+    },
+    {
+      "id": "lio_track",
+      "category": "industry",
+      "form": "text",
+      "titleKey": "event.lio_track.title",
+      "speaker": { "nameKey": "event.speaker.lio.name", "labelKey": "event.speaker.lio.label" },
+      "chain": { "id": "lio", "role": "followUp" },
+      "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["lio_session"] } } },
+      "messageKeys": ["event.lio_track.message.1", "event.lio_track.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.lio_track.a.reply",
+          "effects": [{ "op": "resource", "target": "capital", "value": 3 }],
+          "outcomeKey": "event.lio_track.a.outcome"
+        },
+        {
+          "replyKey": "event.lio_track.b.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "craft", "value": 4 },
+            { "op": "resource", "target": "hype", "value": 1 }
+          ],
+          "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.lio_track.b.press.1"] },
+          "outcomeKey": "event.lio_track.b.outcome"
+        },
+        {
+          "replyKey": "event.lio_track.c.reply",
+          "effects": [{ "op": "resource", "target": "capital", "value": 1 }, { "op": "resource", "target": "hype", "value": 1 }],
+          "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.lio_track.c.press.1"] },
+          "outcomeKey": "event.lio_track.c.outcome"
+        }
       ]
     },
     {
@@ -307,7 +544,7 @@
           "effects": [
             { "op": "slots", "value": -1 },
             { "op": "resource", "target": "craft", "value": 2 },
-            { "op": "resource", "target": "hype", "value": 2 }
+            { "op": "resource", "target": "hype", "value": 1 }
           ],
           "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.casting_arc.a.press.1"] },
           "outcomeKey": "event.casting_arc.a.outcome"
@@ -321,16 +558,50 @@
       "form": "text",
       "titleKey": "event.photographer.title",
       "speaker": { "nameKey": "event.speaker.photographer.name" },
-      "when": { "months": { "from": 3, "to": 11 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
+      "chain": { "id": "lens", "role": "opener" },
+      "when": { "months": { "from": 3, "to": 8 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
       "messageKeys": ["event.photographer.message.1", "event.photographer.message.2"],
       "choices": [
         {
           "replyKey": "event.photographer.a.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 3 }],
+          "effects": [
+            { "op": "resource", "target": "hype", "value": 4 },
+            { "op": "resource", "target": "heat", "value": 3 },
+            { "op": "setFlag", "flag": "tipped_off" }
+          ],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.photographer.a.press.1"] },
           "outcomeKey": "event.photographer.a.outcome"
         },
         { "replyKey": "event.photographer.b.reply", "effects": [], "outcomeKey": "event.photographer.b.outcome" }
+      ]
+    },
+    {
+      "id": "photographer_again",
+      "category": "press",
+      "form": "text",
+      "titleKey": "event.photographer_again.title",
+      "speaker": { "nameKey": "event.speaker.photographer.name" },
+      "chain": { "id": "lens", "role": "followUp" },
+      "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["tipped_off"] } } },
+      "messageKeys": ["event.photographer_again.message.1", "event.photographer_again.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.photographer_again.a.reply",
+          "requires": { "capital": { "min": 5 } },
+          "effects": [{ "op": "resource", "target": "capital", "value": -5 }],
+          "outcomeKey": "event.photographer_again.a.outcome"
+        },
+        {
+          "replyKey": "event.photographer_again.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 3 }, { "op": "addCard", "cardId": "copycat_story", "to": "discard" }],
+          "press": { "paper": "flash", "kind": "scandal", "lineKeys": ["event.photographer_again.b.press.1"] },
+          "outcomeKey": "event.photographer_again.b.outcome"
+        },
+        {
+          "replyKey": "event.photographer_again.c.reply",
+          "effects": [{ "op": "resource", "target": "heat", "value": 4 }],
+          "outcomeKey": "event.photographer_again.c.outcome"
+        }
       ]
     },
     {
@@ -384,6 +655,123 @@
           "replyKey": "event.panel_show.c.reply",
           "effects": [{ "op": "resource", "target": "craft", "value": 2 }],
           "outcomeKey": "event.panel_show.c.outcome"
+        }
+      ]
+    },
+    {
+      "id": "director_read",
+      "category": "industry",
+      "form": "letter",
+      "speaker": { "letterheadKey": "event.letterhead.bramwell", "signoffKey": "event.signoff.okoro" },
+      "when": { "months": { "from": 6, "to": 10 }, "condition": { "hype": { "min": 20 } }, "lane": "screen" },
+      "messageKeys": ["event.director_read.message.1", "event.director_read.message.2", "event.director_read.message.3"],
+      "choices": [
+        {
+          "replyKey": "event.director_read.a.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "craft", "value": 2 },
+            { "op": "resource", "target": "hype", "value": 2 }
+          ],
+          "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.director_read.a.press.1"] },
+          "outcomeKey": "event.director_read.a.outcome"
+        },
+        {
+          "replyKey": "event.director_read.b.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.director_read.b.press.1"] },
+          "outcomeKey": "event.director_read.b.outcome"
+        },
+        { "replyKey": "event.director_read.c.reply", "effects": [], "outcomeKey": "event.director_read.c.outcome" }
+      ]
+    },
+    {
+      "id": "guest_judge",
+      "category": "industry",
+      "form": "text",
+      "titleKey": "event.guest_judge.title",
+      "speaker": { "nameKey": "event.speaker.dana.name", "labelKey": "event.speaker.dana.label" },
+      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 25 } }, "lane": "screen" },
+      "messageKeys": ["event.guest_judge.message.1", "event.guest_judge.message.2"],
+      "choices": [
+        {
+          "replyKey": "event.guest_judge.a.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "hype", "value": 1 },
+            { "op": "resource", "target": "heat", "value": -1 }
+          ],
+          "press": { "paper": "marquee", "kind": "loud", "lineKeys": ["event.guest_judge.a.press.1"] },
+          "outcomeKey": "event.guest_judge.a.outcome"
+        },
+        {
+          "replyKey": "event.guest_judge.b.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "hype", "value": 4 },
+            { "op": "resource", "target": "heat", "value": 4 }
+          ],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.guest_judge.b.press.1"] },
+          "outcomeKey": "event.guest_judge.b.outcome"
+        },
+        { "replyKey": "event.guest_judge.c.reply", "effects": [], "outcomeKey": "event.guest_judge.c.outcome" }
+      ]
+    },
+    {
+      "id": "reality_show",
+      "category": "industry",
+      "form": "letter",
+      "speaker": { "letterheadKey": "event.letterhead.larkspur", "signoffKey": "event.signoff.adeyemi" },
+      "when": { "months": { "from": 4, "to": 10 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
+      "messageKeys": ["event.reality_show.message.1", "event.reality_show.message.2", "event.reality_show.message.3"],
+      "choices": [
+        {
+          "replyKey": "event.reality_show.a.reply",
+          "effects": [
+            { "op": "slots", "value": -1 },
+            { "op": "resource", "target": "capital", "value": 3 },
+            { "op": "resource", "target": "hype", "value": 3 },
+            { "op": "resource", "target": "heat", "value": 3 }
+          ],
+          "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.reality_show.a.press.1"] },
+          "outcomeKey": "event.reality_show.a.outcome"
+        },
+        {
+          "replyKey": "event.reality_show.b.reply",
+          "effects": [{ "op": "resource", "target": "capital", "value": 1 }, { "op": "resource", "target": "hype", "value": 1 }],
+          "outcomeKey": "event.reality_show.b.outcome"
+        },
+        { "replyKey": "event.reality_show.c.reply", "effects": [], "outcomeKey": "event.reality_show.c.outcome" }
+      ]
+    },
+    {
+      "id": "fake_ad",
+      "category": "industry",
+      "form": "letter",
+      "speaker": { "letterheadKey": "event.letterhead.hilltop", "signoffKey": "event.signoff.brand_team" },
+      "when": { "months": { "from": 6, "to": 12 }, "condition": { "hype": { "min": 20 } }, "lane": "celebrity" },
+      "messageKeys": ["event.fake_ad.message.1", "event.fake_ad.message.2", "event.fake_ad.message.3"],
+      "choices": [
+        {
+          "replyKey": "event.fake_ad.a.reply",
+          "effects": [
+            { "op": "resource", "target": "capital", "value": 3 },
+            { "op": "resource", "target": "hype", "value": 2 },
+            { "op": "addCard", "cardId": "old_rumor", "to": "discard" }
+          ],
+          "press": { "paper": "flash", "kind": "scandal", "lineKeys": ["event.fake_ad.a.press.1"] },
+          "outcomeKey": "event.fake_ad.a.outcome"
+        },
+        {
+          "replyKey": "event.fake_ad.b.reply",
+          "requires": { "capital": { "min": 2 } },
+          "effects": [{ "op": "resource", "target": "capital", "value": -2 }, { "op": "resource", "target": "heat", "value": -1 }],
+          "outcomeKey": "event.fake_ad.b.outcome"
+        },
+        {
+          "replyKey": "event.fake_ad.c.reply",
+          "effects": [{ "op": "resource", "target": "hype", "value": 1 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "outcomeKey": "event.fake_ad.c.outcome"
         }
       ]
     }

@@ -59,6 +59,8 @@ export interface TurnSnapshot {
 export interface EventMet {
   readonly eventId: string;
   readonly turn: number;
+  /** The established lane when it came (round R7: a lane's events, in their own lane and in the others). */
+  readonly lane: string | null;
   readonly affordable: readonly number[];
   readonly choice: number;
   readonly scandals: number;
@@ -316,7 +318,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
         const from = state.events.findIndex((e) => e.type === 'eventChosen');
         const open = state.events.findIndex((e, i) => i > from && (e.type === 'draftOffer' || e.type === 'turnStart'));
         const scandals = state.events.slice(from, open < 0 ? undefined : open).filter((e) => e.type === 'addCard' && scandalIds.has(e.cardId)).length;
-        eventsMet.push({ eventId: before.event, turn: before.turn, affordable: legal.flatMap((a) => (a.type === 'CHOOSE_EVENT' ? [a.choice] : [])), choice: action.choice, scandals });
+        eventsMet.push({ eventId: before.event, turn: before.turn, lane: before.establishedLane, affordable: legal.flatMap((a) => (a.type === 'CHOOSE_EVENT' ? [a.choice] : [])), choice: action.choice, scandals });
       }
       actions++;
       tally(state, action);

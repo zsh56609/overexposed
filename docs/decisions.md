@@ -6,6 +6,66 @@ rules).
 
 ---
 
+## 2026-10-19 — Round R7, Part C: the events
+
+- **C1, three new chains.** mum_sunday opens chain home (months 2–8): "I'll
+  be there." sets went_home, "Can't this week." sets missed_dinner.
+  producer_room opens chain lio (months 2–8; its a sets lio_session);
+  photographer opens chain lens (months 3–8; its a sets tipped_off).
+  juno_hello's weight is 3, keeping about its R6 share now that six openers
+  compete for two chains (41 % → 44.5 % of player-like runs, seed
+  20260929). juno_soundalike's "Call it out." sets juno_feud, and no
+  month-12 Juno event comes after it. maxChains stays 2. Each new flag has
+  its two labels.
+- **C2, thirteen events** (draft v10): the chains' follow-ups mum_gran,
+  mum_quiet, lio_track, photographer_again; Juno's one-offs juno_interview
+  (months 6–8, between juno_hello and its follow-up) and the four month-12
+  events, each in one rival's year (when.rival) at weight 3 — a run meets
+  at most one; the lanes' one-offs director_read and guest_judge (screen),
+  reality_show and fake_ad (celebrity), the letters from houses.
+- **C3, tuned with the sim** on the three batch seeds under both managers,
+  new events first. Changed from the author's starting numbers:
+  photographer_again a needs and costs £5,000 (was £3,000), c heat +4 (+2);
+  director_read a craft +2, hype +2 (+3, +3); juno_shortlist a hype +1
+  (+2), b heat +2 (+3); mum_gran a hype +1, heat −1 (+2, −2); guest_judge
+  a hype +1 (+3), b hype +4 (+6); lio_track b hype +1 (+2), c hype +1
+  (+3); fake_ad c hype +1, heat +2 (+3, +1); reality_show a hype +3 (+4),
+  b hype +1 (+2); juno_carpet b hype +2 (+3). Existing events, each by one
+  or two: mum_sunday a heat −4 (−3), so that going home is a real choice
+  now that it sets a flag; sam_interview c hype +1 (+2) and casting_arc a
+  hype +1 (+2), for the band below.
+- What still fails, and why. **juno_credit/a** (91–95 % of greedy
+  appearances): only comeback meets it, and its two modes decide it — in
+  its clean-up mode it always takes the money, in its spike mode the
+  credit; nothing in the state at month 10 changes that comparison, so no
+  setting of the event's own numbers within two moves the share. Under
+  Mags, **dealseeker's Breakthrough** is 70.4 % and 70.2 % on two of the
+  three seeds (band ≤ 70 %; 67.7 % on the third, 64–69 % under Dex): the
+  C1 chains alone, at the starting numbers, put it at 69.5/72.5/70.6 % —
+  the home and lio chains take the two chain slots early, so the heavy ex
+  and sam chains come less (ex_feature 27 % → 7 % of runs) and a dealseeker
+  year is cleaner — and with mum_sunday at −4 it goes home when its heat is
+  4 or more. With mum_sunday at −3 instead, dealseeker passes everywhere
+  but mum_sunday/b is taken in 91–93 % of greedy appearances. The round
+  keeps −4: the smaller miss.
+- The sim report gains two tables: each lane's events by the established
+  lane when they came, and per rival arc the share of its runs that meet an
+  event of its year. check/desk-states.json is recorded again; the pile
+  case for an opportunity moves to card:streaming_role, celebFamous no
+  longer holding one.
+
+## 2026-10-19 — Round R7, Part B: what an event can ask
+
+- **B1, the rival's year**: `when.rival` lists the rival arcs an event may
+  come in (ids from press.rival.arcs). A run's arc is `rivalArc(content,
+  seed)`, fixed when it starts, so the condition is a pure read; rivalArc
+  moves to core/rival.ts (press.ts re-exports it) so the events can read it
+  without an import cycle. Validate holds the ids.
+- **B2, a weight**: `when.weight`, a whole number from 1 to 5 (default 1),
+  multiplies an event's weight in the draw together with the lane's.
+- **B3**: the event budget is 28; docs/content-schema.md documents both
+  fields. "↺ remembered" keeps its rule.
+
 ## 2026-10-19 — Round R7, Part A: from playing v0.6
 
 - **A1, a played card never jumps behind the hand.** Its face flew in

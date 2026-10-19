@@ -133,7 +133,7 @@ export async function checkPileInput(page:Page,url:string) {
   const states=loadStates();
   // Each case names a recorded state that holds its cards: a draw, a two-action card, an opportunity, two plays in a row,
   // the biggest hand. A new recording (npm run desk:states) can deal other hands: then name another state that holds them.
-  const cases=[['s02',['networking']],['s10',['self_tape']],['celebFamous',['streaming_role']],['s02',['side_gig','lay_low']],['bigHand',['@recorded']]] as const;
+  const cases=[['s02',['networking']],['s10',['self_tape']],['card:streaming_role',['streaming_role']],['s02',['side_gig','lay_low']],['bigHand',['@recorded']]] as const;
   for(const [key,cards] of cases) for(const id of cards) assert.ok(states[key]&&(id==='@recorded'||states[key]!.hand.includes(id)),`pile case ${key}: its recorded hand has no ${id}`);
   const selected=process.argv.find(a=>a.startsWith('--pile-case='))?.slice(12);
   assert.ok(!selected||cases.some(([,cards])=>cards.join('+')===selected),`unknown pile case: ${selected}`);

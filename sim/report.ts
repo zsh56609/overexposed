@@ -1,6 +1,7 @@
 // Aggregate a batch into the report (AGENTS.md §5, docs/sim.md): JSON-able data plus console tables.
 // Ids and numbers only; no content display strings.
 
+import { indexContent, rivalArc, type Content } from '../core/index.ts';
 import { MAX_ACTIONS, type BatchResult, type RunRecord, type TurnSnapshot } from './batch.ts';
 import { COMEBACK_SWITCH_AT, ignoredAxes, isGreedy, isProbe, PERSONA_IDS, seeksLane, type PersonaId, type ProbeAxis } from './personas.ts';
 import { chiSquare2xK, mean, median, quantile, sum, totalVariation } from './stats.ts';
@@ -208,6 +209,16 @@ export interface Report {
     readonly chains: Readonly<Record<Group, { readonly opened: number; readonly finished: number | null }>>;
     /** Per group: scandal cards answers added, per run. */
     readonly scandals: Readonly<Record<Group, number>>;
+    /**
+     * Round R7, player-like runs pooled: each event with a lane — the share of runs it came in, and of its
+     * appearances, the share in its own lane, in another, and before any lane was established.
+     */
+    readonly lanes: readonly { readonly id: string; readonly lane: string; readonly came: number; readonly own: number | null; readonly other: number | null; readonly none: number | null }[];
+    /**
+     * Round R7, player-like runs pooled: per rival arc, the share of runs in its year, and of those, the share that
+     * met an event of its year (when.rival naming it); every arc's events listed.
+     */
+    readonly rival: readonly { readonly arc: string; readonly runs: number; readonly events: readonly string[]; readonly met: number | null }[];
   };
   readonly bands: readonly BandCheck[];
   /** Reported for context, not pass/fail: they measure the persona mix as much as the game. */
@@ -641,6 +652,22 @@ export function buildReport(batch: BatchResult): Report {
       return { opened: opened / Math.max(1, rs.length), finished: ratio(finished, opened) };
     }),
     scandals: byGroup((rs) => (rs.length ? mean(rs.map((r) => sum(r.events.map((e) => e.scandals)))) : 0)),
+    lanes: eventDefs.flatMap((ev) => {
+      if (ev.when.lane === undefined) return [];
+      const pool = healthy.filter((r) => players.includes(r.persona));
+      const met = pool.flatMap((r) => r.events.filter((e) => e.eventId === ev.id));
+      const of = (test: (lane: string | null) => boolean) => ratio(met.filter((e) => test(e.lane)).length, met.length);
+      return [{ id: ev.id, lane: ev.when.lane, came: met.length / Math.max(1, pool.length), own: of((l) => l === ev.when.lane), other: of((l) => l !== null && l !== ev.when.lane), none: of((l) => l === null) }];
+    }),
+    rival: (() => {
+      const index = indexContent(content as Content);
+      const pool = healthy.filter((r) => players.includes(r.persona));
+      return (index.press?.rival?.arcs ?? []).map((arc) => {
+        const ids = eventDefs.filter((ev) => ev.when.rival?.includes(arc.id)).map((ev) => ev.id);
+        const runs = pool.filter((r) => rivalArc(index, r.seed)?.id === arc.id);
+        return { arc: arc.id, runs: runs.length / Math.max(1, pool.length), events: ids, met: ids.length === 0 ? null : ratio(runs.filter((r) => r.events.some((e) => ids.includes(e.eventId))).length, runs.length) };
+      });
+    })(),
   };
   if (eventDefs.length > 0) {
     const letter = (i: number) => String.fromCharCode(97 + i);
@@ -996,6 +1023,14 @@ export function formatReport(r: Report): string {
     );
     h('EVENT CHAINS AND SCANDALS  (chains opened per run; share of those whose follow-up came; scandal cards answers added per run)');
     out.push(table(['group', 'chains opened', 'finished', 'scandals added'], G.map((g) => [g, ev.chains[g].opened.toFixed(2), pc(ev.chains[g].finished), ev.scandals[g].toFixed(2)])));
+    if (ev.lanes.length > 0) {
+      h("EVENT LANES  (round R7, player-like pooled: share of runs each lane's event came in; of its appearances, the established lane then)");
+      out.push(table(['event', 'lane', 'came', 'own lane', 'other lane', 'no lane yet'], ev.lanes.map((x) => [x.id, x.lane, pc(x.came), pc(x.own), pc(x.other), pc(x.none)])));
+    }
+    if (ev.rival.length > 0) {
+      h("THE RIVAL'S YEAR  (round R7, player-like pooled: share of runs in each arc's year; of them, the share meeting an event of that year)");
+      out.push(table(['arc', 'runs', 'met', 'its events'], ev.rival.map((x) => [x.arc, pc(x.runs), pc(x.met), x.events.join(' · ') || '-'])));
+    }
   }
 
   if (r.skill) {

@@ -337,9 +337,11 @@
 .event-screen .lhd span { flex: none; font-size: 9px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap; }
 .event-screen .lbody { font-family: 'Courier New', Courier, monospace; font-size: 13.5px; line-height: 1.55; margin-top: 14px; }
 .event-screen .lbody p { margin: 0 0 8px; }
-/* A letter of four paragraphs, the most the schema allows, sits higher and sets its body tighter: it stays on the stage. */
-.event-screen .letter.long { top: 26px; }
-.event-screen .letter.long .lbody { font-size: 13px; line-height: 1.5; }
+/* A letter of four paragraphs, the most the schema allows, sits higher and sets its body tighter: it stays on the stage
+   (round R7: the new letters' longer paragraphs, at the limits, with replies it can't afford). */
+.event-screen .letter.long { top: 18px; }
+.event-screen .letter.long .lbody { font-size: 13px; line-height: 1.45; }
+.event-screen .letter.long .lbody p { margin-bottom: 6px; }
 .event-screen .lrep { margin-top: 12px; border-top: 1px dashed rgba(28, 23, 18, .35); padding-top: 10px; }
 .event-screen .lrep small { font-size: 9px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: #8a7d6c; }
 .event-screen .opt { display: flex; align-items: center; gap: 12px; padding: 8px 6px; cursor: pointer; border-bottom: 1px solid rgba(28, 23, 18, .1); outline: none; transition: background-color .15s, opacity .3s; }
