@@ -7,18 +7,23 @@
 //      earliest-opened chain first, one a month.
 //   2. Otherwise one event is drawn among the eligible openers and one-offs, each by its weight (when.weight, round
 //      R7) — an event of the established lane ×rules.events.laneWeight besides. An event comes at most once a run;
-//      once rules.events.maxChains chains are open, openers are no longer drawn.
+//      once rules.events.maxChains chains are open, openers are no longer drawn. The pool first leaves out the events
+//      the last run met (its memory, round R7, E3), and falls back to the whole pool only when nothing else is
+//      eligible; the memory never holds back a follow-up (step 1).
 // An event may name the rival's years it comes in (when.rival, round R7): the run's arc is fixed by its seed.
 //   3. Nothing eligible: no event that month.
 
 import { evaluate, explainCondition, type ClauseReport, type ConditionSubject } from './conditions.ts';
 import { getEvent, type ContentIndex, type Effect, type EventDef, type EventPressDef, type FlagTest } from './content.ts';
+import type { RunMemory } from './memory.ts';
 import { rivalArc } from './rival.ts';
 import type { EventRecord } from './state.ts';
 
 /** What the event queries read: the condition subject, the run's seed (its rival's year), the established lane, the events met so far. */
 export interface EventSubject extends ConditionSubject {
   readonly seed: number;
+  /** The memory of the last run (round R7, Part E): the events it met are drawn only when nothing else is eligible. */
+  readonly memory: RunMemory;
   readonly establishedLane: string | null;
   readonly eventLog: readonly EventRecord[];
 }
@@ -64,7 +69,8 @@ export function eventCandidates(s: EventSubject): { readonly followUp: EventDef 
   const pool = c.events
     .filter((ev) => ev.chain?.role !== 'followUp' && (ev.chain?.role !== 'opener' || canOpen) && eligible(ev))
     .map((event) => ({ event, weight: (event.when.weight ?? 1) * (event.when.lane !== undefined && event.when.lane === s.establishedLane ? rules.laneWeight : 1) }));
-  return { followUp: null, pool };
+  const fresh = s.memory.events.length === 0 ? pool : pool.filter((p) => !s.memory.events.includes(p.event.id));
+  return { followUp: null, pool: fresh.length > 0 ? fresh : pool };
 }
 
 /** Whether a choice can be made now — its requirement holds — and, when not, the clauses it still needs. */

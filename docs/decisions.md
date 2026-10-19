@@ -6,6 +6,36 @@ rules).
 
 ---
 
+## 2026-10-19 — Round R7, Part E: the next run remembers the last
+
+- **E1, what the browser keeps** (`ui/memory.ts`, beside the collections,
+  with their try/catch guards but no session copy — where storage is
+  missing or refuses, a run has no memory): the events of the run being
+  played, each written as it is offered, so a run left or reloaded still
+  counts; the events of the latest earlier run that met any (a run that met
+  none changes nothing); and for each group shown once a run, the variant
+  last shown, written as it is shown — the opening card, a season's card,
+  the doors, the ending. It is read and written outside React's state
+  initialisers and updaters: the page's first run is made as App loads,
+  PLAY AGAIN's in its handler, the writes in effects.
+- **E2, an input to the run**: `createInitialState(seed, content, { memory
+  })` keeps it in GameState (`memory`, with the ids and variants content no
+  longer has left out), so a replay with the same seed and memory plays the
+  same; with none a run plays exactly as before (sim:compare: 18 files
+  identical). A run loaded with ?seed= neither reads nor writes it. A run
+  that fails logs its seed and memory as JSON to the console.
+- **E3**: the draw's pool first leaves out the events the last run met,
+  falling back to the whole pool only when nothing else is eligible; a
+  follow-up is never held back.
+- **E4**: a run settles its once-a-run lines as it starts (`onceLines`):
+  for each group the variant after the one last shown, else the seed's own
+  choice; the screens, the previews and a replay read them from the state.
+- **E5**, `npm run sim:memory`: two runs in a row per persona, the second
+  on a new seed. Without memory the second meets about 2 of its 6 events
+  again and reads about 6 of its 13 once-a-run lines in the same variant;
+  with the first's memory, 0.01–0.09 events (crafter 0.6, artisan 0.3)
+  and no line.
+
 ## 2026-10-19 — Round R7, Part D: the second variants
 
 - The 27 line groups shown once a run get their second variant (`.2`, draft

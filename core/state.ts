@@ -1,4 +1,5 @@
 import { indexContent, CoreError, getCard, type AddCardZone, type Content, type ContentIndex, type ResourceKey, type Resources } from './content.ts';
+import { memoryFor, settleLines, type RunMemory } from './memory.ts';
 import { cursor, seedRng, shuffleInPlace, type RngState } from './rng.ts';
 import { closeDraft, EFFECT_BUDGET, type Draft } from './resolve.ts';
 import { beginTurn } from './reducer.ts';
@@ -170,6 +171,13 @@ export interface GameState {
    */
   readonly careerPlays: Readonly<Record<string, number>>;
   readonly year: YearRecord;
+  /**
+   * The run's memory of the last (round R7, Part E; core/memory.ts): an input to the run, like its seed — a replay
+   * with the same seed and memory plays the same. Empty: a run as runs have always played.
+   */
+  readonly memory: RunMemory;
+  /** The variant of every group shown once a run, by item (core/variants.ts onceItem), settled as the run starts. */
+  readonly onceLines: Readonly<Record<string, string>>;
 
   readonly events: readonly GameEvent[];
 }
@@ -177,6 +185,8 @@ export interface GameState {
 export interface StateOptions {
   /** Default true. The shipped build passes false. */
   readonly strict?: boolean;
+  /** The memory of the last run (round R7, Part E). Absent: none. Events and variants content no longer has are left out. */
+  readonly memory?: RunMemory;
 }
 
 /**
@@ -188,6 +198,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
   const index = indexContent(content);
   const strict = options.strict ?? true;
   const rules = index.rules;
+  const memory = memoryFor(index, options.memory);
 
   const deck: CardInstance[] = [];
   let uid = 1;
@@ -228,6 +239,8 @@ export function createInitialState(seed: number, content: Content, options: Stat
     endingId: null,
     careerPlays: {},
     year: { peakHype: 0, peakScandals: 0, bestMonthHype: 0, lastMonthEndHype: rules.startingResources.hype },
+    memory,
+    onceLines: settleLines(index, seed >>> 0, memory),
     events: [],
     budget: EFFECT_BUDGET,
   };

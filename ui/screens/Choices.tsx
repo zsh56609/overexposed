@@ -163,7 +163,7 @@ function Requirement({ clause, lane }: { clause: ClauseReport; lane: string | nu
 function Invitation({ c, s, p, lane, last, sameEnding, chosen, take, legal }: { c: ContentIndex; s: GameState; p: GatePreview; lane: string | null; last: boolean; sameEnding: boolean; chosen: string | null; take: (id: string) => void; legal: Legal }) {
   const id = p.gateId;
   const gate = getGate(c, id);
-  const flavor = gateFlavor(c, s.seed, id);
+  const flavor = gateFlavor(s, id);
   const go = () => {
     if (legal.gates.has(id)) take(id);
   };

@@ -63,6 +63,7 @@ export {
   type MonthMessages,
 } from './manager.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
+export { memoryFor, NO_MEMORY, onceGroups, settleLines, type RunMemory } from './memory.ts';
 export { choiceRemembered, eventCandidates, eventChoiceCheck, eventPress, isEventMonth, rememberedFlags, runChains, type EventSubject } from './events.ts';
 export {
   effectiveHeatThreshold,

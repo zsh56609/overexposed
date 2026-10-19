@@ -141,7 +141,7 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     const enterMonth = (act: number, turn: number) => {
       if (act !== lastAct) {
         flush();
-        push('opener', seasonOpener(c, step.after.seed, act));
+        push('opener', seasonOpener(step.after, act));
         lastAct = act;
         if (step.action?.type === 'CHOOSE_GATE') tellLine(); // the season transition says the line tightened
       }

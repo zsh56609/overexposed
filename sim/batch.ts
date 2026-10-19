@@ -21,6 +21,7 @@ import {
   type GameState,
   type GateRecord,
   type Resources,
+  type RunMemory,
 } from '../core/index.ts';
 import { loadContent } from './content.ts';
 import { PERSONA_IDS, PERSONA_SALT, PERSONAS, type PersonaId } from './personas.ts';
@@ -175,6 +176,8 @@ export interface RunOptions {
    * `none` (round 2c): the base game — the run's content without managers, so no perk, no messages.
    */
   readonly manager?: string;
+  /** The memory of a run before (round R7, Part E): sim:memory plays a second run from the first's. Absent: none. */
+  readonly memory?: RunMemory;
 }
 
 /** The manager id that runs the base game, without managers (--manager=none). */
@@ -288,7 +291,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   };
 
   try {
-    state = createInitialState(seed, contentFor(content, options.manager), { strict: true });
+    state = createInitialState(seed, contentFor(content, options.manager), { strict: true, ...(options.memory ? { memory: options.memory } : {}) });
     tally(state, null);
     checkInvariants(state);
     trace?.(state, null);

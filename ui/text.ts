@@ -9,7 +9,6 @@ import {
   getManager,
   getMinor,
   onceItem,
-  onceKey,
   type AddCardZone,
   type AwardDef,
   type ClauseReport,
@@ -97,22 +96,23 @@ export const tagName = (tag: string): string => t(`ui.tag.${tag}`);
 const PLACEHOLDER = 'TODO(prose)';
 export const isPlaceholder = (text: string): boolean => text.startsWith(PLACEHOLDER);
 
-// Items shown once per run pick their variant by a hash of the run seed and the item's id (core/variants.ts),
-// so different runs read differently.
-export const gateFlavor = (c: ContentIndex, seed: number, id: string): string =>
-  t(onceKey(getGate(c, id)?.flavorKeys, seed, onceItem.gate(id)) ?? `gate.${id}.flavor`);
-export const seasonOpener = (c: ContentIndex, seed: number, act: number): string =>
-  t(onceKey(c.rules.actOpenerKeys?.[act - 1], seed, onceItem.opener(act)) ?? `act.${act}.opener`);
-/** The opening premise, for the run this seed starts. */
-export const openingText = (c: { readonly rules: { readonly openingKeys?: readonly string[] } }, seed: number): string =>
-  t(onceKey(c.rules.openingKeys, seed, onceItem.opening) ?? 'story.opening');
+/** A run's lines shown once a run, settled as it starts (round R7, E4; core/memory.ts): a GameState has them. */
+interface OnceLines {
+  readonly onceLines: Readonly<Record<string, string>>;
+}
+// Items shown once a run read the variant their run settled as it started (round R7, E4): the one after the variant
+// the last run showed, else a hash of the run seed and the item's id (core/variants.ts), so different runs read
+// differently — the screen, a preview and a replay alike.
+export const gateFlavor = (s: OnceLines, id: string): string => t(s.onceLines[onceItem.gate(id)] ?? `gate.${id}.flavor`);
+export const seasonOpener = (s: OnceLines, act: number): string => t(s.onceLines[onceItem.opener(act)] ?? `act.${act}.opener`);
+/** The opening premise, for the run this state starts. */
+export const openingText = (s: OnceLines): string => t(s.onceLines[onceItem.opening] ?? 'story.opening');
 // Endings, two levels (docs/design/content-expansion.md §1): a major has a name and a goal line, a minor a
 // name and its text.
 export const majorName = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.nameKey ?? `ending.${id}.name`);
 export const majorGoal = (c: ContentIndex, id: string): string => t(getMajor(c, id)?.goalKey ?? `ending.${id}.goal`);
 export const minorName = (c: ContentIndex, id: string): string => t(getMinor(c, id)?.nameKey ?? `ending.${id}.name`);
-export const minorText = (c: ContentIndex, seed: number, id: string): string =>
-  t(onceKey(getMinor(c, id)?.textKeys, seed, onceItem.ending(id)) ?? `ending.${id}.text`);
+export const minorText = (s: OnceLines, id: string): string => t(s.onceLines[onceItem.ending(id)] ?? `ending.${id}.text`);
 /** A year's ending in full: "The Breakthrough · Leading Role". */
 export const endingPair = (c: ContentIndex, majorId: string, minorId: string): string =>
   t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });

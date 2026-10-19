@@ -15,6 +15,7 @@
     "sim:variants": "node sim/variants.ts",
     "sim:press": "node sim/press.ts",
     "sim:managers": "node sim/managers.ts",
+    "sim:memory": "node sim/memory.ts",
     "validate": "node validate/run.ts",
     "check:preview": "node check/press-contract.ts && node check/preview.ts",
     "check:clicks": "node check/clicks.ts",

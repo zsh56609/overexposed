@@ -9,7 +9,7 @@
 // choice dealt onto it. Every season card waits for its button.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { createInitialState, establishedLanes, getEvent, readLines, reduce, type Action, type GameState } from '../core/index.ts';
+import { createInitialState, establishedLanes, getEvent, onceItem, readLines, reduce, type Action, type GameState, type RunMemory } from '../core/index.ts';
 import { content, STRICT } from './content.ts';
 import { finishTransitions, motionMode, subscribeMotion } from './motion.ts';
 import { Desk, type DeskMode } from './desk/Desk.tsx';
@@ -19,6 +19,7 @@ import { t } from './i18n.ts';
 import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readAwards, readFound } from './collection.ts';
+import { beginRun, rememberEvent, rememberLine } from './memory.ts';
 import { Over, useFontsReady } from './screens/common.tsx';
 import { ManagerScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, NumbersPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
@@ -49,39 +50,56 @@ interface RunHandle {
   readonly id: number;
   readonly seed: number;
   readonly queue: EventQueue;
+  /** Whether the run keeps the browser's memory of runs (round R7, E1): never a run replayed with ?seed=. */
+  readonly remember: boolean;
 }
 
-/** A run from its seed, or why it could not start. */
-function makeRun(seed: number, id: number): RunHandle | string {
+/** A failed run's seed and memory, for the console (round R7, E2): with both, it replays. */
+const logFailure = (seed: number, memory: RunMemory | null) => console.error('Overexposed: the run failed', JSON.stringify({ seed, memory }));
+
+/** A run from its seed and the memory of the last (round R7, E2), or why it could not start. */
+function makeRun(seed: number, id: number, memory: RunMemory | null): RunHandle | string {
   try {
-    const state = createInitialState(seed, content, { strict: STRICT });
-    return { id, seed, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) };
+    const state = createInitialState(seed, content, { strict: STRICT, ...(memory ? { memory } : {}) });
+    return { id, seed, remember: memory !== null, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) };
   } catch (err) {
+    logFailure(seed, memory);
     return t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed, action: 'start' });
   }
 }
 
+/**
+ * The next run (round R7, E1): a fresh seed, and the memory of the last read — the run before it filed as the last,
+ * if it met any events — here, outside React's state initialisers and updaters, which StrictMode runs twice. A run
+ * replayed with ?seed= neither reads nor writes the memory.
+ */
+function startRun(id: number): RunHandle | string {
+  const urlSeed = seedFromUrl();
+  return urlSeed === null ? makeRun(freshSeed(), id, beginRun()) : makeRun((urlSeed + id - 1) >>> 0, id, null);
+}
+
+/** The run the page opens on, made once as the page loads. */
+const FIRST_RUN = startRun(1);
+
 export function App() {
   // The run to come is made now (decision 15, revised): the opening card is its own.
-  const [made] = useState(() => makeRun(seedFromUrl() ?? freshSeed(), 1));
+  const [made] = useState(FIRST_RUN);
   const [run, setRun] = useState<RunHandle | null>(typeof made === 'string' ? null : made);
   const [error, setError] = useState<string | null>(typeof made === 'string' ? made : null);
   // PLAY AGAIN (round R3, B6): a fade through ink, then the next run's title arrives as on first load.
   const [ink, setInk] = useState<'in' | 'out' | null>(null);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
+  // PLAY AGAIN's next run, made in the handler, never in a state updater (round R7, E1).
+  const runs = useRef(1);
   const next = useCallback(() => {
-    setRun((prev) => {
-      const id = (prev?.id ?? 0) + 1;
-      const urlSeed = seedFromUrl();
-      const made = makeRun(urlSeed === null ? freshSeed() : (urlSeed + id - 1) >>> 0, id);
-      if (typeof made === 'string') {
-        setError(made);
-        return prev;
-      }
-      setError(null);
-      return made;
-    });
+    const made = startRun(++runs.current);
+    if (typeof made === 'string') {
+      setError(made);
+      return;
+    }
+    setError(null);
+    setRun(made);
   }, []);
   const restart = useCallback(() => {
     const mode = motionMode();
@@ -214,7 +232,7 @@ function Floating({ anchor, children, leaving = false }: { anchor: Anchor; child
 function seasonOf(s: GameState, answered: number): { readonly act: number; readonly date: string; readonly season: string; readonly paragraphs: readonly string[] } | null {
   if (s.phase === 'ended' || s.act === answered) return null;
   const c = s.content;
-  return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(c, s.seed, s.act)] };
+  return { act: s.act, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(s, s.act)] };
 }
 
 /** The actions taken over the desk: their steps keep the dim up until the month opens onto it (round R4, A3c). */
@@ -324,6 +342,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         queue.enqueue({ action, state: next, events: next.events });
         setError(null);
       } catch (err) {
+        logFailure(run.seed, run.remember ? queue.latest.memory : null);
         setError(t('ui.error.detail', { message: err instanceof Error ? err.message : String(err), seed: run.seed, action: JSON.stringify(action) }));
       }
     },
@@ -358,17 +377,6 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
     [play, queue],
   );
 
-  if (s.phase === 'ended')
-    return (
-      <>
-        <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} openNumbers={() => setPanel('numbers')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
-        {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} awards={readAwards()} overDesk={false} onClose={close} />}
-        {panel === 'numbers' && <NumbersPanel s={s} steps={snap.steps} onClose={close} />}
-      </>
-    );
-  // The title waits for the game's faces (round R1): a font that never comes is waited for 3 s.
-  if (intro === 'title' && !fonts) return <div className="scr title-wait" />;
-
   const mode: DeskMode = s.phase === 'manager' ? 'manager' : 'game';
   // The desk from the opening card's "Continue" on (B2); the title until the desk has come up out of its dark.
   const desk = intro === null;
@@ -394,6 +402,38 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   // its undim beat, and the offers bring it back (A2).
   const between = !!snap.active && OVER_ACTIONS.has(snap.active.step.action?.type ?? '') && s.phase !== 'play';
   const dimmed = desk && !(signing && signBeats.includes('undim')) && (mode === 'manager' || season !== null || offers || eventShown || between);
+  // The run's memory (round R7, E1): each event written as it is offered, so a run left or reloaded still counts; and
+  // each line shown once a run, written as it is shown — the opening card, a season's card, the doors, the ending.
+  const filed = useRef(0);
+  useEffect(() => {
+    if (!run.remember) return;
+    for (const step of snap.steps.slice(filed.current)) for (const e of step.events) if (e.type === 'eventOffered') rememberEvent(e.eventId);
+    filed.current = snap.steps.length;
+  }, [run.remember, snap.steps]);
+  const shownOnce = [
+    ...(intro === 'opening' ? [onceItem.opening] : []),
+    ...(season ? [onceItem.opener(season.act)] : []),
+    ...(offers && s.phase === 'gate' ? s.gateOffer.map((id) => onceItem.gate(id)) : []),
+    ...(s.phase === 'ended' && s.endingId !== null ? [onceItem.ending(s.endingId)] : []),
+  ].join(' ');
+  useEffect(() => {
+    if (!run.remember || shownOnce === '') return;
+    for (const item of shownOnce.split(' ')) {
+      const key = s.onceLines[item];
+      if (key !== undefined) rememberLine(item, key);
+    }
+  }, [run.remember, shownOnce]);
+
+  if (s.phase === 'ended')
+    return (
+      <>
+        <AwardsNight s={s} steps={snap.steps} onRestart={onRestart} openScrapbook={() => setPanel('scrapbook')} openNumbers={() => setPanel('numbers')} busy={snap.busy} beat={snap.active?.beat ?? 'idle'} />
+        {panel === 'scrapbook' && <ScrapbookPanel found={readFound()} awards={readAwards()} overDesk={false} onClose={close} />}
+        {panel === 'numbers' && <NumbersPanel s={s} steps={snap.steps} onClose={close} />}
+      </>
+    );
+  // The title waits for the game's faces (round R1): a font that never comes is waited for 3 s.
+  if (intro === 'title' && !fonts) return <div className="scr title-wait" />;
 
   return (
     <>
@@ -420,7 +460,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
       )}
       {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name. */}
       <Over show={intro === 'opening'} full enter="develop">
-        <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(c, s.seed).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
+        <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(s).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
       </Over>
       {/* The manager choice, dealt onto the desk as it comes up (round R3, B2); signing plays out on it (B3). */}
       <Over show={desk && mode === 'manager'} full enter="deal">

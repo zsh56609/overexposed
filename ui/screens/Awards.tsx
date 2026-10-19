@@ -91,7 +91,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
     return () => window.clearTimeout(timer);
   }, [revealed]);
   const pages = useMemo(() => seasonPages(steps), [steps]);
-  const text = minorText(c, s.seed, id);
+  const text = minorText(s, id);
   const awards = yearAwards(s);
   useNightSounds(cheered(c, majorId), awards.length, revealed);
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.

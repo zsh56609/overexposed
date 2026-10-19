@@ -16,6 +16,7 @@ import {
 } from './content.ts';
 import { evaluate } from './conditions.ts';
 import { cursor, nextInt, shuffleInPlace, type RngCursor } from './rng.ts';
+import type { RunMemory } from './memory.ts';
 import type { CardInstance, DraftState, EventRecord, GameEvent, GameState, GateRecord, Phase, RerollRecord, YearRecord } from './state.ts';
 
 /** Max effect applications per action. A content loop (onDraw → draw → …) fails loudly instead of hanging. */
@@ -52,6 +53,9 @@ export interface Draft {
   endingId: string | null;
   careerPlays: Record<string, number>;
   year: YearRecord;
+  /** Immutable: the run's memory and its settled once-a-run lines (round R7, Part E). */
+  readonly memory: RunMemory;
+  readonly onceLines: Readonly<Record<string, string>>;
   events: GameEvent[];
   budget: number;
 }
@@ -86,6 +90,8 @@ export function openDraft(s: GameState): Draft {
     endingId: s.endingId,
     careerPlays: { ...s.careerPlays },
     year: s.year,
+    memory: s.memory,
+    onceLines: s.onceLines,
     events: [],
     budget: EFFECT_BUDGET,
   };
@@ -121,6 +127,8 @@ export function closeDraft(d: Draft): GameState {
     endingId: d.endingId,
     careerPlays: d.careerPlays,
     year: d.year,
+    memory: d.memory,
+    onceLines: d.onceLines,
     events: d.events,
   };
 }
