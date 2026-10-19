@@ -89,6 +89,8 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
     [playing?.id, answering?.id],
   );
   const game = mode === 'game';
+  // A month ending (round R7, A4): END TURN's step, until it publishes the next month — its messages stop coming.
+  const ending = !!snap.active?.plan && !snap.active.published && snap.active.step.events.some((e) => e.type === 'turnEnd');
   return (
     <div className={`desk ${model.season} lane-${model.lane} mode-${mode}${model.crisis ? ' crisis' : ''}${marks ? ' marks' : ''}${rising ? ' rising' : ''}${arriving ? ' arriving' : ''}`} data-mode={mode} data-beat={snap.active?.beat??'idle'} data-busy={snap.busy || busy ? "1" : "0"} data-step={snap.steps.length} data-turn={snap.state.turn} data-season={model.season} data-lane={model.lane} data-crisis={model.crisis ? '1' : '0'}>
       <IconDefs />
@@ -109,7 +111,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
       <Pile snap={snap} model={model}/>
       <Motion snap={snap} onTails={onTails} />
       {snap.active?.plan&&<MonthMotion key={snap.active.step.id} snap={snap} model={model}/>}
-      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} onTails={onTails} />}
+      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} ending={ending} />}
       <div className="dim" />
       {game && model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">

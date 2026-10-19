@@ -46,3 +46,5 @@ html[data-motion-resolved="reduced"] .desk .bub:hover { transform:none; }
 
 /* The scandals held ticking up (round R3, D1), in the quiet stat-delta style. */
 .desk .motion-delta.delta-held { color: #ff8a7a; }
+/* A played card's raise (round R7, A1): the stretch of its carry lifted clear of the fan, inside the tilting plane. */
+.desk .motion-raise { position: absolute; left: 0; top: 0; }

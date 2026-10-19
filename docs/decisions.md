@@ -6,6 +6,56 @@ rules).
 
 ---
 
+## 2026-10-19 — Round R7, Part A: from playing v0.6
+
+- **A1, a played card never jumps behind the hand.** Its face flew in
+  `.motion-flight` (z-index 85, above the hand's 35) until the flight
+  ended, then lay in the pile (26), under the hand — on that frame jumping
+  from in front of the cards still in the hand to behind them. At the end
+  of the hold (0.29 s) the lifted card is only 50 px up and the cards left
+  in the hand re-fan under it, so in every hand of two or more it overlaps
+  them there; to be clear of them by then it would have to rise about
+  270–290 px. Asked, the author chose: the lift and the hold stay as they
+  are; in the carry the card rises out of the fan in front of it, and from
+  the first frame it overlaps no card left in the hand it goes under the
+  hand and the season's dim (z-index 31, above the bubbles' 30) and lands
+  there. Where the plain path would overlap the fan all the way down to its
+  slot (hands of five or more), the middle of the carry is raised, by as
+  little as clears the fan (68–136 px in the pile's plane), so the card
+  clears it first and comes down behind it. `ui/desk/flight.ts` plans each
+  flight from the fan and the desk's perspective (a hovered card counted
+  too, 4 px to spare, clear for 60 ms); `Motion.tsx` animates the plan, the
+  layer changing once, by the flight container's own z-index keyframes.
+  Timings, the paper coming forward, the tails, reduced motion's crossfade
+  and skipping stay as they were. check:motion plays every flight — hands
+  of 1 up to desk-states' bigHand, every place, every pile slot — on a dev
+  page with the game's own desk (`check/flight.html`), in Chromium at
+  1280×720, and holds that the layer changes on no frame where the face
+  overlaps a card and that, once under, it is never in front of one again;
+  the frames rising out in front after the hold are reported.
+- **A2, the credits read as credits.** One row per credit, the role (a deck
+  section's head) beside the name (11.5px), the links after their name: who
+  made the game, the music, the typefaces, the art and sound, the AI
+  assistance. A name may wrap to a second line; nothing else in a row does
+  (check:overflow holds it). A foot gives the jam and the version after a
+  middle dot. The copyright notices and the URLs leave the panel: the font
+  licence it links to (`ui/fonts/OFL.txt`, still imported, so it ships)
+  carries both fonts' notices. CREDITS.md and the itch page keep the
+  detail, the six track titles included.
+- **A3**: Sam's interview's "No comment." adds Everyone's Running It
+  (`copycat_story`), not The Breakup Story: Sam's story is not a split.
+  Data only; its words stay.
+- **A4, the manager's bubbles always come one by one.** The next action
+  used to complete them (Bubbles' onTails): a card played while a month's
+  four bubbles were coming brought the rest in one frame. Now the first
+  comes once the desk is still, and the rest keep their pace (0.38 s) from
+  it whatever the player does: an action, a card's flight and the month's
+  end never bring them at once. They hold no input. A month that ends
+  (END TURN) before they have all come shows no more of them. Reduced
+  motion keeps its all-at-once with a single buzz. check:motion's arrival
+  case is the author's: a month with four bubbles, a card played 0.3 s
+  after the desk is still.
+
 ## 2026-10-18 — Round R6, Part B: v0.6
 
 - `package.json` is 0.6.0; the credits read "v0.6". The itch zip,

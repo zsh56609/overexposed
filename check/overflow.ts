@@ -178,6 +178,15 @@ const PLAIN = `window.__plainAudit = (where) => {
     const a = again.getBoundingClientRect(), p = lastPage.getBoundingClientRect();
     if (Math.abs(a.left - p.left) > 1 || Math.abs(a.right - p.right) > 1) add('PLAY AGAIN at ' + a.left.toFixed(1) + '-' + a.right.toFixed(1) + ', the last front page at ' + p.left.toFixed(1) + '-' + p.right.toFixed(1));
   }
+  // The credits (round R7, A2): a role on one line, a name on at most two, the foot on one.
+  const lines = (el) => { const r = document.createRange(); r.selectNodeContents(el); const tops = []; for (const b of r.getClientRects()) if (b.width >= 1 && !tops.some((y) => Math.abs(y - b.top) < 3)) tops.push(b.top); return tops.length; };
+  for (const row of document.querySelectorAll('.p-credits .crow')) {
+    const role = row.querySelector('h4'), name = row.querySelector('span');
+    if (role && lines(role) > 1) add('a credit\\'s role wraps:' + text(role));
+    if (name && lines(name) > 2) add('a credit\\'s name runs to ' + lines(name) + ' lines:' + text(name));
+  }
+  const foot = document.querySelector('.p-credits .ver');
+  if (foot && lines(foot) > 1) add('the credits\\' foot wraps:' + text(foot));
   return out;
 };`;
 

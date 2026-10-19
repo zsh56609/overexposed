@@ -379,15 +379,19 @@ function buzz(desk: Element | null): Animation[] {
  * month and its place — never to its words. UI state only: no rule reads it.
  *
  * Round R3: the month's messages wait for a clear desk (C1) — none before its hand is dealt, then one by one once
- * the desk is still, as the desk's own tails: they hold no input, and the next action brings the rest at once. And a
- * bubble once shown stays until its month ends (C2): the count shown only grows within a month, and a bubble shown
- * stays even if the month's list were derived without it.
+ * the desk is still. And a bubble once shown stays until its month ends (C2): the count shown only grows within a
+ * month, and a bubble shown stays even if the month's list were derived without it.
+ *
+ * Round R7 (A4): once a month's first bubble has come, the rest keep their pace whatever the player does — an action,
+ * a card's flight and the month's end never bring them at once. They hold no input, so nothing waits on them; if the
+ * month ends before they have all come, the rest are not shown. Reduced motion shows them all at once, with one buzz.
  */
-export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, onTails }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; onTails?: (settle: () => void) => () => void }) {
+export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, ending = false }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; ending?: boolean }) {
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
-  const buzzing = useRef<Animation[]>([]);
+  /** When the last bubble came (performance.now()): the next keeps its pace from it, whatever re-renders between. */
+  const last = useRef(0);
   useEffect(() => {
     if (open === null) return;
     const close = () => setOpen(null);
@@ -410,32 +414,32 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
       setShown({ month, n: allowed });
       return;
     }
-    if (busy) return; // the deal first: they come once the desk is still
-    const id = window.setTimeout(() => {
-      setShown({ month, n: n + 1 });
-      // A month's messages begin with a buzz, and each bubble pops (round R4, B2); a click that shows them all, none.
-      if (n === 0) cue('buzz');
-      cue('bubble');
-      if (n % 2 === 0) buzzing.current = buzz(box.current?.closest('.desk') ?? null);
-    }, n === 0 ? REVEAL.first : REVEAL.next);
-    const untail = onTails?.(() => {
-      window.clearTimeout(id);
-      for (const a of buzzing.current) a.finish();
-      setShown({ month, n: allowed });
-    });
-    return () => {
-      window.clearTimeout(id);
-      untail?.();
-    };
-  }, [month, n, allowed, busy, shown.month, onTails]);
+    // The month is ending (END TURN): the rest of its messages are not shown (A4).
+    if (ending) return;
+    // The deal first: the first comes once the desk is still; the rest keep their pace from it, a play or not (A4).
+    if (n === 0 && busy) return;
+    const id = window.setTimeout(
+      () => {
+        last.current = performance.now();
+        setShown({ month, n: n + 1 });
+        // A month's messages begin with a buzz, and each bubble pops (round R4, B2).
+        if (n === 0) cue('buzz');
+        cue('bubble');
+        if (n % 2 === 0) buzz(box.current?.closest('.desk') ?? null);
+      },
+      n === 0 ? REVEAL.first : Math.max(0, last.current + REVEAL.next - performance.now()),
+    );
+    return () => window.clearTimeout(id);
+  }, [month, n, allowed, busy, ending, shown.month]);
   // Every bubble this month has shown, so none can go before the month does.
   const seen = useRef<{ month: number; list: { k: string; text: string }[] }>({ month, list: [] });
   if (seen.current.month !== month) seen.current = { month, list: [] };
   const list = all.slice(0, n);
   for (const x of list) if (!seen.current.list.some((y) => y.k === x.k)) seen.current.list.push(x);
   for (const x of seen.current.list) if (!list.some((y) => y.k === x.k)) list.push(x);
-  // Revealing from the moment the month's messages are due until the last is shown, the wait before the first included.
-  const revealing = messages && n < allowed ? '1' : undefined;
+  // Revealing from the moment the month's messages are due until the last is shown, the wait before the first included;
+  // a month that is ending shows no more (A4).
+  const revealing = messages && n < allowed && !ending ? '1' : undefined;
   if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box} />;
   return (
     <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box}>

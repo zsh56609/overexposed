@@ -12,6 +12,7 @@ import { hover } from '../sound/sound.ts';
 import { photoUrl } from './halftone.ts';
 import { Icon, keyboardFocus } from './Icons.tsx';
 import type { EndTurnModel, FaceLine, HandCardModel, HandWords, ValueChip } from './model.ts';
+import { CARD_W, HAND_TOP, MAX_LIFT, fan, fanSpacing } from './fan.ts';
 
 /** Where a preview attaches: an element's box on the stage (App's Floating reads it). */
 export interface DeskAnchor {
@@ -23,23 +24,9 @@ export interface DeskAnchor {
 }
 export type HandFocus = { readonly kind: 'card'; readonly uid: number; readonly anchor: DeskAnchor } | { readonly kind: 'end'; readonly anchor: DeskAnchor } | null;
 
-/** The fan (the mockup's layoutHand), kept clear of END TURN when draws swell the hand. */
-const CARD_W = 186;
-const HAND_TOP = 490;
-const CENTRE = 540;
-const MAX_SPAN = 960;
-const MAX_LIFT = 18;
+/** The fan (the mockup's layoutHand; ./fan.ts), kept clear of END TURN when draws swell the hand. */
+export { fan, fanSpacing };
 const HOVER_LIFT = 13;
-/** The spacing between cards: the strip of each card the next one leaves showing. */
-export const fanSpacing = (n: number): number => Math.min(n > 5 ? 128 : 150, n > 1 ? (MAX_SPAN - CARD_W) / (n - 1) : 150);
-export function fan(n: number): { left: number; rot: number; lift: number }[] {
-  const sp = fanSpacing(n);
-  const x0 = CENTRE - (CARD_W + (n - 1) * sp) / 2;
-  return Array.from({ length: n }, (_, i) => {
-    const t = n === 1 ? 0 : (i / (n - 1)) * 2 - 1;
-    return { left: x0 + i * sp, rot: t * 8, lift: (1 - t * t) * MAX_LIFT };
-  });
-}
 const STAGE = { areaWidth: 1280, areaHeight: 720 };
 /** A preview stands above the highest a hovered card reaches, so it never hides the other cards' names. */
 const cardAnchor = (left: number): DeskAnchor => ({ left, top: HAND_TOP - MAX_LIFT - HOVER_LIFT, width: CARD_W, ...STAGE });

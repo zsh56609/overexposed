@@ -5,10 +5,18 @@ import { signedAmount } from '../text.ts';
 import type { Snapshot } from '../queue.ts';
 import { motionMode } from '../motion.ts';
 import { cue, tick } from '../sound/sound.ts';
-import { fan } from './Hand.tsx';
+import { fan } from './fan.ts';
+import { easing, FLIGHT, planFlight, type FlightPlan, type Key } from './flight.ts';
 
 const SLOTS = [[896, 458, -8], [918, 450, 5], [938, 442, -3], [956, 436, 7], [972, 430, -5]] as const;
 const planeAt = (x: number, y: number, rot: number, scale: number) => `translate(${x - 93}px,${y - 126}px) rotateZ(${rot}deg) scale(${scale})`;
+/** The flight's layers (motion.css): in front of the hand, then under it and the season's dim (round R7, A1). */
+const LAYER = { front: 85, under: 31 } as const;
+/** A track of the flight plan as Web Animations keyframes, each key at its moment of the flight, eased to the next. */
+const frames = <T,>(keys: readonly Key<T>[], css: (v: T) => Keyframe): Keyframe[] =>
+  keys.map((k) => ({ ...css(k.value), offset: k.at / FLIGHT.settle, ...(k.ease ? { easing: easing(k.ease) } : {}) }));
+/** The plans already made, by hand size, place and slot: a hand plays the same flights again. */
+const plans = new Map<string, FlightPlan>();
 
 export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: () => void) => () => void }) {
   const host = useRef<HTMLDivElement>(null);
@@ -68,34 +76,35 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
       const backgroundImage = face.style.backgroundImage;
       face.style.cssText = 'left:0;top:0;transform-origin:50% 50%;pointer-events:none;transition:none;--strip:150px';
       face.style.backgroundImage = backgroundImage;
-      const plane = document.createElement('div'); plane.className = 'plane motion-face'; plane.appendChild(face);
-      host.current.querySelector('.motion-flight')?.appendChild(plane);
-      const rot = parseFloat(original.style.getPropertyValue('--rot')) || 0;
-      const lift = parseFloat(original.style.getPropertyValue('--lift')) || 0;
-      const angle = rot * Math.PI / 180;
-      const cx = parseFloat(original.style.left) + 93 + 176 * Math.sin(angle);
-      const cy = 490 - lift + 302 - 176 * Math.cos(angle);
+      const plane = document.createElement('div'); plane.className = 'plane motion-face';
+      const raise = document.createElement('div'); raise.className = 'motion-raise';
+      plane.appendChild(raise); raise.appendChild(face);
+      const layer = host.current.querySelector<HTMLElement>('.motion-flight')!;
+      layer.appendChild(plane);
       const pileCount = root.querySelectorAll('.motion-pile .plane').length;
-      const [x, y, rz] = SLOTS[Math.min(pileCount, SLOTS.length - 1)]!;
+      const slot = Math.min(pileCount, SLOTS.length - 1);
+      const [x, y, rz] = SLOTS[slot]!;
       original.style.visibility = 'hidden';
-      const remaining = [...root.querySelectorAll<HTMLElement>('.hand .card')].filter(c => c !== original);
+      const cards = [...root.querySelectorAll<HTMLElement>('.hand .card')];
+      const remaining = cards.filter(c => c !== original);
       const positions = fan(remaining.length);
       remaining.forEach((card, i) => {
         const pos = positions[i]!;
         card.style.left = `${pos.left}px`; card.style.setProperty('--rot', `${pos.rot}deg`); card.style.setProperty('--lift', `${pos.lift}px`);
       });
-      const planeMotion = plane.animate([
-        { transform: 'rotateX(0deg)', offset: 0 }, { transform: 'rotateX(0deg)', offset: 290 / 930, easing: 'cubic-bezier(.5,.05,.25,1)' },
-        { transform: 'rotateX(58deg)', offset: 750 / 930, easing: 'cubic-bezier(.3,0,.3,1)' }, { transform: 'rotateX(64deg)' },
-      ], { duration: 930, fill: 'forwards' });
-      const faceMotion = face.animate([
-        { transform: planeAt(cx, cy, rot, 1), offset: 0, easing: 'cubic-bezier(.2,.7,.3,1)' },
-        { transform: planeAt(cx, cy - 50, 0, 1.04), offset: 200 / 930 },
-        { transform: planeAt(cx, cy - 50, 0, 1.04), offset: 290 / 930, easing: 'cubic-bezier(.5,.05,.25,1)' },
-        { transform: planeAt(x, y - 4, rz, .57), offset: 750 / 930, easing: 'cubic-bezier(.3,0,.3,1)' },
-        { transform: planeAt(x, y, rz, .55) },
-      ], { duration: 930, fill: 'forwards' });
-      flight.current = { id: step.id, plane, face, original, x, y, rot: rz, animations: [planeMotion, faceMotion] };
+      // The flight (round R7, A1; ./flight.ts): lifted and held in front of the hand, carried — raised where it must
+      // clear the fan — and from the first moment it overlaps no card left in the hand, under the hand and the season's
+      // dim, landing there. The face rides a raise inside the tilting plane; the layer changes once, on that moment.
+      const key = `${cards.length}:${cards.indexOf(original)}:${slot}`;
+      const plan = plans.get(key) ?? planFlight(cards.length, cards.indexOf(original), { x, y, rot: rz });
+      plans.set(key, plan);
+      const timing = { duration: FLIGHT.settle, fill: 'forwards' } as const;
+      const planeMotion = plane.animate(frames(plan.tilt, (v) => ({ transform: `rotateX(${v}deg)` })), timing);
+      const raiseMotion = raise.animate(frames(plan.raise, (v) => ({ transform: `translateY(${v}px)` })), timing);
+      const faceMotion = face.animate(frames(plan.face, (v) => ({ transform: planeAt(v.x, v.y, v.rot, v.scale) })), timing);
+      const under = plan.under / FLIGHT.settle;
+      const layerMotion = layer.animate([{ zIndex: LAYER.front }, { zIndex: LAYER.front, offset: under }, { zIndex: LAYER.under, offset: under }, { zIndex: LAYER.under }], timing);
+      flight.current = { id: step.id, plane, face, original, x, y, rot: rz, animations: [planeMotion, raiseMotion, faceMotion, layerMotion] };
     }
     if (beat !== 'land' || lastLand.current === step.id) return;
     lastLand.current = step.id;

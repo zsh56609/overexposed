@@ -107,7 +107,7 @@
         },
         {
           "replyKey": "event.sam_interview.b.reply",
-          "effects": [{ "op": "addCard", "cardId": "tabloid_story", "to": "discard" }],
+          "effects": [{ "op": "addCard", "cardId": "copycat_story", "to": "discard" }],
           "press": { "paper": "flash", "kind": "scandal", "lineKeys": ["event.sam_interview.b.press.1"] },
           "outcomeKey": "event.sam_interview.b.outcome"
         },

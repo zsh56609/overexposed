@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { Page } from './browser.ts';
 import { cardPoint, centre, loadStates, reach, type DeskState, type Step } from './desk-replay.ts';
-import { qualifyingMonths } from './month-fixtures.ts';
+import { bubbleMonth, qualifyingMonths } from './month-fixtures.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.scr')?.textContent})`;
 async function waitIdle(page:Page) {
@@ -238,31 +238,55 @@ export async function checkBoundaryInput(page:Page,url:string) {
     }
   }
   // The month's messages (round R3, C1): no step's beat any more but the desk's tails, once its hand is dealt. They
-  // hold no input; the phone lights as each comes, never a whole-phone filter; the next action brings the rest at
-  // once, its light finished, and acts.
+  // hold no input, and the phone lights as each comes, never a whole-phone filter. Round R7, A4: once the first has
+  // come, the rest keep their pace whatever the player does — the author's case: four bubbles, a card played 0.3 s
+  // after the desk is still; they come one at a time, about 0.38 s apart.
   const only=process.argv.find(a=>a.startsWith('--boundary='))?.slice(11);
   if(!only||only==='arrival'){
-    const fixture={...states.early!,steps:states.early!.steps.slice(0,-1)};
+    const fixture=bubbleMonth();
     assert.equal(await reach(page,url,fixture,80),'ok');
     await page.evaluate(`document.documentElement.dataset.motion='full'`);
-    await page.click(...(await centre(page,'.draft .take'))!);
-    const start=Date.now();
-    while(!await page.evaluate<boolean>(`document.querySelector('.desk')?.dataset.busy!=='1'&&!!document.querySelector('.bubbles[data-revealing] .bub[data-k]')`)){
-      assert.ok(Date.now()-start<15000,'arrival: no message came once the hand was dealt');await sleep(10);
+    const step=await page.evaluate<string>(`document.querySelector('.desk').dataset.step`);
+    // Every change of the bubbles shown and of the desk's input hold, frame by frame, from END TURN on.
+    await page.evaluate(`(()=>{window.__bub=[];const tick=()=>{const d=document.querySelector('.desk');const n=d?d.querySelectorAll('.bubbles .bub[data-k]').length:-1;const busy=d?.dataset.busy;const last=window.__bub.at(-1);if(!last||last[1]!==n||last[2]!==busy)window.__bub.push([performance.now(),n,busy]);if(window.__bub.length<400)requestAnimationFrame(tick);};requestAnimationFrame(tick);})()`);
+    await page.click(...(await centre(page,'.endbtn'))!);
+    let start=Date.now();
+    while(!await page.evaluate<boolean>(`(()=>{const d=document.querySelector('.desk');return !!d&&d.dataset.busy!=='1'&&d.dataset.step!==${JSON.stringify(step)}})()`)){
+      assert.ok(Date.now()-start<15000,'arrival: the month never opened');await sleep(10);
+    }
+    const stillAt=Date.now();
+    while(!await page.evaluate<boolean>(`!!document.querySelector('.desk .bubbles .bub[data-k]')`)){
+      assert.ok(Date.now()-stillAt<3000,'arrival: no message came once the hand was dealt');await sleep(10);
     }
     const pulse=`document.querySelector('.phone .phone-screen').getAnimations().some(a=>a.effect.getTiming().duration===450&&a.effect.getKeyframes().some(k=>k.boxShadow))`;
     const phone=await page.evaluate<{filter:string;screenPulse:boolean}>(`({filter:getComputedStyle(document.querySelector('.phone')).filter,screenPulse:${pulse}})`);
     assert.equal(phone.filter,'none','arrival must not filter the whole transformed phone');
     assert.equal(phone.screenPulse,true,'arrival must retain the screen light response');
-    const step=await page.evaluate<string>(`document.querySelector('.desk').dataset.step`);
+    await sleep(Math.max(0,300-(Date.now()-stillAt)));
+    const opened=await page.evaluate<string>(`document.querySelector('.desk').dataset.step`);
     const index=await page.evaluate<number>(`[...document.querySelectorAll('.hand .card')].findIndex(c=>c.getAttribute('aria-disabled')==='false')`);
     assert.ok(index>=0,'arrival: no legal card to play');
     await page.click(...(await cardPoint(page,index))!);
     await sleep(40);
-    const after=await page.evaluate<{revealing:boolean;pulse:boolean;acted:boolean}>(`({revealing:!!document.querySelector('.bubbles[data-revealing]'),pulse:${pulse},acted:document.querySelector('.desk').dataset.busy==='1'||document.querySelector('.desk').dataset.step!==${JSON.stringify(step)}})`);
-    assert.equal(after.revealing,false,'arrival: the next action did not bring the rest of the messages');
-    assert.equal(after.pulse,false,'arrival: the next action did not finish the phone light');
-    assert.equal(after.acted,true,'arrival: the next action did not act');
-    console.log(`boundary input ${page.name}: arrival holds no input; the next action brings the rest, finishes the light and acts`);
+    const acted=await page.evaluate<boolean>(`document.querySelector('.desk').dataset.busy==='1'||document.querySelector('.desk').dataset.step!==${JSON.stringify(opened)}`);
+    assert.equal(acted,true,'arrival: the play did not act at once');
+    start=Date.now();
+    while(await page.evaluate<boolean>(`!!document.querySelector('.bubbles[data-revealing]')`)){
+      assert.ok(Date.now()-start<6000,'arrival: the messages never all came');await sleep(30);
+    }
+    await sleep(100);
+    const trace=await page.evaluate<[number,number,string][]>('window.__bub');
+    // From the frame the new month's desk was still: each bubble's arrival, one at a time.
+    const still=trace.findIndex((e,i)=>i>0&&e[2]==='0'&&trace.slice(0,i).some(x=>x[2]==='1'));
+    assert.ok(still>0,'arrival: no still desk after END TURN in the trace');
+    const comes:number[]=[];let shown=trace[still]![1];
+    for(const [at,n] of trace.slice(still)){
+      if(n>shown){assert.equal(n-shown,1,`arrival: ${n-shown} bubbles came in one frame`);comes.push(at);}
+      shown=Math.max(shown,n);
+    }
+    assert.equal(shown,4,`arrival: ${shown} bubbles shown, expected the month's four`);
+    const gaps=comes.slice(1).map((t,i)=>t-comes[i]!);
+    for(const g of gaps)assert.ok(g>300&&g<520,`arrival: bubbles ${gaps.map(Math.round).join(', ')} ms apart, expected about 380`);
+    console.log(`boundary input ${page.name}: arrival holds no input; with a card played 0.3 s after the desk was still, the four bubbles came one at a time, ${gaps.map(Math.round).join(', ')} ms apart`);
   }
 }

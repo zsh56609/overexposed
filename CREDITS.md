@@ -1,8 +1,8 @@
 # Credits
 
 Every third-party asset Overexposed ships, for the itch.io page and the jam's
-credits requirement (AGENTS.md §6, §10). The game shows the same credits from
-its title screen.
+credits requirement (AGENTS.md §6, §10). The game shows these credits, shorter,
+from its title screen.
 
 ## Fonts
 

@@ -158,7 +158,11 @@ italic line.
   desk's plane**: it uses the desk's own perspective (1100px, vanishing point 640,140)
   and tilts about the desk's own hinge (its front edge, 640,556) to the desk's 64°, so it
   converges with the phone and the desk. Once down it sits beneath the hand, and the
-  nearest hand cards may hide part of it. As it lands its
+  nearest hand cards may hide part of it — so it never jumps behind them (round R7): it rises
+  out of the fan in front of the hand, and from the moment it overlaps none of the cards left
+  in it, it goes under the hand and the season's dim and comes down there; where its path
+  would cross the fan all the way to its slot, the carry arcs higher to clear the fan first.
+  As it lands its
   line is **printed**: on the front paper a new item, "Just in", appears left to right
   as if under a press roller, with a brief warm flash and the red margin rule; the paper it prints in has
   come forward while the card was carried (§2); quiet work is written into the **notebook**.
@@ -178,7 +182,8 @@ italic line.
   opener) while the light changes → the papers show the new issue → a new hand is dealt
   one card at a time and the bulbs relight → the manager's messages arrive as a chat
   does: each new bubble grows in at the bottom and pushes the earlier ones up, and the
-  phone on the desk buzzes.
+  phone on the desk buzzes. Once the first has come, the rest keep their pace whatever the
+  player does; a month that ends before they have all come shows no more (round R7).
 - **Deck.** A panel: "Still to draw — sorted by name, not in the order you'll draw
   them" and "Played — back into the deck when it runs out", as mini card faces;
   scandals in red. Never reveal draw order.
@@ -187,8 +192,10 @@ italic line.
   "Endings found · N of 14".
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
   (off). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
-  track comes back (round R4). Credits share this panel's style: the fonts,
-  the music (Holizna, CC0 1.0, linked to Holizna's OpenGameArt page) and how the sound is made.
+  track comes back (round R4). Credits share this panel's style (round R7): one row per credit,
+  the role beside the name — the game's maker, the music (linked to Holizna's OpenGameArt page),
+  the typefaces (linked to their licence), the art and sound, the AI assistance — and a foot
+  with the jam and the version.
 
 ### 10. Sound (round R4)
 

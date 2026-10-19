@@ -306,41 +306,43 @@ export function NumbersPanel({ s, steps, onClose }: { s: GameState; steps: reado
 const HOLIZNA_URL = 'https://opengameart.org/user/120037';
 
 /**
- * The credits, in House rules' style: every third-party asset the game ships, as the jam requires — the two font
- * families, their copyright notices and their licence (ui/fonts/OFL.txt, shipped beside the fonts); since round R4
- * (B6), the music, Holizna's six tracks (CC0 1.0), and how the sound effects are made.
+ * The credits, in House rules' style (round R7, A2): one row per credit, the role beside the name — who made the game,
+ * the music, the typefaces, the art and sound, the AI assistance — and a link after its name where there is one. A
+ * name may wrap to a second line; nothing else in a row does. The copyright notices, the sources and the six track
+ * titles are CREDITS.md's and the itch page's: the font licence linked here (ui/fonts/OFL.txt, shipped beside the fonts
+ * by this import) carries both fonts' notices, as the licence asks.
  */
 export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
+  const rows: readonly { readonly role: string; readonly name: string; readonly link?: { readonly href: string; readonly label: string } }[] = [
+    { role: t('ui.credits.author'), name: t('credits.author') },
+    { role: t('ui.credits.music'), name: t('credits.music.holizna'), link: { href: HOLIZNA_URL, label: t('ui.credits.musicLink') } },
+    { role: t('ui.credits.fonts'), name: t('credits.fonts'), link: { href: licenceUrl, label: t('ui.credits.read') } },
+    { role: t('ui.credits.sound'), name: t('credits.sound') },
+    { role: t('ui.credits.ai'), name: t('credits.ai') },
+  ];
   return (
     <Overlay id="credits" label={t('ui.credits.title')} overDesk={overDesk} onClose={onClose}>
       <div className="set credits">
         <Head kicker={t('ui.title.name')} title={t('ui.credits.title')} close={t('ui.credits.close')} onClose={onClose} />
-        <div className="crow">
-          <b>{t('ui.credits.fonts')}</b>
-          <span>{t('credits.font.playfair')}</span>
-          <span>{t('credits.font.franklin')}</span>
-          <span>
-            {t('ui.credits.licence')}{' '}
-            <a href={licenceUrl} target="_blank" rel="noreferrer">
-              {t('ui.credits.read')}
-            </a>
-          </span>
-        </div>
-        <div className="crow">
-          <b>{t('ui.credits.music')}</b>
-          <span>{t('credits.music.holizna')}</span>
-          <span>
-            <a href={HOLIZNA_URL} target="_blank" rel="noreferrer">
-              {t('ui.credits.musicLink')}
-            </a>
-          </span>
-        </div>
-        <div className="crow">
-          <b>{t('ui.credits.sound')}</b>
-          <span>{t('credits.sound')}</span>
-        </div>
-        {/* The build's version, small at the foot (round R3): major and minor, as the itch page names builds. */}
-        <div className="ver">{t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })}</div>
+        {rows.map((row) => (
+          <div className="crow" key={row.role}>
+            <h4>{row.role}</h4>
+            <span>
+              {row.name}
+              {row.link && (
+                <>
+                  {' '}
+                  <a href={row.link.href} target="_blank" rel="noreferrer">
+                    {row.link.label}
+                  </a>
+                </>
+              )}
+            </span>
+          </div>
+        ))}
+        {/* The foot: the jam, and the build's version after a middle dot (round R3; major and minor, as the itch page
+            names builds). */}
+        <div className="ver">{[t('ui.credits.jam'), t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })].join(' · ')}</div>
       </div>
     </Overlay>
   );
