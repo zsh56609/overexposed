@@ -722,6 +722,13 @@ export interface EventDef {
     readonly condition?: Condition;
     /** Its weight doubles (rules.events.laneWeight) while this lane is established. */
     readonly lane?: string;
+    /**
+     * The rival's years it may come in (round R7, B1): arc ids from press.rival.arcs. A run's arc is fixed when it
+     * starts (core/rival.ts), so this is a pure read. Absent: any year.
+     */
+    readonly rival?: readonly string[];
+    /** Its weight in the draw (round R7, B2): a whole number from 1 to 5, together with the lane's. Absent: 1. */
+    readonly weight?: number;
   };
   /** A text's bubbles (up to three) or a letter's paragraphs (up to four). */
   readonly messageKeys: readonly string[];

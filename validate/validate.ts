@@ -1223,7 +1223,8 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   checkFaces(v, rules, cards);
   checkScripts(v, raw.scripts, rules);
   const paperIds = new Set(isObj(raw.press) && Array.isArray(raw.press.papers) ? raw.press.papers.map((p) => (isObj(p) ? p.id : undefined)).filter(isStr) : []);
-  checkEvents(v, raw.events, rules, paperIds);
+  const arcIds = new Set(isObj(raw.press) && isObj(raw.press.rival) && Array.isArray(raw.press.rival.arcs) ? raw.press.rival.arcs.map((a) => (isObj(a) ? a.id : undefined)).filter(isStr) : []);
+  checkEvents(v, raw.events, rules, paperIds, arcIds);
   const earliestAct = checkReachability(v, rules, cards);
   checkStructure(v, rules, cards, gates);
   checkBudget(v, cards, gates, endings);
@@ -1649,9 +1650,9 @@ function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
 const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'choices'];
 const EVENT_CHOICE_FIELDS = ['replyKey', 'requires', 'effects', 'press', 'outcomeKey'];
 /** Events have their own budget (AGENTS.md → Content budget): a ceiling, not a target. */
-const EVENT_BUDGET = 15;
+const EVENT_BUDGET = 28;
 
-function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: ReadonlySet<string>): void {
+function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: ReadonlySet<string>, arcIds: ReadonlySet<string>): void {
   const file = 'content/events.json';
   if (raw === undefined) return;
   if (!isObj(raw)) return v.error('schema', file, 'must be { categories, events }');
@@ -1714,9 +1715,9 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
     }
     let firstAct = 1;
     const w = isObj(e.when) ? e.when : null;
-    if (!w) v.error('schema', `${where}.when`, 'must be { months, condition?, lane? }');
+    if (!w) v.error('schema', `${where}.when`, 'must be { months, condition?, lane?, rival?, weight? }');
     else {
-      v.fields(w, ['months', 'condition', 'lane'], `${where}.when`);
+      v.fields(w, ['months', 'condition', 'lane', 'rival', 'weight'], `${where}.when`);
       const m = isObj(w.months) ? w.months : null;
       if (!m) v.error('schema', `${where}.when.months`, 'must be { from, to? }');
       else {
@@ -1732,6 +1733,12 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
       }
       if (w.condition !== undefined) checkCondition(v, w.condition, `${where}.when.condition`);
       if (w.lane !== undefined && !v.lanes.includes(w.lane as string)) v.error('references', `${where}.when.lane`, `no lane ${q(w.lane)} in rules.lanes`);
+      // The rival's years (round R7, B1): arc ids from press.rival.arcs; and a weight from 1 to 5 (B2).
+      if (w.rival !== undefined) {
+        if (!Array.isArray(w.rival) || w.rival.length === 0) v.error('schema', `${where}.when.rival`, 'must be a non-empty list of rival arc ids');
+        else w.rival.forEach((id, i) => { if (!arcIds.has(id as string)) v.error('references', `${where}.when.rival[${i}]`, `no rival arc with id ${q(id)} in press.rival.arcs`); });
+      }
+      v.int(w.weight, `${where}.when.weight`, [1, 5], { optional: true });
     }
     if (!Array.isArray(e.messageKeys) || e.messageKeys.length === 0) v.error('schema', `${where}.messageKeys`, 'must be a non-empty list of keys');
     else {

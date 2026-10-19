@@ -291,7 +291,13 @@ a `{ nameKey, lineKey }` for each of `personal`, `industry`, `press`,
   one opener; a follow-up reads the flag its opener's answer set.
 - `when`: `months` `{ from, to? }` (inclusive; `to` defaults to the
   year's last), an optional `condition` (the one shape), an optional
-  `lane` — its weight doubles while that lane is established.
+  `lane` — its weight doubles while that lane is established — an
+  optional `rival` (round R7): the rival arcs it may come in, ids from
+  `press.rival.arcs`; a run's arc is fixed when it starts
+  (`rivalArc(content, seed)`, core/press.ts), so the test is a pure read —
+  and an optional `weight` (round R7), a whole number from 1 to 5
+  (default 1), multiplying its weight in the draw together with the
+  lane's.
 - `messageKeys`; `choices` (two or three): `replyKey`, optional
   `requires` (a condition — unmet, the choice shows disabled with
   "Needs …"), `effects` (the closed set; money in thousands), optional
@@ -301,8 +307,9 @@ a `{ nameKey, lineKey }` for each of `personal`, `industry`, `press`,
 `rules.events`: `months` (the months an event may open — 2, 4, 6, 8, 10,
 12), `maxChains` (2), `laneWeight` (2). At each: an open chain's eligible
 follow-up (the earliest-opened chain first), else one drawn with the game's
-RNG among the eligible openers and one-offs; each at most once a run.
-Events have their own budget: 15.
+RNG among the eligible openers and one-offs, each by its weight; each at
+most once a run. A choice is "↺ remembered" when it sets a flag some
+event's condition reads. Events have their own budget: 28.
 
 ## i18n keys
 
@@ -322,6 +329,7 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
 - awards: fields, conditions, ending ids, a fallback award, at most 8
+- events: months, speaker and form, chains (one opener each), conditions, lanes, rival arcs (ids in `press.rival.arcs`), a weight from 1 to 5, messages and choices (one with no requirement), the event budget
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
 - variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)

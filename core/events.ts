@@ -5,17 +5,20 @@
 //
 //   1. A follow-up of an open chain whose condition holds and whose first month has come takes the month — the
 //      earliest-opened chain first, one a month.
-//   2. Otherwise one event is drawn among the eligible openers and one-offs, an event of the established lane
-//      weighted ×rules.events.laneWeight. An event comes at most once a run; once rules.events.maxChains chains
-//      are open, openers are no longer drawn.
+//   2. Otherwise one event is drawn among the eligible openers and one-offs, each by its weight (when.weight, round
+//      R7) — an event of the established lane ×rules.events.laneWeight besides. An event comes at most once a run;
+//      once rules.events.maxChains chains are open, openers are no longer drawn.
+// An event may name the rival's years it comes in (when.rival, round R7): the run's arc is fixed by its seed.
 //   3. Nothing eligible: no event that month.
 
 import { evaluate, explainCondition, type ClauseReport, type ConditionSubject } from './conditions.ts';
 import { getEvent, type ContentIndex, type Effect, type EventDef, type EventPressDef, type FlagTest } from './content.ts';
+import { rivalArc } from './rival.ts';
 import type { EventRecord } from './state.ts';
 
-/** What the event queries read: the condition subject, the established lane, the events met so far. */
+/** What the event queries read: the condition subject, the run's seed (its rival's year), the established lane, the events met so far. */
 export interface EventSubject extends ConditionSubject {
+  readonly seed: number;
   readonly establishedLane: string | null;
   readonly eventLog: readonly EventRecord[];
 }
@@ -48,7 +51,9 @@ export function eventCandidates(s: EventSubject): { readonly followUp: EventDef 
   const rules = c.rules.events;
   if (!rules || !isEventMonth(c, s.turn)) return { followUp: null, pool: [] };
   const met = new Set(s.eventLog.map((r) => r.eventId));
-  const eligible = (ev: EventDef) => !met.has(ev.id) && inMonths(c, ev, s.turn) && evaluate(ev.when.condition, s);
+  const arc = rivalArc(c, s.seed)?.id;
+  const inYear = (ev: EventDef) => ev.when.rival === undefined || (arc !== undefined && ev.when.rival.includes(arc));
+  const eligible = (ev: EventDef) => !met.has(ev.id) && inMonths(c, ev, s.turn) && inYear(ev) && evaluate(ev.when.condition, s);
   const chains = runChains(s);
   for (const chain of chains) {
     if (!chain.open) continue;
@@ -58,7 +63,7 @@ export function eventCandidates(s: EventSubject): { readonly followUp: EventDef 
   const canOpen = chains.length < rules.maxChains;
   const pool = c.events
     .filter((ev) => ev.chain?.role !== 'followUp' && (ev.chain?.role !== 'opener' || canOpen) && eligible(ev))
-    .map((event) => ({ event, weight: event.when.lane !== undefined && event.when.lane === s.establishedLane ? rules.laneWeight : 1 }));
+    .map((event) => ({ event, weight: (event.when.weight ?? 1) * (event.when.lane !== undefined && event.when.lane === s.establishedLane ? rules.laneWeight : 1) }));
   return { followUp: null, pool };
 }
 

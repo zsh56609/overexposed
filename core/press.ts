@@ -2,12 +2,13 @@
 // and what the papers call the player when it prints. Papers print the public acts; the notebook keeps the
 // private work. Read-only; ids, keys and numbers only — /ui renders the words.
 
-import { getCard, type ContentIndex, type PaperDef, type Prominence, type RivalArcDef, type SceneId } from './content.ts';
+import { getCard, type ContentIndex, type PaperDef, type Prominence, type SceneId } from './content.ts';
 import { eventPress } from './events.ts';
 import { establishedLanes } from './lanes.ts';
 import { readLines, type HistoryStep, type PrintedLine } from './lines.ts';
 import { deriveSeed } from './rng.ts';
 import type { GameEvent, GameState } from './state.ts';
+import { rivalArc } from './rival.ts';
 import { bagKey, hashId } from './variants.ts';
 
 /**
@@ -152,11 +153,7 @@ export interface MonthPress {
   readonly sagas: readonly { readonly paper: string; readonly key: string; readonly printed: boolean }[];
 }
 
-/** The rival's arc for a run, fixed by the seed at the start — never chosen to contrast the player's. */
-export function rivalArc(c: ContentIndex, seed: number): RivalArcDef | null {
-  const arcs = c.press?.rival?.arcs ?? [];
-  return arcs.length === 0 ? null : (arcs[deriveSeed(seed, hashId('rival')) % arcs.length] ?? null);
-}
+export { rivalArc } from './rival.ts';
 
 /** The month of a season that carries the rival's beat (seeded). */
 export function rivalBeatTurn(c: ContentIndex, seed: number, act: number): number {
