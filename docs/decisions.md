@@ -6,6 +6,22 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a: R7's two misses, accepted
+
+The author accepts R7's two sim misses as they stand:
+
+- juno_credit/a is one-sided (91–95 % of greedy appearances), as R4's three
+  are (sam_rent/c, producer_room/a, casting_arc/a): only comeback meets it,
+  and its two modes decide it.
+- dealseeker's Breakthrough under Mags is 70.4 % and 70.2 % on two of
+  three seeds (cap 70 %): mum_sunday's a keeps heat −4, since −3 makes
+  mum_sunday/b one-sided (91–93 %).
+- The spring opener, never shown (spring's card is the opening), stays in
+  content until R9 decides.
+
+R8a itself has no build: v0.8 is R8b's (`npm run build` still runs, as every
+round's check), and nothing that plays changed, so no sim:compare.
+
 ## 2026-10-20 — Round R8a, Part E: fewer words on screen
 
 The author's testers: one found "a lot to read" and clicked through it.
@@ -41,8 +57,9 @@ Three trims; no word is rewritten.
 - The two doors are always the same height: the row stretches the shorter,
   and each has a floor of 350 px (from 300) — about the height of one with
   two lines of flavour, one requirement and one line of branches with the
-  oval (340 px in Chromium here, 348 in the author's trial), so most doors
-  are one size and only the year's last grow.
+  oval (342 px in Chromium here, 348 in the author's trial; the oval and its
+  margin take 110 px), so most doors are one size and only the year's last
+  grow.
 - A card a door adds is a chip, not a sentence: "+", the cards icon, the
   card's name, "+2×" for more (`addChip`, a chip's new `lead`); the same on
   the faces, the replies and the previews, a scandal added keeping its
