@@ -6,7 +6,7 @@
 import { getCard, getManager, type ContentIndex } from '../../core/index.ts';
 import { t } from '../i18n.ts';
 import type { EndTurnPreview, Outcome, PlayPreview } from '../preview.ts';
-import { blockerText, cardName, heatText, isPlaceholder, lineText, mastheadName, money } from '../text.ts';
+import { blockerText, cardFlavor, cardName, heatText, isPlaceholder, lineText, mastheadName, money } from '../text.ts';
 import { FaceLines, Value } from './Hand.tsx';
 import { Icon } from './Icons.tsx';
 import { actionChip, clauseChip, craftLane, faceLines, outcomeChips, type ValueChip } from './model.ts';
@@ -29,6 +29,15 @@ function Results({ chips, words }: { chips: readonly ValueChip[]; words: readonl
       ))}
     </>
   );
+}
+
+/**
+ * A card's flavour line (round R8a, E1): it left the face in the hand, and the preview shows it — last, in the face's
+ * italic, whether or not the card can be played. A scandal has none here: its in-hand line stays on its face.
+ */
+function Flavour({ c, cardId }: { c: ContentIndex; cardId: string }) {
+  const text = getCard(c, cardId)?.kind === 'scandal' ? null : cardFlavor(c, cardId);
+  return text ? <p className={prose(text, 'fl')}>{text}</p> : null;
 }
 
 /** Heat before and after, and the line it stands at: "🔥 2 → 6 · 1 TO GO". */
@@ -95,6 +104,7 @@ export function PlayPreviewView({ c, p, lane, slots }: { c: ContentIndex; p: Pla
             <FaceLines lines={rules} />
           </div>
         )}
+        <Flavour c={c} cardId={p.cardId} />
       </div>
     );
   }
@@ -107,6 +117,7 @@ export function PlayPreviewView({ c, p, lane, slots }: { c: ContentIndex; p: Pla
       <Results {...results} />
       <HeatLine before={p.heatBefore} after={p.heatAfter ?? p.heatBefore} line={heatText(p.lineAfter)} />
       {crossing !== 0 && <p className="warn">{t(crossing === 1 ? 'ui.preview.crosses' : 'ui.preview.cools')}</p>}
+      <Flavour c={c} cardId={p.cardId} />
     </div>
   );
 }

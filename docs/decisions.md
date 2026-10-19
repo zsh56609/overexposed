@@ -6,6 +6,29 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a, Part E: fewer words on screen
+
+The author's testers: one found "a lot to read" and clicked through it.
+Three trims; no word is rewritten.
+
+- E1, a card's flavour line leaves its face in the hand, and so in flight
+  (the flight is the hand's face) and on the pile (`cardModel` gives none
+  but a scandal's). The card's preview (hover, long-press) shows it
+  instead: last, in the face's italic, whether or not the card can be
+  played. The offers and the deck & discard panel keep it on their faces
+  (`offerCardModel`). A scandal is not trimmed: its italic line is its
+  in-hand line and stays on every face — the hand, the month end's flip,
+  the pile — and its preview is as it was. The faces dev page's hands
+  follow the hand, so check:overflow audits the faces players see.
+- E2, the eight letters that opened with a paragraph of its own saying
+  "Hello," lose it — sam_interview, ex_feature, juno_soundalike,
+  casting_arc, charity_song, director_read, reality_show and fake_ad: the
+  key goes from the event and from en.json, and the other paragraphs keep
+  their keys (`.message.2`, `.message.3`).
+- E3, the mirror's sticky notes lose their goal line: a note is the
+  ending's name and what it takes. The goal lines stay in content, for
+  R8b; the desk model no longer carries them.
+
 ## 2026-10-20 — Round R8a, Part D: doors and seasons
 
 - D1, every door has a photograph: an oval of 164×96 above "You're

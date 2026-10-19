@@ -165,6 +165,8 @@
 .desk .floating .preview-headline.in-hand { font-style: italic; }
 .desk .floating .paper-label { display: inline-block; margin-right: 6px; padding: 1px 4px; border: 1px solid currentColor; font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 8.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; vertical-align: 2px; }
 .desk .floating .muted { color: #6b6152; }
+/* A card's flavour line (round R8a, E1), last in its preview, in the face's italic. */
+.desk .floating .preview .fl { margin-top: 7px; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 400; font-size: 11.5px; line-height: 1.32; opacity: .86; }
 .desk .floating .warn, .desk .floating .alarm { color: #b3261e; font-weight: 700; }
 .desk .floating .scandal-list { list-style: none; padding-left: 0; }
 .desk .floating .scandal-list li { margin-top: 5px; }

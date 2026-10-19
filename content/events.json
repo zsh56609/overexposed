@@ -97,7 +97,7 @@
       "speaker": { "paper": "flash", "letterheadKey": "event.letterhead.flash_features", "signoffKey": "event.signoff.marsh" },
       "chain": { "id": "sam", "role": "followUp" },
       "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["sam_refused"] }, "hype": { "min": 15 } } },
-      "messageKeys": ["event.sam_interview.message.1", "event.sam_interview.message.2", "event.sam_interview.message.3"],
+      "messageKeys": ["event.sam_interview.message.2", "event.sam_interview.message.3"],
       "choices": [
         {
           "replyKey": "event.sam_interview.a.reply",
@@ -126,7 +126,7 @@
       "speaker": { "paper": "flash", "letterheadKey": "event.letterhead.flash_features", "signoffKey": "event.signoff.marsh" },
       "chain": { "id": "ex", "role": "opener" },
       "when": { "months": { "from": 4, "to": 8 }, "condition": { "hype": { "min": 15 } } },
-      "messageKeys": ["event.ex_feature.message.1", "event.ex_feature.message.2", "event.ex_feature.message.3"],
+      "messageKeys": ["event.ex_feature.message.2", "event.ex_feature.message.3"],
       "choices": [
         {
           "replyKey": "event.ex_feature.a.reply",
@@ -239,7 +239,7 @@
       "speaker": { "paper": "bside", "letterheadKey": "event.letterhead.bside_reviews", "signoffKey": "event.signoff.iyer" },
       "chain": { "id": "juno", "role": "followUp" },
       "when": { "months": { "from": 10 }, "condition": { "flags": { "all": ["juno_declined"] } } },
-      "messageKeys": ["event.juno_soundalike.message.1", "event.juno_soundalike.message.2", "event.juno_soundalike.message.3"],
+      "messageKeys": ["event.juno_soundalike.message.2", "event.juno_soundalike.message.3"],
       "choices": [
         {
           "replyKey": "event.juno_soundalike.a.reply",
@@ -537,7 +537,7 @@
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.hartley_webb", "signoffKey": "event.signoff.webb" },
       "when": { "months": { "from": 4, "to": 11 }, "lane": "screen" },
-      "messageKeys": ["event.casting_arc.message.1", "event.casting_arc.message.2", "event.casting_arc.message.3"],
+      "messageKeys": ["event.casting_arc.message.2", "event.casting_arc.message.3"],
       "choices": [
         {
           "replyKey": "event.casting_arc.a.reply",
@@ -610,7 +610,7 @@
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.northfield", "signoffKey": "event.signoff.events_team" },
       "when": { "months": { "from": 5, "to": 12 }, "condition": { "hype": { "min": 30 } } },
-      "messageKeys": ["event.charity_song.message.1", "event.charity_song.message.2", "event.charity_song.message.3"],
+      "messageKeys": ["event.charity_song.message.2", "event.charity_song.message.3"],
       "choices": [
         {
           "replyKey": "event.charity_song.a.reply",
@@ -664,7 +664,7 @@
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.bramwell", "signoffKey": "event.signoff.okoro" },
       "when": { "months": { "from": 6, "to": 10 }, "condition": { "hype": { "min": 20 } }, "lane": "screen" },
-      "messageKeys": ["event.director_read.message.1", "event.director_read.message.2", "event.director_read.message.3"],
+      "messageKeys": ["event.director_read.message.2", "event.director_read.message.3"],
       "choices": [
         {
           "replyKey": "event.director_read.a.reply",
@@ -723,7 +723,7 @@
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.larkspur", "signoffKey": "event.signoff.adeyemi" },
       "when": { "months": { "from": 4, "to": 10 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
-      "messageKeys": ["event.reality_show.message.1", "event.reality_show.message.2", "event.reality_show.message.3"],
+      "messageKeys": ["event.reality_show.message.2", "event.reality_show.message.3"],
       "choices": [
         {
           "replyKey": "event.reality_show.a.reply",
@@ -750,7 +750,7 @@
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.hilltop", "signoffKey": "event.signoff.brand_team" },
       "when": { "months": { "from": 6, "to": 12 }, "condition": { "hype": { "min": 20 } }, "lane": "celebrity" },
-      "messageKeys": ["event.fake_ad.message.1", "event.fake_ad.message.2", "event.fake_ad.message.3"],
+      "messageKeys": ["event.fake_ad.message.2", "event.fake_ad.message.3"],
       "choices": [
         {
           "replyKey": "event.fake_ad.a.reply",

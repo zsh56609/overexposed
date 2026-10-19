@@ -72,7 +72,7 @@ function Faces() {
     <div className="desk summer lane-early">
       <IconDefs />
       <Hand
-        cards={cards.map((card) => ({ ...card, playable: true }))}
+        cards={cards.map((card) => ({ ...card, playable: true, flavour: card.scandal ? card.flavour : null }))}
         words={words()}
         endTurn={{ title: '', sub: '', printing: 0, legal: false }}
         season="summer"

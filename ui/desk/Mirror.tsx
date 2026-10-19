@@ -1,6 +1,6 @@
 // The mirror (round V1a; README §3), back right: a bulb frame round the glass; the black card taped to it — "If
-// the year ended today", the major and the minor; three sticky notes for the other three majors, each with its
-// goal line and its requirements in the stat bar's words. In a frenzy some bulbs flicker or go dark and a red
+// the year ended today", the major and the minor; three sticky notes for the other three majors, each its name and
+// its requirements in the stat bar's words (no goal line since round R8a, E3). In a frenzy some bulbs flicker or go dark and a red
 // clipping is stuck to the glass. Every word is the adapter's (./model.ts).
 
 import { memo, type ReactNode } from 'react';
@@ -61,7 +61,6 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
           return (
             <div key={note.majorId} className={`sticky ${note.colour}`} data-major={note.majorId} style={{ left: spot.left, top: spot.top, ['--r' as string]: `${spot.r}deg` }}>
               <b className={ph(note.name, '')}>{note.name}</b>
-              <span className={ph(note.goal, 'goal')}>{note.goal}</span>
               {note.reqs.map((r, k) => (
                 <div key={k} className={`req ${r.met ? 'ok' : 'no'}`}>
                   <i>{r.mark}</i>

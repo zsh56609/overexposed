@@ -63,7 +63,6 @@ import {
   flagName,
   flagNegative,
   lineText,
-  majorGoal,
   majorName,
   managerName,
   mastheadName,
@@ -123,7 +122,6 @@ export interface MirrorNote {
   readonly majorId: string;
   readonly colour: NoteColour;
   readonly name: string;
-  readonly goal: string;
   readonly reqs: readonly NoteReq[];
 }
 
@@ -244,7 +242,10 @@ export interface HandCardModel {
   readonly lines: readonly FaceLine[];
   /** An opportunity: a small label on the face, like the cost bulbs (round R1, H2). */
   readonly opportunity: boolean;
-  /** The italic line, always last on the face; a scandal's is its in-hand line. */
+  /**
+   * The italic line, always last on the face; a scandal's is its in-hand line. Round R8a (E1): a card in the hand — and
+   * so in flight and on the pile — has none but a scandal's; its preview shows it. An offer's or the deck's face keeps it.
+   */
   readonly flavour: string | null;
   /** Actions it costs: bulbs on the face only above one. */
   readonly cost: number;
@@ -447,7 +448,7 @@ function mirror(s: GameState, issue: MonthPress | null): MirrorModel {
       .map((m, i) => ({ m, colour: m.note ?? (NOTE_ORDER[i % NOTE_ORDER.length] as NoteColour) }))
       .filter(({ m }) => m.id !== today?.majorId)
       .slice(0, 3)
-      .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), goal: majorGoal(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
+      .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
     clipping: newest ? pageItemText(c, newest) : null,
   };
 }
@@ -884,7 +885,8 @@ export function cardModel(s: GameState, h: CardInstance, lines: LinesSoFar, play
       name: cardName(c, h.cardId, lines.lane),
       lines: faceLines(c, h.cardId, lines.lane),
       opportunity: def?.kind === 'opportunity',
-      flavour: scandal ? lineText(c, lines.inHand.get(h.uid), h.cardId) : cardFlavor(c, h.cardId),
+      // In the hand, only a scandal's line (round R8a, E1): any other card's flavour is in its preview.
+      flavour: scandal ? lineText(c, lines.inHand.get(h.uid), h.cardId) : null,
       cost: def?.cost ?? 1,
       playable,
       why: scandal ? 'scandal' : !check ? null : check.blockers.some((b) => b.code === 'slots') ? 'actions' : 'requires',
