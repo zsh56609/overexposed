@@ -39,14 +39,14 @@
       "major": "breakthrough",
       "conditions": { "lane": { "any": ["screen"] } },
       "nameKey": "ending.leading_role.name",
-      "textKeys": ["ending.leading_role.text.1"]
+      "textKeys": ["ending.leading_role.text.1", "ending.leading_role.text.2"]
     },
     {
       "id": "household_name",
       "major": "breakthrough",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.household_name.name",
-      "textKeys": ["ending.household_name.text.1"]
+      "textKeys": ["ending.household_name.text.1", "ending.household_name.text.2"]
     },
     {
       "id": "star",
@@ -54,28 +54,28 @@
       "conditions": { "lane": { "any": ["music"] }, "flags": { "all": ["signed_label"] } },
       "nameKey": "ending.star.name",
       "goalKey": "ending.star.goal",
-      "textKeys": ["ending.star.text.1"]
+      "textKeys": ["ending.star.text.1", "ending.star.text.2"]
     },
     {
       "id": "the_independent",
       "major": "breakthrough",
       "fallback": true,
       "nameKey": "ending.the_independent.name",
-      "textKeys": ["ending.the_independent.text.1"]
+      "textKeys": ["ending.the_independent.text.1", "ending.the_independent.text.2"]
     },
     {
       "id": "redemption_arc",
       "major": "overexposed",
       "conditions": { "scandalDrop": { "min": 2 } },
       "nameKey": "ending.redemption_arc.name",
-      "textKeys": ["ending.redemption_arc.text.1"]
+      "textKeys": ["ending.redemption_arc.text.1", "ending.redemption_arc.text.2"]
     },
     {
       "id": "tabloid_royalty",
       "major": "overexposed",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.tabloid_royalty.name",
-      "textKeys": ["ending.tabloid_royalty.text.1"]
+      "textKeys": ["ending.tabloid_royalty.text.1", "ending.tabloid_royalty.text.2"]
     },
     {
       "id": "meltdown",
@@ -83,21 +83,21 @@
       "fallback": true,
       "nameKey": "ending.meltdown.name",
       "goalKey": "ending.meltdown.goal",
-      "textKeys": ["ending.meltdown.text.1"]
+      "textKeys": ["ending.meltdown.text.1", "ending.meltdown.text.2"]
     },
     {
       "id": "character_actor",
       "major": "long_game",
       "conditions": { "craft": { "min": 55 }, "lane": { "any": ["screen"] } },
       "nameKey": "ending.character_actor.name",
-      "textKeys": ["ending.character_actor.text.1"]
+      "textKeys": ["ending.character_actor.text.1", "ending.character_actor.text.2"]
     },
     {
       "id": "the_one_to_watch",
       "major": "long_game",
       "conditions": { "lane": { "any": ["celebrity"] } },
       "nameKey": "ending.the_one_to_watch.name",
-      "textKeys": ["ending.the_one_to_watch.text.1"]
+      "textKeys": ["ending.the_one_to_watch.text.1", "ending.the_one_to_watch.text.2"]
     },
     {
       "id": "craftsman",
@@ -105,7 +105,7 @@
       "conditions": { "craft": { "min": 55 } },
       "nameKey": "ending.craftsman.name",
       "goalKey": "ending.craftsman.goal",
-      "textKeys": ["ending.craftsman.text.1"]
+      "textKeys": ["ending.craftsman.text.1", "ending.craftsman.text.2"]
     },
     {
       "id": "nobody",
@@ -113,28 +113,28 @@
       "fallback": true,
       "nameKey": "ending.nobody.name",
       "goalKey": "ending.nobody.goal",
-      "textKeys": ["ending.nobody.text.1"]
+      "textKeys": ["ending.nobody.text.1", "ending.nobody.text.2"]
     },
     {
       "id": "flash_in_the_pan",
       "major": "hard_way",
       "conditions": { "peakHype": { "min": 75 } },
       "nameKey": "ending.flash_in_the_pan.name",
-      "textKeys": ["ending.flash_in_the_pan.text.1"]
+      "textKeys": ["ending.flash_in_the_pan.text.1", "ending.flash_in_the_pan.text.2"]
     },
     {
       "id": "running_on_empty",
       "major": "hard_way",
       "conditions": { "anyOf": [{ "holds": { "any": ["burnout"] } }, { "craft": { "max": 34 } }] },
       "nameKey": "ending.running_on_empty.name",
-      "textKeys": ["ending.running_on_empty.text.1"]
+      "textKeys": ["ending.running_on_empty.text.1", "ending.running_on_empty.text.2"]
     },
     {
       "id": "starting_over",
       "major": "hard_way",
       "fallback": true,
       "nameKey": "ending.starting_over.name",
-      "textKeys": ["ending.starting_over.text.1"]
+      "textKeys": ["ending.starting_over.text.1", "ending.starting_over.text.2"]
     }
   ]
 }

@@ -6,6 +6,17 @@ rules).
 
 ---
 
+## 2026-10-19 — Round R7, Part D: the second variants
+
+- The 27 line groups shown once a run get their second variant (`.2`, draft
+  v10): the opening, the four season openers, the eight doors' flavour and
+  the fourteen minor endings' text. Validate's 27 variant warnings go;
+  sim:variants finds no group short. check:overflow sets every group to its
+  longest, so the longer second variants are held to fit.
+- Spring's opener is never shown: since round R3 spring's card is the
+  opening, which shows the opening's paragraphs. Its keys stay in content
+  (both variants), unread.
+
 ## 2026-10-19 — Round R7, Part C: the events
 
 - **C1, three new chains.** mum_sunday opens chain home (months 2–8): "I'll
