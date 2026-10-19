@@ -167,9 +167,13 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
 - `scenes` (round 2c, for the visual phase's photographs; only a lead story
   has one): `player` and `world`, a scene per paper; `scandal` and `rival`;
   `overrides` by line group id (`card:<id>`, `scandal:<id>`, `world:<paper>`,
-  `filler:<paper>`, `spillover:<paper>`) or by i18n key. The scenes:
-  `singer`, `rival`, `crowd`, `paparazzi`, `carpet`, `filmset`, `street`,
-  `trophy`. /core's `sceneOf` gives each lead its scene in `frontPages`.
+  `filler:<paper>`, `spillover:<paper>`) or by i18n key — a story's key
+  first, then its group; validate holds that each names a card (a scandal
+  under `scandal:`, any other under `card:`), a paper or a key that exists
+  (round R8a). The twelve scenes: `singer`, `rival`, `crowd`, `paparazzi`,
+  `carpet`, `filmset`, `street`, `trophy`, and since round R8a `tvshow`,
+  `studio`, `arena`, `podium`. /core's `sceneOf` gives each lead its scene
+  in `frontPages`.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), `endingKey`.
 - `boxOffice` (round V1a, README §2): the weekend box office one paper

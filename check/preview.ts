@@ -87,7 +87,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, perkRows: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, sceneOverrides: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, perkRows: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -440,15 +440,29 @@ function checkPages(history: readonly PlayedStep[], seed: number): void {
     counts.pages += month.pages.length;
     // Every page is full, and the lead paper holds the player's most prominent story (or is the default).
     for (const fp of month.pages) if (fp.items.length !== (history[0]?.after.content.press?.page?.slots.length ?? 0)) report('page', seed, month.turn, `${fp.paper}: ${fp.items.length} stories`);
-    // The lead story's photograph (round 2c, D4): only a lead has a scene — by kind and paper, or its override.
+    // The lead story's photograph (round 2c, D4): only a lead has a scene — by kind and paper, or its override:
+    // content's scenes.overrides, the item's i18n key first, then its line group (round R8a). The group is worked
+    // out here, not by /core's sceneOf: a player's line by its card (a scandal's under scandal:), the filler and the
+    // spillover by paper, a world story by paper; an event's answer has no card, so only its key can name it.
+    const overrides: Readonly<Record<string, string>> = history[0]?.after.content.press?.scenes?.overrides ?? {};
     for (const fp of month.pages) {
       for (const item of fp.items) {
         if ((item.slot === 'lead') !== (item.scene !== undefined)) report('scene', seed, month.turn, `${fp.paper} ${item.slot}: scene ${item.scene}`);
         if (item.slot !== 'lead') continue;
         counts.scenes++;
+        const group =
+          item.kind === 'player' && item.line
+            ? `${item.line.kind === 'scandal' ? 'scandal' : 'card'}:${item.line.cardId}`
+            : item.kind === 'filler' || item.kind === 'spillover'
+              ? `${item.kind}:${fp.paper}`
+              : item.kind === 'world'
+                ? `world:${fp.paper}`
+                : null;
+        const override = (item.key !== null ? overrides[item.key] : undefined) ?? (group !== null ? overrides[group] : undefined);
+        if (override !== undefined) counts.sceneOverrides++;
         const expected =
-          item.key === 'rival.breakthrough.4'
-            ? 'trophy'
+          override !== undefined
+            ? override
             : item.kind === 'rival'
               ? 'rival'
               : item.kind === 'player' && item.line?.kind === 'scandal'
@@ -869,7 +883,7 @@ console.log(
     `${counts.blocked} unplayable cards, ${counts.endTurns} end turns (${counts.monthEndScandals} month-end scandal cards, ${counts.copies} of them copies), ` +
     `${counts.events} events (${counts.eventChoices} answers previewed, ${counts.eventLines} printing a line; ${counts.eventRuns} runs' event logs), ${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
-    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs) recomposed, ` +
+    `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs, ${counts.sceneOverrides} of them an override's) recomposed, ` +
     `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines, each where the perk acted, and ${counts.perkRows} END TURN previews with its row) re-read, ${counts.lastWords} last words, ` +
     `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
     `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers; ${counts.handCards} cards in the fan, ${counts.valueCards} faces of values) ` +

@@ -1,8 +1,10 @@
 // The newspaper photographs (round V1a; README §2 and "Porting"): no image files and no generated images — each
 // scene is drawn in greyscale on a canvas, softened, sampled on a 45° grid and printed as dots whose area follows
-// the darkness. The drawings are the mockup's (v18) `SCENES`; a scene's variants come from the same drawing
+// the darkness. The drawings are the mockup's (v18) `SCENES`, four added and the street redrawn in round R8a
+// (docs/design/visual/ref/r8a-halftone.ts); a scene's variants come from the same drawing
 // with a different seed — mirrored, reframed, and its crowds, rain and lights shifted. Each picture is drawn
-// ahead of time in a worker when supported, with the original lazy canvas path as fallback.
+// ahead of time in a worker when supported, with the original lazy canvas path as fallback. Since R8a any scene
+// can also be printed light on ink, as the title's photograph is: the season cards' ovals (renderLightCanvas).
 
 import type { SceneId, SeasonId } from '../../core/index.ts';
 import { t } from '../i18n.ts';
@@ -50,7 +52,7 @@ function glow(g: G, x: number, y: number, r: number, a: number) {
 interface Figure {
   fill?: string;
   dress?: 'legs' | 'gown' | 'coat';
-  pose?: 'stand' | 'mic' | 'guitar' | 'hip' | 'block';
+  pose?: 'stand' | 'mic' | 'guitar' | 'hip' | 'block' | 'reach' | 'shoulder' | 'raise' | 'lectern';
   hair?: 'long';
   hat?: boolean;
 }
@@ -135,13 +137,85 @@ function fig(g: G, x: number, y: number, H: number, o: Figure = {}) {
     arm([-9, -74], [-11, -58], [-10, -44]);
   } else if (pose === 'block') {
     arm([9, -74], [18, -72], [24, -86]);
+  } else if (pose === 'reach') {
+    // An arm held out in front at chest height: a reporter's microphone, a hand offered.
+    arm([9, -74], [20, -69], [31, -71]);
+    arm([-9, -74], [-11, -58], [-10, -44]);
+  } else if (pose === 'shoulder') {
+    // A camera on the shoulder: one hand up to it, the other steadying it in front.
+    arm([9, -74], [15, -82], [10, -90]);
+    arm([-9, -74], [-16, -70], [-24, -82]);
+  } else if (pose === 'raise') {
+    // One arm thrown up, the microphone held high; the other out to the side.
+    arm([9, -74], [14, -92], [17, -110]);
+    arm([-9, -74], [-20, -66], [-31, -60]);
+  } else if (pose === 'lectern') {
+    // Both forearms forward and down, resting on something in front.
+    arm([9, -74], [13, -60], [21, -55]);
+    arm([-9, -74], [-13, -60], [-21, -55]);
   } else {
     arm([9, -74], [11, -58], [10, -44]);
     arm([-9, -74], [-11, -58], [-10, -44]);
   }
 }
+/**
+ * A seated figure, a silhouette: its seat at (x, y), facing `dir` (1 right, -1 left); H the height it would
+ * stand. Upright torso, thighs forward, shins down to the floor, hands on the knee.
+ */
+function seat(g: G, x: number, y: number, H: number, o: { fill?: string; dir?: 1 | -1; hair?: 'long' } = {}) {
+  const f = o.fill ?? '#0c0c0c';
+  const d = o.dir ?? 1;
+  const k = H / 100;
+  const P = (dx: number, dy: number): [number, number] => [x + d * dx * k, y + dy * k];
+  g.fillStyle = f;
+  g.strokeStyle = f;
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  g.beginPath();
+  g.ellipse(...P(1, -44), 5.6 * k, 6.8 * k, 0, 0, 6.2832);
+  g.fill();
+  if (o.hair === 'long') {
+    g.beginPath();
+    g.moveTo(...P(-4.8, -48));
+    g.quadraticCurveTo(...P(-8, -34), ...P(-6.5, -22));
+    g.lineTo(...P(3, -22));
+    g.lineTo(...P(5, -40));
+    g.closePath();
+    g.fill();
+  }
+  g.fillRect(...P(-1, -38), 4.4 * k, 5 * k);
+  g.beginPath();
+  g.moveTo(...P(-10, -33));
+  g.quadraticCurveTo(...P(1, -36), ...P(11, -33));
+  g.lineTo(...P(9, 0));
+  g.lineTo(...P(-9, 0));
+  g.closePath();
+  g.fill();
+  g.lineWidth = 9 * k;
+  g.beginPath();
+  g.moveTo(...P(-4, -3));
+  g.lineTo(...P(22, -4));
+  g.stroke();
+  g.lineWidth = 7 * k;
+  g.beginPath();
+  g.moveTo(...P(22, -4));
+  g.lineTo(...P(24, 26));
+  g.stroke();
+  g.lineWidth = 5 * k;
+  g.beginPath();
+  g.moveTo(...P(24, 27));
+  g.lineTo(...P(31, 27));
+  g.stroke();
+  g.lineWidth = 4.6 * k;
+  g.beginPath();
+  g.moveTo(...P(8, -30));
+  g.lineTo(...P(13, -14));
+  g.lineTo(...P(21, -9));
+  g.stroke();
+}
 
-/** The mockup's eight scenes and the headshot, with `off` shifting their repeating patterns. */
+
+/** The mockup's eight scenes, R7b's four, and the headshot, with `off` shifting their repeating patterns. */
 const SCENES: Record<SceneId | 'headshot', Drawing> = {
   singer(g, w, h, o) {
     g.fillStyle = lg(g, 0, 0, 0, h, [
@@ -477,126 +551,6 @@ const SCENES: Record<SceneId | 'headshot', Drawing> = {
       g.restore();
     } else g.fillText(label, dx - 23, dy - 66, 46);
   },
-  street(g, w, h, o) {
-    const season = o.season;
-    const sky: [number, string][] =
-      season === 'summer'
-        ? [
-            [0, '#fff'],
-            [1, '#dcdcdc'],
-          ]
-        : season === 'winter'
-          ? [
-              [0, '#bdbdbd'],
-              [1, '#d8d8d8'],
-            ]
-          : [
-              [0, '#8a8a8a'],
-              [1, '#b0b0b0'],
-            ];
-    g.fillStyle = lg(g, 0, 0, 0, h * 0.6, sky);
-    g.fillRect(0, 0, w, h);
-    if (season === 'summer') glow(g, w * 0.86, h * 0.16, h * 0.55, 1);
-    const B: [number, number, number][] = [
-      [0, 0.18, 0.2],
-      [0.2, 0.1, 0.17],
-      [0.37, 0.22, 0.15],
-      [0.52, 0.08, 0.2],
-      [0.72, 0.16, 0.28],
-    ];
-    B.forEach(([x, t0, wd], i) => {
-      const top = t0 + ((((i + o.off) * 3) % 5) - 2) * 0.02;
-      g.fillStyle = '#3a3a3a';
-      g.fillRect(w * x, h * top, w * wd, h * (0.7 - top));
-      g.fillStyle = season === 'winter' ? '#f4f4f4' : '#5a5a5a';
-      g.fillRect(w * x, h * top, w * wd, 4);
-      g.fillStyle = '#cfcfcf';
-      for (let yy = h * top + 10; yy < h * 0.5; yy += 14) for (let xx = w * x + 6; xx < w * (x + wd) - 8; xx += 13) g.fillRect(xx, yy, 6, 8);
-      g.fillStyle = '#1e1e1e';
-      g.fillRect(w * x + 4, h * 0.52, w * wd - 8, h * 0.18);
-      g.fillStyle = '#8a8a8a';
-      g.beginPath();
-      g.moveTo(w * x + 2, h * 0.52);
-      g.lineTo(w * (x + wd) - 2, h * 0.52);
-      g.lineTo(w * (x + wd) + 4, h * 0.58);
-      g.lineTo(w * x - 4, h * 0.58);
-      g.closePath();
-      g.fill();
-    });
-    g.fillStyle = season === 'winter' ? '#f0f0f0' : season === 'summer' ? '#d8d8d8' : '#a8a8a8';
-    g.fillRect(0, h * 0.7, w, h * 0.3);
-    const bx = w * 0.44;
-    const by = h * 0.9;
-    g.fillStyle = '#5c5c5c';
-    g.fillRect(bx, by - h * 0.4, w * 0.34, h * 0.36);
-    g.fillStyle = '#e6e6e6';
-    for (let i = 0; i < 7; i++) {
-      g.fillRect(bx + 8 + i * 19, by - h * 0.36, 14, 11);
-      g.fillRect(bx + 8 + i * 19, by - h * 0.21, 14, 11);
-    }
-    g.fillStyle = '#0a0a0a';
-    g.beginPath();
-    g.arc(bx + 26, by - 2, 9, 0, 6.2832);
-    g.arc(bx + w * 0.34 - 26, by - 2, 9, 0, 6.2832);
-    g.fill();
-    g.fillStyle = season === 'winter' ? '#fafafa' : '#444';
-    g.fillRect(bx, by - h * 0.41, w * 0.34, 3);
-    g.fillStyle = '#0a0a0a';
-    g.fillRect(w * 0.36, h * 0.3, 3, h * 0.62);
-    g.beginPath();
-    g.ellipse(w * 0.36 + 1, h * 0.3, 8, 4, 0, 0, 6.2832);
-    g.fill();
-    if (season === 'winter') glow(g, w * 0.36, h * 0.32, 20, 0.9);
-    const walkers: [number, number][] = [
-      [0.1, 0.99],
-      [0.2, 0.97],
-      [0.86, 0.99],
-      [0.95, 0.97],
-    ];
-    walkers.forEach(([px0, py], i) => {
-      const px = px0 + ((((i + o.off) * 5) % 3) - 1) * 0.02;
-      fig(g, w * px, h * py, h * 0.46, { fill: '#0c0c0c', dress: season === 'winter' ? 'coat' : 'legs', hat: season === 'winter' });
-      if (season === 'spring' || season === 'autumn') {
-        g.fillStyle = '#0c0c0c';
-        g.beginPath();
-        g.arc(w * px, h * py - h * 0.46, h * 0.15, Math.PI, 0);
-        g.fill();
-        g.fillRect(w * px - 1, h * py - h * 0.46, 2, h * 0.12);
-      }
-    });
-    if (season === 'spring') {
-      g.strokeStyle = 'rgba(255,255,255,.6)';
-      g.lineWidth = 1.2;
-      for (let i = 0; i < 110; i++) {
-        const x = ((i + o.off * 13) * 41) % w;
-        const y = ((i + o.off * 7) * 29) % h;
-        g.beginPath();
-        g.moveTo(x, y);
-        g.lineTo(x - 4, y + 11);
-        g.stroke();
-      }
-    }
-    if (season === 'autumn') {
-      g.fillStyle = '#1a1a1a';
-      for (let i = 0; i < 34; i++) {
-        g.save();
-        g.translate(((i + o.off * 11) * 67) % w, ((i + o.off * 5) * 37) % (h * 0.75));
-        g.rotate(i);
-        g.beginPath();
-        g.ellipse(0, 0, 3.4, 1.6, 0, 0, 6.2832);
-        g.fill();
-        g.restore();
-      }
-    }
-    if (season === 'winter') {
-      g.fillStyle = '#fff';
-      for (let i = 0; i < 130; i++) {
-        g.beginPath();
-        g.arc(((i + o.off * 17) * 43) % w, ((i + o.off * 9) * 31) % h, 1.8, 0, 6.2832);
-        g.fill();
-      }
-    }
-  },
   trophy(g, w, h, o) {
     for (let i = 0; i < 22; i++) {
       g.fillStyle = (i + o.off) % 2 ? '#262626' : '#3c3c3c';
@@ -640,6 +594,597 @@ const SCENES: Record<SceneId | 'headshot', Drawing> = {
       [0.38, 0.5],
     ] as const) {
       glow(g, w * sx, h * sy, 8, 1);
+    }
+  },
+  // ---- Round R7b: four new scenes, and the street redrawn without its bus. ----
+  tvshow(g, w, h, o) {
+    // A talk-show set: a night skyline behind the host's desk, the guest in an armchair, a studio camera in front.
+    g.fillStyle = lg(g, 0, 0, 0, h, [
+      [0, '#2c2c2c'],
+      [1, '#141414'],
+    ]);
+    g.fillRect(0, 0, w, h);
+    const bx0 = 0;
+    const bx1 = w;
+    const by0 = h * 0.09;
+    const by1 = h * 0.66;
+    g.fillStyle = lg(g, 0, by0, 0, by1, [
+      [0, '#e8e8e8'],
+      [1, '#fafafa'],
+    ]);
+    g.fillRect(bx0, by0, bx1 - bx0, by1 - by0);
+    const towers: [number, number, number][] = [
+      [0.0, 0.46, 0.07],
+      [0.07, 0.3, 0.05],
+      [0.12, 0.52, 0.08],
+      [0.2, 0.36, 0.04],
+      [0.24, 0.24, 0.05],
+      [0.29, 0.44, 0.07],
+      [0.36, 0.33, 0.05],
+      [0.41, 0.5, 0.06],
+      [0.47, 0.28, 0.05],
+      [0.52, 0.42, 0.07],
+      [0.59, 0.2, 0.04],
+      [0.63, 0.38, 0.06],
+      [0.69, 0.5, 0.07],
+      [0.76, 0.34, 0.05],
+      [0.81, 0.46, 0.07],
+      [0.88, 0.3, 0.05],
+      [0.93, 0.48, 0.07],
+    ];
+    g.fillStyle = '#a6a6a6';
+    for (const [x, top, wd] of towers) g.fillRect(w * x, h * (top + 0.06), w * wd, by1 - h * (top + 0.06));
+    for (const [x, top, wd] of [towers[4], towers[10]] as [number, number, number][]) g.fillRect(w * (x + wd / 2) - 1, h * (top + 0.06) - 12, 2, 12);
+    g.fillStyle = '#e4e4e4';
+    towers.forEach(([x, top, wd], i) => {
+      for (let yy = h * (top + 0.06) + 5; yy < by1 - 5; yy += 7)
+        for (let xx = w * x + 3; xx < w * (x + wd) - 3; xx += 6) if (Math.floor(xx * 7 + yy * 13 + (i + o.off) * 17) % 5 < 2) g.fillRect(xx, yy, 2, 3);
+    });
+    g.fillStyle = '#0a0a0a';
+    g.fillRect(0, by0 - 3, w, 3);
+    for (const x of [0.04, 0.3, 0.55, 0.82]) glow(g, w * x, h * 0.03, 14, 1);
+    g.fillStyle = lg(g, 0, h * 0.66, 0, h, [
+      [0, '#9a9a9a'],
+      [1, '#5a5a5a'],
+    ]);
+    g.fillRect(0, h * 0.66, w, h * 0.34);
+    // The host, behind the desk: only the body above it shows.
+    fig(g, w * 0.27, h * 1.0, h * 0.74, { fill: '#0a0a0a', pose: 'lectern' });
+    g.fillStyle = '#3c3c3c';
+    g.beginPath();
+    g.moveTo(w * 0.12, h * 0.6);
+    g.lineTo(w * 0.42, h * 0.6);
+    g.quadraticCurveTo(w * 0.445, h * 0.76, w * 0.41, h * 0.92);
+    g.lineTo(w * 0.14, h * 0.92);
+    g.quadraticCurveTo(w * 0.1, h * 0.76, w * 0.12, h * 0.6);
+    g.fill();
+    g.fillStyle = '#d6d6d6';
+    g.fillRect(w * 0.12, h * 0.6, w * 0.3, 3);
+    g.fillStyle = '#8a8a8a';
+    g.fillRect(w * 0.13, h * 0.74, w * 0.28, 4);
+    g.fillStyle = '#0a0a0a';
+    g.fillRect(w * 0.37, h * 0.52, 7, 10);
+    // The guest, in an armchair, turned to the host.
+    g.fillStyle = '#6a6a6a';
+    g.beginPath();
+    g.moveTo(w * 0.585, h * 0.9);
+    g.lineTo(w * 0.585, h * 0.46);
+    g.quadraticCurveTo(w * 0.625, h * 0.4, w * 0.665, h * 0.46);
+    g.lineTo(w * 0.665, h * 0.9);
+    g.closePath();
+    g.fill();
+    seat(g, w * 0.61, h * 0.72, h * 0.72, { fill: '#0a0a0a', dir: -1, hair: o.off % 2 ? 'long' : undefined });
+    g.fillStyle = '#7a7a7a';
+    g.fillRect(w * 0.545, h * 0.68, w * 0.13, h * 0.08);
+    g.fillRect(w * 0.55, h * 0.76, 6, h * 0.16);
+    g.fillRect(w * 0.665, h * 0.76, 6, h * 0.16);
+    // A studio camera in front, its red light on.
+    const cx = w * 0.9;
+    const cy = h * 0.38;
+    g.fillStyle = '#050505';
+    g.fillRect(cx - 30, cy - 17, 58, 34);
+    g.fillRect(cx - 50, cy - 13, 22, 26);
+    g.fillRect(cx - 6, cy - 31, 30, 15);
+    g.fillRect(cx - 5, cy + 16, 10, h - cy - 16);
+    g.beginPath();
+    g.moveTo(cx - 34, h);
+    g.lineTo(cx, h * 0.84);
+    g.lineTo(cx + 34, h);
+    g.closePath();
+    g.fill();
+    g.strokeStyle = '#050505';
+    g.lineWidth = 3;
+    g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(cx + 26, cy + 6);
+    g.lineTo(cx + 50, cy + 30);
+    g.stroke();
+    glow(g, cx + 18, cy - 35, 8, 1);
+  },
+  studio(g, w, h, o) {
+    // A recording studio from the control room: the singer in the booth behind the glass, headphones on, at a
+    // microphone with its pop filter; the desk's faders and the monitors in front.
+    g.fillStyle = '#3a3a3a';
+    g.fillRect(0, 0, w, h);
+    const x0 = w * 0.17;
+    const x1 = w * 0.83;
+    const y0 = h * 0.05;
+    const y1 = h * 0.64;
+    g.fillStyle = lg(g, 0, y0, 0, y1, [
+      [0, '#e2e2e2'],
+      [1, '#cfcfcf'],
+    ]);
+    g.fillRect(x0, y0, x1 - x0, y1 - y0);
+    g.fillStyle = '#bcbcbc';
+    const n = 8;
+    const pw = (x1 - x0 - 16) / n;
+    for (let i = 0; i < n; i++) g.fillRect(x0 + 8 + i * pw + 3, y0 + 7, pw - 6, (y1 - y0) * 0.62);
+    glow(g, w * (0.48 + ((o.off % 3) - 1) * 0.02), h * 0.32, h * 0.46, 0.95);
+    const sx = w * 0.47;
+    const sy = h * 1.02;
+    const sH = h * 0.88;
+    const k = sH / 100;
+    fig(g, sx, sy, sH, { fill: '#0a0a0a', pose: 'stand', hair: o.off % 2 ? 'long' : undefined });
+    g.strokeStyle = '#0a0a0a';
+    g.lineWidth = 1.8;
+    g.beginPath();
+    g.arc(sx, sy - 89 * k, 7.4 * k, Math.PI * 1.1, Math.PI * 1.9);
+    g.stroke();
+    g.fillStyle = '#0a0a0a';
+    g.beginPath();
+    g.ellipse(sx - 6.6 * k, sy - 87 * k, 1.8 * k, 3 * k, 0, 0, 6.2832);
+    g.ellipse(sx + 6.6 * k, sy - 87 * k, 1.8 * k, 3 * k, 0, 0, 6.2832);
+    g.fill();
+    const mx = sx + 22 * k;
+    const my = sy - 84 * k;
+    g.lineWidth = 2.6;
+    g.beginPath();
+    g.moveTo(mx + 9 * k, sy);
+    g.lineTo(mx + 9 * k, my + 10 * k);
+    g.lineTo(mx + 2 * k, my + 3 * k);
+    g.stroke();
+    g.fillRect(mx - 2 * k, my - 6 * k, 4.4 * k, 11 * k);
+    g.fillStyle = 'rgba(30,30,30,.28)';
+    g.beginPath();
+    g.arc(mx - 10 * k, my - 1 * k, 8 * k, 0, 6.2832);
+    g.fill();
+    g.lineWidth = 3.2;
+    g.stroke();
+    g.lineWidth = 1.6;
+    g.beginPath();
+    g.moveTo(mx - 3 * k, my + 4 * k);
+    g.lineTo(mx - 7 * k, my + 6 * k);
+    g.stroke();
+    g.fillStyle = '#080808';
+    g.fillRect(x0 - 4, y0 - 4, x1 - x0 + 8, 4);
+    g.fillRect(x0 - 4, y0, 4, y1 - y0);
+    g.fillRect(x1, y0, 4, y1 - y0);
+    g.fillStyle = 'rgba(255,255,255,.16)';
+    g.beginPath();
+    g.moveTo(x0 + (x1 - x0) * 0.62, y0);
+    g.lineTo(x0 + (x1 - x0) * 0.74, y0);
+    g.lineTo(x0 + (x1 - x0) * 0.56, y1);
+    g.lineTo(x0 + (x1 - x0) * 0.44, y1);
+    g.closePath();
+    g.fill();
+    // The desk, its faders and knobs, and the two monitors on it.
+    g.fillStyle = '#6a6a6a';
+    g.beginPath();
+    g.moveTo(-10, h * 0.62);
+    g.lineTo(w + 10, h * 0.62);
+    g.lineTo(w + 10, h);
+    g.lineTo(-10, h);
+    g.closePath();
+    g.fill();
+    g.fillStyle = '#1a1a1a';
+    g.fillRect(0, h * 0.62, w, 3);
+    for (let i = 0; i < 34; i++) {
+      const x = w * (0.04 + i * 0.027);
+      const top = h * (0.72 + (((i + o.off) * 7) % 5) * 0.025);
+      g.fillStyle = '#1a1a1a';
+      g.fillRect(x, h * 0.7, 2, h * 0.24);
+      g.fillStyle = '#fafafa';
+      g.fillRect(x - 2.5, top, 7, 4);
+      g.fillStyle = '#1a1a1a';
+      g.beginPath();
+      g.arc(x + 1, h * 0.665, 1.8, 0, 6.2832);
+      g.fill();
+    }
+    for (const [x, on] of [
+      [0.2, 1],
+      [0.46, 0],
+      [0.71, 1],
+    ] as const)
+      if (on) glow(g, w * x, h * 0.665, 5, 1);
+    for (const mxw of [0.2, 0.8]) {
+      const cx = w * mxw;
+      g.fillStyle = '#0a0a0a';
+      g.fillRect(cx - 17, h * 0.4, 34, h * 0.3);
+      g.fillStyle = '#6a6a6a';
+      g.beginPath();
+      g.arc(cx, h * 0.6, 9, 0, 6.2832);
+      g.fill();
+      g.beginPath();
+      g.arc(cx, h * 0.47, 4, 0, 6.2832);
+      g.fill();
+    }
+    // The producer, from behind, at the desk.
+    g.fillStyle = '#050505';
+    g.beginPath();
+    g.ellipse(w * 0.26, h * 0.78, h * 0.08, h * 0.1, 0, 0, 6.2832);
+    g.fill();
+    g.beginPath();
+    g.moveTo(w * 0.15, h);
+    g.quadraticCurveTo(w * 0.17, h * 0.86, w * 0.26, h * 0.86);
+    g.quadraticCurveTo(w * 0.35, h * 0.86, w * 0.37, h);
+    g.closePath();
+    g.fill();
+  },
+  arena(g, w, h, o) {
+    // An arena from the stage: the performer from behind, arm up, and the crowd's lights out into the haze.
+    g.fillStyle = '#2a2a2a';
+    g.fillRect(0, 0, w, h);
+    g.fillStyle = lg(g, 0, h * 0.1, 0, h * 0.8, [
+      [0, '#5a5a5a'],
+      [0.4, '#d6d6d6'],
+      [1, '#8a8a8a'],
+    ]);
+    g.fillRect(0, h * 0.1, w, h * 0.7);
+    glow(g, w * 0.5, h * 0.4, h * 0.7, 0.8);
+    for (const side of [0, 1]) {
+      g.fillStyle = '#4a4a4a';
+      g.beginPath();
+      if (side === 0) {
+        g.moveTo(0, h * 0.2);
+        g.quadraticCurveTo(w * 0.12, h * 0.3, w * 0.18, h * 0.5);
+        g.lineTo(0, h * 0.62);
+      } else {
+        g.moveTo(w, h * 0.2);
+        g.quadraticCurveTo(w * 0.88, h * 0.3, w * 0.82, h * 0.5);
+        g.lineTo(w, h * 0.62);
+      }
+      g.closePath();
+      g.fill();
+    }
+    const beams: [number, number][] = [
+      [0.08, 0.86],
+      [0.24, 0.5],
+      [0.4, 0.12],
+      [0.58, 0.9],
+      [0.74, 0.42],
+      [0.92, 0.1],
+    ];
+    beams.forEach(([sx, ex], i) => {
+      const e = ex + ((((i + o.off) * 3) % 5) - 2) * 0.03;
+      g.fillStyle = 'rgba(255,255,255,.32)';
+      g.beginPath();
+      g.moveTo(w * sx - 2, h * 0.06);
+      g.lineTo(w * sx + 2, h * 0.06);
+      g.lineTo(w * e + 26, h * 0.74);
+      g.lineTo(w * e - 26, h * 0.74);
+      g.closePath();
+      g.fill();
+    });
+    g.fillStyle = '#050505';
+    g.fillRect(0, h * 0.02, w, 7);
+    g.strokeStyle = '#050505';
+    g.lineWidth = 1.5;
+    g.beginPath();
+    for (let x = 0; x < w; x += 12) {
+      g.moveTo(x, h * 0.02 + 7);
+      g.lineTo(x + 6, h * 0.02 + 14);
+      g.lineTo(x + 12, h * 0.02 + 7);
+    }
+    g.stroke();
+    for (const sx of beams.map(([x]) => x)) glow(g, w * sx, h * 0.07, 9, 1);
+    // The crowd, rows of heads into the distance, and their phones lit.
+    for (let row = 0; row < 7; row++) {
+      const yy = h * (0.5 + row * 0.05);
+      const s = 2.4 + row * 1.25;
+      const step = s * 2.3;
+      for (let x = -((row * 7 + o.off * 3) % step); x < w + step; x += step) {
+        g.fillStyle = row < 2 ? '#4a4a4a' : row < 4 ? '#262626' : '#0c0c0c';
+        g.beginPath();
+        g.ellipse(x, yy, s * 0.55, s * 0.62, 0, 0, 6.2832);
+        g.fill();
+        g.fillRect(x - s * 0.9, yy + s * 0.4, s * 1.8, s * 1.4);
+      }
+    }
+    for (let i = 0; i < 46; i++) {
+      const x = ((i + o.off) * 97) % w;
+      const y = h * (0.52 + (((i + o.off) * 31) % 100) / 100 * 0.26);
+      g.fillStyle = '#fafafa';
+      g.fillRect(x - 1, y - 1.5, 2.5, 3.5);
+    }
+    // The stage in front, its wedges, and the performer.
+    g.fillStyle = '#080808';
+    g.fillRect(0, h * 0.8, w, h * 0.2);
+    g.fillStyle = '#3a3a3a';
+    g.fillRect(0, h * 0.8, w, 2);
+    g.fillStyle = '#121212';
+    for (const x of [0.16, 0.72]) {
+      g.beginPath();
+      g.moveTo(w * x, h * 0.86);
+      g.lineTo(w * x + 46, h * 0.86);
+      g.lineTo(w * x + 54, h);
+      g.lineTo(w * x - 8, h);
+      g.closePath();
+      g.fill();
+    }
+    fig(g, w * 0.43, h * 1.04, h * 0.94, { fill: '#040404', pose: 'raise' });
+    const k = (h * 0.94) / 100;
+    g.fillStyle = '#040404';
+    g.fillRect(w * 0.43 + 15 * k, h * 1.04 - 116 * k, 4 * k, 9 * k);
+  },
+  podium(g, w, h, o) {
+    // A press conference: the step-and-repeat behind, a lectern crowded with microphones, the flashes going off,
+    // the press in front with their cameras up.
+    g.fillStyle = '#d2d2d2';
+    g.fillRect(0, 0, w, h);
+    g.fillStyle = '#a2a2a2';
+    for (let r = 0; r < 7; r++)
+      for (let c = -1; c < 13; c++) {
+        const x = c * 42 + (r % 2) * 21 + ((o.off * 7) % 42);
+        const y = 8 + r * 24;
+        g.beginPath();
+        g.arc(x, y + 4, 4, 0, 6.2832);
+        g.fill();
+        g.fillRect(x + 7, y + 2, 16, 4);
+      }
+    const flashes: [number, number, number][] = [
+      [0.16, 0.3, 0.32],
+      [0.8, 0.22, 0.36],
+      [0.66, 0.55, 0.22],
+    ];
+    flashes.forEach(([x, y, r], i) => glow(g, w * (x + ((((i + o.off) * 5) % 3) - 1) * 0.04), h * y, h * r, 1));
+    const px = w * 0.5;
+    fig(g, px, h * 1.02, h * 0.86, { fill: '#121212', pose: 'lectern' });
+    g.fillStyle = '#2a2a2a';
+    g.beginPath();
+    g.moveTo(w * 0.385, h * 0.6);
+    g.lineTo(w * 0.615, h * 0.6);
+    g.lineTo(w * 0.6, h);
+    g.lineTo(w * 0.4, h);
+    g.closePath();
+    g.fill();
+    g.fillStyle = '#4a4a4a';
+    g.fillRect(w * 0.385, h * 0.6, w * 0.23, 4);
+    g.fillStyle = '#e8e8e8';
+    g.beginPath();
+    g.arc(px, h * 0.8, h * 0.085, 0, 6.2832);
+    g.fill();
+    g.fillStyle = '#2a2a2a';
+    g.beginPath();
+    g.arc(px, h * 0.8, h * 0.05, 0, 6.2832);
+    g.fill();
+    // The microphones: stalks from the lectern's top, heads gathered under the speaker's chin.
+    const mics: [number, number, number, boolean][] = [
+      [-0.07, -0.022, 0.43, true],
+      [-0.045, -0.012, 0.39, false],
+      [-0.02, -0.004, 0.42, true],
+      [0.0, 0.004, 0.37, false],
+      [0.025, 0.012, 0.41, true],
+      [0.05, 0.02, 0.38, false],
+      [0.075, 0.03, 0.44, false],
+    ];
+    g.strokeStyle = '#0a0a0a';
+    g.lineWidth = 2;
+    for (const [bx, tx, ty, flag] of mics) {
+      g.beginPath();
+      g.moveTo(px + w * bx, h * 0.6);
+      g.lineTo(px + w * tx, h * ty);
+      g.stroke();
+      g.fillStyle = '#0a0a0a';
+      g.beginPath();
+      g.ellipse(px + w * tx, h * ty, 4, 5, 0, 0, 6.2832);
+      g.fill();
+      if (flag) {
+        g.fillStyle = '#f4f4f4';
+        const fx = px + w * (tx + (bx - tx) * 0.3);
+        const fy = h * (ty + (0.6 - ty) * 0.3);
+        g.fillRect(fx - 5, fy - 5, 10, 10);
+        g.strokeRect(fx - 5, fy - 5, 10, 10);
+      }
+    }
+    // The press, in front: heads and shoulders, two cameras held up.
+    g.fillStyle = '#060606';
+    const heads: [number, number][] = [
+      [0.04, 0.9],
+      [0.13, 0.94],
+      [0.24, 0.92],
+      [0.76, 0.93],
+      [0.86, 0.9],
+      [0.96, 0.94],
+    ];
+    for (const [hx, hy] of heads) {
+      g.beginPath();
+      g.ellipse(w * hx, h * hy, 11, 13, 0, 0, 6.2832);
+      g.fill();
+      g.fillRect(w * hx - 22, h * hy + 8, 44, 30);
+    }
+    for (const [cxw, cyh, dir] of [
+      [0.2, 0.68, 1],
+      [0.82, 0.66, -1],
+    ] as const) {
+      const cx = w * cxw;
+      const cy = h * cyh;
+      g.fillStyle = '#060606';
+      g.fillRect(cx - 13, cy - 10, 26, 20);
+      g.fillRect(dir > 0 ? cx + 13 : cx - 33, cy - 7, 20, 14);
+      g.fillRect(cx - 5, cy - 21, 10, 11);
+      g.strokeStyle = '#060606';
+      g.lineWidth = 5;
+      g.lineCap = 'round';
+      g.beginPath();
+      g.moveTo(cx - dir * 6, cy + 9);
+      g.lineTo(cx - dir * 12, h * 0.96);
+      g.stroke();
+      g.fillStyle = '#e4e4e4';
+      g.fillRect(dir > 0 ? cx + 31 : cx - 34, cy - 5, 3, 10);
+      glow(g, cx, cy - 16, 11, 0.95);
+    }
+  },
+  street(g, w, h, o) {
+    // The street (redrawn in R7b; v1's had a bus at its centre that read as nothing in particular): a reporter's
+    // vox pop outside a row of shops, a passer-by answering into the microphone, the camera on them. The season is
+    // in the sky, the pavement and the weather.
+    const season = o.season;
+    const winter = season === 'winter';
+    const wet = season === 'spring' || season === 'autumn';
+    const sky: [number, string][] =
+      season === 'summer'
+        ? [
+            [0, '#fff'],
+            [1, '#e4e4e4'],
+          ]
+        : winter
+          ? [
+              [0, '#c4c4c4'],
+              [1, '#dcdcdc'],
+            ]
+          : [
+              [0, '#9a9a9a'],
+              [1, '#bcbcbc'],
+            ];
+    g.fillStyle = lg(g, 0, 0, 0, h * 0.2, sky);
+    g.fillRect(0, 0, w, h);
+    if (season === 'summer') glow(g, w * 0.9, h * 0.04, h * 0.45, 1);
+    const shops: [number, number][] = [
+      [-0.02, 0.36],
+      [0.34, 0.32],
+      [0.66, 0.36],
+    ];
+    shops.forEach(([x, wd], i) => {
+      const left = w * x;
+      const right = w * (x + wd);
+      const span = right - left;
+      const top = h * (0.04 + (((i + o.off) * 3) % 3) * 0.025);
+      g.fillStyle = i % 2 ? '#c2c2c2' : '#d6d6d6';
+      g.fillRect(left, top, span, h * 0.72 - top);
+      g.fillStyle = winter ? '#fafafa' : '#7a7a7a';
+      g.fillRect(left, top, span, 3);
+      g.fillStyle = '#4a4a4a';
+      for (const fx of [0.14, 0.42, 0.7]) g.fillRect(left + span * fx, top + 7, span * 0.16, h * 0.13);
+      g.fillStyle = '#f2f2f2';
+      g.fillRect(left + 8, h * 0.27, span - 16, h * 0.07);
+      g.fillStyle = '#9a9a9a';
+      g.fillRect(left + span * 0.3, h * 0.295, span * 0.4, h * 0.02);
+      const ay0 = h * 0.35;
+      const ay1 = h * 0.44;
+      const stripes = 9;
+      for (let st = 0; st < stripes; st++) {
+        g.fillStyle = st % 2 ? '#8a8a8a' : '#f4f4f4';
+        const a = left + (span * st) / stripes;
+        const b = left + (span * (st + 1)) / stripes;
+        const mid = (left + right) / 2;
+        g.beginPath();
+        g.moveTo(a, ay0);
+        g.lineTo(b, ay0);
+        g.lineTo(b + (b - mid) * 0.06, ay1);
+        g.lineTo(a + (a - mid) * 0.06, ay1);
+        g.closePath();
+        g.fill();
+      }
+      if (winter) {
+        g.fillStyle = '#fafafa';
+        g.fillRect(left, ay0 - 3, span, 4);
+      }
+      g.fillStyle = '#8e8e8e';
+      g.fillRect(left + 8, h * 0.46, span * 0.6, h * 0.26);
+      g.fillStyle = 'rgba(255,255,255,.55)';
+      g.beginPath();
+      g.moveTo(left + 8 + span * 0.18, h * 0.46);
+      g.lineTo(left + 8 + span * 0.3, h * 0.46);
+      g.lineTo(left + 8 + span * 0.16, h * 0.72);
+      g.lineTo(left + 8 + span * 0.04, h * 0.72);
+      g.closePath();
+      g.fill();
+      g.fillStyle = '#3a3a3a';
+      g.fillRect(left + span * 0.74, h * 0.47, span * 0.16, h * 0.25);
+    });
+    g.fillStyle = winter ? '#f2f2f2' : season === 'summer' ? '#e2e2e2' : '#b4b4b4';
+    g.fillRect(0, h * 0.72, w, h * 0.28);
+    g.fillStyle = winter ? '#d4d4d4' : '#7a7a7a';
+    g.fillRect(0, h * 0.72, w, 3);
+    g.fillStyle = '#0a0a0a';
+    g.fillRect(w * 0.05, h * 0.16, 3, h * 0.78);
+    g.beginPath();
+    g.ellipse(w * 0.05 + 1.5, h * 0.16, 8, 3.8, 0, 0, 6.2832);
+    g.fill();
+    if (winter) glow(g, w * 0.05, h * 0.18, 18, 0.9);
+    const dress = winter ? 'coat' : 'legs';
+    // A passer-by, further off, under an umbrella when it rains.
+    const fx = w * (0.17 + ((o.off % 3) - 1) * 0.02);
+    fig(g, fx, h * 0.92, h * 0.44, { fill: '#1a1a1a', dress, hat: winter });
+    if (wet) {
+      g.fillStyle = '#1a1a1a';
+      g.beginPath();
+      g.arc(fx, h * 0.92 - h * 0.44, h * 0.13, Math.PI, 0);
+      g.fill();
+      g.fillRect(fx - 1, h * 0.92 - h * 0.44, 2, h * 0.11);
+    }
+    // The vox pop.
+    const rx = w * 0.4;
+    const rH = h * 0.68;
+    const rk = rH / 100;
+    fig(g, rx, h * 1.0, rH, { fill: '#0a0a0a', pose: 'reach', dress });
+    g.fillStyle = '#0a0a0a';
+    g.beginPath();
+    g.ellipse(rx + 34 * rk, h - 73 * rk, 3.4 * rk, 4.2 * rk, 0, 0, 6.2832);
+    g.fill();
+    g.fillStyle = '#fafafa';
+    g.fillRect(rx + 30 * rk, h - 68 * rk, 8 * rk, 7 * rk);
+    g.strokeStyle = '#0a0a0a';
+    g.lineWidth = 1.2;
+    g.strokeRect(rx + 30 * rk, h - 68 * rk, 8 * rk, 7 * rk);
+    fig(g, w * 0.56, h * 1.0, h * 0.66, { fill: '#0a0a0a', dress, hat: winter, hair: o.off % 2 ? 'long' : undefined });
+    const ox = w * 0.79;
+    const oH = h * 0.7;
+    const ok = oH / 100;
+    fig(g, ox, h * 1.0, oH, { fill: '#0a0a0a', pose: 'shoulder', dress });
+    g.fillStyle = '#0a0a0a';
+    g.fillRect(ox - 30 * ok, h - 99 * ok, 36 * ok, 15 * ok);
+    g.beginPath();
+    g.moveTo(ox - 30 * ok, h - 97 * ok);
+    g.lineTo(ox - 44 * ok, h - 100 * ok);
+    g.lineTo(ox - 44 * ok, h - 83 * ok);
+    g.lineTo(ox - 30 * ok, h - 86 * ok);
+    g.closePath();
+    g.fill();
+    g.fillRect(ox - 8 * ok, h - 106 * ok, 10 * ok, 7 * ok);
+    g.fillStyle = '#e8e8e8';
+    g.fillRect(ox - 45 * ok, h - 95 * ok, 2.4 * ok, 7 * ok);
+    if (season === 'spring') {
+      g.strokeStyle = 'rgba(255,255,255,.55)';
+      g.lineWidth = 1.2;
+      for (let i = 0; i < 90; i++) {
+        const x = ((i + o.off * 13) * 41) % w;
+        const y = ((i + o.off * 7) * 29) % h;
+        g.beginPath();
+        g.moveTo(x, y);
+        g.lineTo(x - 4, y + 11);
+        g.stroke();
+      }
+    }
+    if (season === 'autumn') {
+      g.fillStyle = '#2a2a2a';
+      for (let i = 0; i < 30; i++) {
+        g.save();
+        g.translate(((i + o.off * 11) * 67) % w, ((i + o.off * 5) * 37) % (h * 0.75));
+        g.rotate(i);
+        g.beginPath();
+        g.ellipse(0, 0, 3.4, 1.6, 0, 0, 6.2832);
+        g.fill();
+        g.restore();
+      }
+    }
+    if (winter) {
+      g.fillStyle = '#fff';
+      for (let i = 0; i < 120; i++) {
+        g.beginPath();
+        g.arc(((i + o.off * 17) * 43) % w, ((i + o.off * 9) * 31) % h, 1.8, 0, 6.2832);
+        g.fill();
+      }
     }
   },
   headshot(g, w, h) {
@@ -879,6 +1424,31 @@ export function renderTitleCanvas(w: number, h: number, offscreen: boolean): HTM
     w,
     h,
     { dot: TITLE.dot, bg: TITLE.bg, cell: TITLE.cell * k },
+    offscreen,
+  );
+}
+
+/** A scene's own frame: every scene is drawn for the papers' 480×172. */
+const FRAME = { w: 480, h: 172 } as const;
+
+/**
+ * A scene light on ink (round R8a): a season card's oval. The scene is drawn on its own 480×172 frame scaled to
+ * `w`×`h` pixels (keep that 2.8:1), then printed as the title's photograph is (halftoneLight, the title's cream on
+ * ink), with a dot cell of `cell` pixels. A season card's oval: 560×200 stage pixels, the cell 3.6, both times the
+ * factor the oval is drawn at — the stage's scale on the screen × the device pixel ratio, as titleSize() reckons it.
+ */
+export function renderLightCanvas(scene: SceneId, season: SeasonId, w: number, h: number, cell: number, directorLabel: string, offscreen: false): HTMLCanvasElement;
+export function renderLightCanvas(scene: SceneId, season: SeasonId, w: number, h: number, cell: number, directorLabel: string, offscreen: true): OffscreenCanvas;
+export function renderLightCanvas(scene: SceneId, season: SeasonId, w: number, h: number, cell: number, directorLabel: string, offscreen: boolean): HTMLCanvasElement | OffscreenCanvas {
+  const opts: SceneOptions = { season, off: 0, flip: false, directorLabel };
+  return halftoneLight(
+    (g) => {
+      g.scale(w / FRAME.w, h / FRAME.h);
+      SCENES[scene](g, FRAME.w, FRAME.h, opts);
+    },
+    w,
+    h,
+    { dot: TITLE.dot, bg: TITLE.bg, cell },
     offscreen,
   );
 }

@@ -155,6 +155,8 @@ class Ctx {
   acts = 3;
   totalTurns = 12;
   readonly cardIds = new Set<string>();
+  /** The scandal cards among them: a `scandal:` line group names one, a `card:` group never (round R8a). */
+  readonly scandalIds = new Set<string>();
   readonly addCardRefs: { owner: Owner; cardId: string; where: string }[] = [];
   readonly flagsSet = new Map<string, string>();
   readonly flagsRead = new Map<string, string>();
@@ -679,6 +681,7 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
     }
   });
   for (const c of cards) if (isStr(c.id)) v.cardIds.add(c.id);
+  for (const c of cards) if (isStr(c.id) && c.kind === 'scandal') v.scandalIds.add(c.id);
   return cards;
 }
 
@@ -1399,9 +1402,17 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
         if (!isObj(scenes.overrides)) v.error('schema', `${at}.overrides`, 'must map a line group id or an i18n key to a scene');
         else
           for (const [k, x] of Object.entries(scenes.overrides)) {
-            scene(x, `${at}.overrides.${k}`);
-            // A line group id (card:<id>, scandal:<id>, world:<paper>, filler:<paper>, spillover:<paper>), else an i18n key.
-            if (!/^(card|scandal|world|filler|spillover):/.test(k)) v.key(k, `${at}.overrides.${k}`);
+            const where = `${at}.overrides.${k}`;
+            scene(x, where);
+            // A line group id (card:<id>, scandal:<id>, world:<paper>, filler:<paper>, spillover:<paper>), else an i18n
+            // key; either names one that exists (round R8a): a card's group its card, a paper's its paper.
+            const group = /^(card|scandal|world|filler|spillover):(.*)$/.exec(k);
+            if (!group) v.key(k, where);
+            else if (group[1] === 'card' || group[1] === 'scandal') {
+              const id = group[2] as string;
+              if (!v.cardIds.has(id)) v.error('references', where, `no card with id ${q(id)}`);
+              else if ((group[1] === 'scandal') !== v.scandalIds.has(id)) v.error('references', where, group[1] === 'scandal' ? `${q(id)} is not a scandal: its lines are card:${id}` : `${q(id)} is a scandal: its lines are scandal:${id}`);
+            } else if (!paperIds.has(group[2] as string)) v.error('references', where, `no paper with id ${q(group[2])}`);
           }
       }
     }

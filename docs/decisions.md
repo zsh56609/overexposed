@@ -6,6 +6,33 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a, Part A: the photographs (R7b)
+
+- R7b's drawings merged: `ui/desk/halftone.ts` had not changed since
+  `6aea32e`, so it is the author's `docs/design/visual/ref/r8a-halftone.ts`
+  unchanged — four poses for the figure (reach, shoulder, raise, lectern), a
+  seated figure, four scenes (`tvshow`, `studio`, `arena`, `podium`), the
+  street redrawn as a reporter's vox pop outside a row of shops (v1's bus at
+  its centre read as nothing in particular), and `renderLightCanvas` for the
+  season cards (Part D). `SCENE_IDS` has twelve; each new scene has the three
+  drawings every scene has (as drawn, mirrored, closer), and the photo worker
+  draws them with the rest, after the title's photograph.
+- Which stories print which: `content/press.json` `scenes.overrides` gains
+  the author's 69 overrides at its end (talk shows, studios, tours, press
+  conferences, and better matches among the old scenes). Validate now holds
+  that every override names something that exists: a `card:` group a card
+  that is no scandal, a `scandal:` group a scandal, a paper's group a paper,
+  else an i18n key.
+- `check/preview.ts` keeps its own oracle for a lead's scene: it reads
+  `scenes.overrides`, the story's key first, then its line group, which it
+  works out itself (never /core's `sceneOf`). It reports how many leads an
+  override took (677 of 2,160 in 60 runs).
+- `npm run desk:photos` reads each photograph back — one that fails to draw,
+  comes out the wrong size or prints no ink fails the run — and runs in
+  Firefox by default: headless Chrome's screenshot of the longer sheet never
+  came back on this machine (from twelve rows of photographs on, whatever
+  the scene). `--browser=chrome` still works for a shorter sheet.
+
 ## 2026-10-19 — Round R7, Part F: v0.7
 
 - `package.json` is 0.7.0; the credits' foot reads "Made for the Game

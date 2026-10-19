@@ -16,8 +16,11 @@ export type AddCardZone = (typeof ADD_CARD_ZONES)[number];
 export const CARD_FACES = ['flyer', 'score', 'script', 'revision', 'callsheet', 'headshot', 'gloss', 'gold', 'pass', 'notebook', 'scandal'] as const;
 export type CardFace = (typeof CARD_FACES)[number];
 
-/** The newspaper photographs' scenes (round 2c; the visual phase draws each in code). Only a lead story has one. */
-export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy'] as const;
+/**
+ * The newspaper photographs' scenes (round 2c; the visual phase draws each in code; four added in round R8a, from
+ * R7b's drawings). Only a lead story has one; a door and a season card show one too (R8a).
+ */
+export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy', 'tvshow', 'studio', 'arena', 'podium'] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
 /** The seasons the scene can light (round V1a; docs/design/visual/README.md): one per act, in content. */
