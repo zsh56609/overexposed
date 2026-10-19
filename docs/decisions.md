@@ -6,6 +6,21 @@ rules).
 
 ---
 
+## 2026-10-19 — Round R7, Part F: v0.7
+
+- `package.json` is 0.7.0; the credits' foot reads "Made for the Game
+  Gauntlet SIM Jam · v0.7". The itch zip, `overexposed-v0.7.zip`, replaces
+  v0.6: built from a clean export of the round's last source commit, packed
+  as in R6 (`index.html assets audio`).
+- AGENTS.md: §0 rule 4 ends "…replays exactly from its seed and the memory
+  it started with"; §7's version list gains "R7 v0.7"; "Cut for the jam"
+  loses the 27 once-per-run variants. status.md drops them from its cut
+  list too.
+- The acceptance is AGENTS.md §8's for a release candidate, with
+  check:interactions in the same nine configurations, and sim:compare
+  against the R6 baseline (content and rules changed; the tuning is in the
+  round's report).
+
 ## 2026-10-19 — Round R7, Part E: the next run remembers the last
 
 - **E1, what the browser keeps** (`ui/memory.ts`, beside the collections,

@@ -25,7 +25,7 @@ Visual design reference: [`docs/design/visual/README.md`](docs/design/visual/REA
 1. **`/core` imports nothing from React, the DOM, or any browser API.** No `window`, no `document`, no `localStorage`. If it can't run under bare Node, it doesn't belong in `/core`.
 2. **Adding or changing a card, gate, or ending must never require a code change.** If it does, the engine is underspecified — extend the engine, never special-case content in code.
 3. **`/core` and `/sim` never handle display strings.** IDs, keys and numbers only.
-4. **Never `Math.random()`.** Seeded RNG lives in GameState; every run replays exactly from its seed.
+4. **Never `Math.random()`.** Seeded RNG lives in GameState; every run replays exactly from its seed and the memory it started with.
 5. **After 2026-11-05 04:00 JST: crash fixes only.** No balance changes, no new content, no polish. See §10.
 6. **No new dependencies without asking.** Every dependency is a jam-day risk and a credits obligation.
 
@@ -230,9 +230,9 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 | 11/2–3 | Fixes only, the itch page; **submit 11/3 JST** |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
-Versions: R1 v0.1, R2 v0.2, R3 v0.3, R4 v0.4, R5 v0.5, R6 v0.6, the submission v1.0.
+Versions: R1 v0.1, R2 v0.2, R3 v0.3, R4 v0.4, R5 v0.5, R6 v0.6, R7 v0.7, the submission v1.0.
 
-Cut for the jam: the 27 once-per-run variants; hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
+Cut for the jam: hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
 
 ### Scope control
 
