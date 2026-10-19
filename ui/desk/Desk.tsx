@@ -50,7 +50,7 @@ export interface DeskActions {
 export type DeskMode = 'manager' | 'game';
 
 /** The phone on the night before the year: its lock screen and the time, nothing yet. */
-const QUIET_PHONE = { notes: [] } as const;
+const QUIET_PHONE = { press: 0 } as const;
 
 /** A short note in the middle of the desk (README §9): a scandal can't be played; no actions left. */
 function useToast(): [{ readonly text: string; readonly on: boolean }, (text: string) => void] {
@@ -89,6 +89,8 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
     [playing?.id, answering?.id],
   );
   const game = mode === 'game';
+  // The bubbles on screen (round R8a, C2): the phone shows a bar for each, as it comes.
+  const [bubbles, setBubbles] = useState(0);
   // A month ending (round R7, A4): END TURN's step, until it publishes the next month — its messages stop coming.
   const ending = !!snap.active?.plan && !snap.active.published && snap.active.step.events.some((e) => e.type === 'turnEnd');
   return (
@@ -102,7 +104,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
       <div className="floor" />
       <div className="deskscene">
         <div className="desktop">
-          <DeskPlane lane={model.lane} crisis={model.crisis} notebook={game ? model.notebook : null} script={model.script} phone={game ? view.phone : QUIET_PHONE} labels={model.labels} />
+          <DeskPlane lane={model.lane} crisis={model.crisis} notebook={game ? model.notebook : null} script={model.script} phone={game ? model.phone : QUIET_PHONE} bubbles={game ? bubbles : 0} labels={model.labels} />
         </div>
       </div>
       <div className="deskfront" />
@@ -111,7 +113,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
       <Pile snap={snap} model={model}/>
       <Motion snap={snap} onTails={onTails} />
       {snap.active?.plan&&<MonthMotion key={snap.active.step.id} snap={snap} model={model}/>}
-      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} ending={ending} />}
+      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} ending={ending} onShown={setBubbles} />}
       <div className="dim" />
       {game && model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import type { Page } from './browser.ts';
 import { cardPoint, centre, loadStates, reach, type DeskState, type Step } from './desk-replay.ts';
-import { bubbleMonth, qualifyingMonths } from './month-fixtures.ts';
+import { bubbleMonth, frenzyBubbleMonth, qualifyingMonths } from './month-fixtures.ts';
 const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const settled=`JSON.stringify({step:document.querySelector('.desk')?.dataset.step,hand:[...document.querySelectorAll('.hand .card')].map(c=>[c.dataset.uid,c.dataset.card,c.textContent,getComputedStyle(c).visibility]),pile:[...document.querySelectorAll('[data-pile-uid]')].map(c=>[c.dataset.pileUid,c.dataset.pileCard,c.textContent,getComputedStyle(c).visibility,c.style.transform,c.firstElementChild.style.transform]),paper:[...document.querySelectorAll('.pp')].map(c=>c.textContent),note:document.querySelector('.nb-txt')?.textContent,stats:document.querySelector('.stats')?.textContent,bulbs:[...document.querySelectorAll('.slotbulbs i')].map(c=>c.className),bubbles:[...document.querySelectorAll('.bub[data-k]')].map(c=>[c.dataset.k,c.textContent]),phone:[...document.querySelectorAll('.nt')].map(c=>c.className),choice:document.querySelector('.screen-over,.scr')?.textContent})`;
 async function waitIdle(page:Page) {
@@ -240,7 +240,8 @@ export async function checkBoundaryInput(page:Page,url:string) {
   // The month's messages (round R3, C1): no step's beat any more but the desk's tails, once its hand is dealt. They
   // hold no input, and the phone lights as each comes, never a whole-phone filter. Round R7, A4: once the first has
   // come, the rest keep their pace whatever the player does — the author's case: four bubbles, a card played 0.3 s
-  // after the desk is still; they come one at a time, about 0.38 s apart.
+  // after the desk is still; they come one at a time, about 0.38 s apart. Round R8a, C2: on every frame the lock
+  // screen's manager bars are the bubbles on screen.
   const only=process.argv.find(a=>a.startsWith('--boundary='))?.slice(11);
   if(!only||only==='arrival'){
     const fixture=bubbleMonth();
@@ -248,7 +249,8 @@ export async function checkBoundaryInput(page:Page,url:string) {
     await page.evaluate(`document.documentElement.dataset.motion='full'`);
     const step=await page.evaluate<string>(`document.querySelector('.desk').dataset.step`);
     // Every change of the bubbles shown and of the desk's input hold, frame by frame, from END TURN on.
-    await page.evaluate(`(()=>{window.__bub=[];const tick=()=>{const d=document.querySelector('.desk');const n=d?d.querySelectorAll('.bubbles .bub[data-k]').length:-1;const busy=d?.dataset.busy;const last=window.__bub.at(-1);if(!last||last[1]!==n||last[2]!==busy)window.__bub.push([performance.now(),n,busy]);if(window.__bub.length<400)requestAnimationFrame(tick);};requestAnimationFrame(tick);})()`);
+    // Each entry: the time, the bubbles shown, the desk's hold, its step, the lock screen's manager and press bars.
+    await page.evaluate(`(()=>{window.__bub=[];const tick=()=>{const d=document.querySelector('.desk');const n=d?d.querySelectorAll('.bubbles .bub[data-k]').length:-1;const busy=d?.dataset.busy;const step=d?.dataset.step;const mgr=d?d.querySelectorAll('.phone .nt.mgr').length:-1;const press=d?d.querySelectorAll('.phone .nt.press').length:-1;const last=window.__bub.at(-1);if(!last||last[1]!==n||last[2]!==busy||last[3]!==step||last[4]!==mgr||last[5]!==press)window.__bub.push([performance.now(),n,busy,step,mgr,press]);if(window.__bub.length<400)requestAnimationFrame(tick);};requestAnimationFrame(tick);})()`);
     await page.click(...(await centre(page,'.endbtn'))!);
     let start=Date.now();
     while(!await page.evaluate<boolean>(`(()=>{const d=document.querySelector('.desk');return !!d&&d.dataset.busy!=='1'&&d.dataset.step!==${JSON.stringify(step)}})()`)){
@@ -275,7 +277,7 @@ export async function checkBoundaryInput(page:Page,url:string) {
       assert.ok(Date.now()-start<6000,'arrival: the messages never all came');await sleep(30);
     }
     await sleep(100);
-    const trace=await page.evaluate<[number,number,string][]>('window.__bub');
+    const trace=await page.evaluate<[number,number,string,string,number,number][]>('window.__bub');
     // From the frame the new month's desk was still: each bubble's arrival, one at a time.
     const still=trace.findIndex((e,i)=>i>0&&e[2]==='0'&&trace.slice(0,i).some(x=>x[2]==='1'));
     assert.ok(still>0,'arrival: no still desk after END TURN in the trace');
@@ -288,5 +290,32 @@ export async function checkBoundaryInput(page:Page,url:string) {
     const gaps=comes.slice(1).map((t,i)=>t-comes[i]!);
     for(const g of gaps)assert.ok(g>300&&g<520,`arrival: bubbles ${gaps.map(Math.round).join(', ')} ms apart, expected about 380`);
     console.log(`boundary input ${page.name}: arrival holds no input; with a card played 0.3 s after the desk was still, the four bubbles came one at a time, ${gaps.map(Math.round).join(', ')} ms apart`);
+    // The phone's bars (round R8a, C2): a manager bar for each bubble on screen, on every frame from END TURN on.
+    for(const [at,n,,,mgr] of trace)assert.equal(mgr,Math.min(n,7),`arrival: ${mgr} manager bars beside ${n} bubbles at ${Math.round(at)} ms`);
+    console.log(`boundary input ${page.name}: arrival — a manager bar for each bubble on screen, on all ${trace.length} changes from END TURN on`);
+  }
+  // The phone's bars in a frenzy (round R8a, C2): a month whose press bars stand from its start; the draft pick deals
+  // its hand and its four bubbles come. On every frame the manager bars are the bubbles on screen, each arriving with
+  // its bubble, and the press bars, below them, never change.
+  if(!only||only==='bars'){
+    const {fixture,name,card,press}=frenzyBubbleMonth();
+    assert.equal(await reach(page,url,fixture,80),'ok');
+    await page.evaluate(`document.documentElement.dataset.motion='full'`);
+    await page.evaluate(`(()=>{window.__bars=[];const tick=()=>{const d=document.querySelector('.desk');const n=d?d.querySelectorAll('.bubbles .bub[data-k]').length:-1;const mgr=d?d.querySelectorAll('.phone .nt.mgr').length:-1;const p=d?d.querySelectorAll('.phone .nt.press').length:-1;const last=window.__bars.at(-1);if(!last||last[1]!==n||last[2]!==mgr||last[3]!==p)window.__bars.push([performance.now(),n,mgr,p]);if(window.__bars.length<400)requestAnimationFrame(tick);};requestAnimationFrame(tick);})()`);
+    await page.click(...(await centre(page,`.offers .lift.take[data-card="${card}"]`))!);
+    const start=Date.now();
+    while(!await page.evaluate<boolean>(`document.querySelectorAll('.desk .bubbles .bub[data-k]').length===4&&!document.querySelector('.bubbles[data-revealing]')`)){
+      assert.ok(Date.now()-start<10000,'bars: the four bubbles never all came');await sleep(30);
+    }
+    await sleep(100);
+    const trace=await page.evaluate<[number,number,number,number][]>('window.__bars');
+    for(const [at,n,mgr] of trace)assert.equal(mgr,Math.min(n,7),`bars: ${mgr} manager bars beside ${n} bubbles at ${Math.round(at)} ms`);
+    // The press bars come with the month's frenzy look, as the hand is dealt (the desk shows the month's own issue from
+    // then on), before its first bubble; from then on they never change.
+    const up=trace.findIndex(e=>e[3]===press),first=trace.findIndex(e=>e[1]>0);
+    assert.ok(up>=0&&first>=0&&up<=first,`bars: the press bars came at change ${up}, the first bubble at ${first}`);
+    assert.ok(trace.slice(up).every(e=>e[3]===press),`bars: the press bars went ${trace.slice(up).map(e=>e[3]).join(', ')}, expected ${press} throughout`);
+    const shown=trace.slice(up).map(e=>`${e[1]}: ${e[2]}+${e[3]}`);
+    console.log(`boundary input ${page.name}: the lock screen in a frenzy month (${name}, after its draft pick) — bubbles: manager + press bars on each change: ${shown.join(' · ')}`);
   }
 }

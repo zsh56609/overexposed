@@ -5,7 +5,7 @@ import { statBar, type DeskModel } from './model.ts';
 export function presentation(snap: Snapshot, model: DeskModel) {
   const active=snap.active;
   // The month's messages wait for its hand (round R3, C1): before the deal — its season card, event and offers — none.
-  if(!active?.plan) return {stats:model.stats,phone:model.playing?model.phone:{notes:model.phone.notes.filter(k=>k!=='mgr')},visibleBubbles:model.playing?undefined:0,hiddenCards:[] as number[]};
+  if(!active?.plan) return {stats:model.stats,visibleBubbles:model.playing?undefined:0,hiddenCards:[] as number[]};
   const {step,plan}=active;
   const elapsed=plan.beats.slice(0,(active.index??0)+1);
   const base=step.before??step.after;
@@ -26,7 +26,6 @@ export function presentation(snap: Snapshot, model: DeskModel) {
   // that deals it brings them one by one.
   const shownPhase=(published?step.after:base).phase;
   const visibleBubbles=published && shownPhase!=='play' ? 0 : published && plan.incomingMessages>0 ? (lastBubble===undefined?plan.existingMessages*2:lastBubble+1):undefined;
-  let managerCount=0;
-  const phone=visibleBubbles===undefined?model.phone:{notes:model.phone.notes.filter(k=>k!=='mgr'||++managerCount<=Math.ceil(visibleBubbles/2))};
-  return {stats:outgoing||dealing?{...stats,actions:{...stats.actions,left:0}}:spent!==undefined?{...stats,actions:{...stats.actions,left:spent}}:stats,phone,visibleBubbles,hiddenCards};
+  // The phone's manager bars are the bubbles on screen (round R8a, C2): the desk counts them, not this projection.
+  return {stats:outgoing||dealing?{...stats,actions:{...stats.actions,left:0}}:spent!==undefined?{...stats,actions:{...stats.actions,left:spent}}:stats,visibleBubbles,hiddenCards};
 }

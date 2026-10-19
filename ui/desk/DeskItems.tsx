@@ -5,13 +5,13 @@
 // messages. Words and numbers are the adapter's (./model.ts); the motion here is the desk's own — the
 // metronome, the phone's buzz — and V1b adds the rest.
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Face } from '../Face.tsx';
 import { isPlaceholder } from '../text.ts';
 import { composeTransforms, motionMode, useMotionMode } from '../motion.ts';
 import { cue } from '../sound/sound.ts';
 import { crumple, sheetA, sheetB } from './drawings.ts';
-import type { DeskLabels, LaneClass, MessagesModel, PhoneModel, ScriptModel } from './model.ts';
+import { LOCK_BARS, type DeskLabels, type LaneClass, type MessagesModel, type PhoneModel, type ScriptModel } from './model.ts';
 
 const reduceMotion = (): boolean => motionMode()!=='full';
 const ph = (text: string, base?: string): string | undefined => (isPlaceholder(text) ? `${base ?? ''} placeholder`.trim() : base);
@@ -21,7 +21,7 @@ const ph = (text: string, base?: string): string | undefined => (isPlaceholder(t
 
 function Script({ script }: { script: ScriptModel }) {
   return (
-    <div className="script" data-hook="script" style={{ left: 118, top: 40, transform: 'rotate(-6deg)' }}>
+    <div className="script" data-hook="script" style={{ left: 158, top: 40, transform: 'rotate(3deg)' }}>
       <b>{script.heading}</b>
       {script.lines.map((l, i) =>
         l.kind === 'action' ? (
@@ -93,11 +93,12 @@ function localClock(): string {
 }
 
 /**
- * The phone, flat on the desk (README §5): no number badge — its lock screen shows the notifications, one bar
- * each, the manager's blue and, in a frenzy, the press's red; the player's own time, refreshed every few
- * seconds. In a frenzy the screen glows red and it buzzes every few seconds.
+ * The phone, flat on the desk (README §5): no number badge — its lock screen shows the notifications as bars, the
+ * manager's blue and, in a frenzy, the press's red; the player's own time, refreshed every few seconds. In a frenzy the
+ * screen glows red and it buzzes every few seconds. Round R8a: the texts' phone, scaled (C1); a manager bar for each
+ * bubble on screen, arriving with it, the newest on top (C2: `bubbles`, from the desk's Bubbles), the press's below.
  */
-const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis: boolean }) {
+const Phone = memo(function Phone({ phone, bubbles, crisis }: { phone: PhoneModel; bubbles: number; crisis: boolean }) {
   const motion=useMotionMode();
   const [clock, setClock] = useState(localClock);
   const [buzz, setBuzz] = useState(0);
@@ -118,13 +119,21 @@ const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis
     const id = window.setTimeout(() => setBuzzing(false), 1400);
     return () => window.clearTimeout(id);
   }, [buzz]);
+  // A manager bar for each bubble on screen, the newest on top (its key the bubble's place): seven at most.
+  const mgr = Math.min(bubbles, LOCK_BARS);
   return (
     <div className={`onDesk phone${buzzing ? ' buzz wake' : ''}`} data-hook="phone" key={buzz}>
       <div className="phone-screen">
         <div className="lock">
           <b className="clk">{clock}</b>
-          {phone.notes.map((k, i) => (
-            <i key={i} className={`nt ${k}`}>
+          {Array.from({ length: mgr }, (_, i) => (
+            <i key={`m${mgr - i}`} className="nt mgr">
+              <u />
+              <em />
+            </i>
+          ))}
+          {Array.from({ length: phone.press }, (_, i) => (
+            <i key={`p${i}`} className="nt press">
               <u />
               <em />
             </i>
@@ -135,7 +144,7 @@ const Phone = memo(function Phone({ phone, crisis }: { phone: PhoneModel; crisis
   );
 });
 
-export const DeskPlane = memo(function DeskPlane({ lane, crisis, notebook, script, phone, labels }: { lane: LaneClass; crisis: boolean; notebook: string | null; script: ScriptModel | null; phone: PhoneModel; labels: DeskLabels }) {
+export const DeskPlane = memo(function DeskPlane({ lane, crisis, notebook, script, phone, bubbles, labels }: { lane: LaneClass; crisis: boolean; notebook: string | null; script: ScriptModel | null; phone: PhoneModel; bubbles: number; labels: DeskLabels }) {
   const sheets = useMemo(() => [sheetA(), sheetB(labels.sheet)], [labels.sheet]);
   return (
     <>
@@ -153,7 +162,7 @@ export const DeskPlane = memo(function DeskPlane({ lane, crisis, notebook, scrip
       )}
       {lane === 'celebrity' && (
         <div className="onDesk prop">
-          <div className="mag" style={{ left: 170, top: 30, transform: 'rotate(-7deg)' }}>
+          <div className="mag" style={{ left: 210, top: 30, transform: 'rotate(4deg)' }}>
             {labels.gloss}
           </div>
         </div>
@@ -167,7 +176,7 @@ export const DeskPlane = memo(function DeskPlane({ lane, crisis, notebook, scrip
       <div className="onDesk clipD" style={{ left: 520, top: 46, width: 120, height: 84, transform: 'rotate(-12deg)' }} />
       <div className="onDesk clipD" style={{ left: 640, top: 98, width: 104, height: 72, transform: 'rotate(9deg)' }} />
       <div className="onDesk clipD" style={{ left: 430, top: 128, width: 90, height: 64, transform: 'rotate(15deg)' }} />
-      <Phone phone={phone} crisis={crisis} />
+      <Phone phone={phone} bubbles={bubbles} crisis={crisis} />
     </>
   );
 });
@@ -240,8 +249,17 @@ function Metronome({ crisis, title }: { crisis: boolean; title: string }) {
     }
   };
   return (
-    <svg className="up metro" data-hook="metronome" style={{ left: 724, top: 392 }} width="58" height="74" viewBox="0 0 60 80" onClick={toggle} role="button" aria-label={title}>
+    <svg className="up metro" data-hook="metronome" style={{ left: 724, top: 392, overflow: 'visible' }} width="58" height="74" viewBox="0 0 60 80" onClick={toggle} role="button" aria-label={title}>
       <title>{title}</title>
+      {/* Its contact shadow (round R8a, C3; docs/design/visual/ref/r8a-metronome.svg): a small dark ellipse under its base. */}
+      <defs>
+        <radialGradient id="metro-cs" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="#000" stopOpacity=".64" />
+          <stop offset=".6" stopColor="#000" stopOpacity=".44" />
+          <stop offset="1" stopColor="#000" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="35" cy="79.8" rx="38" ry="4.8" fill="url(#metro-cs)" />
       <polygon points="19,4 41,4 57,76 3,76" fill="#8e5d35" />
       <polygon points="19,4 41,4 43,12 17,12" fill="#a8723f" />
       <polygon points="23,14 37,14 47,68 13,68" fill="#241810" />
@@ -254,78 +272,73 @@ function Metronome({ crisis, title }: { crisis: boolean; title: string }) {
   );
 }
 
+/**
+ * The brush cup on a celebrity desk (round R8a, C3; docs/design/visual/ref/r8a-brushcup.svg): a rose-glazed cup with a
+ * gold rim and five brushes, its base where the old cup's was. Its contact shadow is its own: a small dark ellipse
+ * tight under its base, reaching a little to the right, as the pencil's shadow falls. Its ids carry a prefix.
+ */
 function BrushCup() {
   return (
-    <svg className="up" style={{ left: 728, top: 374 }} width="52" height="92" viewBox="0 0 52 92" aria-hidden="true">
-      <g strokeLinecap="round">
-        <line x1="17" y1="54" x2="10" y2="14" stroke="#2a2a2a" strokeWidth="3" />
-        <ellipse cx="9" cy="10" rx="5" ry="8" fill="#e8c7a8" transform="rotate(-12 9 10)" />
-        <line x1="24" y1="54" x2="22" y2="8" stroke="#c9a15b" strokeWidth="3" />
-        <ellipse cx="22" cy="5" rx="4.5" ry="7" fill="#f3d9c2" />
-        <line x1="31" y1="54" x2="36" y2="12" stroke="#2a2a2a" strokeWidth="3" />
-        <ellipse cx="37" cy="8" rx="5.5" ry="8" fill="#d99aa8" transform="rotate(12 37 8)" />
-        <line x1="37" y1="54" x2="44" y2="22" stroke="#c9a15b" strokeWidth="2.5" />
-        <ellipse cx="45" cy="19" rx="3.5" ry="6" fill="#b88a6a" transform="rotate(18 45 19)" />
+    <svg className="up" style={{ left: 718, top: 363 }} width="72" height="112" viewBox="0 0 72 112" aria-hidden="true">
+      <defs>
+      <radialGradient id="bc-cs" cx=".5" cy=".5" r=".5"><stop offset="0" stopColor="#000" stopOpacity=".64"/><stop offset=".6" stopColor="#000" stopOpacity=".42"/><stop offset="1" stopColor="#000" stopOpacity="0"/></radialGradient>
+      <linearGradient id="bc-metal-rose" x1="0" x2="1"><stop offset="0" stopColor="#b9806c"/><stop offset=".35" stopColor="#f3cdb8"/><stop offset=".6" stopColor="#d39c86"/><stop offset="1" stopColor="#9b6553"/></linearGradient>
+      <linearGradient id="bc-metal-silver" x1="0" x2="1"><stop offset="0" stopColor="#8f9399"/><stop offset=".35" stopColor="#eef0f3"/><stop offset=".6" stopColor="#c3c7cd"/><stop offset="1" stopColor="#7d8188"/></linearGradient>
+      <clipPath id="bc-body"><path d="M19.0 62.0 L19.0 101.0 A17.0 7.14 0 0 0 53.0 101.0 L53.0 62.0 Z"/></clipPath>
+      </defs>
+      <ellipse cx="41" cy="102.4" rx="24.6" ry="9.5" fill="url(#bc-cs)"/>
+      <ellipse cx="36.0" cy="62.0" rx="17.0" ry="7.14" fill="#c98f86"/>
+      <ellipse cx="36.0" cy="62.5" rx="15.3" ry="6.24" fill="#3a2422"/>
+      <g transform="translate(31.0 74) rotate(-6)"><path d="M-1.29 0 L-1.87 -33 L1.87 -33 L1.29 0 Z" fill="#1d1c20"/><path d="M-0.61 -5.0 L-0.95 -32.0" stroke="#fff" strokeWidth=".7" opacity=".25"/><path d="M-1.87 -33 L-6.56 -41 L6.56 -41 L1.87 -33 Z" fill="url(#bc-metal-rose)"/><path d="M-5.90 -36.6 L5.90 -36.6" stroke="#000" strokeWidth=".5" opacity=".22"/><g transform="translate(0 -41)"><path d="M-8.0 0 C-9.6 -6 -5.6 -14.4 0 -15.4 C5.6 -14.4 9.6 -6 8.0 0 Z" fill="#5a4334"/><path d="M-9.0 -6.4 C-8.8 -11 -4.8 -14.4 0 -15.4 C4.8 -14.4 8.8 -11 9.0 -6.4 C3.2 -8.6 -3.2 -8.6 -9.0 -6.4 Z" fill="#ecd8c2"/></g></g><g transform="translate(43.4 74) rotate(22)"><path d="M-0.99 0 L-1.43 -30 L1.43 -30 L0.99 0 Z" fill="#b9814b"/><path d="M-0.47 -4.5 L-0.73 -29.0" stroke="#fff" strokeWidth=".7" opacity=".25"/><path d="M-1.43 -30 L-3.00 -36 L3.00 -36 L1.43 -30 Z" fill="url(#bc-metal-silver)"/><path d="M-2.70 -32.7 L2.70 -32.7" stroke="#000" strokeWidth=".5" opacity=".22"/><g transform="translate(0 -36)"><path d="M-1.4 0 L-9.4 -9.6 A12.6 12.6 0 0 1 9.4 -9.6 L1.4 0 Z" fill="#e6e0d6"/><path d="M-8.2 -8.4 L-9.4 -9.6 A12.6 12.6 0 0 1 9.4 -9.6 L8.2 -8.4 A11 11 0 0 0 -8.2 -8.4 Z" fill="#fbf9f5"/></g></g><g transform="translate(24.6 74) rotate(-25)"><path d="M-1.14 0 L-1.65 -27 L1.65 -27 L1.14 0 Z" fill="#1d1c20"/><path d="M-0.54 -4.0 L-0.84 -26.0" stroke="#fff" strokeWidth=".7" opacity=".25"/><path d="M-1.65 -27 L-4.10 -34 L4.10 -34 L1.65 -27 Z" fill="url(#bc-metal-rose)"/><path d="M-3.69 -30.1 L3.69 -30.1" stroke="#000" strokeWidth=".5" opacity=".22"/><g transform="translate(0 -34)"><path d="M-4.5 0 L-5.0 -8.4 Q-1.0 -9.6 5.0 -13 L4.5 0 Z" fill="#3a2a22"/><path d="M-5.0 -6.6 L-5.0 -8.4 Q-1.0 -9.6 5.0 -13 L5.0 -10.4 Q-1.0 -7.6 -5.0 -6.6 Z" fill="#94735c"/></g></g><g transform="translate(39.4 74) rotate(4)"><path d="M-1.29 0 L-1.87 -22 L1.87 -22 L1.29 0 Z" fill="#ece6dd"/><path d="M-0.61 -3.3 L-0.95 -21.0" stroke="#fff" strokeWidth=".7" opacity=".25"/><path d="M-1.87 -22 L-5.25 -29 L5.25 -29 L1.87 -22 Z" fill="url(#bc-metal-rose)"/><path d="M-4.72 -25.1 L4.72 -25.1" stroke="#000" strokeWidth=".5" opacity=".22"/><g transform="translate(0 -29)"><path d="M-5.76 0 L-6.4 -8.6 C-6.4 -10.6 6.4 -10.6 6.4 -8.6 L5.76 0 Z" fill="#4e3a30"/><path d="M-6.4 -7 L-6.4 -8.6 C-6.4 -10.6 6.4 -10.6 6.4 -8.6 L6.4 -7 C2.56 -8 -2.56 -8 -6.4 -7 Z" fill="#b8957d"/></g></g><g transform="translate(48.0 74) rotate(38)"><path d="M-0.76 0 L-1.10 -24 L1.10 -24 L0.76 0 Z" fill="#1d1c20"/><path d="M-0.36 -3.6 L-0.56 -23.0" stroke="#fff" strokeWidth=".7" opacity=".25"/><path d="M-1.10 -24 L-2.40 -28 L2.40 -28 L1.10 -24 Z" fill="url(#bc-metal-silver)"/><path d="M-2.16 -25.8 L2.16 -25.8" stroke="#000" strokeWidth=".5" opacity=".22"/><g transform="translate(0 -28)"><path d="M-1.26 0 L0 -7.6 L1.26 0 Z" fill="#1a1416"/><path d="M-0.7 -4 L0 -7.6 L0.7 -4 Z" fill="#3a2e30"/></g></g>
+      <path d="M19.0 62.0 L19.0 101.0 A17.0 7.14 0 0 0 53.0 101.0 L53.0 62.0 Z" fill="#dba69c"/>
+      <g clipPath="url(#bc-body)">
+      <path d="M42.0 62.0 C45.0 76 45.0 90 42.0 109.0 L55.0 109.0 L55.0 62.0 Z" fill="#5a2a22" opacity=".2"/>
+      <path d="M21.6 67.0 L21.6 100.0 L24.6 101.0 L24.6 67.0 Z" fill="#fff" opacity=".32"/>
+      <path d="M17.0 97.4 A19.0 7.74 0 0 0 55.0 97.4 L55.0 110.0 L17.0 110.0 Z" fill="#5a2a22" opacity=".14"/>
       </g>
-      <rect x="9" y="50" width="34" height="40" rx="4" fill="#d9a07f" />
-      <rect x="9" y="50" width="34" height="6" rx="3" fill="#e8b996" />
-      <rect x="11" y="56" width="4" height="30" rx="2" fill="rgba(255,255,255,.28)" />
+      <path d="M19.0 62.0 A17.0 7.14 0 0 0 53.0 62.0" fill="none" stroke="#e2c27a" strokeWidth="1.7"/>
+      <path d="M19.0 62.0 A17.0 7.14 0 0 1 53.0 62.0" fill="none" stroke="#b8975a" strokeWidth="1"/>
     </svg>
   );
 }
 
 /**
- * The mug on the neutral desk (round R3, E1; docs/design/visual/ref/mug.svg): rim and base share the desk's
- * foreshortening (ry/rx ≈ 0.42) and a red band follows the cylinder. Scaled to the old mug's body (34 px wide) and
- * standing where it stood; its contact shadow is the standing objects' own (.cshadow), so the drawing's blurred
- * shadows are left out. Its ids carry a prefix: no other drawing in the page shares them.
+ * The mug on the neutral desk (round R8a, C3; docs/design/visual/ref/r8a-mug.svg): a diner mug in three flat tones and
+ * two red stripes, in the old mug's box. Its contact shadow is its own, a small dark ellipse tight under its base,
+ * reaching a little to the right; the steam keeps its classes and its animation. Its ids carry the mug- prefix: no
+ * other drawing in the page shares them.
  */
 function Mug() {
   return (
     <svg className="up mug" style={{ left: 715, top: 399 }} width="74" height="74" viewBox="0 0 140 140" aria-hidden="true">
       <defs>
-        <linearGradient id="mug-body" x1="0" x2="1">
-          <stop offset="0" stopColor="#d9d1c1" />
-          <stop offset=".18" stopColor="#f6f1e6" />
-          <stop offset=".45" stopColor="#ece5d6" />
-          <stop offset=".8" stopColor="#c9bfad" />
-          <stop offset="1" stopColor="#a99f8e" />
-        </linearGradient>
-        <linearGradient id="mug-band" x1="0" x2="1">
-          <stop offset="0" stopColor="#a51f16" />
-          <stop offset=".2" stopColor="#e0352a" />
-          <stop offset=".5" stopColor="#d22b1f" />
-          <stop offset=".85" stopColor="#9c1d14" />
-          <stop offset="1" stopColor="#7f170f" />
-        </linearGradient>
-        <linearGradient id="mug-handle" x1="0" x2="1">
-          <stop offset="0" stopColor="#cfc6b5" />
-          <stop offset=".5" stopColor="#e9e2d3" />
-          <stop offset="1" stopColor="#a39886" />
-        </linearGradient>
-        <radialGradient id="mug-coffee" cx=".45" cy=".6" r=".7">
-          <stop offset="0" stopColor="#4a2c1c" />
-          <stop offset=".75" stopColor="#2c1910" />
-          <stop offset="1" stopColor="#6b4630" />
-        </radialGradient>
-        <linearGradient id="mug-inner" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#b8ae9c" />
-          <stop offset="1" stopColor="#e3dccd" />
-        </linearGradient>
+      <radialGradient id="mug-cs" cx=".5" cy=".5" r=".5"><stop offset="0" stopColor="#000" stopOpacity=".64"/><stop offset=".6" stopColor="#000" stopOpacity=".44"/><stop offset="1" stopColor="#000" stopOpacity="0"/></radialGradient>
+      <clipPath id="mug-mouth"><ellipse cx="62.0" cy="42.8" rx="25.6" ry="10.6"/></clipPath>
+      <clipPath id="mug-body"><path d="M32.0 42.0 C29.4 52 28.6 66 29.4 78 C30.2 90 33.0 99 37.0 104.0 A25.0 10.5 0 0 0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 Z"/></clipPath>
       </defs>
-      <path d="M90 54 C116 50 124 64 121 78 C118 92 106 98 90 97 L90 88 C102 89 110 84 112 76 C114 67 108 61 90 63 Z" fill="url(#mug-handle)" />
-      <path d="M90 63 C108 61 114 67 112 76" fill="none" stroke="#8f8574" strokeWidth="1.2" opacity=".7" />
-      <path d="M30 40 L30 106 A32 13.4 0 0 0 94 106 L94 40 Z" fill="url(#mug-body)" />
-      <path d="M30 52 A32 13.4 0 0 0 94 52 L94 59 A32 13.4 0 0 1 30 59 Z" fill="url(#mug-band)" />
-      <path d="M30 102 A32 13.4 0 0 0 94 102 L94 106 A32 13.4 0 0 1 30 106 Z" fill="#000" opacity=".12" />
-      <path d="M37 44 L37 100" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" opacity=".55" />
-      <ellipse cx="62" cy="40" rx="32" ry="13.4" fill="#f8f4eb" />
-      <ellipse cx="62" cy="40.6" rx="28" ry="11.4" fill="url(#mug-inner)" />
-      <ellipse cx="62" cy="43" rx="27.2" ry="10" fill="url(#mug-coffee)" />
-      <ellipse cx="55" cy="41" rx="9" ry="2.2" fill="#fff" opacity=".10" />
-      <g fill="none" stroke="#fff" strokeLinecap="round" opacity=".28">
-        <path className="steam" d="M54 30 C48 22 60 18 54 8" strokeWidth="2" />
-        <path className="steam late" d="M68 28 C74 20 62 15 68 4" strokeWidth="1.6" />
+      <ellipse cx="71" cy="105.6" rx="37" ry="13.6" fill="url(#mug-cs)"/>
+      <path d="M91.6 51.6 C101 47.4 116.4 49 119.4 60.4 C122.2 71.4 113.4 83.6 100.6 87.6 C97.6 88.6 94.6 89.6 92 90.4 L93.4 81.4 C96.6 80.6 99.4 79.6 101.8 78.4 C108.8 75 112.4 68.6 110.8 63.4 C109.2 58.2 101.6 57.4 93.8 60.6 Z" fill="#e9e1d1"/>
+      <path d="M110.6 54.4 C117.4 57 120.6 64.6 118 72.6 C115.4 80.6 108 85.6 100.6 87.6 C97.6 88.6 94.6 89.6 92 90.4 L92.6 86.6 C99.6 84.4 109.6 80 112.6 71.6 C114.6 66 113.6 59.4 110.6 54.4 Z" fill="#2b1d10" opacity=".16"/>
+      <path d="M93.8 60.6 C101.6 57.4 109.2 58.2 110.8 63.4 C111.4 65.4 111.2 67.6 110.2 69.8" fill="none" stroke="#b9ac94" strokeWidth="2.2" strokeLinecap="round"/>
+      <path d="M32.0 42.0 C29.4 52 28.6 66 29.4 78 C30.2 90 33.0 99 37.0 104.0 A25.0 10.5 0 0 0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 Z" fill="#efe8da"/>
+      <g clipPath="url(#mug-body)">
+      <path d="M30.9 53.6 A31.1 13.1 0 0 0 93.1 53.6 L93.1 57.0 A31.1 13.1 0 0 1 30.9 57.0 Z" fill="#c8281c"/>
+      <path d="M30.4 59.8 A31.6 13.3 0 0 0 93.6 59.8 L93.6 61.7 A31.6 13.3 0 0 1 30.4 61.7 Z" fill="#c8281c"/>
+      <path d="M76.0 54.4 C83.0 62 84.0 82 78.0 113.6 C82.0 111.0 87.0 107.0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 C90.0 48.0 84.0 52.6 76.0 54.4 Z" fill="#2b1d10" opacity=".2"/>
+      <path d="M33.6 50 C32.0 62 32.0 80 35.0 94 L39.4 94 C37.0 80 37.0 62 38.4 50 Z" fill="#fffdf8" opacity=".75"/>
+      <path d="M33.0 100 A29.0 12.1 0 0 0 91.0 100 L91.0 112 L33.0 112 Z" fill="#2b1d10" opacity=".13"/>
+      </g>
+      <ellipse cx="62.0" cy="42.0" rx="30.0" ry="12.6" fill="#f6f1e6"/>
+      <ellipse cx="62.0" cy="42.8" rx="25.6" ry="10.6" fill="#bdb19c"/>
+      <g clipPath="url(#mug-mouth)">
+      <ellipse cx="62.0" cy="46.2" rx="25.4" ry="10.2" fill="#2d1a0e"/>
+      <ellipse cx="62.0" cy="46.2" rx="24.8" ry="9.7" fill="none" stroke="#6d4429" strokeWidth="1.4"/>
+      <ellipse cx="55.0" cy="44.8" rx="7.4" ry="1.8" fill="#fff" opacity=".16"/>
+      </g>
+      <path d="M33.4 44.6 A28.6 11.6 0 0 0 56.0 54.0" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" opacity=".8"/>
+      <g fill="none" stroke="#fff" strokeLinecap="round" opacity=".26">
+      <path className="steam" d="M55 31 C50 25 58 20 53.6 13 C51 9 54 5 56 3" strokeWidth="2"/>
+      <path className="steam late" d="M68 29 C72 23 64 18 68.6 11 C70.6 8 69 4 67.4 2" strokeWidth="1.6"/>
       </g>
     </svg>
   );
@@ -336,7 +349,6 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
   const drawn = useMemo(() => [crumple(a, 68, 62), crumple(b, 46, 42)], [a, b]);
   return (
     <>
-      {lane !== 'screen' && <div className="cshadow" style={{ left: 712, top: 456, width: 80, height: 14 }} />}
       {lane === 'music' && <Metronome crisis={crisis} title={labels.metronome} />}
       {lane === 'celebrity' && <BrushCup />}
       {lane === 'early' && <Mug />}
@@ -387,7 +399,7 @@ function buzz(desk: Element | null): Animation[] {
  * a card's flight and the month's end never bring them at once. They hold no input, so nothing waits on them; if the
  * month ends before they have all come, the rest are not shown. Reduced motion shows them all at once, with one buzz.
  */
-export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, ending = false }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; ending?: boolean }) {
+export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, ending = false, onShown }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; ending?: boolean; onShown?: (n: number) => void }) {
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -441,6 +453,10 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
   // Revealing from the moment the month's messages are due until the last is shown, the wait before the first included;
   // a month that is ending shows no more (A4).
   const revealing = messages && n < allowed && !ending ? '1' : undefined;
+  // How many bubbles are on screen, for the phone's bars (round R8a, C2): told before the frame paints, so a bar
+  // arrives with its bubble; a bubble the month's end drops never comes, and so never gets one.
+  const count = messages ? list.length : 0;
+  useLayoutEffect(() => onShown?.(count), [count, onShown]);
   if (!messages || list.length === 0) return <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box} />;
   return (
     <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box}>

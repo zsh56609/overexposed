@@ -683,9 +683,11 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   }
   const month = managerMessages(history).find((x) => x.turn === s.turn);
   const due = month?.messages.length ?? 0;
-  const mgr = m.phone.notes.filter((k) => k === 'mgr').length;
-  const press = m.phone.notes.filter((k) => k === 'press').length;
-  if (mgr !== due || m.phone.notes.length > 6 || (press > 0 && !m.crisis)) bad(`phone: ${mgr} manager bars for ${due} messages, ${press} press bars, crisis ${m.crisis}`);
+  // The phone's press bars (round R8a, C2): in a frenzy, one for each of the player's stories that is a scandal or
+  // spills over, filling what the month's bubbles (two a message) leave of the lock screen's seven bars; the manager's
+  // bars are the bubbles on screen, which the desk counts as they come (check:motion's arrival holds them).
+  const alerts = m.crisis ? (issue?.pages ?? []).flatMap((p) => p.items).filter((x) => (x.kind === 'player' && x.line?.kind === 'scandal') || x.kind === 'spillover').length : 0;
+  if (m.phone.press !== Math.min(alerts, Math.max(0, 7 - 2 * due))) bad(`phone: ${m.phone.press} press bars for ${alerts} alerts beside ${due} messages, crisis ${m.crisis}`);
   if (s.manager !== null) {
     const msgs = m.messages;
     if (!msgs || msgs.messages.length !== due || msgs.messages.some((x, i) => x.id !== `${month?.turn}.${i}` || x.bubbles.length !== 2)) bad(`bubbles ${JSON.stringify(msgs?.messages)} for ${due} messages`);

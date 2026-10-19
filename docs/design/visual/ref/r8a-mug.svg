@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="74" height="74">
+<!-- Overexposed, R8a: the mug on the neutral desk. A diner mug in three flat tones, two red stripes; its own contact shadow. -->
+<defs>
+  <radialGradient id="mug-cs" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#000" stop-opacity=".64"/><stop offset=".6" stop-color="#000" stop-opacity=".44"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <clipPath id="mug-mouth"><ellipse cx="62.0" cy="42.8" rx="25.6" ry="10.6"/></clipPath>
+  <clipPath id="mug-body"><path d="M32.0 42.0 C29.4 52 28.6 66 29.4 78 C30.2 90 33.0 99 37.0 104.0 A25.0 10.5 0 0 0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 Z"/></clipPath>
+</defs>
+<ellipse cx="71" cy="105.6" rx="37" ry="13.6" fill="url(#mug-cs)"/>
+<path d="M91.6 51.6 C101 47.4 116.4 49 119.4 60.4 C122.2 71.4 113.4 83.6 100.6 87.6 C97.6 88.6 94.6 89.6 92 90.4 L93.4 81.4 C96.6 80.6 99.4 79.6 101.8 78.4 C108.8 75 112.4 68.6 110.8 63.4 C109.2 58.2 101.6 57.4 93.8 60.6 Z" fill="#e9e1d1"/>
+<path d="M110.6 54.4 C117.4 57 120.6 64.6 118 72.6 C115.4 80.6 108 85.6 100.6 87.6 C97.6 88.6 94.6 89.6 92 90.4 L92.6 86.6 C99.6 84.4 109.6 80 112.6 71.6 C114.6 66 113.6 59.4 110.6 54.4 Z" fill="#2b1d10" opacity=".16"/>
+<path d="M93.8 60.6 C101.6 57.4 109.2 58.2 110.8 63.4 C111.4 65.4 111.2 67.6 110.2 69.8" fill="none" stroke="#b9ac94" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M32.0 42.0 C29.4 52 28.6 66 29.4 78 C30.2 90 33.0 99 37.0 104.0 A25.0 10.5 0 0 0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 Z" fill="#efe8da"/>
+<g clip-path="url(#mug-body)">
+  <path d="M30.9 53.6 A31.1 13.1 0 0 0 93.1 53.6 L93.1 57.0 A31.1 13.1 0 0 1 30.9 57.0 Z" fill="#c8281c"/>
+  <path d="M30.4 59.8 A31.6 13.3 0 0 0 93.6 59.8 L93.6 61.7 A31.6 13.3 0 0 1 30.4 61.7 Z" fill="#c8281c"/>
+  <path d="M76.0 54.4 C83.0 62 84.0 82 78.0 113.6 C82.0 111.0 87.0 107.0 87.0 104.0 C91.0 99 93.8 90 94.6 78 C95.4 66 94.6 52 92.0 42.0 C90.0 48.0 84.0 52.6 76.0 54.4 Z" fill="#2b1d10" opacity=".2"/>
+  <path d="M33.6 50 C32.0 62 32.0 80 35.0 94 L39.4 94 C37.0 80 37.0 62 38.4 50 Z" fill="#fffdf8" opacity=".75"/>
+  <path d="M33.0 100 A29.0 12.1 0 0 0 91.0 100 L91.0 112 L33.0 112 Z" fill="#2b1d10" opacity=".13"/>
+</g>
+<ellipse cx="62.0" cy="42.0" rx="30.0" ry="12.6" fill="#f6f1e6"/>
+<ellipse cx="62.0" cy="42.8" rx="25.6" ry="10.6" fill="#bdb19c"/>
+<g clip-path="url(#mug-mouth)">
+  <ellipse cx="62.0" cy="46.2" rx="25.4" ry="10.2" fill="#2d1a0e"/>
+  <ellipse cx="62.0" cy="46.2" rx="24.8" ry="9.7" fill="none" stroke="#6d4429" stroke-width="1.4"/>
+  <ellipse cx="55.0" cy="44.8" rx="7.4" ry="1.8" fill="#fff" opacity=".16"/>
+</g>
+<path d="M33.4 44.6 A28.6 11.6 0 0 0 56.0 54.0" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>
+<g fill="none" stroke="#fff" stroke-linecap="round" opacity=".26">
+  <path class="steam" d="M55 31 C50 25 58 20 53.6 13 C51 9 54 5 56 3" stroke-width="2"/>
+  <path class="steam late" d="M68 29 C72 23 64 18 68.6 11 C70.6 8 69 4 67.4 2" stroke-width="1.6"/>
+</g>
+</svg>

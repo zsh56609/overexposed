@@ -180,9 +180,17 @@ export interface ScriptModel {
   readonly lines: readonly { readonly kind: 'you' | 'other' | 'action'; readonly cue: string | null; readonly text: string }[];
 }
 
+/** The bars the lock screen holds (round R8a, C2): the redrawn phone's taller screen holds seven. */
+export const LOCK_BARS = 7;
+
 export interface PhoneModel {
-  /** The lock screen's notifications, newest first: the manager's (blue) and, in a frenzy, the press's (red). */
-  readonly notes: readonly ('mgr' | 'press')[];
+  /**
+   * The lock screen's press alerts, red, below the manager's bars (round R8a, C2): in a frenzy, one for each of the
+   * player's stories that is a scandal or spills over, filling what the month's bubbles leave of the screen's seven —
+   * counted from the month's start, so none goes as a bubble comes. The manager's bars are not the model's: one for
+   * each bubble on screen, the desk counts them as they come (DeskItems' Bubbles and Phone).
+   */
+  readonly press: number;
 }
 
 export interface MessagesModel {
@@ -335,6 +343,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
   const endPreview = s.phase === 'play' ? previewEndTurn(s, lines.counter, lane) : null;
   const season = seasonOf(s);
 
+  const msgs = messages(s, steps, issue?.frenzy ?? false);
   return {
     playing: s.phase === 'play',
     season,
@@ -346,8 +355,8 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
     papers: issue ? papers(s, issue, history, steps.length) : null,
     notebook: notebook(steps),
     script: laneClass === 'screen' ? script(s, fame) : null,
-    phone: phone(s, steps, issue),
-    messages: messages(s, steps, issue?.frenzy ?? false),
+    phone: phone(issue, (msgs?.messages ?? []).reduce((n, m) => n + m.bubbles.length, 0)),
+    messages: msgs,
     labels: labels(),
     balls: [deriveSeed(s.seed, 0xba11), deriveSeed(s.seed, 0xba12)],
     hand: hand(s, lines),
@@ -593,17 +602,11 @@ function thisMonth(s: GameState, steps: readonly PlayedStep[]) {
   return managerMessages(steps).find((m) => m.turn === s.turn) ?? null;
 }
 
-function phone(s: GameState, steps: readonly PlayedStep[], issue: MonthPress | null): PhoneModel {
-  const mgr = thisMonth(s, steps)?.messages.length ?? 0;
+/** The phone's press bars (round R8a, C2), from the month's issue and the bubbles its messages will bring. */
+function phone(issue: MonthPress | null, bubbles: number): PhoneModel {
   // In a frenzy the press piles in: one alert for each story of the player's that is a scandal or spills over.
   const alerts = issue?.frenzy ? issue.pages.flatMap((p) => p.items).filter((x) => isScandalLine(x) || x.kind === 'spillover').length : 0;
-  const press = Math.min(alerts, Math.max(0, 6 - mgr));
-  const notes: ('mgr' | 'press')[] = [];
-  for (let i = 0; i < Math.max(mgr, press); i++) {
-    if (i < press) notes.push('press');
-    if (i < mgr) notes.push('mgr');
-  }
-  return { notes };
+  return { press: Math.min(alerts, Math.max(0, LOCK_BARS - bubbles)) };
 }
 
 function messages(s: GameState, steps: readonly PlayedStep[], frenzy: boolean): MessagesModel | null {

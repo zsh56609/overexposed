@@ -6,6 +6,40 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8a, Part C: the desk
+
+- C1, the phone on the desk is the texts' phone: `.phone-big`'s proportions
+  and look scaled to 104×191 (body `#0b0d10`, its 3 px ring as 1 px, bezel 4,
+  corners 12 and 9). It lies further back — left 947 (the narrower phone
+  keeps its centre's x), top 24, its front edge 25 px in from the desk's —
+  and the bubbles move up by as much (bottom 306 px). Its 26 px drop shadow
+  goes (moved back, it left a dark patch on the desk); its side shows below
+  its front edge in three 2.5 px steps, with a tight contact shadow a little
+  to the right, a 1 px inner light on its frame and a sheen on the glass. The
+  lock screen keeps its clock and bars; its crisis colours, glow and buzz
+  stay.
+- C2, the lock screen counts the bubbles: one manager bar for each bubble on
+  screen, arriving with it, the newest on top — the desk's Bubbles report
+  how many are on screen before the frame paints, and the phone draws a bar
+  for each. A bubble the month's end drops never gets one. A frenzy's press
+  bars, below, are the model's (`PhoneModel.press`): they fill what the
+  month's bubbles leave of seven (the taller screen holds seven), counted
+  from the month's start, so none goes as a bubble comes; they come with the
+  month's frenzy look, as its hand is dealt. Reduced motion shows them all at
+  once, as the bubbles. check:motion's boundary input holds it: in the
+  arrival, a manager bar for each bubble on every frame; in a frenzy month
+  opened by its draft pick (the corpus has none opened by END TURN), the
+  same, and its press bars unchanged from the deal on.
+- C3, the standing objects: the author's mug (a diner mug in three flat
+  tones, two red stripes) and brush cup (rose glaze, a gold rim, five
+  brushes; 72×112 at 718, 363) replace the old drawings; each carries its
+  own contact shadow in its SVG, a small dark ellipse tight under its base
+  reaching a little to the right, and the metronome gains the same (its svg
+  shows its overflow). `.cshadow` goes.
+- C4, the magazine and the script lie with the desk: turned a little
+  clockwise and moved in toward the middle (the magazine left 210,
+  `rotate(4deg)`; the script left 158, `rotate(3deg)`; their tops kept).
+
 ## 2026-10-20 — Round R8a, Part B: faces
 
 - The people who text the player and the managers get faces (the author's
