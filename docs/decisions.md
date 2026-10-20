@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-10-21 — Round R8d, Part B: the halftones in colour
+
+- The author (2026-10-20): every halftone that is not a newspaper in colour, muted and dark
+  enough to suit the dots — a middle ground between the photographs and faces and the papers.
+  The author's choices (docs/design/visual/ref/r8d-colour.ts, drawn in r8d-colour.png): the
+  title's photograph oxblood and amber, the flashes cool (TITLE_LOOK); the season cards' ovals
+  a hue a season, a shade darker (SEASON_LOOKS); the awards night's backdrop warm, all four
+  (BACKDROP_LOOKS); the doors' photographs an ink for each door's scene (DOOR_INKS). The papers'
+  photographs, the night's front-page pictures and the headshot stay black and white.
+- Ported unchanged into ui/desk/halftone.ts: the colour helpers, halftoneLight with a Look,
+  halftoneInk, the looks and PLAIN (the old cream on ink, for a scene with no look), the
+  sampling and the colour's step of 6; the dots filled a colour at a time, with no Path2D.
+  renderLightCanvas takes `use` ('season' or 'backdrop') after `cell`, and a LightJob carries it,
+  so a job still spreads into it; renderPhotoCanvas's drawing is photoDrawing, shared with
+  renderDoorCanvas. Fitted to the module: photoKey is exported (the warm-up counts the doors once
+  by it), and a door's job is a DoorJob (a scene, never the headshot).
+- The warm-up draws the doors ahead, between the papers' photographs and the other ovals:
+  every gate's photo in its act's season, once each — eight. Choices prints a door with
+  doorUrl.
+- Three things settled for the author: the looks go by scene and use, so one scene can have
+  two (winter's card and Overexposed's night are both the carpet: navy on the card, warm on the
+  night); the doors have a cache of their own, keyed as the papers' (the same scene and drawing
+  print black in a paper and in colour on a door); the papers' pixels do not move —
+  check/photo-worker.ts holds the papers, the doors, the four ovals and the backdrop to the
+  page's own pixels, and the 46 papers' photographs hash the same before and after the round.
+- The CSS around them stays: the title's fades and vignette, the cards' rings, the night's
+  opacity and mask, the doors' boxes.
+
 ## 2026-10-21 — Round R8d, Part A: spring's card
 
 - The author (2026-10-20): spring's card is the only one without a photograph; give it one, and

@@ -85,7 +85,7 @@ Conditions use one shape everywhere:
 }
 ```
 
-`photo` (round R8a): the door's photograph, an oval above "You're invited" — a `scene` (one of the thirteen, below under `scenes`) and a `drawing`, 0 to 2: as drawn, mirrored, closer (`SCENE_DRAWINGS`). Every door has one; validate checks both. `flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
+`photo` (round R8a): the door's photograph, an oval above "You're invited" — a `scene` (one of the thirteen, below under `scenes`) and a `drawing`, 0 to 2: as drawn, mirrored, closer (`SCENE_DRAWINGS`). Every door has one; validate checks both. Since round R8d it prints in its scene's ink (ui/desk/halftone.ts `DOOR_INKS`; a scene without one prints in the papers' ink). `flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ## Endings — `content/endings.json`

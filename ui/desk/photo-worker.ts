@@ -1,11 +1,11 @@
-import { renderLightCanvas, renderPhotoCanvas, renderTitleCanvas, type PhotoJob } from './halftone.ts';
-import type { LightJob } from './photo-preload.ts';
+import { renderDoorCanvas, renderLightCanvas, renderPhotoCanvas, renderTitleCanvas, type PhotoJob } from './halftone.ts';
+import type { DoorJob, LightJob } from './photo-preload.ts';
 
 // This worker owns only image preparation, never game state or presentation callbacks. It draws the warm-up's work
-// in its order (photo-preload.ts warmJobs): spring's oval first (round R8d, A3), the papers' photographs, then the
-// other season cards' ovals light on ink (round R8a, D2); or one light job, the awards night's backdrop (round R8c); or
-// the title's photograph (round R3, amended) at the screen's pixel size.
-globalThis.onmessage=async (event:MessageEvent<{first?:LightJob|null;jobs?:readonly PhotoJob[];lights?:readonly LightJob[];directorLabel?:string;title?:{readonly w:number;readonly h:number}}>)=>{
+// in its order (photo-preload.ts warmJobs): spring's oval first (round R8d, A3), the papers' photographs, the doors'
+// in their inks (B3), then the other season cards' ovals light on ink (round R8a, D2); or one light job, the awards
+// night's backdrop (round R8c); or the title's photograph (round R3, amended) at the screen's pixel size.
+globalThis.onmessage=async (event:MessageEvent<{first?:LightJob|null;jobs?:readonly PhotoJob[];doors?:readonly DoorJob[];lights?:readonly LightJob[];directorLabel?:string;title?:{readonly w:number;readonly h:number}}>)=>{
   try {
     const title=event.data.title;
     if(title) {
@@ -17,6 +17,10 @@ globalThis.onmessage=async (event:MessageEvent<{first?:LightJob|null;jobs?:reado
     for(const job of event.data.jobs??[]) {
       const blob=await renderPhotoCanvas(...job,event.data.directorLabel??'',true).convertToBlob({type:'image/png'});
       globalThis.postMessage({job,blob});
+    }
+    for(const door of event.data.doors??[]) {
+      const blob=await renderDoorCanvas(...door,event.data.directorLabel??'',true).convertToBlob({type:'image/png'});
+      globalThis.postMessage({door,blob});
     }
     for(const light of event.data.lights??[]) {
       const blob=await renderLightCanvas(...light,event.data.directorLabel??'',true).convertToBlob({type:'image/png'});

@@ -2,7 +2,7 @@ import { SCENE_IDS, SEASON_IDS, type SceneId, type SeasonId } from '../../core/i
 import { content } from '../content.ts';
 import { t } from '../i18n.ts';
 import { STAGE_HEIGHT, STAGE_WIDTH } from '../Stage.tsx';
-import { cachePhotoBlob, photoUrl, renderLightCanvas, renderTitleCanvas, type PhotoJob } from './halftone.ts';
+import { cacheDoorBlob, cachePhotoBlob, doorUrl, photoKey, photoUrl, renderLightCanvas, renderTitleCanvas, type LightUse, type PhotoJob } from './halftone.ts';
 
 let title: Promise<string> | null = null;
 let titleReady: string | null = null;
@@ -28,9 +28,10 @@ function titleSize(): { readonly w: number; readonly h: number } {
 
 /**
  * A season card's oval (round R8a, D2): its scene light on ink (halftone.ts renderLightCanvas), drawn at 560×200 stage
- * pixels times the stage's factor, its dot cell 3.6 times the same; the oval shows the drawing's middle 400.
+ * pixels times the stage's factor, its dot cell 3.6 times the same; the oval shows the drawing's middle 400. Since round
+ * R8d a light job carries its use, which picks its colours: 'season' for an oval, 'backdrop' for the night's backdrop.
  */
-export type LightJob = readonly [scene: SceneId, season: SeasonId, w: number, h: number, cell: number];
+export type LightJob = readonly [scene: SceneId, season: SeasonId, w: number, h: number, cell: number, use: LightUse];
 const OVAL = { w: 560, h: 200, cell: 3.6 } as const;
 const lights = new Map<string, string>();
 const lightKey = ([scene, season]: LightJob): string => `${scene}:${season}`;
@@ -48,7 +49,7 @@ const backdropKey = ([scene, , w, h]: LightJob): string => `${scene}:${w}x${h}`;
 /** The backdrop's light job for a scene, at the stage's factor now. */
 export function backdropJob(scene: SceneId): LightJob {
   const k = stageFactor();
-  return [scene, 'winter', Math.round(BACKDROP.w * k), Math.round(BACKDROP.h * k), BACKDROP.cell * k] as const;
+  return [scene, 'winter', Math.round(BACKDROP.w * k), Math.round(BACKDROP.h * k), BACKDROP.cell * k, 'backdrop'] as const;
 }
 
 /** The backdrop if it is drawn already. */
@@ -114,7 +115,7 @@ export function drawBackdrop(job: LightJob, onPage: (draw: () => void) => void):
 /** The season cards' ovals content asks for (rules.seasonScenes), at the stage's factor now. */
 export function lightJobs(): LightJob[] {
   const k = stageFactor();
-  return Object.entries(content.rules.seasonScenes ?? {}).map(([season, scene]) => [scene as SceneId, season as SeasonId, Math.round(OVAL.w * k), Math.round(OVAL.h * k), OVAL.cell * k] as const);
+  return Object.entries(content.rules.seasonScenes ?? {}).map(([season, scene]) => [scene as SceneId, season as SeasonId, Math.round(OVAL.w * k), Math.round(OVAL.h * k), OVAL.cell * k, 'season'] as const);
 }
 const ovalJob = (season: SeasonId): LightJob | undefined => lightJobs().find(([, s]) => s === season);
 
@@ -140,6 +141,20 @@ function keepLight(job: LightJob, url: () => string): string {
 export function seasonPhotoUrl(season: SeasonId): string | null {
   const job = ovalJob(season);
   return job ? keepLight(job, () => renderLightCanvas(...job, t('desk.photo.director'), false).toDataURL()) : null;
+}
+
+/** A door's photograph (round R8d, B3): its scene, its act's season and its drawing, printed in the scene's ink. */
+export type DoorJob = readonly [scene: SceneId, season: SeasonId, variant: number];
+
+/** The doors' photographs (round R8d, B3): every gate's photo, in its act's season (rules.seasons), once each. */
+export function doorJobs(): DoorJob[] {
+  const jobs = new Map<string, DoorJob>();
+  for (const gate of Object.values(content.gates)) {
+    if (!gate.photo) continue;
+    const job = [gate.photo.scene, content.rules.seasons?.[gate.act - 1] ?? 'spring', gate.photo.drawing] as const;
+    if (!jobs.has(photoKey(job))) jobs.set(photoKey(job), job);
+  }
+  return [...jobs.values()];
 }
 
 /** Whether a season's card has an oval: content gives the season a scene. */
@@ -234,12 +249,13 @@ export function photoJobs(variants:number):PhotoJob[] {
 
 /**
  * The warm-up's work, in its order (round R8d, A3): spring's oval first — the opening comes right after BEGIN — then
- * the papers' photographs, then the other season cards' ovals (round R8a, D2): a card never waits for its photograph.
+ * the papers' photographs, the doors' (B3), then the other season cards' ovals (round R8a, D2): a card never waits for
+ * its photograph.
  */
-export interface WarmJobs { readonly first:LightJob|null;readonly jobs:readonly PhotoJob[];readonly lights:readonly LightJob[] }
+export interface WarmJobs { readonly first:LightJob|null;readonly jobs:readonly PhotoJob[];readonly doors:readonly DoorJob[];readonly lights:readonly LightJob[] }
 export function warmJobs(variants:number):WarmJobs {
   const ovals=lightJobs(),opening=content.rules.seasons?.[0],first=ovals.find(([,season])=>season===opening)??null;
-  return {first,jobs:photoJobs(variants),lights:ovals.filter(oval=>oval!==first)};
+  return {first,jobs:photoJobs(variants),doors:doorJobs(),lights:ovals.filter(oval=>oval!==first)};
 }
 
 /**
@@ -248,12 +264,12 @@ export function warmJobs(variants:number):WarmJobs {
  */
 export function warmPhotos(variants:number):Promise<PhotoWarmResult> {
   return warming??=new Promise(resolve=>{
-    const warm=warmJobs(variants),count=(warm.first?1:0)+warm.jobs.length+warm.lights.length;
+    const warm=warmJobs(variants),count=(warm.first?1:0)+warm.jobs.length+warm.doors.length+warm.lights.length;
     let worker:Worker|undefined,timer:ReturnType<typeof setTimeout>|undefined,fellBack=false;
     const cleanup=()=>{clearTimeout(timer);worker?.terminate();};
     const fallback=(reason:string)=>{
       if(fellBack)return;fellBack=true;cleanup();
-      const pending:(()=>unknown)[]=[...(warm.first?[warm.first]:[]).map(oval=>()=>seasonPhotoUrl(oval[1])),...warm.jobs.map(job=>()=>photoUrl(...job)),...warm.lights.map(oval=>()=>seasonPhotoUrl(oval[1]))];
+      const pending:(()=>unknown)[]=[...(warm.first?[warm.first]:[]).map(oval=>()=>seasonPhotoUrl(oval[1])),...warm.jobs.map(job=>()=>photoUrl(...job)),...warm.doors.map(door=>()=>doorUrl(...door)),...warm.lights.map(oval=>()=>seasonPhotoUrl(oval[1]))];
       const next=()=>{
         if(document.querySelector('[data-busy="1"]')){setTimeout(schedule,250);return;}
         pending.shift()?.();
@@ -268,11 +284,12 @@ export function warmPhotos(variants:number):Promise<PhotoWarmResult> {
     if(typeof Worker==='undefined'||typeof OffscreenCanvas==='undefined'){fallback('Worker/OffscreenCanvas unavailable');return;}
     try {
       worker=new Worker(new URL('./photo-worker.ts',import.meta.url),{type:'module'});
-      worker.onmessage=(event:MessageEvent<{job?:PhotoJob;light?:LightJob;blob?:Blob;done?:boolean;error?:string}>)=>{
+      worker.onmessage=(event:MessageEvent<{job?:PhotoJob;door?:DoorJob;light?:LightJob;blob?:Blob;done?:boolean;error?:string}>)=>{
         if(fellBack)return;
         const message=event.data;
         if(message.error){fallback(message.error);return;}
         if(message.job&&message.blob)cachePhotoBlob(message.job,message.blob);
+        if(message.door&&message.blob)cacheDoorBlob(message.door,message.blob);
         if(message.light&&message.blob)cacheLightBlob(message.light,message.blob);
         if(message.done){cleanup();resolve({method:'worker',count});}
       };

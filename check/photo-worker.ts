@@ -9,7 +9,7 @@ try {
     const page=await launch(browser,{width:1280,height:720});
     try {
       await page.navigate(server.resolvedUrls!.local[0]!);
-      const result=await page.evaluate<{warm:{method:string;count:number;reason?:string};comparisons:{job:unknown;light:boolean;backdrop:boolean;different:number;maxDelta:number}[];first:string|null;fallback:{method:string;count:number};blockedWhileBusy:boolean}>(`(async()=>{
+      const result=await page.evaluate<{warm:{method:string;count:number;reason?:string};comparisons:{job:unknown;light:boolean;door:boolean;backdrop:boolean;different:number;maxDelta:number}[];first:string|null;doors:number;fallback:{method:string;count:number};blockedWhileBusy:boolean}>(`(async()=>{
         const preload=await import('/ui/desk/photo-preload.ts');
         const drawing=await import('/ui/desk/halftone.ts');
         const warm=await preload.warmPhotos(3);
@@ -29,9 +29,10 @@ try {
             const m=event.data;
             if(m.error){finish();reject(Error(m.error));return}
             // A paper's photograph against the page's own; a season card's oval (round R8a, D2) against renderLightCanvas.
-            if((m.job||m.light)&&m.blob&&first===null)first=m.light?'oval:'+m.light[1]:'photo';
-            if((m.job||m.light)&&m.blob)pending.push((async()=>{
-              const expected=m.job?drawing.photoCanvas(...m.job):drawing.renderLightCanvas(...m.light,label,false),g=expected.getContext('2d');
+            if((m.job||m.door||m.light)&&m.blob&&first===null)first=m.light?'oval:'+m.light[1]:'photo';
+            // A door's photograph (round R8d, B3) against renderDoorCanvas, in its scene's ink.
+            if((m.job||m.door||m.light)&&m.blob)pending.push((async()=>{
+              const expected=m.job?drawing.photoCanvas(...m.job):m.door?drawing.renderDoorCanvas(...m.door,label,false):drawing.renderLightCanvas(...m.light,label,false),g=expected.getContext('2d');
               const a=g.getImageData(0,0,expected.width,expected.height).data;
               const url=URL.createObjectURL(m.blob),img=new Image();
               try {
@@ -40,7 +41,7 @@ try {
                 const b=g.getImageData(0,0,expected.width,expected.height).data;
                 let different=0,maxDelta=0;
                 for(let i=0;i<a.length;i++)if(a[i]!==b[i]){different++;maxDelta=Math.max(maxDelta,Math.abs(a[i]-b[i]))}
-                comparisons.push({job:m.job??m.light,light:!!m.light,backdrop:!!m.light&&m.light[2]===backdrop[2]&&m.light[3]===backdrop[3],different,maxDelta});
+                comparisons.push({job:m.job??m.door??m.light,light:!!m.light,door:!!m.door,backdrop:!!m.light&&m.light[5]==='backdrop',different,maxDelta});
               }finally{URL.revokeObjectURL(url)}
             })());
             if(m.done)Promise.all(pending).then(()=>{finish();resolve(true)},e=>{finish();reject(e)});
@@ -57,17 +58,19 @@ try {
           await new Promise(r=>setTimeout(r,300));blockedWhileBusy=!done;busy.remove();
           fallback=await loading;
         }finally{window.Worker=OriginalWorker}
-        return {warm,comparisons,first,fallback,blockedWhileBusy};
+        return {warm,comparisons,first,doors:work.doors.length,fallback,blockedWhileBusy};
       })()`,45000);
       if(result.warm.method==='worker'){
         assert.equal(result.comparisons.length,result.warm.count+1);
         assert.deepEqual(result.comparisons.filter(c=>c.different),[],`${browser}: worker pixels differ from original canvas`);
         const backdrops=result.comparisons.filter(c=>c.backdrop).length;
         const ovals=result.comparisons.filter(c=>c.light&&!c.backdrop).length;
+        const doors=result.comparisons.filter(c=>c.door).length;
+        assert.ok(doors>0&&doors===result.doors,`${browser}: ${doors} doors compared of ${result.doors}`);
         assert.ok(ovals>0,`${browser}: no season card's oval was compared`);
         assert.equal(backdrops,1,`${browser}: the night's backdrop was not compared`);
         assert.equal(result.first,'oval:spring',`${browser}: the warm-up's first picture is ${result.first}, not spring's oval`);
-        console.log(`PASS photo worker ${browser}: ${result.comparisons.length-ovals-backdrops} photos, ${ovals} season cards' ovals (spring's first) and the night's backdrop, exact RGBA parity`);
+        console.log(`PASS photo worker ${browser}: ${result.comparisons.length-ovals-backdrops-doors} photos, ${doors} doors, ${ovals} season cards' ovals (spring's first) and the night's backdrop, exact RGBA parity`);
       }else {
         assert.equal(result.warm.reason,'Worker/OffscreenCanvas unavailable',`${browser}: unexpected worker failure is not a capability skip`);
         console.log(`SKIP worker pixels ${browser}: ${result.warm.reason}; original idle rendering retained`);

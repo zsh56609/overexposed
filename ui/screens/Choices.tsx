@@ -5,7 +5,7 @@
 
 import type { KeyboardEvent } from 'react';
 import { freeRerollAvailable, getGate, getManager, rerollCost, type Action, type ClauseReport, type ContentIndex, type GameState, type SeasonId } from '../../core/index.ts';
-import { photoUrl } from '../desk/halftone.ts';
+import { doorUrl } from '../desk/halftone.ts';
 import { CardPicture } from '../desk/Hand.tsx';
 import { Icon } from '../desk/Icons.tsx';
 import { effectChips, offerCardModel, type HandWords, type IconId, type ValueChip } from '../desk/model.ts';
@@ -172,8 +172,9 @@ function Invitation({ c, s, p, lane, last, sameEnding, chosen, take, legal }: { 
   return (
     <div className={`inv take${chosen === id ? ' chosen' : ''}`} role="button" tabIndex={0} data-gate={id} aria-label={gateName(c, id)} aria-disabled={!legal.gates.has(id)} onClick={go} onKeyDown={onKeys(go)}>
       <span className={`odds ${p.passes ? 'y' : 'n'}`}>{t(p.passes ? 'ui.doors.likely' : 'ui.doors.unlikely')}</span>
-      {/* The door's photograph (round R8a, D1): its scene and drawing from content, printed as the papers print theirs. */}
-      {gate?.photo && <div className="ivp" aria-hidden="true" style={{ backgroundImage: `url("${photoUrl(gate.photo.scene, c.rules.seasons?.[s.act - 1] ?? 'spring', gate.photo.drawing)}")` }} />}
+      {/* The door's photograph (round R8a, D1): its scene and drawing from content, the papers' drawing printed in the
+          scene's ink (round R8d, B3), drawn ahead by the warm-up. */}
+      {gate?.photo && <div className="ivp" aria-hidden="true" style={{ backgroundImage: `url("${doorUrl(gate.photo.scene, c.rules.seasons?.[s.act - 1] ?? 'spring', gate.photo.drawing)}")` }} />}
       <div className="ivk">{t('ui.doors.invited')}</div>
       <div className="ivt">{gateName(c, id)}</div>
       <div className={prose(flavor, 'ivf')}>{flavor}</div>

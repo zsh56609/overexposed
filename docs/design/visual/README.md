@@ -67,6 +67,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - **The paper comes to you** (round R1): when a play prints a story in a paper behind, that paper comes forward — the same motion as a click — while the card is carried, so the story prints in front of the player. It stays in front until another play brings a different paper forward, the player picks one, or the month ends (the new issue's lead paper takes the desk). A play that changes more than one paper brings forward the one whose lead changed; if both or neither did, the one with the played card's own story; a play that changes no visible story moves nothing. It never lengthens the play's input hold. Reduced motion: the papers swap under a short crossfade.
 - **Mark my stories** (a setting, on by default): the player's stories carry a red rule in the left margin; the rival's carry a purple one.
 - **Photographs:** only the lead story has one. Halftone, drawn in code (see Porting; `ui/desk/halftone.ts`). Thirteen scenes: singer at a microphone · the rival with a guitar · festival crowd · paparazzi (red duotone, only when a scandal leads) · red carpet · film set · the street, a reporter's vox pop outside a row of shops, in each season (spring rain, summer sun, autumn leaves, winter snow) · award under a spotlight — and since round R8a (R7b's drawings) a talk-show set (the host at the desk, the guest in an armchair, a studio camera) · a recording studio seen from the control room · an arena seen from the stage · a press conference (lectern, microphones, flashes) — and since round R8d the room (`docs/design/visual/ref/r8d-room.ts`): the singer from behind on the edge of the bed, playing, at the window with the city outside, a lamp on the left, a coat on its hook on the right; spring's card shows it, and no paper prints it yet. Rule learned: a silhouette needs light behind it, and a picture is recognised by one iconic object.
+- **The halftones in colour** (round R8d; the author's choices, `docs/design/visual/ref/r8d-colour.ts`, drawn in `docs/design/visual/ref/r8d-colour.png`): every halftone that is not a newspaper prints in colour, muted and dark enough to suit the dots — a middle ground between the photographs and faces and the papers. Light on ink, each dot's size follows the light, as before, and its colour the look's ramp at that light — dark and muted in the shadows, a warm cream in the highlights — tinted near the picture's own lights (a lamp, a beam, the flashes, a red carpet): the title's photograph in oxblood and amber, the photographers' flashes cool (`TITLE_LOOK`); the season cards' ovals a hue a season, a shade darker (`SEASON_LOOKS`); the awards night's backdrop warm, all four (`BACKDROP_LOOKS`). Ink on paper, each dot's size follows the dark, as the papers' do, and its colour the door's ink — a light tint in the small dots, the full ink in the large: the doors' photographs, an ink for each door's scene (`DOOR_INKS`). The looks go by scene and use, so one scene can have two: winter's card and Overexposed's night are both the red carpet, navy on the card and warm on the night. A scene with no look prints in the old cream on ink (`PLAIN`). The papers' photographs, the night's front-page pictures and the headshot stay black and white, their pixels unchanged (`halftone`, `INK`, `RED`, `HEADSHOT`). Each dot's colour is rounded to a step of 6 a channel, so a picture has a few hundred colours, filled a colour at a time.
 - **Photo selection:** a lead story's scene is content's (`content/press.json` → `scenes`, /core's `sceneOf`): an override for the story's own i18n key first, then for its line group — a card's lines (`card:<id>`, a scandal's `scandal:<id>`), a paper's world stories, filler or spillover — so a talk show's story shows the talk-show set and a tour the arena; else its kind's default: a scandal the paparazzi, the rival her own, a world story or a saga's beat its paper's (Flash the street, B-Side the crowd, Marquee the film set), the player's own its paper's (Flash the red carpet, B-Side the singer, Marquee the film set). Each scene has three drawings — as drawn, mirrored, closer — its patterns shifted by the seed; a shuffle bag picks one, never the same picture on the same paper two months running.
 - **B-Side reviews:** stars only for the player’s own releases, using the craft tier at release: Raw ★, Learning ★★, Solid ★★★, Seasoned ★★★½, Skilled ★★★★, Masterful ★★★★★. Coming scandal stories carry “Going to press” and disappear if cooling prevents them.
 - **Marquee's box office** changes every month; when the player is Famous on the screen lane, their film, *One Year*, tops it.
@@ -150,7 +151,8 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
   applause once a box; a click, reduced motion or motion off show it all at once.
 - **The night's backdrop** (round R8c): the major's scene printed light on ink, as the season cards' ovals are —
   The Breakthrough the arena, The Long Game the studio, Overexposed the red carpet, The Hard Way the street, all in
-  winter — behind the night's top: an image, the night's first child, at 90, 8, 1100×393 on the stage, over the
+  winter, in a warm look whatever the scene, as the night's curtains and trophies are (round R8d, `BACKDROP_LOOKS`) —
+  behind the night's top: an image, the night's first child, at 90, 8, 1100×393 on the stage, over the
   night's ground and under the spotlight and the curtains, opacity .26, feathered by a radial mask (`ellipse 56% 50%
   at 50% 40%`, solid to 34%, gone at 80%). Drawn at the stage's factor (its dot cell 4.4 times it) by the photo worker
   when the night mounts; it fades in over 600 ms when it comes (reduced motion or motion off: no fade) and never holds
@@ -187,9 +189,12 @@ italic line.
   threshold, the number in the icon's colour — "★ 64+ (you have 104)" — never the
   stat's name; a condition without a stat ("Signed to a label") is plain text. The last door adds **On the night** (the awards that choice
   wins) and the header states the ending either way. Clicking accepts (ACCEPTED stamp).
-  - **Every door has a photograph** (round R8a): an oval of 164×96 above "You're invited", its scene printed as the
-    papers print theirs (`photoUrl`, the papers' cell), filling the oval at 300 px wide (50% across, 46% down), framed
-    as the invitation is — 1 px of gold `#b8924a`, 3 px of the card's cream, 1 px of gold. Content names it: each
+  - **Every door has a photograph** (round R8a): an oval of 164×96 above "You're invited", its scene drawn as the
+    papers draw it, with the papers' cell, filling the oval at 300 px wide (50% across, 46% down), framed as the
+    invitation is — 1 px of gold `#b8924a`, 3 px of the card's cream, 1 px of gold. Since round R8d it prints in its
+    scene's ink on the invitation's paper (`doorUrl`, `DOOR_INKS`: the singer oxblood, the crowd indigo, the arena
+    plum, the studio teal, the press conference slate blue, the trophy bronze), drawn ahead by the warm-up, in a cache
+    of its own beside the papers' (the same drawing prints black in a paper). Content names it: each
     gate's `photo`, a scene and one of its three drawings (the audition the singer, the showcase the crowd, the
     festival and the arena tour the arena, session work the studio, the label deal the press conference, the
     residency the singer mirrored, the award show the trophy). The Likely / Unlikely stamp stays where it was, clear
@@ -205,9 +210,11 @@ italic line.
   — both times the stage's own factor, its scale on the screen × the device pixel ratio, as the title's is reckoned,
   the dot cell 3.6 times it — ringed, from the inside, 1.5 px of cream at .55, 5 px of ink, 1 px of cream at .25.
   Content names the scenes (`rules.seasonScenes`): spring the room (summer's arena is the same back at the far end of
-  the year), summer the arena, autumn the street in autumn, winter the red carpet. Spring's card is the opening, over
-  the title's photograph right after BEGIN, so its oval is drawn first: in the worker after the title's, the warm-up
-  draws spring's oval, then the papers' photographs, then the other ovals — a card never waits for its photograph.
+  the year), summer the arena, autumn the street in autumn, winter the red carpet — since round R8d a hue each, a
+  shade darker (`SEASON_LOOKS`): spring's slate and its lamp, summer's violet and rose under the beams, autumn's amber,
+  winter's navy over the red carpet. Spring's card is the opening, over the title's photograph right after BEGIN, so
+  its oval is drawn first: in the worker after the title's, the warm-up draws spring's oval, then the papers'
+  photographs, then the doors', then the other ovals — a card never waits for its photograph.
   The opening only looks spring's up and never draws it on the page: if the card comes first, the oval stands empty,
   its rings shown, and the picture fades in over 300 ms when it comes (reduced motion or motion off: at once);
   nothing moves.
