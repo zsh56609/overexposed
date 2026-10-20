@@ -340,8 +340,10 @@ async function mirrorTips(page: Page, url: string): Promise<Result[]> {
     if (page.name !== 'webkit' || !(err instanceof Error) || err.message !== 'WebKit driver: trusted long-press unsupported by Playwright Touchscreen') throw err;
     out.push([`a sticky note's tooltip on a long-press: ${err.message.slice(0, 60)}`, 'skipped']);
   }
-  // Keyboard: Tab until the mirror has the focus (headless Firefox's window never has it: no focus events there).
+  // Keyboard: Tab until the mirror has the focus (headless Firefox's window never has it: no focus events there). A focus
+  // within 600 ms of a press is the press's, not the keyboard's (keyboardFocus, ui/desk/Icons.tsx): the keys come after.
   if (!(await page.evaluate<boolean>(`document.hasFocus()`))) return [...out, ['the mirror on keyboard focus: this headless window never has focus', 'skipped']];
+  await sleep(700);
   let focused: string | null = null;
   for (let i = 0; i < 40 && !focused; i++) {
     await page.key('Tab');

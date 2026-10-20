@@ -13,8 +13,9 @@
 // - a seeded run without notes=1 shows none, nor does a run with the switch off;
 // - under touch input the actions note says "hold": its .touch line.
 // With --years instead: two years from the title as a new player has them — unseeded, a fresh store, one per manager,
-// played for Hype (a Scandal in the hand by summer), through the awards night: when each note came and why, all six,
-// the switch off after them, and no console error (Chromium at 1280×720 unless --browsers and --sizes say otherwise).
+// played for Hype and the heat it brings (a Scandal in the hand by summer), through the awards night: when each note
+// came and why, all six, the switch off after them, and no console error (Chromium at 1280×720 unless --browsers and
+// --sizes say otherwise).
 // Runs the Vite dev server in-process. Usage: node check/notes.ts [--years] [--browsers=chrome,firefox,webkit] [--sizes=1280x720,844x390m]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -145,7 +146,7 @@ interface Walk {
 
 /**
  * One move of the year by real input: whatever screen is up, its choice (the manager `manager`); else a play — for heat,
- * a card that raises it first; for Hype, the card that raises it most — else END TURN.
+ * a card that raises it first; for Hype, the card that raises Hype and the heat that comes with it most — else END TURN.
  */
 async function move(page: Page, input: 'mouse' | 'touch', w: Walk, manager = 0, policy: 'heat' | 'hype' = 'heat'): Promise<string> {
   const tap = async (at: Pt | null) => {
@@ -188,7 +189,8 @@ async function move(page: Page, input: 'mouse' | 'touch', w: Walk, manager = 0, 
     const i = await page.evaluate<number>(`(() => {
       const ok = [...document.querySelectorAll('.desk .hand .card')].map((c, i) => [c, i]).filter(([c]) => c.getAttribute('aria-disabled') === 'false');
       const hot = ok.find(([c]) => [...c.querySelectorAll('.r-heat')].some((x) => x.textContent.includes('+')));
-      const hype = (c) => Math.max(0, ...[...c.querySelectorAll('.r-hype')].map((x) => Number((x.textContent.match(/\\+(\\d+)/) ?? [])[1] ?? 0)));
+      const gain = (c, k) => Math.max(0, ...[...c.querySelectorAll('.r-' + k)].map((x) => Number((x.textContent.match(/\\+(\\d+)/) ?? [])[1] ?? 0)));
+      const hype = (c) => gain(c, 'hype') + gain(c, 'heat');
       const most = ok.reduce((best, x) => (best === null || hype(x[0]) > hype(best[0]) ? x : best), null);
       return ((${JSON.stringify(policy)} === 'hype' && most && hype(most[0]) > 0 ? most : hot) ?? ok[0])?.[1] ?? -1;
     })()`);
@@ -625,10 +627,10 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
   }
   const reached = await page.evaluate<boolean>(night);
   out.push(['the year reached its ending', reached]);
-  // The awards night: wait for PLAY AGAIN.
+  // The awards night, revealed — during its reveal a click only shows the night at once (decision 7) — to PLAY AGAIN.
   let again: Pt | null = null;
   for (let k = 0; k < 240 && !again; k++) {
-    again = await centre(page, 'button.play-again');
+    again = (await page.evaluate<boolean>(`!!document.querySelector('.awards-night.shown')`)) ? await centre(page, 'button.play-again') : null;
     if (!again) await sleep(250);
   }
   out.push(['the awards night came, to PLAY AGAIN', !!again]);
@@ -637,16 +639,20 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
   out.push([`all six notes came${missing.length ? `: not ${missing.join(', ')}` : ''}`, missing.length === 0]);
   out.push([`each came once (${came.length} in all)`, came.length === new Set(came).size]);
   out.push([`a Scandal in the hand by summer (month ${scandalBy || 'none'})`, scandalBy > 0 && scandalBy <= 6]);
-  // PLAY AGAIN, the title's House rules: the switch reads off.
+  // PLAY AGAIN, the title's House rules: the switch reads off (and so does the stored setting).
+  let open: Pt | null = null;
   if (again) {
     await page.click(...again);
-    await sleep(2500);
-    const open = await centre(page, '.title-screen .settings-open');
+    for (let k = 0; k < 80 && !open; k++) {
+      await sleep(250);
+      // The ink gone first: a click during PLAY AGAIN's fade only completes it (D7).
+      open = (await page.evaluate<boolean>(`!!document.querySelector('.title-screen:not(.dim) .begin') && !document.querySelector('.ink')`)) ? await centre(page, '.title-screen .settings-open') : null;
+    }
     if (open) await page.click(...open);
-    await sleep(700);
+    for (let k = 0; k < 20 && !(await page.evaluate<boolean>(`!!document.querySelector('[data-setting="notes"]')`)); k++) await sleep(150);
   }
-  const sw = await page.evaluate<string | null>(`document.querySelector('[data-setting="notes"]')?.getAttribute('aria-checked') ?? null`);
-  out.push(['after the six, House rules\' switch reads off', sw === 'false']);
+  const sw = await page.evaluate<{ shown: string | null; stored: unknown }>(`(() => { let stored = null; try { stored = JSON.parse(localStorage.getItem('overexposed.settings') ?? 'null')?.notes ?? null; } catch {} return { shown: document.querySelector('[data-setting="notes"]')?.getAttribute('aria-checked') ?? null, stored }; })()`);
+  out.push([`after the six, House rules' switch reads off (it reads ${sw.shown ?? 'nothing: no House rules'}; stored ${String(sw.stored)})`, sw.shown === 'false' && sw.stored === false]);
   return { results: out, timeline };
 }
 
