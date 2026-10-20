@@ -6,6 +6,14 @@ rules).
 
 ---
 
+## 2026-10-21 — Round R8d, Part D: v0.9, again
+
+- R8c's zip is void: it was never uploaded. v0.9 is built again from this round's last commit
+  (overexposed-v0.9.zip, as R8c's F2: a clean export, the build, the zip checked against dist/
+  file by file and its six mp3s against the repo's). package.json stays 0.9.0, and AGENTS.md
+  is not edited: its version list keeps "R8c v0.9", and v0.9 is R8c and R8d.
+- R8d brings no new words (THE NEW WORDS: none); it takes two away, spring's openers.
+
 ## 2026-10-21 — Round R8d, Part C: three small fixes in the pictures
 
 - Alex's face (the author: from afar, the sun behind his head read as part of it): the
