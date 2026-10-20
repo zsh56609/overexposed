@@ -28,6 +28,7 @@ import {
   EVENT_CATEGORIES,
   EVENT_FORMS,
   AVATAR_IDS,
+  PHOTO_IDS,
   EVENT_PRESS_KINDS,
   PROMINENCES,
   REGISTERS,
@@ -58,6 +59,7 @@ export const CHECKS = {
   boundaries: 'code boundaries (CLAUDE.md §0)',
   sound: "the sound module: the author's, copied unchanged",
   avatars: "the faces: the author's ten portraits, unchanged",
+  photos: "the photos: the author's seven drawings, unchanged",
 } as const;
 export type CheckId = keyof typeof CHECKS;
 
@@ -1687,7 +1689,7 @@ function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
 // Events (content/events.json, round R2): the categories that caption them, and each event's months, speaker,
 // chain, messages and choices. Every event has a choice with no requirement — the player can always answer.
 
-const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'choices'];
+const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'photo', 'choices'];
 const EVENT_CHOICE_FIELDS = ['replyKey', 'requires', 'effects', 'press', 'outcomeKey'];
 /** Events have their own budget (AGENTS.md → Content budget): a ceiling, not a target. */
 const EVENT_BUDGET = 28;
@@ -1789,6 +1791,17 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
       if (e.messageKeys.length > max) v.error('ranges', `${where}.messageKeys`, `a ${String(e.form)} holds at most ${max}`);
       e.messageKeys.forEach((k, i) => v.key(k, `${where}.messageKeys[${i}]`));
     }
+    // A photograph in a text (round R8b): one of PHOTO_IDS, after one of its messages; a letter has none.
+    if (e.photo !== undefined) {
+      const ph = e.photo;
+      if (e.form !== 'text') v.error('schema', `${where}.photo`, 'only a text carries a photograph');
+      if (!isObj(ph)) v.error('schema', `${where}.photo`, 'must be { id, after }');
+      else {
+        v.fields(ph, ['id', 'after'], `${where}.photo`);
+        if (!(PHOTO_IDS as readonly unknown[]).includes(ph.id)) v.error('references', `${where}.photo.id`, `must be one of ${PHOTO_IDS.join(', ')}, got ${q(ph.id)}`);
+        v.int(ph.after, `${where}.photo.after`, [1, Math.max(1, Array.isArray(e.messageKeys) ? e.messageKeys.length : 1)]);
+      }
+    }
     const choices = Array.isArray(e.choices) ? e.choices : [];
     if (choices.length < 2 || choices.length > 3) v.error('ranges', `${where}.choices`, 'an event has two or three choices');
     const owner: Owner = { kind: 'event', id: String(e.id), act: firstAct };
@@ -1889,28 +1902,47 @@ export function checkSoundModule(reference: string | null, copy: string | null):
  * a 100×100 box, and their ids unique across the ten.
  */
 export function checkAvatars(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
+  return checkDrawings({ check: 'avatars', file: 'ui/avatars.ts', dir: 'r8a-avatars', ids: AVATAR_IDS, box: '0 0 100 100', list: 'AVATAR_IDS', what: 'faces' }, references, copies);
+}
+
+/**
+ * The photos some texts carry (round R8b): ui/photos.ts holds the author's seven drawings,
+ * docs/design/visual/ref/r8b-photos/<id>.svg, one for each of core's PHOTO_IDS and no more, unchanged — line endings
+ * aside — each drawn on a 400×300 box, their ids unique across the seven.
+ */
+export function checkPhotos(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
+  return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: 'r8b-photos', ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos' }, references, copies);
+}
+
+/** The author's drawings held as strings, against their reference files: the faces' check and the photos'. */
+function checkDrawings(
+  kind: { readonly check: CheckId; readonly file: string; readonly dir: string; readonly ids: readonly string[]; readonly box: string; readonly list: string; readonly what: string },
+  references: Readonly<Record<string, string | null>>,
+  copies: Readonly<Record<string, string>> | null,
+): Issue[] {
   const issues: Issue[] = [];
-  const err = (where: string, message: string) => issues.push({ level: 'error', check: 'avatars', where, message });
+  const err = (where: string, message: string) => issues.push({ level: 'error', check: kind.check, where, message });
   if (copies === null) {
-    err('ui/avatars.ts', 'missing: the faces, the reference files as strings');
+    err(kind.file, `missing: the ${kind.what}, the reference files as strings`);
     return issues;
   }
   const norm = (text: string) => text.replace(/\r\n/g, '\n');
-  for (const id of AVATAR_IDS) {
+  const viewBox = `viewBox="${kind.box}"`;
+  for (const id of kind.ids) {
     const reference = references[id] ?? null;
     const copy = copies[id];
-    const where = `ui/avatars.ts ${id}`;
-    if (reference === null) err(where, `docs/design/visual/ref/r8a-avatars/${id}.svg, the reference, is missing`);
+    const where = `${kind.file} ${id}`;
+    if (reference === null) err(where, `docs/design/visual/ref/${kind.dir}/${id}.svg, the reference, is missing`);
     else if (copy === undefined) err(where, 'missing: copy its reference here');
-    else if (norm(copy) !== norm(reference)) err(where, `differs from docs/design/visual/ref/r8a-avatars/${id}.svg: copy the reference again`);
-    if (copy !== undefined && !/^<svg[^>]*\sviewBox="0 0 100 100"/.test(copy)) err(where, 'must be drawn on a 100×100 box (viewBox="0 0 100 100")');
+    else if (norm(copy) !== norm(reference)) err(where, `differs from docs/design/visual/ref/${kind.dir}/${id}.svg: copy the reference again`);
+    if (copy !== undefined && !(copy.startsWith('<svg') && copy.slice(0, copy.indexOf('>')).includes(viewBox))) err(where, `must be drawn on its box (${viewBox})`);
   }
-  for (const id of Object.keys(copies)) if (!(AVATAR_IDS as readonly string[]).includes(id)) err(`ui/avatars.ts ${id}`, `no face ${q(id)} in core's AVATAR_IDS`);
+  for (const id of Object.keys(copies)) if (!kind.ids.includes(id)) err(`${kind.file} ${id}`, `no ${kind.what.replace(/s$/, '')} ${q(id)} in core's ${kind.list}`);
   const owners = new Map<string, string>();
   for (const [id, svg] of Object.entries(copies))
     for (const m of svg.matchAll(/\sid="([^"]+)"/g)) {
       const was = owners.get(m[1] as string);
-      if (was !== undefined) err(`ui/avatars.ts ${id}`, `id ${q(m[1])} is ${was}'s too: ids are unique across the faces`);
+      if (was !== undefined) err(`${kind.file} ${id}`, `id ${q(m[1])} is ${was}'s too: ids are unique across the ${kind.what}`);
       else owners.set(m[1] as string, id);
     }
   return issues;

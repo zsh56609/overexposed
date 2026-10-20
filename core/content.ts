@@ -32,6 +32,14 @@ export const SCENE_DRAWINGS = 3;
 export const AVATAR_IDS = ['mum', 'sam', 'alex', 'juno', 'lio', 'priya', 'dana', 'photographer', 'veteran', 'guardian'] as const;
 export type AvatarId = (typeof AVATAR_IDS)[number];
 
+/**
+ * The photographs some texts carry (round R8b; docs/design/visual/ref/r8b-photos/, drawn into ui/photos.ts): Mum's
+ * Sunday table, Lio's desk, Sam's band's poster, the photographer's shot of the player. A text names one and where in
+ * its thread it comes (EventDef.photo); a letter has none.
+ */
+export const PHOTO_IDS = ['gran_coat', 'sunday_table', 'luccas', 'flash_shot', 'console', 'gig_poster', 'panel_tv'] as const;
+export type PhotoId = (typeof PHOTO_IDS)[number];
+
 /** The seasons the scene can light (round V1a; docs/design/visual/README.md): one per act, in content. */
 export const SEASON_IDS = ['spring', 'summer', 'autumn', 'winter'] as const;
 export type SeasonId = (typeof SEASON_IDS)[number];
@@ -758,6 +766,11 @@ export interface EventDef {
   };
   /** A text's bubbles (up to three) or a letter's paragraphs (up to four). */
   readonly messageKeys: readonly string[];
+  /**
+   * A photograph the sender sends (round R8b): it comes in the thread as one more message, after its `after`-th
+   * message (1 … the number of messages). Only a text has one; it is not a message's words.
+   */
+  readonly photo?: { readonly id: PhotoId; readonly after: number };
   readonly choices: readonly EventChoiceDef[];
 }
 

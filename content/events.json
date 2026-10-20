@@ -44,6 +44,7 @@
       "chain": { "id": "sam", "role": "followUp" },
       "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["sam_lent"] } } },
       "messageKeys": ["event.sam_band.message.1", "event.sam_band.message.2", "event.sam_band.message.3"],
+      "photo": { "id": "gig_poster", "after": 2 },
       "choices": [
         {
           "replyKey": "event.sam_band.a.reply",
@@ -72,6 +73,7 @@
       "chain": { "id": "sam", "role": "followUp" },
       "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["sam_half"] } } },
       "messageKeys": ["event.sam_payback.message.1", "event.sam_payback.message.2"],
+      "photo": { "id": "gig_poster", "after": 2 },
       "choices": [
         {
           "replyKey": "event.sam_payback.a.reply",
@@ -417,6 +419,7 @@
       "chain": { "id": "home", "role": "opener" },
       "when": { "months": { "from": 2, "to": 8 } },
       "messageKeys": ["event.mum_sunday.message.1", "event.mum_sunday.message.2"],
+      "photo": { "id": "sunday_table", "after": 1 },
       "choices": [
         {
           "replyKey": "event.mum_sunday.a.reply",
@@ -443,6 +446,7 @@
       "chain": { "id": "home", "role": "followUp" },
       "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["went_home"] } } },
       "messageKeys": ["event.mum_gran.message.1", "event.mum_gran.message.2"],
+      "photo": { "id": "gran_coat", "after": 2 },
       "choices": [
         {
           "replyKey": "event.mum_gran.a.reply",
@@ -485,6 +489,7 @@
       "chain": { "id": "lio", "role": "opener" },
       "when": { "months": { "from": 2, "to": 8 }, "lane": "music" },
       "messageKeys": ["event.producer_room.message.1", "event.producer_room.message.2"],
+      "photo": { "id": "console", "after": 2 },
       "choices": [
         {
           "replyKey": "event.producer_room.a.reply",
@@ -561,6 +566,7 @@
       "chain": { "id": "lens", "role": "opener" },
       "when": { "months": { "from": 3, "to": 8 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
       "messageKeys": ["event.photographer.message.1", "event.photographer.message.2"],
+      "photo": { "id": "luccas", "after": 2 },
       "choices": [
         {
           "replyKey": "event.photographer.a.reply",
@@ -584,6 +590,7 @@
       "chain": { "id": "lens", "role": "followUp" },
       "when": { "months": { "from": 8 }, "condition": { "flags": { "all": ["tipped_off"] } } },
       "messageKeys": ["event.photographer_again.message.1", "event.photographer_again.message.2"],
+      "photo": { "id": "flash_shot", "after": 1 },
       "choices": [
         {
           "replyKey": "event.photographer_again.a.reply",
@@ -639,6 +646,7 @@
       "speaker": { "nameKey": "event.speaker.priya.name", "labelKey": "event.speaker.priya.label", "avatar": "priya" },
       "when": { "months": { "from": 5, "to": 12 }, "condition": { "hype": { "min": 30 } } },
       "messageKeys": ["event.panel_show.message.1", "event.panel_show.message.2"],
+      "photo": { "id": "panel_tv", "after": 1 },
       "choices": [
         {
           "replyKey": "event.panel_show.a.reply",

@@ -319,7 +319,15 @@ An `avatar` is one of the closed list in `core/content.ts`, `AVATAR_IDS`:
   and an optional `weight` (round R7), a whole number from 1 to 5
   (default 1), multiplying its weight in the draw together with the
   lane's.
-- `messageKeys`; `choices` (two or three): `replyKey`, optional
+- `messageKeys`; optional `photo` (round R8b), a text's photograph:
+  `{ id, after }` — `id` one of `PHOTO_IDS` in `core/content.ts`
+  (`gran_coat`, `sunday_table`, `luccas`, `flash_shot`, `console`,
+  `gig_poster`, `panel_tv`: the author's drawings in
+  `docs/design/visual/ref/r8b-photos/`, held as strings in `ui/photos.ts`),
+  and `after`, the message it comes after (1 … the number of messages). It
+  arrives in the thread as one more message; it is not a message's words. A
+  letter has none; validate checks the id, the range and the form.
+- `choices` (two or three): `replyKey`, optional
   `requires` (a condition — unmet, the choice shows disabled with
   "Needs …"), `effects` (the closed set; money in thousands), optional
   `press` `{ paper, kind: loud | scandal, lineKeys }` (printed when
@@ -352,6 +360,7 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - awards: fields, conditions, ending ids, a fallback award, at most 8
 - events: months, speaker and form, chains (one opener each), conditions, lanes, rival arcs (ids in `press.rival.arcs`), a weight from 1 to 5, messages and choices (one with no requirement), the event budget
 - the faces (round R8a): every text's speaker and every manager names an `avatar` in `AVATAR_IDS`, a letter none; `ui/avatars.ts` holds one portrait for each, equal to its file in `docs/design/visual/ref/r8a-avatars/`, on a 100×100 box, their ids unique across the ten
+- the photos (round R8b): a text's `photo` names one of `PHOTO_IDS` after one of its messages, a letter none; `ui/photos.ts` holds the seven drawings, each equal to its file in `docs/design/visual/ref/r8b-photos/`, on a 400×300 box, their ids unique across the seven
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
 - variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)

@@ -381,6 +381,10 @@ const ALL_EVENTS = `(async () => {
   const issues = [];
   let shown = 0;
   let disabled = 0;
+  // The texts' photographs (round R8b): loaded before anything is looked at; each text that carries one holds it in its
+  // thread in every state, with room to spare (layout pixels, the phone's tilt aside).
+  await window.__events.photos;
+  const spare = {};
   const n = window.__events.show(0, 'choices');
   for (let i = 0; i < n; i++) {
     for (const mode of ['choices', 'broke', 'answered']) {
@@ -391,9 +395,18 @@ const ALL_EVENTS = `(async () => {
       if (mode === 'broke') { if (!document.querySelector('.event-screen .choose.off')) continue; disabled++; }
       shown++;
       issues.push(...__plainAudit(where), ...__eventAudit(where));
+      const pic = document.querySelector('.event-screen .thread .pic');
+      if (pic) {
+        const th = pic.closest('.thread');
+        const last = [...th.children].at(-1);
+        const room = th.offsetTop + th.clientHeight - parseFloat(getComputedStyle(th).paddingBottom) - (last.offsetTop + last.offsetHeight);
+        if (!pic.querySelector('img')) issues.push(where + ': its photograph is not in the thread');
+        if (room < 0) issues.push(where + ': the thread overflows with its photograph, by ' + Math.round(-room) + ' px');
+        spare[where] = Math.round(room);
+      }
     }
   }
-  return { events: n, shown, disabled, issues };
+  return { events: n, shown, disabled, spare, issues };
 })()`;
 
 /** Runs in the page: plays RUNS seeded runs by DOM, auditing every state and every hover along the way. */
@@ -595,8 +608,16 @@ try {
         await auditStep(page, `${tag} events patch`, PATCH);
         await page.evaluate(PLAIN);
         await page.evaluate(EVENTS);
-        const evs = await auditStep<{ events: number; shown: number; disabled: number; issues: string[] }>(page, `${tag} events`, ALL_EVENTS, 120_000);
+        const evs = await auditStep<{ events: number; shown: number; disabled: number; spare: Record<string, number>; issues: string[] }>(page, `${tag} events`, ALL_EVENTS, 120_000);
         console.log(`overflow check, ${tag}: ${evs.events} events (two at the limits) in ${evs.shown} states — with their replies, answered, and ${evs.disabled} with a reply they can't afford`);
+        // The texts with a photograph (round R8b): every state of each, and the tightest.
+        const rooms = Object.entries(evs.spare).sort((a, b) => a[1] - b[1]);
+        const texts = new Set(rooms.map(([w]) => w.split(' ')[0]));
+        console.log(`overflow check, ${tag}: ${texts.size} texts with their photographs in ${rooms.length} states — the tightest ${rooms[0]?.[0] ?? '-'}, ${rooms[0]?.[1] ?? '-'} px to spare`);
+        if (texts.size === 0) {
+          console.log('OVERFLOW events  no text showed a photograph');
+          failed = true;
+        }
         for (const m of [...new Set(evs.issues)].slice(0, 20)) console.log(`OVERFLOW events  ${m}`);
         if (evs.issues.length > 0) failed = true;
         if (REPLAYS) {

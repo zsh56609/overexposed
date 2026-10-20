@@ -3,8 +3,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
-import { AVATAR_IDS } from '../core/index.ts';
-import { CHECKS, checkAvatars, checkBoundaries, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { AVATAR_IDS, PHOTO_IDS } from '../core/index.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkPhotos, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -27,6 +27,12 @@ const faces = await import('../ui/avatars.ts').then(
   () => null,
 );
 issues.push(...checkAvatars(Object.fromEntries(AVATAR_IDS.map((id) => [id, text(`docs/design/visual/ref/r8a-avatars/${id}.svg`)])), faces));
+// The photos (round R8b): the strings ui/photos.ts holds, against the author's files.
+const photos = await import('../ui/photos.ts').then(
+  (m: { PHOTOS: Readonly<Record<string, string>> }) => m.PHOTOS,
+  () => null,
+);
+issues.push(...checkPhotos(Object.fromEntries(PHOTO_IDS.map((id) => [id, text(`docs/design/visual/ref/r8b-photos/${id}.svg`)])), photos));
 
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');

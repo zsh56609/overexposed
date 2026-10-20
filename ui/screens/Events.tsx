@@ -16,6 +16,7 @@ import { previewEventChoice, type EventChoicePreview, type Legal, type LinesSoFa
 import type { BeatKind } from '../timeline.ts';
 import { Face } from '../Face.tsx';
 import { calendarLabel, mastheadName } from '../text.ts';
+import { loadPhotos, photosReady, usePhoto } from '../textPhotos.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
 import { cue } from '../sound/sound.ts';
 import { prose } from './common.tsx';
@@ -97,31 +98,45 @@ function Chips({ a }: { a: AnswerView }) {
   );
 }
 
-/** The messages' arrival, one at a time; a click during it shows them all (D7). Motion off or reduced: all at once. */
-function useArrival(count: number, settled: boolean): { readonly shown: number; readonly typing: boolean; readonly done: boolean; readonly finish: () => void } {
+/**
+ * The thread's arrival, one at a time; a click during it shows them all (D7). Motion off or reduced: all at once. A
+ * photo (round R8b) is one more message on the rhythm the messages keep; if its chunk has not loaded by its turn, the
+ * typing goes on until it has, and the rest follow on — the thread never breaks.
+ */
+function useArrival(count: number, settled: boolean, wait: { readonly at: number; readonly ready: () => boolean; readonly until: () => Promise<unknown> } | null): { readonly shown: number; readonly typing: boolean; readonly done: boolean; readonly finish: () => void } {
   const instant = settled || motionMode() !== 'full';
   const [shown, setShown] = useState(instant ? count : 0);
   const [typing, setTyping] = useState(false);
   const [ready, setReady] = useState(instant);
   const timers = useRef<number[]>([]);
+  // Each arrival is one run; a click (finish), a change of motion or leaving ends it, and an ended run does no more.
+  const runs = useRef(0);
   const clear = () => {
+    runs.current++;
     for (const id of timers.current) window.clearTimeout(id);
     timers.current = [];
   };
   useEffect(() => {
     if (instant) return;
-    for (let i = 0; i < count; i++) {
-      const at = FIRST + i * NEXT;
-      timers.current.push(window.setTimeout(() => setTyping(true), at));
-      timers.current.push(
-        window.setTimeout(() => {
-          setTyping(false);
-          setShown(i + 1);
-          cue('bubble'); // each message as it arrives (round R4, B2); none for those a click shows at once
-        }, at + TYPING),
-      );
-    }
-    timers.current.push(window.setTimeout(() => setReady(true), FIRST + (count - 1) * NEXT + TYPING + REPLIES));
+    const me = ++runs.current;
+    const live = () => runs.current === me;
+    const sleep = (ms: number) => new Promise<void>((resolve) => timers.current.push(window.setTimeout(resolve, ms)));
+    void (async () => {
+      await sleep(FIRST);
+      for (let i = 0; i < count; i++) {
+        if (!live()) return;
+        setTyping(true);
+        await sleep(TYPING);
+        if (wait && i === wait.at && !wait.ready()) await wait.until().catch(() => {});
+        if (!live()) return;
+        setTyping(false);
+        setShown(i + 1);
+        cue('bubble'); // each message as it arrives (round R4, B2); none for those a click shows at once
+        if (i < count - 1) await sleep(NEXT - TYPING);
+      }
+      await sleep(REPLIES);
+      if (live()) setReady(true);
+    })();
     return clear;
   }, [count, instant]);
   const finish = () => {
@@ -132,6 +147,9 @@ function useArrival(count: number, settled: boolean): { readonly shown: number; 
   };
   return { shown, typing, done: ready, finish };
 }
+
+/** A thread's items (round R8b): its messages, and a photo after its `after`-th one. */
+type ThreadItem = { readonly kind: 'message'; readonly key: string; readonly text: string } | { readonly kind: 'photo'; readonly key: string };
 
 export function EventScreen({ s, chosen, beats, legal, act, lines, lane }: EventScreenProps) {
   const ev = getEvent(s.content, s.event ?? '');
@@ -153,8 +171,11 @@ interface FormProps {
 
 function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const c = s.content;
-  const messages = ev.messageKeys.map((k) => t(k));
-  const arrival = useArrival(messages.length, chosen !== null);
+  // The thread (round R8b): the messages and, if the sender sends one, a photo after its message — one more message on
+  // the phone, never a message's words.
+  const items: ThreadItem[] = ev.messageKeys.flatMap((k, i): ThreadItem[] => [{ kind: 'message', key: `m${i}`, text: t(k) }, ...(ev.photo && ev.photo.after === i + 1 ? [{ kind: 'photo' as const, key: 'photo' }] : [])]);
+  const photo = usePhoto(ev.photo?.id ?? null);
+  const arrival = useArrival(items.length, chosen !== null, ev.photo ? { at: items.findIndex((x) => x.kind === 'photo'), ready: photosReady, until: loadPhotos } : null);
   const category = c.eventCategories?.[ev.category];
   const name = t(ev.speaker.nameKey ?? '');
   const label = ev.speaker.labelKey ? t(ev.speaker.labelKey) : null;
@@ -186,11 +207,17 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
             </div>
           </div>
           <div className="thread">
-            {messages.slice(0, arrival.shown).map((m, i) => (
-              <div key={i} className={prose(m, 'm in')}>
-                {m}
-              </div>
-            ))}
+            {items.slice(0, arrival.shown).map((item) =>
+              item.kind === 'photo' ? (
+                <div key={item.key} className="m in pic">
+                  {photo && <img src={photo} alt="" width={200} height={150} />}
+                </div>
+              ) : (
+                <div key={item.key} className={prose(item.text, 'm in')}>
+                  {item.text}
+                </div>
+              ),
+            )}
             {arrival.typing && <TypingDots />}
             {answer && <div className={prose(answer.reply, 'm out')}>{answer.reply}</div>}
             {answer && !replied && <TypingDots late />}

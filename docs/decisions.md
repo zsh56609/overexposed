@@ -6,6 +6,35 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8b, Part A: photographs in texts
+
+- Some people send a photograph with their text (the author's seven
+  drawings, `docs/design/visual/ref/r8b-photos/`, their words outlined from
+  the repo's fonts): Mum the Sunday table and Gran's coat, Lio the desk, Sam
+  his band's poster, the photographer last night's shot of the player, Priya
+  the panel show's set. Content says which and where: a text's
+  `photo: { id, after }` — the eight as the author set them; validate holds
+  the id to `PHOTO_IDS` (`core/content.ts`), `after` to 1 … the messages, and
+  a photo to a text.
+- They are code, not files (as the faces): `ui/photos.ts` holds the seven
+  SVGs unchanged as strings — a new validate check, "the photos", holds them
+  equal to the files, on a 400×300 box, their ids unique — shown from data
+  URIs with an empty alt, the words beside a photo carrying its meaning.
+  `ui/photos.ts` is a chunk of its own (186 kB), imported by
+  `ui/textPhotos.ts` when the year begins (BEGIN), so the main bundle does
+  not grow by it (665 kB, from 663).
+- In the thread a photo is one more message in its place: typing dots, then
+  the photo with the bubble's cue, on the messages' rhythm (the arrival is
+  now one sequential run, which holds at the photo, typing, if its chunk has
+  not come — the thread never breaks). A click shows it with the rest;
+  motion off or reduced, all at once. Its bubble: 200×150, radius 15 with
+  the sender's corner 4, no padding, a 1 px ring. Nothing that reads the
+  messages' words counts it.
+- The dev events page shows the eight with their photos (its two limit
+  events keep none); check:overflow waits for the chunk and reports each
+  text's room in every state — the tightest, photographer_again with three
+  replies showing, has 21 px to spare at both sizes.
+
 ## 2026-10-20 — Round R8a: R7's two misses, accepted
 
 The author accepts R7's two sim misses as they stand:

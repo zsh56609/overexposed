@@ -20,6 +20,7 @@ import { legalOf, previewPlay } from './preview.ts';
 import { EventQueue } from './queue.ts';
 import { readAwards, readFound } from './collection.ts';
 import { beginRun, rememberEvent, rememberLine } from './memory.ts';
+import { loadPhotos } from './textPhotos.ts';
 import { Over, useFontsReady } from './screens/common.tsx';
 import { ManagerScreen } from './screens/Opening.tsx';
 import { CreditsPanel, DeckPanel, NumbersPanel, ScrapbookPanel, SettingsPanel, type PanelId } from './screens/Panels.tsx';
@@ -371,6 +372,8 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
         startSound();
         cue('flash');
         music(seasonTrack(queue.getSnapshot().state.content, 1), 2000);
+        // The year begins: the texts' photographs, a chunk of their own, start loading (round R8b, A1).
+        void loadPhotos().catch(() => {});
         play('begin', () => setIntro('opening'));
       },
       scrapbook: () => setPanel('scrapbook'),

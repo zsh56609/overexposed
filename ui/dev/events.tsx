@@ -18,6 +18,7 @@ import { legalOf } from '../preview.ts';
 import { EventScreen } from '../screens/Events.tsx';
 import { Stage } from '../Stage.tsx';
 import { calendarLabel, mastheadName } from '../text.ts';
+import { loadPhotos } from '../textPhotos.ts';
 import '../style.css';
 import '../screens/common.tsx';
 
@@ -71,6 +72,9 @@ function atLimit(form: EventForm): EventDef {
 }
 
 const events = [...own, atLimit('text'), atLimit('letter')];
+// The texts' photographs (round R8b): the eight show with theirs; the two at the limits keep none (with one, the limit
+// text would overflow its thread). The checks wait for `photos` before they look.
+const photos = loadPhotos();
 const base = content.events ? createInitialState(7, { ...content, events: { ...content.events, events } }, { strict: true }) : plain;
 /** The event month whose date line runs longest: the limits are shown in it. */
 const longestMonth = longest(months, (m) => calendarLabel(base.content, m).length, 1)[0] ?? 1;
@@ -80,12 +84,13 @@ const acted: Action[] = [];
 
 declare global {
   interface Window {
-    __events: { show(index: number, mode: Mode): number; ids: readonly string[]; acted: Action[] };
+    __events: { show(index: number, mode: Mode): number; ids: readonly string[]; acted: Action[]; photos: Promise<unknown> };
   }
 }
 window.__events = {
   ids: events.map((e) => e.id),
   acted,
+  photos,
   show(index, mode) {
     shown = { index, mode };
     for (const fn of listeners) fn();

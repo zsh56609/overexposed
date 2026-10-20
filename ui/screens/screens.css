@@ -314,6 +314,10 @@
 .event-screen .thread { flex: 1; min-height: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
 .event-screen .m { max-width: 80%; padding: 8px 11px; border-radius: 15px; font-size: 12.5px; line-height: 1.38; animation: ev-pop .28s ease-out backwards; }
 .event-screen .m.in { align-self: flex-start; background: #26303a; color: #eef3f6; border-bottom-left-radius: 4px; }
+/* A photo in a thread (round R8b): one more incoming message, the photograph itself the bubble — 200×150, the sender's
+   corner 4 px, no padding, a faint 1 px ring. */
+.event-screen .m.pic { flex: none; width: 200px; height: 150px; max-width: none; padding: 0; overflow: hidden; border-radius: 15px 15px 15px 4px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .06); }
+.event-screen .m.pic img { display: block; width: 200px; height: 150px; }
 .event-screen .m.out { align-self: flex-end; background: #2f6fd6; color: #fff; border-bottom-right-radius: 4px; }
 .event-screen .typing { flex: none; align-self: flex-start; background: #26303a; border-radius: 15px; padding: 10px 12px; display: flex; gap: 4px; animation: ev-pop .28s ease-out backwards; }
 .event-screen .typing.late { animation-delay: 450ms; }

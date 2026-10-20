@@ -171,6 +171,16 @@ italic line.
     replies appear only once they have finished. The choices are **reply bubbles**, each showing its effects;
     "↺ remembered" marks a choice that sets a flag a later event may call back. After
     replying: typing dots, then their answer — the outcome line.
+  - *A photo in a thread* (round R8b): some send a photograph with their text — Mum the Sunday table and Gran in her
+    coat, Lio the desk, Sam his band's poster, the photographer last night's shot of you, Priya the panel show's set.
+    It arrives as one more message, in its place: typing dots, then the photo, on the messages' rhythm and with the
+    bubble's sound. Its bubble is the photograph itself — 200×150, an incoming message's alignment, radius 15 with the
+    sender's corner (bottom left) 4, no padding, a 1 px ring `rgba(255,255,255,.06)`; its alt is empty, the words
+    beside it carry its meaning. A click during the arrival shows it with the rest; motion off or reduced, all at
+    once. The seven photos are the author's drawings (`docs/design/visual/ref/r8b-photos/`, their words outlined from
+    the repo's fonts), held as strings in `ui/photos.ts` — a chunk of its own, fetched when the year begins (BEGIN),
+    so the main bundle does not grow by it; if it has not arrived when a photo is due, the photo waits, the thread
+    does not break.
   - *The press and institutions*: a **letter** — the paper's letterhead, a typed body,
     the choices as tick boxes with effect chips. After choosing: a SENT stamp and the
     outcome line.
