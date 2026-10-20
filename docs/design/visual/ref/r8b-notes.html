@@ -1,0 +1,56 @@
+<!doctype html>
+<!-- Overexposed, R8b: the manager's notes, as the author approved them (review sheet r8b-review-2-notes.png,
+     2026-10-20). A reference for the look only: the note, its arrow, and the first-time highlight. Positions, moments
+     and words are in R8b's prompt. Open from the repo (the fonts load from ui/fonts). -->
+<meta charset="utf-8">
+<title>R8b · the manager's notes</title>
+<style>
+@font-face { font-family: 'Playfair Display'; src: url('../../../../ui/fonts/PlayfairDisplay-Italic.woff2') format('woff2'); font-weight: 400 900; font-style: italic; }
+@font-face { font-family: 'Libre Franklin'; src: url('../../../../ui/fonts/LibreFranklin.woff2') format('woff2'); font-weight: 100 900; }
+body { margin: 0; background: #1b1611; color: #e9e1cf; font-family: 'Libre Franklin', system-ui, sans-serif; }
+.stage { position: relative; width: 1280px; height: 720px; margin: 24px; background: radial-gradient(ellipse at 50% 30%, #3a2c20, #120e0a 70%); overflow: hidden; }
+.cell { position: absolute; height: 26px; padding: 0 12px; display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; color: #f2e8d5; }
+
+/* ---- the note ------------------------------------------------------------------------------------------------ */
+.oxn { position: absolute; box-sizing: border-box; padding: 15px 16px 11px 17px; cursor: pointer;
+  background: linear-gradient(180deg, #f7f1e1 0%, #f1e9d4 100%); color: #2b2520;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 7px 16px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .35);
+  font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: 17px; line-height: 1.32; }
+/* the corner, folded */
+.oxn::after { content: ''; position: absolute; right: 0; bottom: 0; width: 22px; height: 22px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(120, 100, 70, .18) 50%, rgba(255, 255, 255, .5) 100%); }
+/* the tape */
+.oxn .tape { position: absolute; left: 50%; top: -9px; width: 64px; height: 18px; margin-left: -32px; transform: rotate(-4deg);
+  background: rgba(236, 224, 190, .78); box-shadow: 0 1px 2px rgba(0, 0, 0, .18); }
+.oxn p { margin: 0; }
+/* a stat's own icon, inline, in the ink's colour */
+.oxn p svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 1px; fill: currentColor; }
+.oxn .sig { display: block; text-align: right; margin-top: 5px; font-size: 14.5px; color: #75654f; }
+.oxn .x { position: absolute; right: 8px; top: 5px; font: 600 13px 'Libre Franklin', sans-serif; font-style: normal; color: #a08f78; }
+.oxn:hover .x { color: #5f5140; }
+
+/* ---- the arrow: a hand-drawn curve and a two-stroke head ------------------------------------------------------ */
+.oxn-arrow { position: absolute; inset: 0; width: 1280px; height: 720px; overflow: visible; pointer-events: none; }
+.oxn-arrow path { fill: none; stroke: #f4ead2; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
+
+/* ---- the first time: the veil with two holes, the target's glow (on the target element itself) ---------------- */
+.oxn-veil { position: absolute; inset: 0; width: 1280px; height: 720px; pointer-events: none; }
+.oxn-lit { box-shadow: 0 0 0 2.5px #ffcf85, 0 0 22px 6px rgba(255, 207, 133, .55); border-radius: 8px; }
+</style>
+
+<div class="stage">
+  <div class="cell oxn-lit" style="left: 16px; top: 10px; width: 318px;">★ Unknown 0 &nbsp; ♪ Raw 0 &nbsp; 🔥 Quiet 0</div>
+  <svg class="oxn-veil" viewBox="0 0 1280 720">
+    <defs><mask id="m"><rect width="1280" height="720" fill="white"/>
+      <rect x="4" y="-2" width="354" height="50" rx="10" fill="black"/>
+      <rect x="32" y="48" width="310" height="170" rx="10" fill="black"/></mask></defs>
+    <rect width="1280" height="720" fill="rgba(6, 4, 2, .46)" mask="url(#m)"/>
+  </svg>
+  <div class="oxn" style="left: 44px; top: 66px; width: 286px; transform: rotate(-1.2deg);">
+    <i class="tape"></i><b class="x">✕</b>
+    <p>Up top: ★ Hype is how known you are, ♪ Craft how good, 🔥 Heat how hard they're looking. Your cards move them.</p>
+    <span class="sig">— Dex</span>
+  </div>
+  <svg class="oxn-arrow" viewBox="0 0 1280 720"><path d="M240 62 Q226 45 196 42 M206 35 L196 42 L206 48"/></svg>
+</div>

@@ -312,6 +312,7 @@ npm run check:clicks   # every legal action's control on the stage and hit at it
 npm run check:overflow # every text at its longest, desk and screens (:full replays check/desk-states.json)
 npm run check:motion   # the motion by real input (release candidates, with check:overflow:full)
 npm run check:interactions  # the desk's tooltips, bubbles, papers and hand by real input
+npm run check:notes    # the notes by real input
 npm run sim:awards     # year-end award rates per persona (targets: docs/decisions.md)
 npm run sim:tiers      # stat tiers reached in play, per persona
 npm run sim:managers   # the two managers side by side, and the message triggers

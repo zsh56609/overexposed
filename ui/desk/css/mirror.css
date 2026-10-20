@@ -23,6 +23,8 @@
 /* The black card: "If the year ended today" · major · minor. */
 .desk .today { position: absolute; left: 40px; top: 40px; width: 150px; background: var(--ink); color: var(--cream); padding: 7px 9px; box-shadow: 0 5px 9px rgba(0, 0, 0, .4); transform: rotate(-3deg); transition: transform .28s ease; }
 .desk .today:hover { transform: rotate(-3deg) scale(1.04); z-index: 6; }
+/* Round R8b (B7): the black card and the notes take focus; their goal lines are their tooltips. */
+.desk .today:focus-visible { transform: rotate(-3deg) scale(1.04); z-index: 6; outline: none; box-shadow: 0 5px 9px rgba(0, 0, 0, .4), 0 0 0 2px rgba(255, 207, 133, .6); }
 .desk .today small { display: block; font-size: 7px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #ffcf85; margin-bottom: 2px; }
 .desk .today b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 13px; line-height: 1.05; }
 .desk .today span { display: block; font-size: 9px; }
@@ -30,6 +32,7 @@
 /* The sticky notes: the other three majors. */
 .desk .sticky { position: absolute; width: 118px; padding: 8px 9px 9px; font-size: 8.3px; line-height: 1.28; color: var(--ink); box-shadow: 0 5px 9px rgba(0, 0, 0, .35); transform: rotate(var(--r, 0deg)); transition: transform .28s ease, box-shadow .28s; }
 .desk .sticky:hover { transform: rotate(var(--r, 0deg)) scale(1.05); box-shadow: 0 8px 14px rgba(0, 0, 0, .42); z-index: 6; }
+.desk .sticky:focus-visible { transform: rotate(var(--r, 0deg)) scale(1.05); z-index: 6; outline: none; box-shadow: 0 8px 14px rgba(0, 0, 0, .42), 0 0 0 2px rgba(255, 207, 133, .6); }
 .desk .sticky.yellow { background: #fff1a0; }
 .desk .sticky.green { background: #d3ebc6; }
 .desk .sticky.blue { background: #c6e4ff; }

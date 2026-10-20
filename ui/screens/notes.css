@@ -1,0 +1,55 @@
+/* The manager's notes (round R8b, B4; docs/design/visual/ref/r8b-notes.html, its CSS): a note in the manager's hand on
+   cream paper with a strip of tape and a folded corner, its arrow, and the first time's veil and glow. The layer stands
+   over the desk and whatever screen is on it (the offers' too), under the panels, and takes no click but the note's. */
+
+.oxn-layer { position: absolute; inset: 0; z-index: 155; pointer-events: none; }
+
+/* ---- the note ---------------------------------------------------------------------------------------------------- */
+.oxn {
+  position: absolute; box-sizing: border-box; margin: 0; border: 0; padding: 15px 16px 11px 17px; cursor: pointer; text-align: left;
+  pointer-events: auto; transform: rotate(var(--r, 0deg)); transform-origin: 50% 50%;
+  background: linear-gradient(180deg, #f7f1e1 0%, #f1e9d4 100%); color: #2b2520;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .6) inset, 0 7px 16px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .35);
+  font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-weight: 500; font-size: 17px; line-height: 1.32;
+  animation: oxn-in .26s ease-out both;
+}
+.oxn:focus-visible { outline: 2px solid #ffcf85; outline-offset: 3px; }
+/* the corner, folded */
+.oxn::after { content: ''; position: absolute; right: 0; bottom: 0; width: 22px; height: 22px;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0) 50%, rgba(120, 100, 70, .18) 50%, rgba(255, 255, 255, .5) 100%); }
+/* the tape */
+.oxn .tape { position: absolute; left: 50%; top: -9px; width: 64px; height: 18px; margin-left: -32px; transform: rotate(-4deg);
+  background: rgba(236, 224, 190, .78); box-shadow: 0 1px 2px rgba(0, 0, 0, .18); }
+.oxn p { margin: 0; }
+/* a stat's own icon, inline, in the ink's colour */
+.oxn p svg { width: 15px; height: 15px; vertical-align: -2px; margin-right: 1px; fill: currentColor; color: currentColor; }
+.oxn .sig { display: block; text-align: right; margin-top: 5px; font-size: 14.5px; color: #75654f; }
+.oxn .x { position: absolute; right: 8px; top: 5px; font: 600 13px 'Libre Franklin', sans-serif; font-style: normal; color: #a08f78; }
+.oxn:hover .x { color: #5f5140; }
+/* In: down 8 px and up from transparent, 260 ms. Out: a fade, 200 ms. A preview over it: faded, taking no click. */
+@keyframes oxn-in { from { opacity: 0; transform: translateY(8px) rotate(var(--r, 0deg)); } to { opacity: 1; transform: rotate(var(--r, 0deg)); } }
+@keyframes oxn-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes oxn-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.oxn.out, .oxn-arrow.out { animation: oxn-fade-out .2s ease-in both; pointer-events: none; }
+.oxn.faded, .oxn-arrow.faded { opacity: 0; pointer-events: none; transition: opacity .2s; }
+:root[data-motion-resolved='reduced'] .oxn:not(.out) { animation-name: oxn-fade-in; }
+:root[data-motion='off'] .oxn, :root[data-motion='off'] .oxn-arrow { animation: none; transition: none; }
+
+/* ---- the arrow: a hand-drawn curve and a two-stroke head ---------------------------------------------------------- */
+.oxn-arrow { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; overflow: visible; pointer-events: none; animation: oxn-fade-in .26s ease-out both; }
+.oxn-arrow path { fill: none; stroke: #f4ead2; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6)); }
+
+/* ---- the first time (B5): the veil with two holes, the target's glow ------------------------------------------------
+   The veil in 160 ms, the glow on, off, on, off over 900 ms, the veil out 340 ms; reduced, a still glow held 600 ms. */
+.oxn-veil { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; pointer-events: none; animation: oxn-veil 1.4s linear both; }
+.oxn-veil.reduced { animation: oxn-veil-reduced 1.1s linear both; }
+@keyframes oxn-veil { 0% { opacity: 0; } 11.4% { opacity: 1; } 75.7% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes oxn-veil-reduced { 0% { opacity: 0; } 14.5% { opacity: 1; } 69.1% { opacity: 1; } 100% { opacity: 0; } }
+.oxn-glow { position: absolute; border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 2.5px #ffcf85, 0 0 22px 6px rgba(255, 207, 133, .55); opacity: 0; animation: oxn-flash 1.4s linear both; }
+.oxn-glow.reduced { animation: oxn-glow-still 1.1s linear both; }
+@keyframes oxn-flash {
+  0%, 11.4% { opacity: 0; } 13% { opacity: 1; } 27.5% { opacity: 1; } 29% { opacity: 0; } 43.6% { opacity: 0; }
+  45% { opacity: 1; } 59.6% { opacity: 1; } 61% { opacity: 0; } 100% { opacity: 0; }
+}
+@keyframes oxn-glow-still { 0% { opacity: 0; } 14.5% { opacity: 1; } 69.1% { opacity: 1; } 100% { opacity: 0; } }
+:root[data-motion='off'] .oxn-veil, :root[data-motion='off'] .oxn-glow { animation: none; opacity: 0; }

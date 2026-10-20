@@ -28,6 +28,8 @@ import { DoorsScreen, OffersScreen } from './screens/Choices.tsx';
 import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
 import { SeasonCard } from './screens/Season.tsx';
+import { Notes } from './screens/Notes.tsx';
+import { useSettings } from './settings.ts';
 import { seasonPhotoUrl } from './desk/photo-preload.ts';
 import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
@@ -45,6 +47,9 @@ function seedFromUrl(): number | null {
   const s = new URLSearchParams(window.location.search).get('seed');
   return s !== null && /^\d{1,10}$/.test(s) ? Number(s) >>> 0 : null;
 }
+
+/** The manager's notes (round R8b, B1): a run with ?seed= shows none unless ?notes=1 asks for them. */
+const notesAsked = (): boolean => seedFromUrl() === null || new URLSearchParams(window.location.search).get('notes') === '1';
 
 // ---------------------------------------------------------------------------
 
@@ -332,6 +337,7 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
   const s = snap.state;
   const c = s.content;
   const legal = useMemo(() => legalOf(s), [s]);
+  const notesOn = useSettings().notes;
   // Every line printed so far, the counter the next ones follow from (decision 15, revised), and the
   // established lane, which has hysteresis and so is read from history.
   const lines = useMemo(() => ({ ...readLines(snap.steps), lane: establishedLanes(snap.steps).slice(-1)[0] ?? null }), [snap.steps]);
@@ -496,6 +502,20 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           />
         )}
       </Over>
+      {/* The manager's notes (round R8b, Part B): over the desk and its screens, under the panels; in App's runs only. */}
+      {desk && (
+        <Notes
+          enabled={notesOn && notesAsked()}
+          s={s}
+          steps={snap.active && !snap.steps.some((x) => x.id === snap.active?.step.id) ? [...snap.steps, snap.active.step] : snap.steps}
+          idle={!snap.busy && scene === null}
+          screen={offers && s.phase === 'draft' ? 'offer' : mode === 'manager' || season !== null || offers || eventShown || signing !== null ? 'other' : 'none'}
+          panel={panel !== null}
+          preview={(s.phase === 'play' && !!card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && !!endPreview)}
+          actionsLeft={model.stats.actions.left}
+          craftIcon={model.stats.cells.find((x) => x.id === 'craft')?.icon ?? 'note'}
+        />
+      )}
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}
       {panel === 'settings' && <SettingsPanel overDesk={game} onClose={close} />}
       {panel === 'credits' && <CreditsPanel overDesk={false} onClose={close} />}

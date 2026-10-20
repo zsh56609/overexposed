@@ -1,11 +1,12 @@
 // The mirror (round V1a; README §3), back right: a bulb frame round the glass; the black card taped to it — "If
 // the year ended today", the major and the minor; three sticky notes for the other three majors, each its name and
 // its requirements in the stat bar's words (no goal line since round R8a, E3). In a frenzy some bulbs flicker or go dark and a red
-// clipping is stuck to the glass. Every word is the adapter's (./model.ts).
+// clipping is stuck to the glass. Every word is the adapter's (./model.ts). Round R8b (B7): the goal lines come back as
+// tooltips — hovering, a long-press or keyboard focus on the black card shows its major's, on a note its own.
 
-import { memo, type ReactNode } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type PointerEvent, type ReactNode } from 'react';
 import { isPlaceholder } from '../text.ts';
-import { Icon } from './Icons.tsx';
+import { Icon, keyboardFocus } from './Icons.tsx';
 import type { MirrorModel } from './model.ts';
 
 const W = 420;
@@ -35,8 +36,90 @@ const SPOTS = [
 
 const ph = (text: string, base: string): string => (isPlaceholder(text) ? `${base} placeholder` : base);
 
+/** A goal's tooltip (round R8b, B7): where it stands on the stage, and what it says. */
+interface GoalTip {
+  readonly header: string;
+  readonly line: string;
+  /** The hovered thing's box on the stage. */
+  readonly box: { readonly x: number; readonly y: number; readonly w: number; readonly h: number };
+}
+
+/** An element's box in the stage's own 1280×720 frame. */
+function stageBox(el: Element): GoalTip['box'] {
+  const stage = el.closest('.stage')?.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const k = stage ? stage.width / 1280 || 1 : 1;
+  return { x: (r.left - (stage?.left ?? 0)) / k, y: (r.top - (stage?.top ?? 0)) / k, w: r.width / k, h: r.height / k };
+}
+
+/**
+ * The goals' tooltips, as the stat bar's are shown: hover (mouse), a long-press (touch, 450 ms) or keyboard focus; closed
+ * by leaving, blur or any press elsewhere. Under the thing (above if there is no room), kept on the stage.
+ */
+function useGoalTip() {
+  const [tip, setTip] = useState<GoalTip | null>(null);
+  const [last, setLast] = useState<GoalTip | null>(null);
+  const press = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (!tip) return;
+    const close = () => setTip(null);
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [tip]);
+  useEffect(() => () => window.clearTimeout(press.current), []);
+  const show = (header: string, line: string, el: Element) => {
+    const at = { header, line, box: stageBox(el) };
+    setTip(at);
+    setLast(at);
+  };
+  const bind = (header: string, line: string) => ({
+    tabIndex: 0,
+    'data-goal': '',
+    onPointerEnter: (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType === 'mouse') show(header, line, e.currentTarget);
+    },
+    onPointerLeave: (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType === 'mouse') setTip(null);
+    },
+    onPointerDown: (e: PointerEvent<HTMLElement>) => {
+      if (e.pointerType === 'mouse') return;
+      const el = e.currentTarget;
+      window.clearTimeout(press.current);
+      press.current = window.setTimeout(() => show(header, line, el), 450);
+    },
+    onPointerUp: () => window.clearTimeout(press.current),
+    onPointerCancel: () => window.clearTimeout(press.current),
+    onFocus: (e: FocusEvent<HTMLElement>) => {
+      if (keyboardFocus(e.currentTarget)) show(header, line, e.currentTarget);
+    },
+    onBlur: () => setTip(null),
+  });
+  return { tip, shown: tip ?? last, bind };
+}
+
+/** The goal's tooltip: the stat bar's look, under its thing — above if there is no room — kept on the stage. */
+function GoalTipView({ tip, on }: { tip: GoalTip | null; on: boolean }) {
+  const el = useRef<HTMLDivElement>(null);
+  const [at, setAt] = useState<{ left: number; top: number; above: boolean } | null>(null);
+  useLayoutEffect(() => {
+    if (!tip || !el.current) return;
+    const h = el.current.offsetHeight;
+    const w = el.current.offsetWidth;
+    const under = tip.box.y + tip.box.h + 10;
+    const above = under + h > 716;
+    setAt({ left: Math.max(4, Math.min(1280 - w - 4, tip.box.x)), top: above ? Math.max(50, tip.box.y - 10 - h) : under, above });
+  }, [tip]);
+  return (
+    <div ref={el} className={`tip goaltip${on && at ? ' on' : ''}${at?.above ? ' above' : ''}`} role="tooltip" aria-hidden={on ? undefined : true} style={{ left: at?.left ?? 0, top: at?.top ?? 0 }}>
+      <b>{tip?.header}</b>
+      <span className={tip && isPlaceholder(tip.line) ? 'placeholder' : undefined}>{tip?.line}</span>
+    </div>
+  );
+}
+
 /** The mirror; `mirror` null for the title's (round R3), whose notes are its children. */
 export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirror: MirrorModel | null; crisis: boolean; children?: ReactNode }) {
+  const goal = useGoalTip();
   return (
     <>
       <div className="mShadow" />
@@ -50,7 +133,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
         </div>
         {children}
         {mirror?.today && (
-          <div className="today" data-hook="today">
+          <div className="today" data-hook="today" data-major={mirror.today.majorId} {...goal.bind(mirror.today.major, mirror.today.goal)}>
             <small>{mirror.kicker}</small>
             <b className={ph(mirror.today.major, '')}>{mirror.today.major}</b>
             <span className={ph(mirror.today.minor, '')}>{mirror.today.minor}</span>
@@ -59,7 +142,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
         {mirror?.notes.map((note, i) => {
           const spot = SPOTS[i] ?? SPOTS[0];
           return (
-            <div key={note.majorId} className={`sticky ${note.colour}`} data-major={note.majorId} style={{ left: spot.left, top: spot.top, ['--r' as string]: `${spot.r}deg` }}>
+            <div key={note.majorId} className={`sticky ${note.colour}`} data-major={note.majorId} style={{ left: spot.left, top: spot.top, ['--r' as string]: `${spot.r}deg` }} {...goal.bind(note.name, note.goal)}>
               <b className={ph(note.name, '')}>{note.name}</b>
               {note.reqs.map((r, k) => (
                 <div key={k} className={`req ${r.met ? 'ok' : 'no'}`}>
@@ -78,6 +161,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
           </div>
         )}
       </div>
+      {mirror && <GoalTipView tip={goal.shown} on={goal.tip !== null} />}
     </>
   );
 });

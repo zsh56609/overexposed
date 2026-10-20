@@ -60,6 +60,7 @@ export const CHECKS = {
   sound: "the sound module: the author's, copied unchanged",
   avatars: "the faces: the author's ten portraits, unchanged",
   photos: "the photos: the author's seven drawings, unchanged",
+  notes: "the manager's notes: a line per note and manager, and their marks",
 } as const;
 export type CheckId = keyof typeof CHECKS;
 
@@ -1912,6 +1913,46 @@ export function checkAvatars(references: Readonly<Record<string, string | null>>
  */
 export function checkPhotos(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
   return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: 'r8b-photos', ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos' }, references, copies);
+}
+
+/**
+ * The manager's notes (round R8b, B6): ui/notes.ts's six, each in every manager's words — notes.<note>.<manager>, and
+ * .touch too for the two that say "hold" where a mouse would hover — and each manager's signature, notes.sign.<manager>.
+ * Marks are checked in notes.* lines only: [hype], [craft] and [heat] are drawn as the stat bar's icons, any other is
+ * flagged. A notes.* key no note uses is a warning.
+ */
+export function checkNotes(
+  i18n: unknown,
+  managers: readonly string[],
+  notes: { readonly ids: readonly string[]; readonly touch: readonly string[]; readonly marks: readonly string[] } | null,
+): Issue[] {
+  const issues: Issue[] = [];
+  const err = (where: string, message: string) => issues.push({ level: 'error', check: 'notes', where, message });
+  if (notes === null) {
+    err('ui/notes.ts', 'missing: the notes and their marks');
+    return issues;
+  }
+  // checkI18n reports an i18n file of the wrong shape.
+  if (!isObj(i18n)) return issues;
+  const wanted = new Set<string>();
+  for (const m of managers) {
+    wanted.add(`notes.sign.${m}`);
+    for (const id of notes.ids) {
+      wanted.add(`notes.${id}.${m}`);
+      if (notes.touch.includes(id)) wanted.add(`notes.${id}.${m}.touch`);
+    }
+  }
+  for (const key of wanted) {
+    if (typeof i18n[key] !== 'string' || i18n[key] === '') err(`i18n/en.json ${q(key)}`, 'missing: a note in its manager\'s words');
+  }
+  for (const [key, value] of Object.entries(i18n)) {
+    if (!key.startsWith('notes.') || typeof value !== 'string') continue;
+    if (!wanted.has(key)) issues.push({ level: 'warning', check: 'notes', where: `i18n/en.json ${q(key)}`, message: 'no note uses this key' });
+    for (const [, mark] of value.matchAll(/\[([^\]]*)\]/g)) {
+      if (!notes.marks.includes(mark ?? '')) err(`i18n/en.json ${q(key)}`, `[${mark}] is not a mark: only [${notes.marks.join('], [')}]`);
+    }
+  }
+  return issues;
 }
 
 /** The author's drawings held as strings, against their reference files: the faces' check and the photos'. */

@@ -2,6 +2,9 @@
 // headless Chrome and Firefox (check/browser.ts), on states recorded in check/desk-states.json:
 // - a stat tooltip opens on hover and closes on leaving; opens on a long-press, not on a tap, and closes on a tap
 //   elsewhere; opens on keyboard focus;
+// - the mirror's goals (round R8b, B7): the black card's tooltip — its major's name and goal line — opens on hover and
+//   closes on leaving; a sticky note's, its own, opens on a long-press and closes on a tap elsewhere; on keyboard focus,
+//   and closes on blur; each whole on the stage;
 // - a bubble's reaction row opens on a click; a reaction becomes a badge, another replaces it, the same again
 //   removes it; a click elsewhere closes the row;
 // - the metronome swings, settles at the centre on a click, and swings again on the next;
@@ -292,6 +295,68 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
 }
 
 /**
+ * The mirror's goals (round R8b, B7), on a recorded desk (s02): the black card's tooltip is its major's name and goal
+ * line, on hover; a sticky note's is its own, on a long-press (450 ms, as the stat bar's) and on keyboard focus. It closes
+ * as the stat bar's do — leaving, a tap elsewhere, blur — and stands whole on the stage.
+ */
+async function mirrorTips(page: Page, url: string): Promise<Result[]> {
+  const out: Result[] = [];
+  const state = states.s02;
+  if (!state) return [['mirror tooltips: no recorded state s02', false]];
+  await reach(page, url, state);
+  const tip = () =>
+    page.evaluate<{ on: boolean; header: string; line: string; whole: boolean }>(`(() => {
+      const t = document.querySelector('.desk .goaltip');
+      const st = document.querySelector('.stage').getBoundingClientRect();
+      const r = t?.getBoundingClientRect();
+      return { on: !!t?.classList.contains('on'), header: t?.querySelector('b')?.textContent ?? '', line: t?.querySelector('span')?.textContent ?? '', whole: !!r && r.left >= st.left - 0.5 && r.right <= st.right + 0.5 && r.top >= st.top - 0.5 && r.bottom <= st.bottom + 0.5 };
+    })()`);
+  const words = (major: string | null) => ({ header: en[`ending.${major}.name`] ?? '?', line: en[`ending.${major}.goal`] ?? '?' });
+  const says = (t: { header: string; line: string }, major: string | null) => !!major && t.header === words(major).header && t.line === words(major).line;
+  const today = await page.evaluate<string | null>(`document.querySelector('.desk .mirror .today')?.dataset.major ?? null`);
+  const card = await centre(page, '.desk .mirror .today');
+  if (!card || !today) return [['mirror tooltips: no black card', false]];
+  await page.move(...card);
+  await sleep(350);
+  const hovered = await tip();
+  out.push([`the black card's tooltip opens on hover, its major's name and goal line${hovered.on && !says(hovered, today) ? `: "${hovered.header}" "${hovered.line.slice(0, 30)}"` : ''}`, hovered.on && says(hovered, today)]);
+  out.push(["the black card's tooltip stands whole on the stage", hovered.whole]);
+  await page.move(...(await neutral(page)));
+  await sleep(300);
+  out.push(["the black card's tooltip closes when the pointer leaves", !(await tip()).on]);
+  const major = await page.evaluate<string | null>(`document.querySelector('.desk .mirror .sticky')?.dataset.major ?? null`);
+  const sticky = await centre(page, '.desk .mirror .sticky');
+  if (!sticky || !major) return [...out, ['mirror tooltips: no sticky note', false]];
+  try {
+    await page.press(...sticky, 700);
+    await sleep(200);
+    const pressed = await tip();
+    out.push([`a sticky note's tooltip opens on a long-press, its own goal line`, pressed.on && says(pressed, major)]);
+    out.push(["a sticky note's tooltip stands whole on the stage", pressed.whole]);
+    await page.press(...(await neutral(page)), 40);
+    await sleep(300);
+    out.push(["a tap elsewhere closes a sticky note's tooltip", !(await tip()).on]);
+  } catch (err) {
+    if (page.name !== 'webkit' || !(err instanceof Error) || err.message !== 'WebKit driver: trusted long-press unsupported by Playwright Touchscreen') throw err;
+    out.push([`a sticky note's tooltip on a long-press: ${err.message.slice(0, 60)}`, 'skipped']);
+  }
+  // Keyboard: Tab until the mirror has the focus (headless Firefox's window never has it: no focus events there).
+  if (!(await page.evaluate<boolean>(`document.hasFocus()`))) return [...out, ['the mirror on keyboard focus: this headless window never has focus', 'skipped']];
+  let focused: string | null = null;
+  for (let i = 0; i < 40 && !focused; i++) {
+    await page.key('Tab');
+    focused = await page.evaluate<string | null>(`document.activeElement?.closest?.('.desk .mirror [data-goal]')?.dataset.major ?? null`);
+  }
+  await sleep(250);
+  const keyed = await tip();
+  out.push([`the mirror's tooltip opens on keyboard focus, the focused one's goal line`, !!focused && keyed.on && says(keyed, focused)]);
+  await page.evaluate(`document.activeElement?.blur()`);
+  await sleep(250);
+  out.push(["the mirror's tooltip closes on blur", !(await tip()).on]);
+  return out;
+}
+
+/**
  * Round R3, C2: the bubbles stay. For each manager, the author's seed from the title with motion full: BEGIN, the
  * opening card, the manager, the first offer; then a month of plays, a paper picked by hand between them and each
  * play's print, the bubbles shown sampled every 90 ms in the page. They never decrease before END TURN.
@@ -518,7 +583,7 @@ try {
     for (const size of sizesFromArgs(process.argv)) {
     const page = await launch(browser, size);
     try {
-      const results = [...(await tooltips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
+      const results = [...(await tooltips(page, url)), ...(await mirrorTips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
       // Every keyframe animated over the runs, CSS-valid (round R5, B3): the phone's shake, the hand, the month's pile.
       const rejected = await badKeyframes(page);
       results.push([`no keyframe value CSS rejects${rejected.length ? `: ${rejected.slice(0, 3).map((b) => `${b.element} ${b.property}: ${b.value}`).join('; ')}` : ''}`, rejected.length === 0]);

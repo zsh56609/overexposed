@@ -642,7 +642,8 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   for (const note of mirror.notes) {
     const major = others.find((x) => x.id === note.majorId);
     if (!major) continue;
-    if (note.colour !== major.note || note.name !== t(`ending.${major.id}.name`)) bad(`note ${major.id}: ${note.colour} "${note.name}"`);
+    // Its goal line is its tooltip (round R8b, B7), as the black card's is its major's.
+    if (note.colour !== major.note || note.name !== t(`ending.${major.id}.name`) || note.goal !== t(`ending.${major.id}.goal`)) bad(`note ${major.id}: ${note.colour} "${note.name}"`);
     const clauses = majorRequirements(major, s);
     if (note.reqs.length !== clauses.length) bad(`note ${major.id}: ${note.reqs.length} requirements, /core has ${clauses.length}`);
     clauses.forEach((clause, i) => {

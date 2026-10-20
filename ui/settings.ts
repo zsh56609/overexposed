@@ -1,5 +1,6 @@
 // "House rules" (README §9, settings; round R1): Mark my stories, on by default, and Reduce motion, off; since round
-// R4, Sound effects and Music, both on. UI state only — no rule reads it. Kept in this browser (guarded like the
+// R4, Sound effects and Music, both on; since round R8b, Manager's notes, on (ui/notes.ts). UI state only — no rule
+// reads it. Kept in this browser (guarded like the
 // endings collection). Reduce motion drives the existing reduced mode (ui/motion.ts) through the same switch the OS
 // preference and the audits use; the two sound switches drive ui/sound/sound.ts.
 
@@ -12,10 +13,15 @@ export interface Settings {
   /** The six tracks (round R4, B5). */
   readonly music: boolean;
   readonly reduceMotion: boolean;
+  /**
+   * The manager's notes (round R8b, B1), on by default — a player of v0.7, with no such setting stored, has it on and
+   * sees the notes too. It turns itself off once all six have come and none is up.
+   */
+  readonly notes: boolean;
 }
 
 const KEY = 'overexposed.settings';
-const DEFAULTS: Settings = { markStories: true, soundEffects: true, music: true, reduceMotion: false };
+const DEFAULTS: Settings = { markStories: true, soundEffects: true, music: true, reduceMotion: false, notes: true };
 const listeners = new Set<() => void>();
 
 function load(): Settings {
@@ -28,6 +34,7 @@ function load(): Settings {
         soundEffects: typeof p.soundEffects === 'boolean' ? p.soundEffects : DEFAULTS.soundEffects,
         music: typeof p.music === 'boolean' ? p.music : DEFAULTS.music,
         reduceMotion: typeof p.reduceMotion === 'boolean' ? p.reduceMotion : DEFAULTS.reduceMotion,
+        notes: typeof p.notes === 'boolean' ? p.notes : DEFAULTS.notes,
       };
     }
   } catch {

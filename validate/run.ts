@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
 import { AVATAR_IDS, PHOTO_IDS } from '../core/index.ts';
-import { CHECKS, checkAvatars, checkBoundaries, checkPhotos, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -33,6 +33,18 @@ const photos = await import('../ui/photos.ts').then(
   () => null,
 );
 issues.push(...checkPhotos(Object.fromEntries(PHOTO_IDS.map((id) => [id, text(`docs/design/visual/ref/r8b-photos/${id}.svg`)])), photos));
+// The manager's notes (round R8b): ui/notes.ts's six in every manager's words, and only the marks they draw.
+const notes = await import('../ui/notes.ts').then(
+  (m: { NOTE_IDS: readonly string[]; TOUCH_NOTES: readonly string[]; NOTE_MARKS: readonly string[] }) => ({ ids: m.NOTE_IDS, touch: m.TOUCH_NOTES, marks: m.NOTE_MARKS }),
+  () => null,
+);
+try {
+  const raw = readJson('content/managers.json') as { managers?: readonly { id?: unknown }[] };
+  const managerIds = (raw.managers ?? []).map((m) => m.id).filter((id): id is string => typeof id === 'string');
+  issues.push(...checkNotes(readJson('i18n/en.json'), managerIds, notes));
+} catch (err) {
+  issues.push({ level: 'error', check: 'notes', where: 'load', message: (err as Error).message });
+}
 
 const errors = issues.filter((i) => i.level === 'error');
 const warnings = issues.filter((i) => i.level === 'warning');

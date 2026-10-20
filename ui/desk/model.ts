@@ -63,6 +63,7 @@ import {
   flagName,
   flagNegative,
   lineText,
+  majorGoal,
   majorName,
   managerName,
   mastheadName,
@@ -122,12 +123,15 @@ export interface MirrorNote {
   readonly majorId: string;
   readonly colour: NoteColour;
   readonly name: string;
+  /** Its goal line: no longer on the note (round R8a, E3), its tooltip since round R8b (B7). */
+  readonly goal: string;
   readonly reqs: readonly NoteReq[];
 }
 
 export interface MirrorModel {
   readonly kicker: string;
-  readonly today: { readonly major: string; readonly minor: string } | null;
+  /** The black card: where the year would land today; its major's goal line is its tooltip (round R8b, B7). */
+  readonly today: { readonly majorId: string; readonly major: string; readonly minor: string; readonly goal: string } | null;
   /** The other three majors, in content's order. */
   readonly notes: readonly MirrorNote[];
   /** In a frenzy, the red clipping stuck to the glass: the month's newest scandal headline. */
@@ -443,12 +447,12 @@ function mirror(s: GameState, issue: MonthPress | null): MirrorModel {
   const newest = scandals.reduce<PageItem | null>((a, x) => (a === null || (x.line?.step ?? 0) > (a.line?.step ?? 0) ? x : a), null);
   return {
     kicker: t('ui.goals.today'),
-    today: today ? { major: majorName(c, today.majorId), minor: minorName(c, today.minorId) } : null,
+    today: today ? { majorId: today.majorId, major: majorName(c, today.majorId), minor: minorName(c, today.minorId), goal: majorGoal(c, today.majorId) } : null,
     notes: c.majors
       .map((m, i) => ({ m, colour: m.note ?? (NOTE_ORDER[i % NOTE_ORDER.length] as NoteColour) }))
       .filter(({ m }) => m.id !== today?.majorId)
       .slice(0, 3)
-      .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
+      .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), goal: majorGoal(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
     clipping: newest ? pageItemText(c, newest) : null,
   };
 }

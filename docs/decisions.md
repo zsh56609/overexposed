@@ -6,6 +6,42 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8b, Part B: the manager's notes
+
+- Six notes in the manager's hand for a new player's first year (README §11): the stat bar on
+  the first offers, the bulbs on the first hand, the countdown after a play that raised heat,
+  END TURN with no actions left, the mirror on a later month's hand, a Scandal in the hand.
+  Each once, one at a time, never in the way; their moments are read from the steps'
+  GameEvents and the desk's model (the step being played counts from its start), never by
+  comparing state in /ui. Words are the author's (`notes.<note>.<manager>`, `.touch` for the
+  two that say "hold"), checked by validate's new "notes" check, which also holds a line's
+  marks to `[hype]`, `[craft]`, `[heat]`.
+- The switch is House rules' "Manager's notes", on by default; `seen` and `lit` are kept
+  under `overexposed.notes`, guarded as the settings. A note joins `seen` as it comes; all six
+  seen and none up, the switch turns itself off; turning it on empties `seen`, keeps `lit`.
+  A run begun after the switch came on counts whole for the mirror's note (a month ended
+  since the switch came on).
+- The author's choices: notes come only in unseeded runs unless `?notes=1` asks (every
+  existing check is seeded, so none sees one; the dev pages never render the layer); the
+  highlight comes once per note, ever, even after the switch is turned back on; Mags signs
+  "Mags"; a v0.7 player sees the notes too (the setting defaults on when absent); the notes
+  capitalise game terms as the cards do.
+- Reduced motion has no flashes (B5): the veil fades in, holds 600 ms and fades out, the glow
+  standing still with it. Motion off shows a note at once and draws neither veil nor glow.
+- The mirror's goal lines are tooltips again (B7), the stat bar's: hover, a 450 ms long-press,
+  keyboard focus; the black card's says its major's, a sticky note's its own; the black card
+  and the notes take focus. No new words: `ending.<major>.name` and `.goal`. The desk model
+  carries the goal lines again (`MirrorNote.goal`, `today.goal`), and check:preview holds them
+  to content.
+- `npm run check:notes` (Chromium, Firefox, WebKit at 1280×720 and 844×390) plays seed 3 from
+  the title with `?notes=1` and a fresh store: each note at its moment, whole on the stage,
+  clear of the hand, END TURN and the offers; highlighted the first time only; put away by a
+  click into `seen`; faded under a card's preview and END TURN's; the switch off once all six
+  are seen, and a note again unlit once it is back on; on a recorded autumn hand (s04) the
+  scandal's note follows its card as the hand fans again; a seeded run without `notes=1` and
+  a run with the switch off show none; the actions note's touch line under touch.
+  check:interactions adds the mirror's tooltips by hover, long-press and keyboard focus.
+
 ## 2026-10-20 — Round R8b, Part A: photographs in texts
 
 - Some people send a photograph with their text (the author's seven

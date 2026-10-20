@@ -75,8 +75,9 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 - Bulb frame. In a frenzy some bulbs flicker or go dark and a red clipping of the month’s latest scandal headline is stuck to the glass.
 - **Black card** (taped, slight tilt): "If the year ended today" · major · minor.
-- **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows the ending's name and what it takes — its requirements **in the stat bar's language** (no goal line since round R8a: fewer words on screen; the goal lines stay in content, for R8b): `✓/✗` + icon + tier word + number — "★ Known · 80+" — and a scandal clause the doors' way, the icon and the threshold: "📰 5 or fewer", "📰 6+" (round R5). The words stay in ink: the icons carry the stat's colour, ✓/✗ the met state. The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
+- **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows the ending's name and what it takes — its requirements **in the stat bar's language** (no goal line on it since round R8a: fewer words on screen; since round R8b it is the note's tooltip): `✓/✗` + icon + tier word + number — "★ Known · 80+" — and a scandal clause the doors' way, the icon and the threshold: "📰 5 or fewer", "📰 6+" (round R5). The words stay in ink: the icons carry the stat's colour, ✓/✗ the met state. The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
 - Notes and the black card scale up slightly on hover (×1.05, ×1.04).
+- **The goals as tooltips** (round R8b): hovering (mouse), a long-press (touch, 450 ms) or keyboard focus on the black card shows its major's goal, on a sticky note its own — the stat bar's tooltip (§1), the major's name as its header and the goal line under it, under the card or note (above it if there is no room), kept on the stage. It closes as the stat bar's do: leaving, a press elsewhere, blur. The black card and the notes take focus (tabIndex 0).
 
 ### 4. The desk
 
@@ -225,7 +226,7 @@ italic line.
   minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
   "Endings found · N of 14".
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
-  (off). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
+  (off), Manager's notes (on; round R8b, §11). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
   track comes back (round R4). Credits share this panel's style (round R7): one row per credit,
   the role beside the name — the game's maker, the music (linked to Holizna's OpenGameArt page),
   the typefaces (linked to their licence), the art and sound, the AI assistance — and a foot
@@ -263,6 +264,53 @@ fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `p
   last month, the scandal track once a scandal is held, the awards track in winter.
 - Nothing sounds before the first BEGIN click; a play the browser refuses leaves the game silent. A hidden
   page suspends the sound and pauses the music. `?cues` logs every cue for the checks.
+
+### 11. The manager's notes (round R8b)
+
+In a new player's first year, six short notes in the manager's hand, each once, each at the moment it matters
+(`ui/screens/Notes.tsx`; the look from `docs/design/visual/ref/r8b-notes.html`). Every moment is read from the steps'
+GameEvents and the desk's model, never by comparing state in /ui, and needs the desk idle.
+
+| Note | Comes | Points at · lit | Goes | Stands (stage px) |
+|---|---|---|---|---|
+| stats | the offers up, once they are still | Craft's cell · Hype, Craft, Heat | the offers close | 44, 66 · 286 wide · −1.2° |
+| actions | a hand dealt, no card played this month | the bulbs | the month's first play, END TURN | 318, 66 · 280 · 0.9° |
+| heat | a play has landed whose step raised heat | the countdown | the next play, END TURN | 300, 70 · 284 · −0.8° |
+| end | no actions left | END TURN's left side · END TURN | END TURN | left 994, bottom 626 · 262 · 1.1° |
+| mirror | a hand dealt, no card played, a month ended since the switch came on | the black card's left edge · the black card | the first play, END TURN | 398, 84 · 268 · −1° |
+| scandal | a Scandal in the hand | the leftmost Scandal's top · the card | END TURN, or the card leaves the hand | top 204 · 284 · 0.8° |
+
+- **END TURN's** stands on its bottom (four lines: top ≈ 486) and moves up if a wide hand would meet it. **The
+  scandal's** stands by its card, from fan.ts: a card right of the centre (640), 330 px left of the card's left;
+  otherwise 30 px left of its centre; kept on the stage, and following the card as the hand fans again. A preview over
+  it fades it.
+- **One at a time**, in the table's order: the other waits, and comes when the first goes if its moment still holds,
+  else at its next. **Never in the way**: the layer takes no click but the note's; no note covers a hand card, END
+  TURN, or an offer's cards and buttons. A card's or END TURN's preview over a note fades it and lets clicks through;
+  a panel hides it (it comes back if its moment holds). A click, Enter or Space puts it away. The note is a button
+  whose accessible name is its words; the ✕ is drawn (aria-hidden); the layer is aria-live polite.
+- **The look**: cream paper (`#f7f1e1` → `#f1e9d4`, padding 15 16 11 17, the reference's two shadows), a strip of
+  tape, a folded corner; Playfair Display italic 500, 17 px, line height 1.32, ink `#2b2520`; a line's marks
+  `[hype]` `[craft]` `[heat]` are the stat bar's own icons, 15 px, in the ink's colour (Craft's the lane's); game
+  terms capitalised as the cards are. The signature right, 14.5 px, `#75654f` ("— Dex", "— Mags"); the ✕ Libre
+  Franklin 600 13 px `#a08f78`. The arrow: a hand-drawn curve and a two-stroke head, `#f4ead2`, 2.6 px, round caps,
+  a dark drop shadow. In: down 8 px and up from transparent, 260 ms; out: a fade, 200 ms; reduced, fades only;
+  motion off, at once. The layer is over the desk and its screens (the offers too), under the panels.
+- **The first time** each note ever shows, the eye is drawn to it: a veil (`rgba(6,4,2,.46)`) with two holes — the
+  target's, 6 px round it, radius 10, and the note's — and the target's glow (`0 0 0 2.5px #ffcf85, 0 0 22px 6px
+  rgba(255,207,133,.55)`) on its own outline: a box for the stat cells, the bulbs, the countdown, the black card and
+  END TURN; a card's own outline, tilting with it. The veil in 160 ms, the glow on, off, on, off over 900 ms, the
+  veil out 340 ms (about 1.4 s); reduced, no flashes: the veil fades in, holds 600 ms and fades out; motion off,
+  none. The veil takes no click; any click ends it. A note is highlighted once, ever — never again, even after the
+  switch comes back on.
+- **Words**: `notes.<note>.<manager>`, signed `notes.sign.<manager>`; the actions and mirror notes say "hold" where
+  a mouse would hover (`.touch`, when the last pointer put down was touch or a pen).
+- **The switch** — House rules' "Manager's notes", on by default (a v0.7 player, with no such setting stored, has it
+  on). A note comes only while it is on and has not come before; it joins `seen` as it comes, and stays until it
+  goes or is clicked (a preview or a panel only hides it). Once all six are seen and none is up, the switch turns
+  itself off; turning it on empties `seen` (the highlights stay had). `seen` and `lit` are kept under
+  `overexposed.notes`, guarded as the settings are. A run with `?seed=` shows none unless `?notes=1`; the dev pages
+  never. `npm run check:notes` checks it all by real input.
 
 ## Porting notes
 

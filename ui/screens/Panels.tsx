@@ -12,6 +12,7 @@ import { offerCardModel, type HandWords } from '../desk/model.ts';
 import licenceUrl from '../fonts/OFL.txt?url';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
+import { notesOn } from '../notes.ts';
 import { setSetting, useSettings, type Settings } from '../settings.ts';
 import type { PlayedStep } from '../queue.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
@@ -222,10 +223,19 @@ export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: Re
 // ---------------------------------------------------------------------------------------------------- House rules
 
 /** A row is one switch, its words and its toggle: the whole row takes the click. */
-function Switch({ id, label, line }: { id: keyof Settings; label: string; line: string }) {
+function Switch({ id, label, line, onTurnOn }: { id: keyof Settings; label: string; line: string; onTurnOn?: () => void }) {
   const on = useSettings()[id];
   return (
-    <button className="srow" role="switch" aria-checked={on} data-setting={id} onClick={() => setSetting(id, !on)}>
+    <button
+      className="srow"
+      role="switch"
+      aria-checked={on}
+      data-setting={id}
+      onClick={() => {
+        if (!on) onTurnOn?.();
+        setSetting(id, !on);
+      }}
+    >
       <span className="sw">
         <b>{label}</b>
         <span>{line}</span>
@@ -245,6 +255,8 @@ export function SettingsPanel({ overDesk, onClose }: { overDesk: boolean; onClos
         <Switch id="soundEffects" label={t('ui.settings.sound')} line={t('ui.settings.soundLine')} />
         <Switch id="music" label={t('ui.settings.music')} line={t('ui.settings.musicLine')} />
         <Switch id="reduceMotion" label={t('ui.settings.motion')} line={t('ui.settings.motionLine')} />
+        {/* The manager's notes (round R8b, B1): turned on, they come again from the start. */}
+        <Switch id="notes" label={t('ui.settings.notes')} line={t('ui.settings.notesLine')} onTurnOn={notesOn} />
       </div>
     </Overlay>
   );
