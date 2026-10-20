@@ -3,8 +3,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
-import { AVATAR_IDS, PHOTO_IDS } from '../core/index.ts';
-import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { AVATAR_IDS, PHOTO_IDS, TROPHY_IDS } from '../core/index.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, checkTrophies, trophyDir, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -33,6 +33,12 @@ const photos = await import('../ui/photos.ts').then(
   () => null,
 );
 issues.push(...checkPhotos(Object.fromEntries(PHOTO_IDS.map((id) => [id, text(`docs/design/visual/ref/r8b-photos/${id}.svg`)])), photos));
+// The trophies (round R8c): the strings ui/trophies.ts holds, against the author's files.
+const trophies = await import('../ui/trophies.ts').then(
+  (m: { TROPHIES: Readonly<Record<string, string>> }) => m.TROPHIES,
+  () => null,
+);
+issues.push(...checkTrophies(Object.fromEntries(TROPHY_IDS.map((id) => [id, text(`docs/design/visual/ref/${trophyDir()}/${id}.svg`)])), trophies));
 // The manager's notes (round R8b): ui/notes.ts's six in every manager's words, and only the marks they draw.
 const notes = await import('../ui/notes.ts').then(
   (m: { NOTE_IDS: readonly string[]; TOUCH_NOTES: readonly string[]; NOTE_MARKS: readonly string[] }) => ({ ids: m.NOTE_IDS, touch: m.TOUCH_NOTES, marks: m.NOTE_MARKS }),

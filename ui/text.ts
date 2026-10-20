@@ -134,6 +134,8 @@ export const monthEndText = (line: MonthEndLine): string => t(line.key ?? `manag
 type Awarded = { readonly awards?: readonly AwardDef[] };
 export const awardName = (c: Awarded, id: string): string => t(c.awards?.find((a) => a.id === id)?.nameKey ?? `award.${id}.name`);
 export const awardCitation = (c: Awarded, id: string): string => t(c.awards?.find((a) => a.id === id)?.citationKey ?? `award.${id}.citation`);
+/** Its short line (round R8c, B3): what the night's boxes for the rest of the awards say under its name. */
+export const awardShort = (c: Awarded, id: string): string => t(c.awards?.find((a) => a.id === id)?.shortKey ?? `award.${id}.short`);
 /** How an award is won (round R4, A7): its line, each placeholder its numeric condition's min (its max if only a max). */
 export function awardHow(c: Awarded, id: string): string {
   const award = c.awards?.find((a) => a.id === id);

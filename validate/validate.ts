@@ -61,6 +61,7 @@ export const CHECKS = {
   sound: "the sound module: the author's, copied unchanged",
   avatars: "the faces: the author's ten portraits, unchanged",
   photos: "the photos: the author's seven drawings, unchanged",
+  trophies: "the trophies: the author's seven drawings, unchanged",
   notes: "the manager's notes: a line per note and manager, and their marks",
 } as const;
 export type CheckId = keyof typeof CHECKS;
@@ -169,9 +170,9 @@ class Ctx {
   readonly flagsRead = new Map<string, string>();
   readonly exhaustTags = new Map<string, string>();
   readonly keysUsed = new Map<string, string>();
-  /** rules.lanes, once checked: what a card's lane and a lane test may name. */
   /** The gates' ids, once checked (round R8c): what a year's `passed` test may name. */
   readonly gateIds = new Set<string>();
+  /** rules.lanes, once checked: what a card's lane and a lane test may name. */
   lanes: readonly string[] = [];
   /** rules.fameBands' ids, once checked (round 2c). */
   fameBands: readonly string[] = [];
@@ -708,8 +709,8 @@ function checkCards(v: Ctx, raw: unknown): Obj[] {
 function checkGates(v: Ctx, raw: unknown): Obj[] {
   return checkList(v, raw, 'content/gates.json', 'gate', (g, where) => {
     v.fields(g, GATE_FIELDS, where);
-    const act = v.int(g.act, `${where}.act`, [1, v.acts]) ? g.act : 0;
     if (isStr(g.id)) v.gateIds.add(g.id);
+    const act = v.int(g.act, `${where}.act`, [1, v.acts]) ? g.act : 0;
     const owner: Owner = { kind: 'gate', id: String(g.id), act };
     v.key(g.nameKey, `${where}.nameKey`);
     if (g.flavorKeys !== undefined) v.keys(g.flavorKeys, `${where}.flavorKeys`);
@@ -765,7 +766,6 @@ function checkYearConditions(v: Ctx, c: unknown, where: string, extra: readonly 
       }
     }
   }
-  if (c.anyOf !== undefined) {
   if (c.passed !== undefined) {
     const at = `${where}.passed`;
     if (!isObj(c.passed)) v.error('schema', at, 'must be an object like { "any": ["gate_festival"] }');
@@ -779,6 +779,7 @@ function checkYearConditions(v: Ctx, c: unknown, where: string, extra: readonly 
       }
     }
   }
+  if (c.anyOf !== undefined) {
     if (!Array.isArray(c.anyOf) || c.anyOf.length < 2) v.error('schema', `${where}.anyOf`, 'must list two or more alternative conditions');
     else c.anyOf.forEach((alt, i) => checkYearConditions(v, alt, `${where}.anyOf[${i}]`));
   }
@@ -879,10 +880,10 @@ function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>, i18n
     v.fields(a, AWARD_FIELDS, where);
     v.key(a.nameKey, `${where}.nameKey`);
     v.key(a.citationKey, `${where}.citationKey`);
-    // How it is won (round R4, A7): a placeholder names one of the award's numeric conditions, which fills it with
     // Its trophy and its short line (round R8c, B1 and B3): one of the author's drawings, and what the night's boxes say.
     if (!(TROPHY_IDS as readonly unknown[]).includes(a.trophy)) v.error('references', `${where}.trophy`, `must be one of ${TROPHY_IDS.join(', ')}, got ${q(a.trophy)}`);
     v.key(a.shortKey, `${where}.shortKey`);
+    // How it is won (round R4, A7): a placeholder names one of the award's numeric conditions, which fills it with
     // its min (its max when it has only a max), so a tuned number needs no new prose; an ending stays in words.
     v.key(a.howKey, `${where}.howKey`);
     const how = isStr(a.howKey) ? i18n[a.howKey] : undefined;
@@ -1925,7 +1926,7 @@ export function checkSoundModule(reference: string | null, copy: string | null):
  * a 100×100 box, and their ids unique across the ten.
  */
 export function checkAvatars(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
-  return checkDrawings({ check: 'avatars', file: 'ui/avatars.ts', dir: 'r8a-avatars', ids: AVATAR_IDS, box: '0 0 100 100', list: 'AVATAR_IDS', what: 'faces' }, references, copies);
+  return checkDrawings({ check: 'avatars', file: 'ui/avatars.ts', dir: () => 'r8a-avatars', ids: AVATAR_IDS, box: '0 0 100 100', list: 'AVATAR_IDS', what: 'faces', one: 'face' }, references, copies);
 }
 
 /**
@@ -1934,7 +1935,19 @@ export function checkAvatars(references: Readonly<Record<string, string | null>>
  * aside — each drawn on a 400×300 box, their ids unique across the seven.
  */
 export function checkPhotos(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
-  return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: 'r8b-photos', ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos' }, references, copies);
+  return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: () => 'r8b-photos', ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos', one: 'photo' }, references, copies);
+}
+
+/** The folder each trophy's drawing is in (round R8c): r8c-trophies/. */
+export const trophyDir = (): string => 'r8c-trophies';
+
+/**
+ * The awards' trophies (round R8c, B1): ui/trophies.ts holds the author's seven drawings,
+ * docs/design/visual/ref/r8c-trophies/<id>.svg, one for each of core's TROPHY_IDS and no more, unchanged — line
+ * endings aside — each drawn on a 120×150 box, their ids unique across the seven.
+ */
+export function checkTrophies(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
+  return checkDrawings({ check: 'trophies', file: 'ui/trophies.ts', dir: trophyDir, ids: TROPHY_IDS, box: '0 0 120 150', list: 'TROPHY_IDS', what: 'trophies', one: 'trophy' }, references, copies);
 }
 
 /**
@@ -1977,9 +1990,21 @@ export function checkNotes(
   return issues;
 }
 
-/** The author's drawings held as strings, against their reference files: the faces' check and the photos'. */
+/**
+ * The author's drawings held as strings, against their reference files: the faces' check, the photos' and the
+ * trophies'. `dir` gives each drawing's folder under docs/design/visual/ref/; `one` names one of them.
+ */
 function checkDrawings(
-  kind: { readonly check: CheckId; readonly file: string; readonly dir: string; readonly ids: readonly string[]; readonly box: string; readonly list: string; readonly what: string },
+  kind: {
+    readonly check: CheckId;
+    readonly file: string;
+    readonly dir: (id: string) => string;
+    readonly ids: readonly string[];
+    readonly box: string;
+    readonly list: string;
+    readonly what: string;
+    readonly one: string;
+  },
   references: Readonly<Record<string, string | null>>,
   copies: Readonly<Record<string, string>> | null,
 ): Issue[] {
@@ -1995,12 +2020,12 @@ function checkDrawings(
     const reference = references[id] ?? null;
     const copy = copies[id];
     const where = `${kind.file} ${id}`;
-    if (reference === null) err(where, `docs/design/visual/ref/${kind.dir}/${id}.svg, the reference, is missing`);
+    if (reference === null) err(where, `docs/design/visual/ref/${kind.dir(id)}/${id}.svg, the reference, is missing`);
     else if (copy === undefined) err(where, 'missing: copy its reference here');
-    else if (norm(copy) !== norm(reference)) err(where, `differs from docs/design/visual/ref/${kind.dir}/${id}.svg: copy the reference again`);
+    else if (norm(copy) !== norm(reference)) err(where, `differs from docs/design/visual/ref/${kind.dir(id)}/${id}.svg: copy the reference again`);
     if (copy !== undefined && !(copy.startsWith('<svg') && copy.slice(0, copy.indexOf('>')).includes(viewBox))) err(where, `must be drawn on its box (${viewBox})`);
   }
-  for (const id of Object.keys(copies)) if (!kind.ids.includes(id)) err(`${kind.file} ${id}`, `no ${kind.what.replace(/s$/, '')} ${q(id)} in core's ${kind.list}`);
+  for (const id of Object.keys(copies)) if (!kind.ids.includes(id)) err(`${kind.file} ${id}`, `no ${kind.one} ${q(id)} in core's ${kind.list}`);
   const owners = new Map<string, string>();
   for (const [id, svg] of Object.entries(copies))
     for (const m of svg.matchAll(/\sid="([^"]+)"/g)) {

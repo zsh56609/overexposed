@@ -185,6 +185,33 @@
 :is(.awards-night, .ov .book) .pl .t { font-size: 8.5px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: #d6b46e; }
 :is(.awards-night, .ov .book) .pl .n { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 17px; line-height: 1.1; color: #FFF3DC; margin-top: 4px; }
 :is(.awards-night, .ov .book) .pl .c { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 10.5px; line-height: 1.35; color: #bfb09a; margin-top: 5px; }
+/* A plaque with its trophy (round R8c, B2; docs/design/visual/ref/r8c-awards.html .pl.tro): the trophy at its left, its
+   words at its right, a size smaller beside it — the name 15 px, the citation 10 px. The trophy's box is its size
+   (56×70 on the night, 60×75 on the shelf), empty until the drawings' chunk is here. */
+:is(.awards-night, .ov .book) .pl.tro { display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 8px; }
+:is(.awards-night, .ov .book) .pl.tro > .tr { display: block; flex: none; }
+:is(.awards-night, .ov .book) .pl.tro > .tr img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .55)); }
+:is(.awards-night, .ov .book) .pl.tro .tx { min-width: 0; }
+:is(.awards-night, .ov .book) .pl.tro .n { font-size: 15px; }
+:is(.awards-night, .ov .book) .pl.tro .c { font-size: 10px; line-height: 1.3; }
+/* The rest of the year's awards (round R8c, B3; r8c-awards.html .pl.rest): in the fourth box (five or six), or a wide
+   box over the third and fourth columns (seven or eight), two columns filled row by row. An entry: its trophy, then the
+   name over the short line, each on one line; a fresh one, a dot at its trophy's upper right. */
+.awards-night .pl.rest { display: flex; flex-direction: column; padding: 9px 12px; }
+.awards-night .pl.rest .ri { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.awards-night .pl.rest .ri > div { min-width: 0; }
+.awards-night .pl.rest .ri .tr { display: block; position: relative; flex: none; }
+.awards-night .pl.rest .ri .tr img { display: block; width: 100%; height: 100%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .5)); }
+.awards-night .pl.rest .ri .tr i { position: absolute; right: -2px; top: -1px; width: 6px; height: 6px; border-radius: 50%; background: #ffcf85; box-shadow: 0 0 0 1.5px #15110c; }
+.awards-night .pl.rest .rn { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; color: #FFF3DC; line-height: 1.08; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.awards-night .pl.rest .rc { font-family: 'Playfair Display', Georgia, serif; font-style: italic; color: #bfb09a; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.awards-night .pl.rest.list .rows { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; margin-top: 3px; }
+.awards-night .pl.rest.list .rn { font-size: 12px; }
+.awards-night .pl.rest.list .rc { font-size: 10px; }
+.awards-night .pl.rest.wide { flex: 0 0 468px; }
+.awards-night .pl.rest.wide .rows { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; column-gap: 18px; row-gap: 2px; margin-top: 4px; }
+.awards-night .pl.rest.wide .rn { font-size: 12px; }
+.awards-night .pl.rest.wide .rc { font-size: 9.5px; }
 .awards-night .a-rev { top: 420px; }
 /* The front pages' width, which PLAY AGAIN takes too (round R5, B5). */
 .awards-night { --fp-width: 226px; }
@@ -205,8 +232,9 @@
 /* The bottom block stands right-aligned on the front pages' right edge (round R4, A6): the mirror of the manager's last
    word, which stands on their left edge. Four pages of 226 px, 16 px apart, centred: 164 px in from either side. */
 .awards-night .a-bottom { position: absolute; right: 164px; top: 568px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; text-align: right; }
-.scr .again { padding: 14px 42px; background: #EDE6D6; color: #15120E; font-weight: 800; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(255, 220, 160, .18); }
-.scr .again:hover { background: #ffcf85; }
+/* PLAY AGAIN in brass (round R8c, B6; r8c-awards.html .again), no longer the papers' cream. */
+.scr .again { padding: 14px 42px; background: linear-gradient(180deg, #e9c87a, #c9a04a); color: #1a120a; font-weight: 800; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; box-shadow: 0 10px 24px rgba(214, 180, 110, .25), inset 0 1px 0 rgba(255, 246, 214, .7); }
+.scr .again:hover { background: linear-gradient(180deg, #f6dc98, #dcb45a); }
 /* PLAY AGAIN as wide as the last front page above it, both edges on its edges, its words centred — the letter-spacing
    trails the last letter, so as much again leads the first (round R5, B5). */
 .awards-night .a-bottom .again { box-sizing: border-box; width: var(--fp-width); padding: 14px 0 14px .2em; text-align: center; }
@@ -251,7 +279,8 @@
 /* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
 .ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; min-height: 540px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
 .ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 18px; }
-/* Its two pages (round R4, A7): tabs in its head; the awards as the night's plaques, four and three, not yet won dimmed. */
+/* Its two pages (round R4, A7): tabs in its head; the awards as the night's plaques with their trophies, in rows of four
+   (round R8c, B4), not yet won dimmed, the trophy a silhouette. */
 .ov .book .pnh { align-items: flex-end; }
 .ov .book .tabs { display: flex; gap: 4px; margin-left: auto; margin-right: 18px; }
 .ov .book .tab { padding: 7px 14px 6px; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b9c4b6; border-bottom: 2px solid transparent; }
@@ -263,7 +292,9 @@
 .ov .book .pl.dim { background: linear-gradient(160deg, #1c1a14, #12100c); border-color: #4a3d27; box-shadow: none; }
 .ov .book .pl.dim .t { color: #8f8470; }
 .ov .book .pl.dim .n { color: #b8ac97; }
-.ov .book .pl.dim .c { font-style: normal; font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 10.5px; color: #a89c87; }
+.ov .book .pl.dim .c { font-style: normal; font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 10px; color: #a89c87; }
+.ov .book .pl.tro > .tr img { filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .5)); }
+.ov .book .pl.tro.dim > .tr img { filter: grayscale(1) brightness(.42) contrast(.9) opacity(.75); }
 .ov .col h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; margin: 0 0 4px; color: #f3ead4; }
 .ov .col .gl { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; color: #b9c4b6; margin-bottom: 14px; min-height: 32px; }
 .ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 9px 10px 10px; margin-bottom: 17px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }

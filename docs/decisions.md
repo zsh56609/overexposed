@@ -6,6 +6,30 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part B: trophies, on the night and on the shelf
+
+- Every award has a trophy, the author's drawing (seven: a gold record, a gramophone with
+  its horn, a microphone, a star, a film reel, a laurel, and the press camera — Villain of
+  the Year's). They are code, as the photos are: `ui/trophies.ts` holds them unchanged as
+  strings, a chunk of its own fetched once the title has painted (when the page is idle);
+  validate's new "trophies" check holds them to the files. Until the chunk comes a
+  trophy's box stands empty at its size.
+- A plaque has its trophy at its left. Beside a trophy the words have less room, so they
+  are a size smaller: the name 15 px (17), the citation 10 px at 1.3 (10.5 at 1.35), a
+  how-line on the shelf 10 px (10.5) — at the old sizes Most Promising Newcomer and Comeback
+  of the Year would overflow. Winner and the New chip stay.
+- The night's layout by how many the year won: up to four plaques (four on the front pages'
+  columns); five or six, three plaques and the fourth box listing the rest ("And n more");
+  seven or eight, two plaques and a wide box over the third and fourth columns, two columns
+  of entries. A fresh award in a box is a 6 px dot at its trophy, not a chip. Applause once a
+  box. check:overflow shows the nights with five to eight from chosen lists (few years win
+  five): the tightest line in a box is Breakthrough Performance's, 12 px to spare.
+- The scrapbook's shelf: rows of four, three for twelve; a not-yet-won trophy a silhouette.
+- PLAY AGAIN in brass (the author's choice), no longer the papers' cream; its size and place
+  stay.
+- check/desk-states.json's awards:4 wins six now (best_live_act and songwriter_of_the_year
+  join), so check:overflow:full replays a real fourth-box night; its note says so.
+
 ## 2026-10-20 — Round R8c, Part A: twelve awards
 
 - The author: more ways to be recognised, each with its trophy. Twelve awards, in this

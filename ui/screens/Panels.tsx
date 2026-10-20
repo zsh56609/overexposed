@@ -18,6 +18,7 @@ import type { PlayedStep } from '../queue.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
 import { cue } from '../sound/sound.ts';
 import { awardCitation, awardHow, awardName, cardName, flagName, money } from '../text.ts';
+import { Trophy } from '../Trophy.tsx';
 
 export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits' | 'numbers';
 
@@ -138,13 +139,17 @@ export function DeckPanel({ s, lane, season, words, onClose }: { s: GameState; l
 
 // ---------------------------------------------------------------------------------------------------- The scrapbook
 
+/** The shelf's rows (round R8c, B4): four plaques a row, three rows for twelve. */
+const SHELF_ROW = 4;
+
 /** The clippings' tilts, as the mockup pins them. */
 const TILT = [-2, 1.5, -1, 2];
 
 /**
  * The scrapbook: two pages, the endings found and the awards won (round R4, A7), switched by two tabs in its head; it
- * opens on the endings, and its title counts the open page. The awards page shows all seven as the awards night's
- * plaques, four and three: one won bright, Winner and its citation; one not yet won dimmed, its name and how it is won.
+ * opens on the endings, and its title counts the open page. The awards page is a shelf of all twelve as the awards
+ * night's plaques with their trophies (round R8c), in rows of four: one won bright, Winner and its citation; one not yet
+ * won dimmed, its trophy a silhouette, its name and how it is won.
  */
 export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: ReadonlySet<string>; awards: ReadonlySet<string>; overDesk: boolean; onClose: () => void }) {
   const { majors, minors } = content.endings;
@@ -168,20 +173,26 @@ export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: Re
         <Head kicker={t('ui.scrapbook.kicker')} title={title} close={t('ui.scrapbook.close')} onClose={onClose} tabs={tabs} />
         {page === 'awards' ? (
           <div className="awards-page">
-            {[list.slice(0, 4), list.slice(4)].map((row, r) => (
+            {Array.from({ length: Math.ceil(list.length / SHELF_ROW) }, (_, r) => list.slice(r * SHELF_ROW, (r + 1) * SHELF_ROW)).map((row, r) => (
               <div key={r} className="prow">
                 {row.map((a) =>
                   awards.has(a.id) ? (
-                    <div key={a.id} className="pl" data-award={a.id} data-fit="1">
-                      <div className="t">{t('ui.awards.winner')}</div>
-                      <div className="n">{awardName(content, a.id)}</div>
-                      <div className="c">{awardCitation(content, a.id)}</div>
+                    <div key={a.id} className="pl tro" data-award={a.id} data-fit="1">
+                      <Trophy id={a.trophy} w={60} h={75} />
+                      <div className="tx">
+                        <div className="t">{t('ui.awards.winner')}</div>
+                        <div className="n">{awardName(content, a.id)}</div>
+                        <div className="c">{awardCitation(content, a.id)}</div>
+                      </div>
                     </div>
                   ) : (
-                    <div key={a.id} className="pl dim" data-award={a.id} data-fit="1">
-                      <div className="t">{t('ui.scrapbook.notWon')}</div>
-                      <div className="n">{awardName(content, a.id)}</div>
-                      <div className="c">{awardHow(content, a.id)}</div>
+                    <div key={a.id} className="pl tro dim" data-award={a.id} data-fit="1">
+                      <Trophy id={a.trophy} w={60} h={75} />
+                      <div className="tx">
+                        <div className="t">{t('ui.scrapbook.notWon')}</div>
+                        <div className="n">{awardName(content, a.id)}</div>
+                        <div className="c">{awardHow(content, a.id)}</div>
+                      </div>
                     </div>
                   ),
                 )}

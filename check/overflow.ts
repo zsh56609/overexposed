@@ -213,6 +213,45 @@ window.__plainAudit = (where) => {
     const a = again.getBoundingClientRect(), p = lastPage.getBoundingClientRect();
     if (Math.abs(a.left - p.left) > 1 || Math.abs(a.right - p.right) > 1) add('PLAY AGAIN at ' + a.left.toFixed(1) + '-' + a.right.toFixed(1) + ', the last front page at ' + p.left.toFixed(1) + '-' + p.right.toFixed(1));
   }
+  // The plaques with their trophies (round R8c, B2), on the night and on the scrapbook's shelf: the name 15 px, the
+  // citation (a how-line on the shelf) 10 px, the plaque's padding 9 12 9 8.
+  for (const pl of document.querySelectorAll(':is(.awards-night, .ov .book) .pl.tro')) {
+    const n = pl.querySelector('.n'), c = pl.querySelector('.c'), cs = getComputedStyle(pl);
+    if (n && getComputedStyle(n).fontSize !== '15px') add('a plaque\\'s name is ' + getComputedStyle(n).fontSize + ', not 15px:' + text(n));
+    if (c && getComputedStyle(c).fontSize !== '10px') add('a plaque\\'s citation is ' + getComputedStyle(c).fontSize + ', not 10px:' + text(c));
+    const pad = [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].join(' ');
+    if (pad !== '9px 12px 9px 8px') add('a plaque\\'s padding is ' + pad + ':' + text(pl));
+  }
+  // The night's boxes (round R8c, B3): each 124 px high and holding what it holds; four on the front pages' columns
+  // (the wide box over the third and fourth), fewer centred; an entry's name and short line each on one line, uncut.
+  const plaques = [...document.querySelectorAll('.awards-night .plaques')].find((p) => p.offsetParent !== null);
+  if (plaques) {
+    const k = stage.width / 1280;
+    const S = (r) => ({ l: (r.left - stage.left) / k, r: (r.right - stage.left) / k, t: (r.top - stage.top) / k, b: (r.bottom - stage.top) / k });
+    const boxes = [...plaques.children].filter((e) => e.classList.contains('pl')).map((e) => [e, S(e.getBoundingClientRect())]);
+    for (const [b, r] of boxes) {
+      if (Math.abs(r.b - r.t - 124) > 0.5) add('an award box is ' + (r.b - r.t).toFixed(1) + ' px high, not 124:' + text(b));
+      if (b.scrollHeight > b.clientHeight + 1) add('an award box does not hold what it holds: ' + b.scrollHeight + ' in ' + b.clientHeight + text(b));
+    }
+    const wide = boxes.find(([b]) => b.classList.contains('wide'));
+    const columns = boxes.length === 4 ? [164, 406, 648, 890] : wide ? [164, 406, 648] : null;
+    if (columns) {
+      if (boxes.some(([, r], i) => Math.abs(r.l - columns[i]) > 1)) add('the award boxes stand at ' + boxes.map(([, r]) => Math.round(r.l)).join(', ') + ', not on the columns ' + columns.join(', '));
+      if (wide && Math.abs(wide[1].r - wide[1].l - 468) > 1) add('the wide box is ' + Math.round(wide[1].r - wide[1].l) + ' px wide, not 468');
+    } else if (boxes.length > 0) {
+      const mid = (boxes[0][1].l + boxes[boxes.length - 1][1].r) / 2;
+      if (Math.abs(mid - 640) > 1) add('the award plaques are centred on ' + mid.toFixed(1) + ', not 640');
+    }
+    for (const el of plaques.querySelectorAll('.pl.rest .rn, .pl.rest .rc')) if (el.scrollWidth > el.clientWidth + 0.5) add('an award\\'s line in the box is cut: ' + el.scrollWidth + ' in ' + el.clientWidth + text(el));
+  }
+  // The scrapbook's shelf (round R8c, B4): its last row inside the book, the book on the stage.
+  const book = document.querySelector('.ov .book');
+  const shelf = book ? [...book.querySelectorAll('.awards-page .prow')] : [];
+  if (book && shelf.length > 0) {
+    const b = book.getBoundingClientRect(), last = shelf[shelf.length - 1].getBoundingClientRect();
+    if (last.bottom > b.bottom + 0.5) add('the shelf\\'s last row ends ' + (last.bottom - b.bottom).toFixed(1) + ' px below the book');
+    if (b.top < stage.top - 0.5 || b.bottom > stage.bottom + 0.5) add('the book runs off the stage');
+  }
   // The credits (round R7, A2; round R8b, C4): a role on one line, a name on at most two, the foot on one — and a foot.
   const lines = (el) => { const r = document.createRange(); r.selectNodeContents(el); const tops = []; for (const b of r.getClientRects()) if (b.width >= 1 && !tops.some((y) => Math.abs(y - b.top) < 3)) tops.push(b.top); return tops.length; };
   for (const row of document.querySelectorAll('.p-credits .crow')) {
@@ -272,6 +311,12 @@ const TITLE_AUDIT = `window.__titleAudit = (where) => {
   // The foot's counts (round R4, A7): the endings found and the awards won, a row each, as one block.
   const parts = [['slogan', '.slogan'], ['endings and awards', '.counts'], ['links', '.tlinks'], ['BEGIN', '.begin']].map(([w, sel]) => [w, t.querySelector(sel)]);
   for (const row of t.querySelectorAll('.counts .found')) holds(row, 'count row');
+  // Each counter's total is its dots (round R8c, B5): the endings' 14, the awards' 12.
+  for (const row of t.querySelectorAll('.counts .found')) {
+    const dots = row.querySelectorAll('.dots i').length;
+    const m = /\\/\\s*(\\d+)/.exec(row.textContent);
+    if (!m || Number(m[1]) !== dots) add('a counter reads "' + row.textContent.trim().slice(0, 40) + '" over ' + dots + ' dots');
+  }
   for (const [w, el] of parts) { if (!el) { add('no ' + w); continue; } holds(el, w); within(el, w); }
   for (const l of t.querySelectorAll('.tlinks .link')) { holds(l, 'link'); within(l, 'link'); }
   const boxes = parts.filter(([, el]) => el).map(([w, el]) => [w, S(el.getBoundingClientRect())]);
@@ -421,6 +466,39 @@ const DRIVE = (runs: number) => `(async () => {
   const note = (l) => { for (const m of l) issues[m] = (issues[m] || 0) + 1; };
   const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0, doors: { pairs: 0, apart: 0, tallest: 0, bottom: 0, clear: Infinity, worst: 0, worstBottom: 0 } };
   const longest = { ends: null, night: null };
+  // The nights with five to eight awards (round R8c, B3): few years win five and seven is rare, so these are chosen
+  // lists, shown in the night's place by the night's own component (ui/dev/plaques.tsx) — the plaques the longest
+  // names and citations, the box the longest names and short lines, every boxed one fresh. The tightest line's room.
+  seen.nights = { lists: 0, tightest: null };
+  const nights = async () => {
+    const fx = await import('/ui/dev/plaques.tsx');
+    const core = await import('/core/index.ts');
+    const text = await import('/ui/text.ts');
+    const { content } = await import('/ui/content.ts');
+    const c = core.indexContent(content);
+    const ids = c.awards.map((a) => a.id);
+    const entry = (id) => Math.max(text.awardName(c, id).length, text.awardShort(c, id).length);
+    const plaque = (id) => text.awardName(c, id).length + text.awardCitation(c, id).length;
+    for (const n of [5, 6, 7, 8]) {
+      const shown = n <= 6 ? 3 : 2;
+      const rest = [...ids].sort((x, y) => entry(y) - entry(x)).slice(0, n - shown);
+      const top = ids.filter((id) => !rest.includes(id)).sort((x, y) => plaque(y) - plaque(x)).slice(0, shown);
+      const undo = fx.showPlaques(c, [...top, ...rest], rest);
+      await sleep(30);
+      plain('the night with ' + n + ' awards');
+      // A line's room: from its words' end to its entry's end (the words' own box shrinks to them).
+      const k = document.querySelector('.stage').getBoundingClientRect().width / 1280;
+      for (const el of document.querySelectorAll('.awards-night .plaques .pl.rest :is(.rn, .rc)')) {
+        const r = document.createRange();
+        r.selectNodeContents(el);
+        const ri = el.closest('.ri');
+        const room = (ri.getBoundingClientRect().right - r.getBoundingClientRect().right) / k;
+        if (!seen.nights.tightest || room < seen.nights.tightest.room) seen.nights.tightest = { room: Math.round(room * 10) / 10, what: el.textContent + ' (' + n + ')' };
+      }
+      seen.nights.lists++;
+      undo();
+    }
+  };
   const lastDoors = async () => {
     if (longest.ends === null) {
       const core = await import('/core/index.ts');
@@ -534,12 +612,13 @@ const DRIVE = (runs: number) => `(async () => {
     }
     if (!document.querySelector('.ending')) throw new Error('audit reached 800-action guard: '+JSON.stringify(window.__auditProgress));
     plain('ending');
+    if (seen.nights.lists === 0) await nights();
     await panel('.awards-night .scrapbook-open', 'scrapbook', 'scrapbook over the awards night');
     await panel('.awards-night .numbers-toggle', 'numbers', 'the numbers over the awards night');
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
@@ -556,7 +635,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null }; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -592,6 +671,13 @@ try {
           `overflow check, ${tag}: doors — ${d.pairs} pairs, each pair's heights ${d.apart <= 0.5 ? 'equal' : `apart by up to ${d.apart} px`}; the tallest ${d.tallest} px, ending at y ${Math.round(d.bottom)}; ` +
             `the year's last doors at their longest (the longest ending line, three award names and +5) ${d.worst} px, ending at y ${Math.round(d.worstBottom)} of 720; the odds stamps ${d.clear.toFixed(1)} px or more from the photographs`,
         );
+        // The nights with five to eight awards (round R8c, B3), from chosen lists: the tightest line in a box.
+        const nt = out.nights;
+        console.log(`overflow check, ${tag}: the night with 5, 6, 7 and 8 awards (${nt.lists} chosen lists) — the tightest line in a box ${nt.tightest ? `"${nt.tightest.what}", ${nt.tightest.room} px to spare` : '-'}`);
+        if (nt.lists !== 4) {
+          console.log('OVERFLOW nights  the nights with five to eight awards were not all shown');
+          failed = true;
+        }
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
         if (out.issues.length > 0) failed = true;
         // Every face of the content, at its longest, in the hand and in an offer of four (round R1, H2).

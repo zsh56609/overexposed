@@ -8,6 +8,7 @@ import { memo, useEffect, useState } from 'react';
 import type { ContentIndex } from '../../core/index.ts';
 import { t } from '../i18n.ts';
 import { titlePhoto, titlePhotoNow } from '../desk/photo-preload.ts';
+import { loadTrophiesWhenIdle } from '../trophyLoad.ts';
 import './title.css';
 
 /**
@@ -61,6 +62,9 @@ export interface TitleProps {
 
 export const TitleScreen = memo(function TitleScreen({ c, found, won, dim = false, out = false, busy = false, begin, scrapbook, settings, credits }: TitleProps) {
   const photo = useTitlePhoto();
+  // The trophies' chunk (round R8c, B1), once the title has painted: the scrapbook opened from here has it, and so does
+  // the night.
+  useEffect(() => loadTrophiesWhenIdle(), []);
   const n = c.minors.filter((m) => found.has(m.id)).length;
   return (
     <div className={`title-screen${photo ? ' lit' : ''}${dim ? ' dim' : ''}${out ? ' out' : ''}`} data-screen="title" data-presentation="title" data-busy={busy ? '1' : '0'}>

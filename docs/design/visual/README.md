@@ -123,6 +123,21 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
 ### 8. Other screens (`screens.html`)
 
 - **Title**, **manager choice** (two business cards; each shows its **perk** — Dex D2 (one extra card in each draft offer and the first reroll each season free), Mags M1 (season-end relief; see content/managers.json and draft-v7)), **awards night** (curtains, spotlight, plaques revealed in sequence, rival's closing line). "Play again" sits at the bottom, after the reveal.
+- **The night's awards** (round R8c; `docs/design/visual/ref/r8c-awards.html`). Every award has a **trophy**, the
+  author's drawing (`r8c-trophies/`: a gold record, a gramophone, a microphone, a star, a film reel, a laurel, a press
+  camera — the camera is Villain of the Year's), held as strings in `ui/trophies.ts`, a chunk of its own fetched once
+  the title has painted; until it comes a trophy's box stands empty at its size, and nothing moves when it does. A
+  **plaque** has its trophy at its left (56×70 on the night, 60×75 on the shelf, a drop shadow) and its words at its
+  right, a size smaller beside it: the name 15 px, the citation 10 px (line height 1.3), padding 9 12 9 8; Winner and
+  the New chip as before. By how many the year won, in content order: one to three plaques, centred; four, on the
+  front pages' columns (164, 406, 648, 890; 226 wide); five or six, three plaques and the fourth box, "And n more",
+  an entry per award (a 24×30 trophy, the name 12 px, its short line 10 px italic, each on one line); seven or eight
+  (the most a year wins), two plaques and a wide box over the third and fourth columns (468), its entries in two
+  columns filled row by row (22×27, 12 px, 9.5 px). A fresh award in a box has no chip but a 6 px `#ffcf85` dot at
+  its trophy's upper right. A box comes as a plaque does (2.45 s + 0.3 s a box), its entries 0.12 s apart after it;
+  applause once a box; a click, reduced motion or motion off show it all at once.
+- **PLAY AGAIN in brass** (round R8c): `linear-gradient(180deg, #e9c87a, #c9a04a)`, ink `#1a120a`, a warm glow and
+  an inner highlight; hovered, `#f6dc98` → `#dcb45a`. Its size and place as before, the last front page's width.
 
 ### 9. The screens around the desk
 
@@ -224,7 +239,10 @@ italic line.
   scandals in red. Never reveal draw order.
 - **Endings.** A scrapbook: four columns for the majors with their goal lines; found
   minors as taped newspaper clippings; undiscovered ones as dashed "?" outlines.
-  "Endings found · N of 14".
+  "Endings found · N of 14". Its awards page is a shelf (round R8c): the twelve as the
+  night's plaques with their trophies, in rows of four; one not yet won dimmed, its
+  trophy a silhouette (`grayscale(1) brightness(.42) contrast(.9) opacity(.75)`), its
+  how-line 10 px.
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
   (off), Manager's notes (on; round R8b, §11). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
   track comes back (round R4). Credits share this panel's style (round R7; laid out again in round
