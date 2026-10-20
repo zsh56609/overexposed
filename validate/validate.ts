@@ -38,6 +38,7 @@ import {
   NOTE_COLOURS,
   SCRIPT_LINE_KINDS,
   RESOURCE_KEYS,
+  TROPHY_IDS,
   scandalGroup,
   YEAR_ONLY_KEYS,
   YEAR_STAT_KEYS,
@@ -115,9 +116,9 @@ const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
 const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note'];
 const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKeys', 'goalKey'];
-const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'howKey', 'conditions', 'fallback'];
-/** Awards are a separate list, capped at 8 (docs/ui-plan.md §13, decision 20). */
-const MAX_AWARDS = 8;
+const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'howKey', 'shortKey', 'trophy', 'conditions', 'fallback'];
+/** Awards are a separate list, capped at 12 (docs/ui-plan.md §13, decision 20; raised from 8 in round R8c). */
+const MAX_AWARDS = 12;
 /**
  * The content budget (AGENTS.md → Content budget): a ceiling per kind, not a target. Raised for phase 1 of
  * the content expansion — five screen cards, and endings as 4 majors × 13 minors.
@@ -169,6 +170,8 @@ class Ctx {
   readonly exhaustTags = new Map<string, string>();
   readonly keysUsed = new Map<string, string>();
   /** rules.lanes, once checked: what a card's lane and a lane test may name. */
+  /** The gates' ids, once checked (round R8c): what a year's `passed` test may name. */
+  readonly gateIds = new Set<string>();
   lanes: readonly string[] = [];
   /** rules.fameBands' ids, once checked (round 2c). */
   fameBands: readonly string[] = [];
@@ -706,6 +709,7 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
   return checkList(v, raw, 'content/gates.json', 'gate', (g, where) => {
     v.fields(g, GATE_FIELDS, where);
     const act = v.int(g.act, `${where}.act`, [1, v.acts]) ? g.act : 0;
+    if (isStr(g.id)) v.gateIds.add(g.id);
     const owner: Owner = { kind: 'gate', id: String(g.id), act };
     v.key(g.nameKey, `${where}.nameKey`);
     if (g.flavorKeys !== undefined) v.keys(g.flavorKeys, `${where}.flavorKeys`);
@@ -727,8 +731,9 @@ function checkGates(v: Ctx, raw: unknown): Obj[] {
 }
 
 /**
- * Year conditions (core/year.ts): the condition shape plus a lane test, cards held, alternatives and the
- * year stats. Minor endings and awards read them; `extra` names keys the caller checks itself (`ending`).
+ * Year conditions (core/year.ts): the condition shape plus a lane test, cards held, the doors passed (round R8c),
+ * alternatives and the year stats. Minor endings and awards read them; `extra` names keys the caller checks itself
+ * (`ending`).
  */
 function checkYearConditions(v: Ctx, c: unknown, where: string, extra: readonly string[] = []): void {
   if (!isObj(c)) return v.error('schema', where, 'must be an object');
@@ -761,6 +766,19 @@ function checkYearConditions(v: Ctx, c: unknown, where: string, extra: readonly 
     }
   }
   if (c.anyOf !== undefined) {
+  if (c.passed !== undefined) {
+    const at = `${where}.passed`;
+    if (!isObj(c.passed)) v.error('schema', at, 'must be an object like { "any": ["gate_festival"] }');
+    else {
+      v.fields(c.passed, FLAG_TEST_KEYS, at);
+      for (const k of FLAG_TEST_KEYS) {
+        const list = c.passed[k];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) v.error('schema', `${at}.${k}`, 'must be an array of gate ids');
+        else for (const id of list) if (!v.gateIds.has(id)) v.error('references', `${at}.${k}`, `no gate with id ${q(id)}`);
+      }
+    }
+  }
     if (!Array.isArray(c.anyOf) || c.anyOf.length < 2) v.error('schema', `${where}.anyOf`, 'must list two or more alternative conditions');
     else c.anyOf.forEach((alt, i) => checkYearConditions(v, alt, `${where}.anyOf[${i}]`));
   }
@@ -853,7 +871,8 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
 
 /**
  * Year-end awards (decisions 16 and 20): the condition shape, plus the award-only keys (the year's ending,
- * and a range on any year stat — YEAR_STAT_KEYS). At most 8, and a fallback so that every year ends with one.
+ * and a range on any year stat — YEAR_STAT_KEYS). At most 12 (round R8c), and a fallback so that every year ends with
+ * one. Each names its trophy and its short line (round R8c).
  */
 function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>, i18n: Obj): Obj[] {
   const awards = checkList(v, raw, 'content/awards.json', 'award', (a, where) => {
@@ -861,6 +880,9 @@ function checkAwards(v: Ctx, raw: unknown, endingIds: ReadonlySet<unknown>, i18n
     v.key(a.nameKey, `${where}.nameKey`);
     v.key(a.citationKey, `${where}.citationKey`);
     // How it is won (round R4, A7): a placeholder names one of the award's numeric conditions, which fills it with
+    // Its trophy and its short line (round R8c, B1 and B3): one of the author's drawings, and what the night's boxes say.
+    if (!(TROPHY_IDS as readonly unknown[]).includes(a.trophy)) v.error('references', `${where}.trophy`, `must be one of ${TROPHY_IDS.join(', ')}, got ${q(a.trophy)}`);
+    v.key(a.shortKey, `${where}.shortKey`);
     // its min (its max when it has only a max), so a tuned number needs no new prose; an ending stays in words.
     v.key(a.howKey, `${where}.howKey`);
     const how = isStr(a.howKey) ? i18n[a.howKey] : undefined;

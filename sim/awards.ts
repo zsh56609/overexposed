@@ -4,7 +4,8 @@
 // Awards are read-only, so this changes no run: `npm run sim` stays byte-identical. Ids and numbers only.
 //
 // Tuning target: every award won in at least a few percent and at most about 40% of player-like runs,
-// and no run ends with zero awards.
+// and no run ends with zero awards. Since round R8c (twelve awards) it also reports how many a year wins — the share
+// of player-like years with 5+ and 7+, the most any run won — and ten sample years with 5+.
 
 import { yearAwards, type GameState } from '../core/index.ts';
 import { managersToRun, runOne, runSeeds } from './batch.ts';
@@ -27,6 +28,8 @@ function awardsFor(manager: string | undefined): boolean {
   const tally = (): Tally => ({ runs: 0, won: Object.fromEntries(awardIds.map((id) => [id, 0])), byCount: {} });
   const perPersona = new Map<PersonaId, Tally>();
   const players = tally();
+  /** Player-like years with five or more awards (round R8c), for ten samples: the most awards first, persona by persona. */
+  const candidates: { persona: PersonaId; n: number; line: string }[] = [];
 
   const t0 = performance.now();
   for (const persona of PERSONA_IDS) {
@@ -45,6 +48,7 @@ function awardsFor(manager: string | undefined): boolean {
       const final = last as GameState | null;
       if (!final || final.phase !== 'ended') continue;
       const won = yearAwards(final);
+      if (!isProbe(persona) && won.length >= 5) candidates.push({ persona, n: won.length, line: `${persona} seed=${seed} ending=${final.endingId ?? '-'}: ${won.length} — ${won.join(', ')}` });
       for (const target of isProbe(persona) ? [t] : [t, players]) {
         target.runs++;
         for (const id of won) target.won[id] = (target.won[id] ?? 0) + 1;
@@ -70,8 +74,27 @@ function awardsFor(manager: string | undefined): boolean {
   for (let n = 0; n <= maxCount; n++) {
     lines.push(pad(`runs with ${n} award(s)`, 26) + tallies.map((t) => pct(t.byCount[n] ?? 0, t.runs).padStart(W)).join(''));
   }
-  const multi = (t: Tally) => Object.entries(t.byCount).reduce((sum, [k, v]) => sum + (Number(k) >= 2 ? v : 0), 0);
-  lines.push(pad('runs with 2+ awards', 26) + tallies.map((t) => pct(multi(t), t.runs).padStart(W)).join(''));
+  const atLeast = (t: Tally, n: number) => Object.entries(t.byCount).reduce((sum, [k, v]) => sum + (Number(k) >= n ? v : 0), 0);
+  for (const n of [2, 5, 7]) lines.push(pad(`runs with ${n}+ awards`, 26) + tallies.map((t) => pct(atLeast(t, n), t.runs).padStart(W)).join(''));
+  const most = (t: Tally) => Math.max(0, ...Object.keys(t.byCount).map(Number));
+  lines.push(pad('the most one run won', 26) + tallies.map((t) => String(most(t)).padStart(W)).join(''));
+  // Ten samples: the most awards first; among equals, one persona at a time, in persona order.
+  const queue = [...candidates].sort((a, b) => b.n - a.n);
+  const samples: string[] = [];
+  while (samples.length < 10 && queue.length > 0) {
+    const taken = new Set<PersonaId>();
+    const top = queue[0]?.n ?? 0;
+    for (let i = 0; i < queue.length && samples.length < 10; ) {
+      const x = queue[i] as (typeof queue)[number];
+      if (x.n === top && !taken.has(x.persona)) {
+        taken.add(x.persona);
+        samples.push(x.line);
+        queue.splice(i, 1);
+      } else i++;
+    }
+    if (taken.size === 0) queue.shift();
+  }
+  lines.push('', `sample years with 5+ awards (player-like; ${candidates.length} in all, ten shown, the most awards first):`, ...samples.map((x) => `  ${x}`));
   lines.push('');
 
   let pass = true;

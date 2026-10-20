@@ -429,7 +429,8 @@ const DRIVE = (runs: number) => `(async () => {
       const { content } = await import('/ui/content.ts');
       const c = core.indexContent(content);
       longest.ends = c.minors.map((m) => t('ui.gate.leadsTo', { ending: text.endingPair(c, m.major, m.id) })).sort((x, y) => y.length - x.length)[0];
-      longest.night = c.awards.map((a) => text.awardName(c, a.id)).sort((x, y) => y.length - x.length).slice(0, 6).join(' · ');
+      // A year wins at most eight (round R8c): the three longest names, then the most "+n" can say.
+      longest.night = [...c.awards.map((a) => text.awardName(c, a.id)).sort((x, y) => y.length - x.length).slice(0, 3), t('ui.doors.nightMore', { n: 5 })].join(' · ');
       longest.label = t('ui.doors.night');
     }
     const added = [], hidden = [];
@@ -589,7 +590,7 @@ try {
         const d = out.doors;
         console.log(
           `overflow check, ${tag}: doors — ${d.pairs} pairs, each pair's heights ${d.apart <= 0.5 ? 'equal' : `apart by up to ${d.apart} px`}; the tallest ${d.tallest} px, ending at y ${Math.round(d.bottom)}; ` +
-            `the year's last doors at their longest (the longest ending line, six awards) ${d.worst} px, ending at y ${Math.round(d.worstBottom)} of 720; the odds stamps ${d.clear.toFixed(1)} px or more from the photographs`,
+            `the year's last doors at their longest (the longest ending line, three award names and +5) ${d.worst} px, ending at y ${Math.round(d.worstBottom)} of 720; the odds stamps ${d.clear.toFixed(1)} px or more from the photographs`,
         );
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
         if (out.issues.length > 0) failed = true;

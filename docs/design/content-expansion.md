@@ -152,7 +152,8 @@ minor = first minor of that major whose condition holds  // by priority
 
 - Remap award conditions to the new ending ids.
 - Consider one lane-specific award (e.g. a screen debut award), staying within
-  the cap of 8.
+  the cap of 8. (Round R8c added a lane award for each lane, and the author
+  raised the cap to 12.)
 
 ---
 

@@ -107,18 +107,27 @@ Two levels ([`design/content-expansion.md`](design/content-expansion.md) §1).
 
 Minor conditions are **year conditions**: the condition shape plus
 `lane` (`any`/`not`), `holds` (card ids in the deck, `all`/`any`/`not`),
-`anyOf` (alternatives), and the year stats `peakHype`, `peakScandals`,
-`scandalDrop` (peak minus now), `bestMonthHype`, kept in `state.year` at
-each month end.
+`passed` (round R8c: the doors this run passed, gate ids `all`/`any`/`not`,
+read from `gateHistory` — the last door counts, recorded before the
+ending resolves), `anyOf` (alternatives), and the year stats `peakHype`,
+`peakScandals`, `scandalDrop` (peak minus now), `bestMonthHype`, kept in
+`state.year` at each month end.
 
 ## Awards — `content/awards.json`
 
-`id`, `nameKey`, `citationKey`, `howKey`, and `conditions` — year
-conditions plus `ending` (`any`/`not` major or minor ids; a major matches
-each of its minors) — or `fallback: true`, won only when nothing else is.
-Every award whose conditions hold is won. /core's `yearAwards` is a
-read-only query on the final state, never a GameEvent. Awards change no
-play: outside the content budget, capped at 8.
+`id`, `nameKey`, `citationKey`, `howKey`, `shortKey`, `trophy`, and
+`conditions` — year conditions plus `ending` (`any`/`not` major or minor
+ids; a major matches each of its minors) — or `fallback: true`, won only
+when nothing else is. Every award whose conditions hold is won, and the
+night and the scrapbook show them in content order. /core's `yearAwards`
+is a read-only query on the final state, never a GameEvent. Awards change
+no play: outside the content budget, capped at 12 (round R8c; 8 before).
+Ids stay through a rename: the awards won are kept by id.
+
+`trophy` (round R8c) is one of `TROPHY_IDS` (`core/content.ts`): the
+author's drawing shown beside its name, on the night and on the
+scrapbook's shelf. `shortKey` (round R8c) is its short line, what the
+night's box for the rest of a year's awards says under its name.
 
 `howKey` (round R4) is the line that says how it is won, in the
 scrapbook's awards page. Its placeholders are the award's numeric
@@ -357,7 +366,7 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - the content budget
 - numeric ranges
 - opportunity cards in the starting deck; an act with an empty draft pool
-- awards: fields, conditions, ending ids, a fallback award, at most 8
+- awards: fields, conditions, ending ids, a trophy in `TROPHY_IDS`, a short line, a fallback award, at most 12; a year condition's `passed` names gates
 - events: months, speaker and form, chains (one opener each), conditions, lanes, rival arcs (ids in `press.rival.arcs`), a weight from 1 to 5, messages and choices (one with no requirement), the event budget
 - the faces (round R8a): every text's speaker and every manager names an `avatar` in `AVATAR_IDS`, a letter none; `ui/avatars.ts` holds one portrait for each, equal to its file in `docs/design/visual/ref/r8a-avatars/`, on a 100×100 box, their ids unique across the ten
 - the photos (round R8b): a text's `photo` names one of `PHOTO_IDS` after one of its messages, a letter none; `ui/photos.ts` holds the seven drawings, each equal to its file in `docs/design/visual/ref/r8b-photos/`, on a 400×300 box, their ids unique across the seven

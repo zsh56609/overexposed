@@ -192,10 +192,11 @@ function Invitation({ c, s, p, lane, last, sameEnding, chosen, take, legal }: { 
         ))}
       </div>
       {last && !sameEnding && p.majorId !== null && p.endingId !== null && <div className="ends">{t('ui.gate.leadsTo', { ending: endingPair(c, p.majorId, p.endingId) })}</div>}
+      {/* At most three names, then how many more (round R8c, A3): a year wins up to eight. */}
       {last && p.awardIds && (
         <div className="night">
           <b>{t('ui.doors.night')}</b>
-          {p.awardIds.map((a) => awardName(c, a)).join(' · ')}
+          {[...p.awardIds.slice(0, 3).map((a) => awardName(c, a)), ...(p.awardIds.length > 3 ? [t('ui.doors.nightMore', { n: p.awardIds.length - 3 })] : [])].join(' · ')}
         </div>
       )}
       <span className="acc" aria-hidden="true">

@@ -495,7 +495,7 @@ it.
 20. Awards do not count toward the 46-item cap. The cap bounds gameplay
     content because it bounds balance and scope. Awards present an
     outcome and change no play. They are a separate list, capped at 8.
-    (2026-09-30)
+    (2026-09-30) The author raised the cap to 12 in round R8c (2026-10-20).
 21. The preview leads with the headline. Hovering a card, the preview's
     first line is the exact headline that card would print — the same
     variant the feed will use, computed from the same hash. Then the

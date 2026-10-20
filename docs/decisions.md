@@ -6,6 +6,32 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part A: twelve awards
+
+- The author: more ways to be recognised, each with its trophy. Twelve awards, in this
+  order (the night and the scrapbook show them in content order): best_new_artist,
+  breakthrough_of_the_year, peoples_choice, critics_choice, best_live_act,
+  songwriter_of_the_year, breakthrough_performance, style_icon, best_collaboration,
+  comeback_of_the_year, scandal_of_the_year, most_promising_newcomer (the fallback). The
+  list's cap is 12: decision 20's 8, raised by the author.
+- Ids stay through the renames — a player's `overexposed.awardsWon` keeps ids, so a
+  renamed id would lose an award won: breakthrough_of_the_year reads "Breakthrough Act",
+  scandal_of_the_year "Villain of the Year", most_promising_newcomer drops "(Still)" and
+  its citation changes.
+- The five new: best_live_act (music, and one of the three live doors passed — the
+  Festival Slot, the Club Residency, the Arena Tour — read from the doors, not from
+  flags); songwriter_of_the_year (music, 60 Craft); breakthrough_performance (screen, 80
+  Hype); style_icon (celebrity, 80 Hype); best_collaboration (juno_cowrite). A year
+  condition `passed` reads the doors passed from gateHistory, the last door included.
+- juno_unsigned's two yeses to "write one with me?" set juno_cowrite, last in their
+  effects, so they show "↺ remembered" as juno_hello's a does.
+- sim:awards, seed 20260929, 1000 runs a persona: every award inside its band for both
+  managers, no number moved; the fallback 5.3% and 6.2% (17–18% before). A year wins at
+  most eight; 5+ in 4–5% of player-like years, 7 in a few runs (seed 424242 under Mags),
+  never 8. sim:compare against the round's baseline: the awards' reports, and the
+  juno_cowrite rows of the flags (players 10.8–11.4% → 12.3–13.4%); nothing else.
+- The last doors' "On the night" names at most three awards, then "+n".
+
 ## 2026-10-20 — Round R8b, Part D: v0.8
 
 - v0.8 is R8a and R8b's build (`package.json` 0.8.0; the credits' foot reads v0.8), a release

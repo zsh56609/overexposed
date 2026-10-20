@@ -4,6 +4,8 @@
     "nameKey": "award.best_new_artist.name",
     "citationKey": "award.best_new_artist.citation",
     "howKey": "award.best_new_artist.how",
+    "shortKey": "award.best_new_artist.short",
+    "trophy": "gold_record",
     "conditions": { "ending": { "any": ["star", "the_independent"] } }
   },
   {
@@ -11,6 +13,8 @@
     "nameKey": "award.breakthrough_of_the_year.name",
     "citationKey": "award.breakthrough_of_the_year.citation",
     "howKey": "award.breakthrough_of_the_year.how",
+    "shortKey": "award.breakthrough_of_the_year.short",
+    "trophy": "star",
     "conditions": { "bestMonthHype": { "min": 20 } }
   },
   {
@@ -18,6 +22,8 @@
     "nameKey": "award.peoples_choice.name",
     "citationKey": "award.peoples_choice.citation",
     "howKey": "award.peoples_choice.how",
+    "shortKey": "award.peoples_choice.short",
+    "trophy": "star",
     "conditions": { "hype": { "min": 105 } }
   },
   {
@@ -25,13 +31,62 @@
     "nameKey": "award.critics_choice.name",
     "citationKey": "award.critics_choice.citation",
     "howKey": "award.critics_choice.how",
+    "shortKey": "award.critics_choice.short",
+    "trophy": "laurel",
     "conditions": { "craft": { "min": 90 }, "ending": { "not": ["breakthrough"] } }
+  },
+  {
+    "id": "best_live_act",
+    "nameKey": "award.best_live_act.name",
+    "citationKey": "award.best_live_act.citation",
+    "howKey": "award.best_live_act.how",
+    "shortKey": "award.best_live_act.short",
+    "trophy": "microphone",
+    "conditions": { "lane": { "any": ["music"] }, "passed": { "any": ["gate_festival", "gate_residency", "gate_arena_tour"] } }
+  },
+  {
+    "id": "songwriter_of_the_year",
+    "nameKey": "award.songwriter_of_the_year.name",
+    "citationKey": "award.songwriter_of_the_year.citation",
+    "howKey": "award.songwriter_of_the_year.how",
+    "shortKey": "award.songwriter_of_the_year.short",
+    "trophy": "gramophone",
+    "conditions": { "lane": { "any": ["music"] }, "craft": { "min": 60 } }
+  },
+  {
+    "id": "breakthrough_performance",
+    "nameKey": "award.breakthrough_performance.name",
+    "citationKey": "award.breakthrough_performance.citation",
+    "howKey": "award.breakthrough_performance.how",
+    "shortKey": "award.breakthrough_performance.short",
+    "trophy": "film_reel",
+    "conditions": { "lane": { "any": ["screen"] }, "hype": { "min": 80 } }
+  },
+  {
+    "id": "style_icon",
+    "nameKey": "award.style_icon.name",
+    "citationKey": "award.style_icon.citation",
+    "howKey": "award.style_icon.how",
+    "shortKey": "award.style_icon.short",
+    "trophy": "star",
+    "conditions": { "lane": { "any": ["celebrity"] }, "hype": { "min": 80 } }
+  },
+  {
+    "id": "best_collaboration",
+    "nameKey": "award.best_collaboration.name",
+    "citationKey": "award.best_collaboration.citation",
+    "howKey": "award.best_collaboration.how",
+    "shortKey": "award.best_collaboration.short",
+    "trophy": "gold_record",
+    "conditions": { "flags": { "all": ["juno_cowrite"] } }
   },
   {
     "id": "comeback_of_the_year",
     "nameKey": "award.comeback_of_the_year.name",
     "citationKey": "award.comeback_of_the_year.citation",
     "howKey": "award.comeback_of_the_year.how",
+    "shortKey": "award.comeback_of_the_year.short",
+    "trophy": "laurel",
     "conditions": { "scandalDrop": { "min": 2 } }
   },
   {
@@ -39,6 +94,8 @@
     "nameKey": "award.scandal_of_the_year.name",
     "citationKey": "award.scandal_of_the_year.citation",
     "howKey": "award.scandal_of_the_year.how",
+    "shortKey": "award.scandal_of_the_year.short",
+    "trophy": "press_camera",
     "conditions": { "scandalCount": { "min": 9 } }
   },
   {
@@ -46,6 +103,8 @@
     "nameKey": "award.most_promising_newcomer.name",
     "citationKey": "award.most_promising_newcomer.citation",
     "howKey": "award.most_promising_newcomer.how",
+    "shortKey": "award.most_promising_newcomer.short",
+    "trophy": "laurel",
     "fallback": true
   }
 ]

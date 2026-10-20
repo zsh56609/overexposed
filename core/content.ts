@@ -40,6 +40,13 @@ export type AvatarId = (typeof AVATAR_IDS)[number];
 export const PHOTO_IDS = ['gran_coat', 'sunday_table', 'luccas', 'flash_shot', 'console', 'gig_poster', 'panel_tv'] as const;
 export type PhotoId = (typeof PHOTO_IDS)[number];
 
+/**
+ * The awards' trophies (round R8c; docs/design/visual/ref/r8c-trophies/, drawn into ui/trophies.ts): each award names
+ * one (AwardDef.trophy), shown beside its name on the awards night and on the scrapbook's shelf.
+ */
+export const TROPHY_IDS = ['gold_record', 'gramophone', 'microphone', 'star', 'film_reel', 'laurel', 'press_camera'] as const;
+export type TrophyId = (typeof TROPHY_IDS)[number];
+
 /** The seasons the scene can light (round V1a; docs/design/visual/README.md): one per act, in content. */
 export const SEASON_IDS = ['spring', 'summer', 'autumn', 'winter'] as const;
 export type SeasonId = (typeof SEASON_IDS)[number];
@@ -224,9 +231,14 @@ export interface YearConditions extends Condition {
   readonly bestMonthHype?: Range;
   /** The most hype held at any month end. */
   readonly peakHype?: Range;
+  /**
+   * The doors this run passed (round R8c, A2), the last one's included: gate ids, one of `any`, all of `all`, none of
+   * `not`. Read from gateHistory's passed records.
+   */
+  readonly passed?: FlagTest;
 }
 
-export const YEAR_ONLY_KEYS = ['lane', 'holds', 'anyOf', ...YEAR_STAT_KEYS] as const;
+export const YEAR_ONLY_KEYS = ['lane', 'holds', 'anyOf', 'passed', ...YEAR_STAT_KEYS] as const;
 
 /** An award's conditions: year conditions plus the ending the year resolved to (a major or a minor id). */
 export interface AwardConditions extends YearConditions {
@@ -295,6 +307,10 @@ export interface AwardDef {
   readonly citationKey: string;
   /** How it is won (round R4, A7): its placeholders are its numeric conditions, filled with their min (else max). */
   readonly howKey: string;
+  /** Its short line (round R8c, B3): what the night's boxes for the rest of the awards say under its name. */
+  readonly shortKey: string;
+  /** Its trophy (round R8c, B1): one of the author's seven drawings. */
+  readonly trophy: TrophyId;
   readonly conditions?: AwardConditions;
   readonly fallback?: boolean;
 }
@@ -690,7 +706,7 @@ export interface Content {
   readonly cards: readonly CardDef[];
   readonly gates: readonly GateDef[];
   readonly endings: EndingsDef;
-  /** A separate list, capped at 8 (decision 20). Absent: no awards. */
+  /** A separate list, capped at 12 (decision 20; raised from 8 in round R8c). Absent: no awards. */
   readonly awards?: readonly AwardDef[];
   /** The press (phase 2a). Absent: no papers — every line is the player's own. */
   readonly press?: PressDef;

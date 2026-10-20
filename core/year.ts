@@ -4,12 +4,14 @@
 import { evaluate, inRange, scandalCount, type ConditionSubject } from './conditions.ts';
 import { YEAR_ONLY_KEYS, YEAR_STAT_KEYS, type Condition, type FlagTest, type YearConditions, type YearStatKey } from './content.ts';
 import { currentLane } from './lanes.ts';
-import type { YearRecord } from './state.ts';
+import type { GateRecord, YearRecord } from './state.ts';
 
 /** GameState and the reducer's Draft both satisfy it. */
 export interface YearSubject extends ConditionSubject {
   readonly careerPlays: Readonly<Record<string, number>>;
   readonly year: YearRecord;
+  /** The doors chosen, passed or not (round R8c, A2: what a `passed` test reads). */
+  readonly gateHistory: readonly GateRecord[];
 }
 
 export type YearStats = Readonly<Record<YearStatKey, number>>;
@@ -36,6 +38,14 @@ function heldIds(s: ConditionSubject): ReadonlySet<string> {
   return new Set([...s.deck, ...s.hand, ...s.discard].map((c) => c.cardId));
 }
 
+/**
+ * The doors this run passed (round R8c, A2). The last door counts: chooseGate records it before the ending resolves, so
+ * the last doors' preview sees it door by door.
+ */
+function passedIds(s: YearSubject): ReadonlySet<string> {
+  return new Set(s.gateHistory.filter((g) => g.passed).map((g) => g.gateId));
+}
+
 function holdsTest(held: ReadonlySet<string>, t: FlagTest): boolean {
   if (t.all && !t.all.every((id) => held.has(id))) return false;
   if (t.any && !t.any.some((id) => held.has(id))) return false;
@@ -53,6 +63,7 @@ export function yearHolds(c: YearConditions | undefined, s: YearSubject, stats: 
     if (c.lane.not && lane !== null && c.lane.not.includes(lane)) return false;
   }
   if (c.holds && !holdsTest(heldIds(s), c.holds)) return false;
+  if (c.passed && !holdsTest(passedIds(s), c.passed)) return false;
   for (const k of YEAR_STAT_KEYS) {
     const range = c[k];
     if (range && !inRange(stats[k], range)) return false;

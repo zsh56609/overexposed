@@ -394,7 +394,7 @@
       "choices": [
         {
           "replyKey": "event.juno_unsigned.a.reply",
-          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }],
+          "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }, { "op": "setFlag", "flag": "juno_cowrite" }],
           "outcomeKey": "event.juno_unsigned.a.outcome"
         },
         {
@@ -402,7 +402,8 @@
           "effects": [
             { "op": "slots", "value": -1 },
             { "op": "resource", "target": "craft", "value": 2 },
-            { "op": "resource", "target": "hype", "value": 2 }
+            { "op": "resource", "target": "hype", "value": 2 },
+            { "op": "setFlag", "flag": "juno_cowrite" }
           ],
           "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_unsigned.b.press.1"] },
           "outcomeKey": "event.juno_unsigned.b.outcome"
