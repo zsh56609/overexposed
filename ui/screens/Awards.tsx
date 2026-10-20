@@ -268,7 +268,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
       }}
     >
       {/* The backdrop (round R8c, C2): the night's first child, over its ground, under the spotlight and the curtains. */}
-      {backdrop && <img className="backdrop" src={backdrop} alt="" data-deco="1" data-hook="backdrop" />}
+      {backdrop && <img className="backdrop" src={backdrop} alt="" data-deco="1" data-hook="backdrop" data-scene={getMajor(c, majorId)?.scene} />}
       <div className="spot" data-deco="1" />
       <div className="floorA" data-deco="1" />
       <div className="curtL" data-deco="1" />

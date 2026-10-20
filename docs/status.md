@@ -1,11 +1,11 @@
 # Status
 
-As of 2026-10-20: round R8b is done, and with it v0.8 — R8a and R8b's build, a release candidate, whose zip
-(`overexposed-v0.8.zip`, built outside the repo) replaces v0.7 on itch. R8b: the manager's notes, six tips in the
-manager's hand for a new player's first year, each at the moment it matters, with House rules' switch "Manager's
-notes"; photographs in some texts; the mirror's goal lines back as tooltips; the credits laid out again. R8a before it:
-the newspaper photographs (R7b), faces, the desk's phone and objects redrawn, photographs on the doors and the season
-cards, fewer words on screen.
+As of 2026-10-20: round R8c is done, and with it v0.9 — a release candidate whose zip (`overexposed-v0.9.zip`, built
+outside the repo) replaces v0.8 on itch. R8c: the awards night grows — twelve awards, each with its trophy, laid out by
+how many a year wins, the major's scene behind the night, PLAY AGAIN in brass, the scrapbook's shelf of twelve — Juno's
+year ends on what passed between you (her line, her award said outright, her last word under the second front page),
+and people's names take their colours. R8b before it: the manager's notes, photographs in texts, the mirror's goal
+lines as tooltips, the credits laid out again.
 **Read this first; update it at the end of every session** (AGENTS.md → Session rules).
 
 Overexposed is a deck-building career sim for the Game Gauntlet SIM Jam, played in the browser: one year as a young
@@ -15,18 +15,18 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-20-r8b.md](reports/2026-10-20-r8b.md).
+[reports/2026-10-20-r8c.md](reports/2026-10-20-r8c.md).
 
 ## Built
 
 | Area | State |
 |---|---|
 | Engine | Pure TypeScript reducer, seeded, 21 GameEvents; content-driven cards, gates, two-level endings, awards, managers, the press, lanes, the draft and the events (phase `event`, `CHOOSE_EVENT`; an event may ask for the rival's year and carry a weight, R7); read-only queries for everything the UI shows. A run starts from its seed and the memory of the last run (R7, `core/memory.ts`): the events it met are drawn only when nothing else is eligible, and every line shown once a run turns to its next variant |
-| Content | 42 cards, 8 gates (each with its photograph, R8a), 4 majors and 14 minors, 7 awards, 2 managers, 3 papers, 9 desk scripts, 28 events in 6 chains (eight texts send a photograph, R8b); every line shown once a run in two variants; 12 photograph scenes, 70 of the press's scene overrides, the season cards' scenes and ten faces (R8a); prose keyed in `i18n/en.json`, all of it written |
+| Content | 42 cards, 8 gates (each with its photograph, R8a), 4 majors and 14 minors (each major with the night's backdrop scene, R8c), 12 awards (each with its trophy and short line, R8c), 2 managers, 3 papers, 9 desk scripts, 28 events in 6 chains (ten texts send a photograph, R8b and R8c; a rival event's replies take Juno's side or not, R8c); every line shown once a run in two variants; 12 photograph scenes, 70 of the press's scene overrides, the season cards' scenes and ten faces (R8a); prose keyed in `i18n/en.json`, all of it written |
 | Sim | 9 personas, 17 bands, once per manager, with the events reported — each lane's events by the lane they came in, and the rival's year (R7); `sim:compare` holds a round to the recorded numbers; `sim:memory` plays two runs in a row |
 | The desk (V1a, V1b, R8a) | Stat bar, papers with code-drawn halftone photographs (twelve scenes since R8a: a talk-show set, a recording studio, an arena, a press conference; the street a vox pop), mirror (its notes the ending's name and what it takes, R8a; the goal lines their tooltips, R8b), props, phone and bubbles, the fanned hand, and its motion. R8a: the phone is the texts' phone scaled, lying further back, its lock screen a manager bar for each bubble on screen; the mug and the brush cup redrawn, each standing object with its own contact shadow; the magazine and the script lying with the desk; the manager's face beside their name. Handoff notes: [handoff/v1a.md](handoff/v1a.md), [handoff/v1b.md](handoff/v1b.md) |
 | The hand (R1, R7, R8a) | A play holds input only until the card is down (about 0.94 s); its tails play on and the next action completes them. Since R8a a card in the hand has no flavour line but a scandal's: its preview shows it, last. The played card rises out of the fan in front of the hand and goes under it from the first frame it overlaps no card left in it (R7, `ui/desk/flight.ts`; check:motion plays every hand of 1–8 on `check/flight.html`). One face order everywhere (name, body, flavour), every number an icon; the paper a play prints in comes forward; popovers rise and fade in one way |
-| Screens (R1, R3, R4, R8a, `ui/screens/`) | The manager choice (dealt onto the desk since R3; each card with its manager's face, R8a), the season cards (after spring, the season's scene light on ink in an oval, R8a), the offers, the doors and the last door (each with its photograph, the two always one height, R8a), the awards night with the year in four front pages, and five panels — the deck, the scrapbook (its Endings and Awards pages, R4), House rules (`ui/settings.ts`; Manager's notes since R8b), the credits (laid out again, R8b) and the numbers (R3). One dim under every overlay, kept between overlays; everything over the desk leaves as one piece (R4). No plain screen is left |
+| Screens (R1, R3, R4, R8a, `ui/screens/`) | The manager choice (dealt onto the desk since R3; each card with its manager's face, R8a), the season cards (after spring, the season's scene light on ink in an oval, R8a), the offers, the doors and the last door (each with its photograph, the two always one height, R8a), the awards night with the year in four front pages (since R8c: each award with its trophy, the rest of a big year in a box, the major's scene behind it, Juno's line and last word, PLAY AGAIN in brass), and five panels — the deck, the scrapbook (its Endings and Awards pages, R4; the awards a shelf of twelve, R8c), House rules (`ui/settings.ts`; Manager's notes since R8b), the credits (laid out again, R8b) and the numbers (R3). One dim under every overlay, kept between overlays; everything over the desk leaves as one piece (R4). No plain screen is left |
 | Events (R2, R8a, R8b) | A text comes up on the phone, message by message, its sender's face in the header (R8a); some send a photograph, one more message in its place (R8b: the author's seven drawings, `ui/photos.ts`, a chunk of its own); a letter lands on the desk, typed, with tick boxes (no "Hello," paragraph of its own since R8a). Answering is a step of its own: the reply, their answer or the SENT stamp, the effects landing, then the month opens with the paper that printed it in front. A dev page, `check/events.html`, shows every event and two at the schema's limits for the checks |
 | The opening (R3, amended) | The title is one photograph, the whole stage (`ui/screens/Title.tsx`): the singer in a spotlight, drawn once by the photo worker light on ink, the name developing, flashes popping near the edges. BEGIN's white flash brings spring's card over it, dimmed; "Continue" takes it to dark and brings the desk up, its bulbs lighting, the manager cards dealt; signing slides both cards off the stage, the phone glowing once, and drops the month's papers onto the desk (R4); every season card waits for "Continue" (`ui/screens/Season.tsx`). One set of transitions (`ui/motion.ts`, `tr-…` keyframes); the last door puts the bulbs out; PLAY AGAIN fades through ink. The manager's messages come after the deal, one by one whatever the player does (R7), and stay till the month ends; the scandals held show on the Deck & Discard button. The build's version (`package.json`) is in the credits |
 | The manager's notes (R8b, `ui/screens/Notes.tsx`) | Six notes in the manager's hand for a new player's first year — the stat bar, the bulbs, the countdown, END TURN, the mirror, a Scandal — each once, at its moment, one at a time and never in the way (a preview over one fades it, a panel hides it, a click puts it away); the first time each ever shows, a veil and the target's glow. House rules' "Manager's notes" switches them, and turns itself off once all six have come. A run with `?seed=` shows none unless `?notes=1`; `npm run check:notes` plays them by real input |
@@ -34,7 +34,7 @@ Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); th
 
 ## Next
 
-1. **Now:** v0.8 on itch (the zip is built outside the repo; see the R8b report), and the playtest it is for.
+1. **Now:** v0.9 on itch (the zip is built outside the repo; see the R8c report), and the playtest it is for.
 2. **10/25–31:** polish and a retune, from what the playtest finds. **11/1:** feature freeze.
    **11/2–3:** fixes only, the itch page; submit 11/3 JST (v1.0). Deadline 11/5 04:00 JST — treat 11/4 as the real one.
 

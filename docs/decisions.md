@@ -6,6 +6,22 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part F: v0.9
+
+- v0.9 is R8c's build (`package.json` 0.9.0; the credits' foot reads v0.9), a release candidate:
+  its zip replaces v0.8 on itch. AGENTS.md's version list adds "R8c v0.9".
+- R8c's new words are THE NEW WORDS the author approved, kept in `docs/writing/draft-v12.md`; a
+  script compared them with `i18n/en.json` key by key (67 keys; the four rival.<arc>.ending
+  lines gone).
+- The author's choices this round, each in its part's entry above: twelve awards, the cap
+  raised from 8 (decision 20) to 12, ids kept through the renames (A); the camera as Villain of
+  the Year's trophy and the gramophone's horn, the plaques' smaller type beside a trophy, the
+  five-to-eight layouts and the fresh dot, PLAY AGAIN in brass (B); best_live_act in music and
+  through one of the three live doors, read from the doors, not from flags, and juno_unsigned's
+  yes setting juno_cowrite (A); the backdrop's scenes (C); Juno's terms — the stances and the
+  rule — her award said outright, and her word under the second front page (D); the people's
+  colours and where they apply (E).
+
 ## 2026-10-20 — Round R8c, Part E: people's colours
 
 - The author: every person's name stands out in their own colour, close to their portrait's.
