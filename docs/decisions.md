@@ -6,6 +6,29 @@ rules).
 
 ---
 
+## 2026-10-21 — Round R8d, Part C: three small fixes in the pictures
+
+- Alex's face (the author: from afar, the sun behind his head read as part of it): the
+  reference is redrawn — the same profile, line for line, against a sky going from violet to
+  rose and amber, an SVG gradient (`alex-sky`, as the photographer's placeholder has one); no
+  sun, no sea. ui/avatars.ts's alex is the file, unchanged; validate holds them equal and the
+  ten faces' ids unique.
+- The title's photograph: its four cameras lose their lens glints (the white dot in
+  titleScene's camera loop, and the switch back to black). Black on black the cameras never
+  showed; the one glint in frame, at the foot on the right, printed as two stray dots under
+  BEGIN. Nothing else in titleScene changes.
+- The phone on the desk showed the wrong side (the author: its left looked flat while its
+  bottom and right looked solid, which its place cannot show). The desk is drawn in
+  perspective from above its middle (perspective 1100, origin 640 140, tilted 64°): a slab
+  lying right of the middle shows its near edge and the side toward the middle, its left —
+  never its right. The side drawn stepped straight down in the desk's plane, and the
+  perspective pushed it out to the right; a real side steps down and in. Now its three steps
+  go down and left: -1.7px 2.5px #50555f (a shade lighter: that side faces the light, as the
+  standing objects' shadows say), -3.4px 5px #30333a, -5.1px 7.5px #17181c; its contact shadow
+  1 px closer (2px 11px 8px, 7px 16px 16px). The true left side is about 1 px wide on screen;
+  the 1.7 px steps draw it about half again as wide, so it shows. The ring, the inner light and
+  the rest stay.
+
 ## 2026-10-21 — Round R8d, Part B: the halftones in colour
 
 - The author (2026-10-20): every halftone that is not a newspaper in colour, muted and dark

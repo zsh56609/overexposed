@@ -1,7 +1,8 @@
 // The faces (round R8a): the author's ten portraits, docs/design/visual/ref/r8a-avatars/, unchanged, as strings — the
 // people who text the player and the two managers, in colour, with brows and a nose but no eyes or mouth, each drawn
 // at 100×100 to be shown in a circle. Mum's is a sunflower (her own photo is her garden: the player's family stays
-// unpictured); the photographer's is the phone's grey placeholder (the number was never saved); Dex's and Mags's
+// unpictured); the photographer's is the phone's grey placeholder (the number was never saved); Alex's profile is
+// against a dusk sky, redrawn in round R8d (from afar the sun behind his head read as part of it); Dex's and Mags's
 // wear their business cards' colours. They are code, never image files in the build (AGENTS.md §6, as the favicon
 // is inlined): each is shown as an image from a data URI (ui/Face.tsx). Validate holds them equal to the reference
 // files, and their ids unique across the ten.
@@ -104,12 +105,9 @@ export const AVATARS: Readonly<Record<AvatarId, string>> = {
 </svg>
 `,
   alex: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Alex">
-<!-- Overexposed, R8a avatar "alex": drawn in code, flat colour; brows and nose only. -->
-<rect width="100" height="100" fill="#6a5a9a"/>
-<circle cx="66" cy="58" r="25" fill="#f4a05f"/>
-<circle cx="66" cy="58" r="17" fill="#f8b874"/>
-<rect y="70" width="100" height="30" fill="#5a4b86"/>
-<path d="M0 71.6 Q25 68.6 50 71 T100 70 L100 73.6 Q75 72.6 50 74.6 T0 75.4 Z" fill="#e8956a" opacity=".6"/>
+<!-- Overexposed, R8a avatar "alex", redrawn in round R8d (no sun behind him, the sky in its colours): drawn in code, flat colour; brows and nose only. -->
+<defs><linearGradient id="alex-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4c90"/><stop offset=".52" stop-color="#7a5698"/><stop offset=".74" stop-color="#c46c86"/><stop offset="1" stop-color="#ee9c66"/></linearGradient></defs>
+<rect width="100" height="100" fill="url(#alex-sky)"/>
 <path d="M45.4 61 L44.6 80 L61.6 80 L60.4 56 Z" fill="#bd875e"/>
 <path d="M14 100 C16 86 30 78 44 76 L52 82 L64 75 C78 77 88 87 88 100 Z" fill="#30405c"/>
 <path d="M44 76 L52 86 L49 76.5 Z M64 75 L54 86 L58 74.8 Z" fill="#46597c"/>

@@ -45,10 +45,15 @@
 /* The phone, flat on the desk: no number badge — the lock screen's bars are the count. Round R8a (C1): drawn as the
    texts' phone is (.phone-big, screens.css), scaled — its 340×624 to 104×191, its body, its 3 px ring as 1 px, its
    12 px bezel as 4, its 40 and 29 px corners as 12 and 9 — and lying further back, its front edge 25 px in from the
-   desk's (the narrower phone keeps its centre's x). Its side shows below its front edge in three 2.5 px steps, as the
-   notebook shows its pages; a tight contact shadow falls a little to the right, as the standing objects' do, never the
-   old drop shadow; its frame has a faint inner light, and the glass a sheen across its upper left. */
-.desk .phone { left: 947px; top: 24px; width: 104px; height: 191px; border-radius: 12px; background: #0b0d10; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 0 0 1px #2a2d33, 0 2.5px 0 #43474f, 0 5px 0 #2a2d33, 0 7.5px 0 #17181c, 3px 11px 8px rgba(0, 0, 0, .55), 8px 16px 16px rgba(0, 0, 0, .22); }
+   desk's (the narrower phone keeps its centre's x). Its side shows below its front edge and to its left in three steps
+   of 1.7 × 2.5 px (round R8d, C3): the desk is seen from above its middle (scene.css: perspective 1100, origin 640 140,
+   the plane tilted 64°), so a slab lying right of the middle shows its near edge and the side toward the middle, its
+   left — never its right. Each step goes down and left in the desk's plane, as a real side steps down and in; the true
+   left side is about 1 px wide on screen, the steps draw it about half again as wide, so it shows. The first step a
+   shade lighter: that side faces the light, as the standing objects' shadows say. A tight contact shadow falls a little
+   to the right, as the standing objects' do, never the old drop shadow; its frame has a faint inner light, and the
+   glass a sheen across its upper left. */
+.desk .phone { left: 947px; top: 24px; width: 104px; height: 191px; border-radius: 12px; background: #0b0d10; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07), 0 0 0 1px #2a2d33, -1.7px 2.5px 0 #50555f, -3.4px 5px 0 #30333a, -5.1px 7.5px 0 #17181c, 2px 11px 8px rgba(0, 0, 0, .55), 7px 16px 16px rgba(0, 0, 0, .22); }
 .desk .phone .phone-screen { position: absolute; inset: 4px; border-radius: 9px; background: linear-gradient(180deg, #22313f, #121a22); overflow: hidden; transition: box-shadow .5s; }
 .desk .phone .phone-screen::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, rgba(255, 255, 255, .075) 0 34%, transparent 34.5%); pointer-events: none; }
 .desk .lock { position: absolute; inset: 0; padding: 7px 7px 0; }

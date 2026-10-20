@@ -1618,6 +1618,8 @@ function titleScene(g: G, w: number, h: number) {
     [0.19, 0.79, 0.13],
   ] as const)
     glow(g, w * x, h * y, h * r, 1);
+  // Their cameras have no lens glints (round R8d, C2): black on black they never showed, and the one in frame, at the
+  // foot on the right, printed as two stray dots under BEGIN.
   g.fillStyle = '#000';
   for (const [cx, cy] of [
     [0.05, 0.97],
@@ -1629,11 +1631,6 @@ function titleScene(g: G, w: number, h: number) {
     g.beginPath();
     g.arc(w * cx, h * cy, h * 0.07, 0, 6.2832);
     g.fill();
-    g.fillStyle = '#fff';
-    g.beginPath();
-    g.arc(w * cx, h * cy, h * 0.022, 0, 6.2832);
-    g.fill();
-    g.fillStyle = '#000';
   }
   for (let i = 0; i < 26; i++) {
     const x = w * (i / 25) + ((i * 37) % 13) - 6;
