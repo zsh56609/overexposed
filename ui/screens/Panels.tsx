@@ -318,17 +318,18 @@ export function NumbersPanel({ s, steps, onClose }: { s: GameState; steps: reado
 const HOLIZNA_URL = 'https://opengameart.org/user/120037';
 
 /**
- * The credits, in House rules' style (round R7, A2): one row per credit, the role beside the name — who made the game,
- * the music, the typefaces, the art and sound, the AI assistance — and a link after its name where there is one. A
- * name may wrap to a second line; nothing else in a row does. The copyright notices, the sources and the six track
- * titles are CREDITS.md's and the itch page's: the font licence linked here (ui/fonts/OFL.txt, shipped beside the fonts
- * by this import) carries both fonts' notices, as the licence asks.
+ * The credits, in House rules' style (round R7, A2; laid out again in round R8b, Part C): one row per credit, its role
+ * over its name on one left edge — who made the game, the music, the typefaces, the art and sound, the AI assistance —
+ * and a link after a middle dot where there is one. A name may wrap to a second line; nothing else in a row does. The
+ * foot is one more row: the jam, and the version. The copyright notices, the sources and the six track titles are
+ * CREDITS.md's and the itch page's: the font licence linked here (ui/fonts/OFL.txt, shipped beside the fonts by this
+ * import) carries both fonts' notices, as the licence asks.
  */
 export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose: () => void }) {
   const rows: readonly { readonly role: string; readonly name: string; readonly link?: { readonly href: string; readonly label: string } }[] = [
     { role: t('ui.credits.author'), name: t('credits.author') },
     { role: t('ui.credits.music'), name: t('credits.music.holizna'), link: { href: HOLIZNA_URL, label: t('ui.credits.musicLink') } },
-    { role: t('ui.credits.fonts'), name: t('credits.fonts'), link: { href: licenceUrl, label: t('ui.credits.read') } },
+    { role: t('ui.credits.fonts'), name: t('credits.fonts'), link: { href: licenceUrl, label: t('ui.credits.fontsLink') } },
     { role: t('ui.credits.sound'), name: t('credits.sound') },
     { role: t('ui.credits.ai'), name: t('credits.ai') },
   ];
@@ -343,7 +344,7 @@ export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose
               {row.name}
               {row.link && (
                 <>
-                  {' '}
+                  {' · '}
                   <a href={row.link.href} target="_blank" rel="noreferrer">
                     {row.link.label}
                   </a>
@@ -352,9 +353,12 @@ export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose
             </span>
           </div>
         ))}
-        {/* The foot: the jam, and the build's version after a middle dot (round R3; major and minor, as the itch page
-            names builds). */}
-        <div className="ver">{[t('ui.credits.jam'), t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })].join(' · ')}</div>
+        {/* The foot, a row of its own (round R8b, C2): the jam left, the build's version right (major and minor, as the
+            itch page names builds). */}
+        <div className="ver">
+          <span>{t('ui.credits.jam')}</span>
+          <b>{t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })}</b>
+        </div>
       </div>
     </Overlay>
   );

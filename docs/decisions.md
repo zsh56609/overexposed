@@ -6,6 +6,20 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8b, Part C: the credits laid out again
+
+- Each credit's role stands over its name, one left edge: the role as before (a deck section's
+  head) on its own line 4 px above, the name 12 px in `#e2d8c6`; a hairline over each row,
+  11 px above and below, no gap between rows, the first 16 px under the head. A link follows
+  its name after a middle dot: Music "Holizna · six tracks · CC0 1.0 · OpenGameArt", Typefaces
+  "Playfair Display and Libre Franklin · SIL Open Font License 1.1" (the licence linked).
+  `credits.fonts` keeps the names only, `ui.credits.fontsLink` carries the licence's name, and
+  `ui.credits.read` goes — moved words, not new ones.
+- The foot is one more row under the same rule: the jam left, the version right; the credits
+  panel's bottom padding is 12 px (House rules keeps its own). check:overflow now fails when
+  the credits have no foot, as well as when a role or the foot wraps or a name runs past two
+  lines.
+
 ## 2026-10-20 — Round R8b, Part B: the manager's notes
 
 - Six notes in the manager's hand for a new player's first year (README §11): the stat bar on

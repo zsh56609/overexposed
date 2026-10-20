@@ -227,10 +227,13 @@ italic line.
   "Endings found · N of 14".
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
   (off), Manager's notes (on; round R8b, §11). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
-  track comes back (round R4). Credits share this panel's style (round R7): one row per credit,
-  the role beside the name — the game's maker, the music (linked to Holizna's OpenGameArt page),
-  the typefaces (linked to their licence), the art and sound, the AI assistance — and a foot
-  with the jam and the version.
+  track comes back (round R4). Credits share this panel's style (round R7; laid out again in round
+  R8b): one row per credit, its role over its name on one left edge (the role a deck section's head,
+  4 px above; the name 12 px, `#e2d8c6`), a hairline over each row and no gap between them — the
+  game's maker, the music ("Holizna · six tracks · CC0 1.0 · OpenGameArt", the last linked to
+  Holizna's page), the typefaces ("Playfair Display and Libre Franklin · SIL Open Font License 1.1",
+  the licence linked), the art and sound, the AI assistance — and a foot row under the same rule,
+  the jam left and the version right.
 
 ### 10. Sound (round R4)
 
