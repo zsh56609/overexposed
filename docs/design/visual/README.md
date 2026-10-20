@@ -66,7 +66,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - **Lead paper** stands in front; the other two stand behind with their mastheads visible. Clicking a back paper pulls it forward. **Switching papers re-renders only the papers — never the hand.**
 - **The paper comes to you** (round R1): when a play prints a story in a paper behind, that paper comes forward — the same motion as a click — while the card is carried, so the story prints in front of the player. It stays in front until another play brings a different paper forward, the player picks one, or the month ends (the new issue's lead paper takes the desk). A play that changes more than one paper brings forward the one whose lead changed; if both or neither did, the one with the played card's own story; a play that changes no visible story moves nothing. It never lengthens the play's input hold. Reduced motion: the papers swap under a short crossfade.
 - **Mark my stories** (a setting, on by default): the player's stories carry a red rule in the left margin; the rival's carry a purple one.
-- **Photographs:** only the lead story has one. Halftone, drawn in code (see Porting; `ui/desk/halftone.ts`). Twelve scenes: singer at a microphone · the rival with a guitar · festival crowd · paparazzi (red duotone, only when a scandal leads) · red carpet · film set · the street, a reporter's vox pop outside a row of shops, in each season (spring rain, summer sun, autumn leaves, winter snow) · award under a spotlight — and since round R8a (R7b's drawings) a talk-show set (the host at the desk, the guest in an armchair, a studio camera) · a recording studio seen from the control room · an arena seen from the stage · a press conference (lectern, microphones, flashes). Rule learned: a silhouette needs light behind it, and a picture is recognised by one iconic object.
+- **Photographs:** only the lead story has one. Halftone, drawn in code (see Porting; `ui/desk/halftone.ts`). Thirteen scenes: singer at a microphone · the rival with a guitar · festival crowd · paparazzi (red duotone, only when a scandal leads) · red carpet · film set · the street, a reporter's vox pop outside a row of shops, in each season (spring rain, summer sun, autumn leaves, winter snow) · award under a spotlight — and since round R8a (R7b's drawings) a talk-show set (the host at the desk, the guest in an armchair, a studio camera) · a recording studio seen from the control room · an arena seen from the stage · a press conference (lectern, microphones, flashes) — and since round R8d the room (`docs/design/visual/ref/r8d-room.ts`): the singer from behind on the edge of the bed, playing, at the window with the city outside, a lamp on the left, a coat on its hook on the right; spring's card shows it, and no paper prints it yet. Rule learned: a silhouette needs light behind it, and a picture is recognised by one iconic object.
 - **Photo selection:** a lead story's scene is content's (`content/press.json` → `scenes`, /core's `sceneOf`): an override for the story's own i18n key first, then for its line group — a card's lines (`card:<id>`, a scandal's `scandal:<id>`), a paper's world stories, filler or spillover — so a talk show's story shows the talk-show set and a tour the arena; else its kind's default: a scandal the paparazzi, the rival her own, a world story or a saga's beat its paper's (Flash the street, B-Side the crowd, Marquee the film set), the player's own its paper's (Flash the red carpet, B-Side the singer, Marquee the film set). Each scene has three drawings — as drawn, mirrored, closer — its patterns shifted by the seed; a shuffle bag picks one, never the same picture on the same paper two months running.
 - **B-Side reviews:** stars only for the player’s own releases, using the craft tier at release: Raw ★, Learning ★★, Solid ★★★, Seasoned ★★★½, Skilled ★★★★, Masterful ★★★★★. Coming scandal stories carry “Going to press” and disappear if cooling prevents them.
 - **Marquee's box office** changes every month; when the player is Famous on the screen lane, their film, *One Year*, tops it.
@@ -200,13 +200,17 @@ italic line.
     their longest, at 1280×720 and 844×390).
   - **A card a door adds is a short chip**, not a sentence: "+", the cards icon, the card's name ("+2×" for more) —
     the same chip on the faces, the replies and the previews; a scandal added keeps its newspaper chip.
-- **Season cards after spring** (round R8a): the season's scene above the date, printed light on ink as the title's
-  photograph is (`renderLightCanvas`): an oval of 400×200 showing the middle 400 of a drawing at 560×200 — both
-  times the stage's own factor, its scale on the screen × the device pixel ratio, as the title's is reckoned, the dot
-  cell 3.6 times it — ringed, from the inside, 1.5 px of cream at .55, 5 px of ink, 1 px of cream at .25. Content
-  names the scenes (`rules.seasonScenes`): summer the arena, autumn the street in autumn, winter the red carpet.
-  Spring's card opens the year over the title's photograph and has none. They are drawn ahead with the papers'
-  photographs, in the worker after the title's, so a card never waits for its photograph.
+- **Season cards** (round R8a; spring's since round R8d): the season's scene above the date, printed light on ink as
+  the title's photograph is (`renderLightCanvas`): an oval of 400×200 showing the middle 400 of a drawing at 560×200
+  — both times the stage's own factor, its scale on the screen × the device pixel ratio, as the title's is reckoned,
+  the dot cell 3.6 times it — ringed, from the inside, 1.5 px of cream at .55, 5 px of ink, 1 px of cream at .25.
+  Content names the scenes (`rules.seasonScenes`): spring the room (summer's arena is the same back at the far end of
+  the year), summer the arena, autumn the street in autumn, winter the red carpet. Spring's card is the opening, over
+  the title's photograph right after BEGIN, so its oval is drawn first: in the worker after the title's, the warm-up
+  draws spring's oval, then the papers' photographs, then the other ovals — a card never waits for its photograph.
+  The opening only looks spring's up and never draws it on the page: if the card comes first, the oval stands empty,
+  its rings shown, and the picture fades in over 300 ms when it comes (reduced motion or motion off: at once);
+  nothing moves.
 - **Events (phase 3) — two presentations, chosen by the voice.**
   - *People who text* — the manager, friends, family, the rival: the phone comes up
     and their messages arrive **one at a time**, each after a few typing dots; the

@@ -9,7 +9,7 @@ try {
     const page=await launch(browser,{width:1280,height:720});
     try {
       await page.navigate(server.resolvedUrls!.local[0]!);
-      const result=await page.evaluate<{warm:{method:string;count:number;reason?:string};comparisons:{job:unknown;light:boolean;backdrop:boolean;different:number;maxDelta:number}[];fallback:{method:string;count:number};blockedWhileBusy:boolean}>(`(async()=>{
+      const result=await page.evaluate<{warm:{method:string;count:number;reason?:string};comparisons:{job:unknown;light:boolean;backdrop:boolean;different:number;maxDelta:number}[];first:string|null;fallback:{method:string;count:number};blockedWhileBusy:boolean}>(`(async()=>{
         const preload=await import('/ui/desk/photo-preload.ts');
         const drawing=await import('/ui/desk/halftone.ts');
         const warm=await preload.warmPhotos(3);
@@ -17,6 +17,9 @@ try {
         const comparisons=[];
         // The awards night's backdrop (round R8c, C3): one backdrop-sized light job, the worker's against the page's.
         const backdrop=preload.backdropJob('arena');
+        // The warm-up's own work in its order (round R8d, A3): spring's oval comes back first.
+        const work=preload.warmJobs(3);
+        let first=null;
         if(warm.method==='worker')await new Promise((resolve,reject)=>{
           const worker=new Worker('/ui/desk/photo-worker.ts',{type:'module'}),pending=[];
           const timer=setTimeout(()=>{worker.terminate();reject(Error('photo pixel comparison deadline'))},30000);
@@ -26,6 +29,7 @@ try {
             const m=event.data;
             if(m.error){finish();reject(Error(m.error));return}
             // A paper's photograph against the page's own; a season card's oval (round R8a, D2) against renderLightCanvas.
+            if((m.job||m.light)&&m.blob&&first===null)first=m.light?'oval:'+m.light[1]:'photo';
             if((m.job||m.light)&&m.blob)pending.push((async()=>{
               const expected=m.job?drawing.photoCanvas(...m.job):drawing.renderLightCanvas(...m.light,label,false),g=expected.getContext('2d');
               const a=g.getImageData(0,0,expected.width,expected.height).data;
@@ -41,7 +45,7 @@ try {
             })());
             if(m.done)Promise.all(pending).then(()=>{finish();resolve(true)},e=>{finish();reject(e)});
           };
-          worker.postMessage({jobs:preload.photoJobs(3),lights:[...preload.lightJobs(),backdrop],directorLabel:label});
+          worker.postMessage({...work,lights:[...work.lights,backdrop],directorLabel:label});
         });
         const OriginalWorker=window.Worker;
         let fallback,blockedWhileBusy;
@@ -53,7 +57,7 @@ try {
           await new Promise(r=>setTimeout(r,300));blockedWhileBusy=!done;busy.remove();
           fallback=await loading;
         }finally{window.Worker=OriginalWorker}
-        return {warm,comparisons,fallback,blockedWhileBusy};
+        return {warm,comparisons,first,fallback,blockedWhileBusy};
       })()`,45000);
       if(result.warm.method==='worker'){
         assert.equal(result.comparisons.length,result.warm.count+1);
@@ -62,7 +66,8 @@ try {
         const ovals=result.comparisons.filter(c=>c.light&&!c.backdrop).length;
         assert.ok(ovals>0,`${browser}: no season card's oval was compared`);
         assert.equal(backdrops,1,`${browser}: the night's backdrop was not compared`);
-        console.log(`PASS photo worker ${browser}: ${result.comparisons.length-ovals-backdrops} photos, ${ovals} season cards' ovals and the night's backdrop, exact RGBA parity`);
+        assert.equal(result.first,'oval:spring',`${browser}: the warm-up's first picture is ${result.first}, not spring's oval`);
+        console.log(`PASS photo worker ${browser}: ${result.comparisons.length-ovals-backdrops} photos, ${ovals} season cards' ovals (spring's first) and the night's backdrop, exact RGBA parity`);
       }else {
         assert.equal(result.warm.reason,'Worker/OffscreenCanvas unavailable',`${browser}: unexpected worker failure is not a capability skip`);
         console.log(`SKIP worker pixels ${browser}: ${result.warm.reason}; original idle rendering retained`);

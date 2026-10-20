@@ -239,7 +239,7 @@ function Floating({ anchor, children, leaving = false }: { anchor: Anchor; child
 function seasonOf(s: GameState, answered: number): { readonly act: number; readonly photo: string | null; readonly date: string; readonly season: string; readonly paragraphs: readonly string[] } | null {
   if (s.phase === 'ended' || s.act === answered) return null;
   const c = s.content;
-  // The season's photograph (round R8a, D2): drawn ahead by the warm-up; spring's card, the opening, has none.
+  // The season's photograph (round R8a, D2): drawn ahead by the warm-up.
   const id = c.rules.seasons?.[s.act - 1];
   return { act: s.act, photo: id ? seasonPhotoUrl(id) : null, date: calendarLabel(c, s.turn), season: seasonName(c, s.act), paragraphs: [seasonOpener(s, s.act)] };
 }
@@ -470,9 +470,10 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           {t('ui.error.title')}: {error}
         </p>
       )}
-      {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name. */}
+      {/* Spring's card before the year (round R3, A2): the opening's paragraphs, under the season's name; since round
+          R8d its oval above the date, drawn first by the warm-up and only looked up here (A3). */}
       <Over show={intro === 'opening'} full enter="develop">
-        <SeasonCard date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(s).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
+        <SeasonCard awaits={c.rules.seasons?.[0] ?? null} date={calendarLabel(c, 1)} season={seasonName(c, 1)} paragraphs={openingText(s).split('\n\n').slice(1)} go={() => play('into', () => setIntro(null))} />
       </Over>
       {/* The manager choice, dealt onto the desk as it comes up (round R3, B2); signing plays out on it (B3). */}
       <Over show={desk && mode === 'manager'} full enter="deal">

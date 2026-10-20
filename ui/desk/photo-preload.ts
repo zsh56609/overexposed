@@ -116,19 +116,52 @@ export function lightJobs(): LightJob[] {
   const k = stageFactor();
   return Object.entries(content.rules.seasonScenes ?? {}).map(([season, scene]) => [scene as SceneId, season as SeasonId, Math.round(OVAL.w * k), Math.round(OVAL.h * k), OVAL.cell * k] as const);
 }
+const ovalJob = (season: SeasonId): LightJob | undefined => lightJobs().find(([, s]) => s === season);
+
+/** Who waits for an oval, by its key (round R8d, A3): the opening, for spring's. */
+const waiting = new Map<string, ((url: string) => void)[]>();
+/** Keeps an oval unless one is kept already (`url` is made only then), and hands it to whoever waits for it. */
+function keepLight(job: LightJob, url: () => string): string {
+  const key = lightKey(job);
+  const was = lights.get(key);
+  if (was !== undefined) return was;
+  const kept = url();
+  lights.set(key, kept);
+  for (const resolve of waiting.get(key) ?? []) resolve(kept);
+  waiting.delete(key);
+  return kept;
+}
 
 /**
- * A season card's photograph, or null for a season with none (spring's card is the opening). Drawn ahead by the
- * warm-up and kept for the page's life, as the title's is; drawn here, at once, only if the warm-up has not delivered it.
+ * A season card's photograph, or null for a season content gives no scene. Drawn ahead by the warm-up and kept for
+ * the page's life, as the title's is; drawn here, at once, only if the warm-up has not delivered it. The opening never
+ * draws spring's: it looks it up (seasonPhotoNow) and waits for the warm-up (seasonPhotoDrawn).
  */
 export function seasonPhotoUrl(season: SeasonId): string | null {
-  const job = lightJobs().find(([, s]) => s === season);
+  const job = ovalJob(season);
+  return job ? keepLight(job, () => renderLightCanvas(...job, t('desk.photo.director'), false).toDataURL()) : null;
+}
+
+/** Whether a season's card has an oval: content gives the season a scene. */
+export const seasonHasPhoto = (season: SeasonId): boolean => ovalJob(season) !== undefined;
+
+/** A season card's oval if it is drawn already (round R8d, A3): the opening looks spring's up, never draws it. */
+export function seasonPhotoNow(season: SeasonId): string | null {
+  const job = ovalJob(season);
+  return job ? (lights.get(lightKey(job)) ?? null) : null;
+}
+
+/**
+ * A season card's oval once the warm-up has drawn it (round R8d, A3) — at once if it is kept already; never drawn here.
+ * Null for a season with none.
+ */
+export function seasonPhotoDrawn(season: SeasonId): Promise<string> | null {
+  const job = ovalJob(season);
   if (!job) return null;
-  const hit = lights.get(lightKey(job));
-  if (hit) return hit;
-  const url = renderLightCanvas(...job, t('desk.photo.director'), false).toDataURL();
-  lights.set(lightKey(job), url);
-  return url;
+  const key = lightKey(job);
+  const hit = lights.get(key);
+  if (hit) return Promise.resolve(hit);
+  return new Promise((resolve) => waiting.set(key, [...(waiting.get(key) ?? []), resolve]));
 }
 
 /**
@@ -189,7 +222,7 @@ export const titlePhotoNow = (): string | null => titleReady;
 export interface PhotoWarmResult { readonly method:'worker'|'idle';readonly count:number;readonly reason?:string }
 /** The worker's oval for a season card, kept unless one is shown already. */
 function cacheLightBlob(job:LightJob,blob:Blob):void {
-  const key=lightKey(job);if(!lights.has(key))lights.set(key,URL.createObjectURL(blob));
+  keepLight(job,()=>URL.createObjectURL(blob));
 }
 let warming:Promise<PhotoWarmResult>|null=null;
 export function photoJobs(variants:number):PhotoJob[] {
@@ -200,22 +233,31 @@ export function photoJobs(variants:number):PhotoJob[] {
 }
 
 /**
- * Keep PNG encoding off the presentation thread. Old browsers retain the same lazy/idle path. The papers' photographs
- * first, then the season cards' ovals (round R8a, D2): a card never waits for its photograph.
+ * The warm-up's work, in its order (round R8d, A3): spring's oval first — the opening comes right after BEGIN — then
+ * the papers' photographs, then the other season cards' ovals (round R8a, D2): a card never waits for its photograph.
+ */
+export interface WarmJobs { readonly first:LightJob|null;readonly jobs:readonly PhotoJob[];readonly lights:readonly LightJob[] }
+export function warmJobs(variants:number):WarmJobs {
+  const ovals=lightJobs(),opening=content.rules.seasons?.[0],first=ovals.find(([,season])=>season===opening)??null;
+  return {first,jobs:photoJobs(variants),lights:ovals.filter(oval=>oval!==first)};
+}
+
+/**
+ * Keep PNG encoding off the presentation thread. Old browsers retain the same lazy/idle path, in the same order
+ * (warmJobs).
  */
 export function warmPhotos(variants:number):Promise<PhotoWarmResult> {
   return warming??=new Promise(resolve=>{
-    const jobs=photoJobs(variants),ovals=lightJobs(),count=jobs.length+ovals.length;
+    const warm=warmJobs(variants),count=(warm.first?1:0)+warm.jobs.length+warm.lights.length;
     let worker:Worker|undefined,timer:ReturnType<typeof setTimeout>|undefined,fellBack=false;
     const cleanup=()=>{clearTimeout(timer);worker?.terminate();};
     const fallback=(reason:string)=>{
       if(fellBack)return;fellBack=true;cleanup();
-      const pending=[...jobs],pendingOvals=[...ovals];
+      const pending:(()=>unknown)[]=[...(warm.first?[warm.first]:[]).map(oval=>()=>seasonPhotoUrl(oval[1])),...warm.jobs.map(job=>()=>photoUrl(...job)),...warm.lights.map(oval=>()=>seasonPhotoUrl(oval[1]))];
       const next=()=>{
         if(document.querySelector('[data-busy="1"]')){setTimeout(schedule,250);return;}
-        const job=pending.shift();if(job)photoUrl(...job);
-        else{const oval=pendingOvals.shift();if(oval)seasonPhotoUrl(oval[1]);}
-        if(pending.length||pendingOvals.length)schedule();else resolve({method:'idle',count,reason});
+        pending.shift()?.();
+        if(pending.length)schedule();else resolve({method:'idle',count,reason});
       };
       const schedule=()=>{
         if('requestIdleCallback' in window)window.requestIdleCallback(next,{timeout:2000});
@@ -237,7 +279,7 @@ export function warmPhotos(variants:number):Promise<PhotoWarmResult> {
       worker.onerror=event=>{event.preventDefault();fallback(event.message);};
       worker.onmessageerror=()=>fallback('Photo worker message could not be decoded');
       timer=setTimeout(()=>fallback('Photo worker exceeded 15s preparation deadline'),15000);
-      worker.postMessage({jobs,lights:ovals,directorLabel:t('desk.photo.director')});
+      worker.postMessage({...warm,directorLabel:t('desk.photo.director')});
     } catch(error) {fallback(String(error));}
   });
 }

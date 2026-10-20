@@ -47,9 +47,10 @@ for (const persona of players) {
     );
     if (manager !== undefined) managerRuns.set(manager, (managerRuns.get(manager) ?? 0) + 1);
     const shown = new Map(readLines(history).counter.snapshot());
-    // The items shown once per run: each season reached, the ending reached, every gate offered, the opening.
+    // The items shown once per run: each season reached after the first (whose card is the opening, round R8d, as
+    // sim/memory.ts has it), the ending reached, every gate offered, the opening.
     const last = history.at(-1)?.after;
-    for (let act = 1; last && act <= last.act; act++) shown.set(onceItem.opener(act), 1);
+    for (let act = 2; last && act <= last.act; act++) shown.set(onceItem.opener(act), 1);
     if (last?.endingId) shown.set(onceItem.ending(last.endingId), 1);
     for (const gate of last?.gateHistory ?? []) for (const id of gate.offered) shown.set(onceItem.gate(id), 1);
     shown.set(onceItem.opening, 1);

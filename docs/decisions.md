@@ -6,6 +6,36 @@ rules).
 
 ---
 
+## 2026-10-21 — Round R8d, Part A: spring's card
+
+- The author (2026-10-20): spring's card is the only one without a photograph; give it one, and
+  drop the two spring openers no one sees. Spring's card is the opening.
+- Its photograph is `room`, a thirteenth scene (docs/design/visual/ref/r8d-room.ts, ported
+  unchanged into halftone.ts's SCENES before the street): the singer from behind on the edge of
+  the bed, playing, at the window with the city outside; summer's arena is the same back at the
+  far end of the year. SCENE_IDS gains it, last. It is a scene like the others — a paper could
+  print it, its three drawings as every scene's — so photoJobs has it (49 photographs); no
+  content asks for it yet.
+- rules.seasonScenes gains spring: room. Validate's rule that the first season's card has no
+  photograph goes, with its comment.
+- Drawn before the opening needs it: the warm-up draws spring's oval first — the opening comes
+  right after BEGIN — then the papers' photographs, then the other ovals (Part B puts the
+  doors between), in the worker and on the idle path alike. The worker takes {first, jobs,
+  lights} (photo-preload's warmJobs, which check/photo-worker.ts posts too, holding spring's
+  oval first).
+- The opening only looks spring's oval up (seasonPhotoNow; seasonPhotoDrawn waits for the
+  warm-up) and never draws it on the page. If the card comes first, the oval's box stands empty,
+  its rings shown; the picture — now the box's one child, on every card — fades in over 300 ms
+  when it comes, as the night's backdrop does; reduced motion or motion off: at once. Nothing
+  moves. check:overflow measures the opening card at every size: spring's oval to CONTINUE's
+  foot, inside the stage.
+- Spring's openers go (act.spring.opener.1 and .2; draft-v12.md says so): rules.actOpenerKeys'
+  first list is empty, which core/memory.ts already skips. Validate asks no opener of the first
+  season when rules.openingKeys is written, in the prose warning and the variant groups — and in
+  a third place the prompt did not count: the schema check, which held every opener list to at
+  least one key, now lets the first be empty then. The feed prints no opener for a season with
+  none; sim:variants counts openers from the second season, as sim/memory.ts does.
+
 ## 2026-10-20 — Round R8c, Part F: v0.9
 
 - v0.9 is R8c's build (`package.json` 0.9.0; the credits' foot reads v0.9), a release candidate:

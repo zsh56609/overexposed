@@ -96,6 +96,9 @@ GONE
 rival.breakthrough.ending, rival.crash.ending, rival.crossover.ending,
 rival.fade.ending (replaced by the lines above).
 
+Gone: act.spring.opener.1, act.spring.opener.2 (spring's card is the opening).
+Round R8d, approved 2026-10-20.
+
 IN DRAWINGS, NOT IN EN.JSON
 
 Outlined from the repo's fonts: PREMIERE (r8c-photos/carpet_view.svg);

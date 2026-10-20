@@ -591,6 +591,19 @@ const DRIVE = (runs: number) => `(async () => {
   document.querySelector('.title-screen .begin').click();
   await sleep(40);
   plain('opening card');
+  // The opening card (round R8d, A2): spring's oval above the date, its box there even before the picture comes, and
+  // the column — the oval's top to CONTINUE's foot — inside the stage.
+  {
+    const st = document.querySelector('.stage').getBoundingClientRect(), k = st.height / 720;
+    const oval = document.querySelector('.season-card .sc-photo'), go = document.querySelector('.season-card .into');
+    if (!oval) note(['opening card: no oval above the date']);
+    if (!go) note(['opening card: no CONTINUE']);
+    if (oval && go) {
+      const top = (oval.getBoundingClientRect().top - st.top) / k, bottom = (go.getBoundingClientRect().bottom - st.top) / k;
+      seen.opening = { top: Math.round(top * 10) / 10, bottom: Math.round(bottom * 10) / 10 };
+      if (top < 0 || bottom > 720) note(['opening card: its column runs from ' + top.toFixed(1) + ' to ' + bottom.toFixed(1) + ', off the 720 stage']);
+    }
+  }
   document.querySelector('.season-card .into').click();
   await sleep(20);
   for (let run = 0; run < ${runs}; run++) {
@@ -661,7 +674,7 @@ const DRIVE = (runs: number) => `(async () => {
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
@@ -678,7 +691,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -708,6 +721,12 @@ try {
           `overflow check, ${tag}: ${out.states} states — ${out.previews} previews, ${out.tips} tooltips, ${out.fronts} papers pulled forward, ${out.bubbles} reaction rows, ` +
             `hands of up to ${out.maxHand}; screens ${screens} (${out.extraPicks} extra picks, ${out.rerolls} rerolls); ${out.cards.length} cards and ${out.faces.length} faces seen (${((performance.now() - t0) / 1000).toFixed(1)}s)`,
         );
+        // The opening card (round R8d, A2): spring's oval to CONTINUE's foot.
+        console.log(`overflow check, ${tag}: the opening card — ${out.opening ? `spring's oval from y ${out.opening.top} to CONTINUE's foot at y ${out.opening.bottom} of 720` : 'not measured'}`);
+        if (!out.opening) {
+          failed = true;
+          console.log('OVERFLOW opening  the opening card was not measured');
+        }
         // The doors (round R8a, D1): each pair's heights, the tallest and where it ends, the stamps' clearance.
         const d = out.doors;
         console.log(

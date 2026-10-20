@@ -1,16 +1,19 @@
 import { renderLightCanvas, renderPhotoCanvas, renderTitleCanvas, type PhotoJob } from './halftone.ts';
 import type { LightJob } from './photo-preload.ts';
 
-// This worker owns only image preparation, never game state or presentation callbacks. It draws the papers'
-// photographs in batches, then the season cards' ovals light on ink (round R8a, D2), or the title's photograph
-// (round R3, amended) at the screen's pixel size.
-globalThis.onmessage=async (event:MessageEvent<{jobs?:readonly PhotoJob[];lights?:readonly LightJob[];directorLabel?:string;title?:{readonly w:number;readonly h:number}}>)=>{
+// This worker owns only image preparation, never game state or presentation callbacks. It draws the warm-up's work
+// in its order (photo-preload.ts warmJobs): spring's oval first (round R8d, A3), the papers' photographs, then the
+// other season cards' ovals light on ink (round R8a, D2); or one light job, the awards night's backdrop (round R8c); or
+// the title's photograph (round R3, amended) at the screen's pixel size.
+globalThis.onmessage=async (event:MessageEvent<{first?:LightJob|null;jobs?:readonly PhotoJob[];lights?:readonly LightJob[];directorLabel?:string;title?:{readonly w:number;readonly h:number}}>)=>{
   try {
     const title=event.data.title;
     if(title) {
       globalThis.postMessage({title:true,blob:await renderTitleCanvas(title.w,title.h,true).convertToBlob({type:'image/png'})});
       return;
     }
+    const first=event.data.first;
+    if(first)globalThis.postMessage({light:first,blob:await renderLightCanvas(...first,event.data.directorLabel??'',true).convertToBlob({type:'image/png'})});
     for(const job of event.data.jobs??[]) {
       const blob=await renderPhotoCanvas(...job,event.data.directorLabel??'',true).convertToBlob({type:'image/png'});
       globalThis.postMessage({job,blob});

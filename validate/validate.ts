@@ -352,14 +352,13 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
       });
     v.seasons = Array.isArray(raw.seasons) ? raw.seasons.filter(isStr) : [];
   }
-  // The season cards' photographs (round R8a): a scene by season; the first season's card is the opening, with none.
+  // The season cards' photographs (round R8a): a scene by season, the first season's too (round R8d: the opening).
   if (raw.seasonScenes !== undefined) {
     if (!isObj(raw.seasonScenes)) v.error('schema', 'rules.seasonScenes', 'must map a season to a scene');
     else
       for (const [season, scene] of Object.entries(raw.seasonScenes)) {
         const where = `rules.seasonScenes.${season}`;
         if (!v.seasons.includes(season)) v.error('references', where, `no season ${q(season)} in rules.seasons`);
-        else if (season === v.seasons[0]) v.error('structure', where, "the first season's card is the opening, over the title's photograph: it has none");
         if (!(SCENE_IDS as readonly unknown[]).includes(scene)) v.error('references', where, `must be one of ${SCENE_IDS.join(', ')}, got ${q(scene)}`);
       }
   }
@@ -369,7 +368,11 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
       if (raw.actOpenerKeys.length !== v.acts) {
         v.error('ranges', 'rules.actOpenerKeys', `has ${raw.actOpenerKeys.length} entries for ${v.acts} acts`);
       }
-      raw.actOpenerKeys.forEach((k, i) => v.keys(k, `rules.actOpenerKeys[${i}]`));
+      // The first season needs no opener when the opening is written (round R8d): the opening is its card.
+      const opening = Array.isArray(raw.openingKeys) && raw.openingKeys.length > 0;
+      raw.actOpenerKeys.forEach((k, i) => {
+        if (!(i === 0 && opening && Array.isArray(k) && k.length === 0)) v.keys(k, `rules.actOpenerKeys[${i}]`);
+      });
     }
   }
   if (raw.openingKeys !== undefined) v.keys(raw.openingKeys, 'rules.openingKeys');
@@ -1063,9 +1066,9 @@ export const PROSE_PLACEHOLDER = 'TODO(prose)';
 /**
  * Missing player-facing prose, reported as warnings: every card with no headline, every scandal missing its
  * headline or in-hand line, every major missing its name or goal line, every minor missing its name or
- * text, every gate missing its
- * flavour, every season missing its opener, the opening, and a flag label still a placeholder (a missing
- * one is an i18n error). Missing prose must be visible, not silent.
+ * text, every gate missing its flavour, every season missing its opener (the first needs none when the opening is
+ * written: round R8d), the opening, and a flag label still a placeholder (a missing one is an i18n error). Missing
+ * prose must be visible, not silent.
  */
 function checkProse(
   v: Ctx,
@@ -1104,7 +1107,8 @@ function checkProse(
   }
   for (const g of gates) if (!anyWritten(g.flavorKeys)) v.warn('prose', `gate ${String(g.id)}${nameOf(g)}`, 'no flavour');
   const openers: unknown[] = rules && Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
-  for (let act = 1; act <= v.acts; act++) {
+  // The first season's card is the opening (round R8d): with the opening written, it needs no opener.
+  for (let act = anyWritten(rules?.openingKeys) ? 2 : 1; act <= v.acts; act++) {
     if (!anyWritten(openers[act - 1])) v.warn('prose', `season ${act}`, 'no season opener');
   }
   if (!anyWritten(rules?.openingKeys)) v.warn('prose', 'rules.openingKeys', 'no opening premise');
@@ -1189,7 +1193,11 @@ export function variantGroups(raw: RawContent): VariantGroup[] {
   }
   const rules = isObj(raw.rules) ? raw.rules : {};
   const openers: unknown[] = Array.isArray(rules.actOpenerKeys) ? rules.actOpenerKeys : [];
-  openers.forEach((keys, i) => groups.push({ id: onceItem.opener(i + 1), kind: 'once', owner: `season ${i + 1}`, keys: keyList(keys), register: null, lane: null }));
+  // The first season's card is the opening (round R8d): with the opening's keys, it has no opener to vary.
+  const opening = keyList(rules.openingKeys).length > 0;
+  openers.forEach((keys, i) => {
+    if (!(i === 0 && opening)) groups.push({ id: onceItem.opener(i + 1), kind: 'once', owner: `season ${i + 1}`, keys: keyList(keys), register: null, lane: null });
+  });
   groups.push({ id: onceItem.opening, kind: 'once', owner: 'the opening', keys: keyList(rules.openingKeys), register: null, lane: null });
   for (const g of list(raw.gates)) if (isStr(g.id)) groups.push({ id: onceItem.gate(g.id), kind: 'once', owner: g.id, keys: keyList(g.flavorKeys), register: null, lane: null });
   const endings = isObj(raw.endings) ? raw.endings : {};

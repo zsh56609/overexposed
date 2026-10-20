@@ -679,7 +679,8 @@ stage (decision 17) and keeps everything inside it.
 - **Newspaper photographs** (round 2b) are halftone images drawn in code —
   no image files, no generation models. Eight scenes (twelve since round
   R8a — a talk-show set, a recording studio, an arena, a press conference;
-  the street redrawn as a vox pop: README §2): a singer at a
+  the street redrawn as a vox pop; thirteen since R8d, the room, spring's
+  card's: README §2): a singer at a
   microphone; the rival with a guitar; a festival crowd; a paparazzi shot,
   in red duotone, only when a scandal leads; a red carpet; a film set; a
   street, in each of the four seasons; an award under a spotlight. The

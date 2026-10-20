@@ -18,9 +18,10 @@ export type CardFace = (typeof CARD_FACES)[number];
 
 /**
  * The newspaper photographs' scenes (round 2c; the visual phase draws each in code; four added in round R8a, from
- * R7b's drawings). Only a lead story has one; a door and a season card show one too (R8a).
+ * R7b's drawings; the room in round R8d, spring's). Only a lead story has one; a door and a season card show one too
+ * (R8a).
  */
-export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy', 'tvshow', 'studio', 'arena', 'podium'] as const;
+export const SCENE_IDS = ['singer', 'rival', 'crowd', 'paparazzi', 'carpet', 'filmset', 'street', 'trophy', 'tvshow', 'studio', 'arena', 'podium', 'room'] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 /** The drawings every scene has: as drawn, mirrored, closer (README §2). A door names one (round R8a). */
 export const SCENE_DRAWINGS = 3;
@@ -607,8 +608,8 @@ export interface Rules {
   /** The season each act is (round V1a): the scene's light and the stat bar's marks. One per act. */
   readonly seasons?: readonly SeasonId[];
   /**
-   * The season cards' photographs (round R8a): a scene by season, printed light on ink above the card's date. The first
-   * season's card is the opening, over the title's photograph: it has none.
+   * The season cards' photographs (round R8a): a scene by season, printed light on ink above the card's date. Since
+   * round R8d the first season's has one too: the opening is its card.
    */
   readonly seasonScenes?: Readonly<Partial<Record<SeasonId, SceneId>>>;
   /** Each act's season opener variants (decision 15), one list per act; one variant per run. */

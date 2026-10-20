@@ -85,7 +85,7 @@ Conditions use one shape everywhere:
 }
 ```
 
-`photo` (round R8a): the door's photograph, an oval above "You're invited" — a `scene` (one of the twelve, below under `scenes`) and a `drawing`, 0 to 2: as drawn, mirrored, closer (`SCENE_DRAWINGS`). Every door has one; validate checks both. `flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
+`photo` (round R8a): the door's photograph, an oval above "You're invited" — a `scene` (one of the thirteen, below under `scenes`) and a `drawing`, 0 to 2: as drawn, mirrored, closer (`SCENE_DRAWINGS`). Every door has one; validate checks both. `flavorKeys`: the gate's flavour variants (prose), one per run. Two gates offered per act, resolved after the act's last turn. Gate ids carry no act number: `act` alone says when a gate comes up, so moving it is a one-field change. Failing a Gate is a setback, never a run-ender.
 Requirements are evaluated at resolution. Prefer conditions on state at that moment (heat, scandal count, resources) over permanent flag locks (`flags.not` on a flag set early), which turn a gate into a dead end the player can't respond to — validate warns on them. From act 2 on, at least one gate per act must require `hype` (validate enforces), so a pure-craft deck can't pass everything.
 
 ## Endings — `content/endings.json`
@@ -181,9 +181,10 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   `filler:<paper>`, `spillover:<paper>`) or by i18n key — a story's key
   first, then its group; validate holds that each names a card (a scandal
   under `scandal:`, any other under `card:`), a paper or a key that exists
-  (round R8a). The twelve scenes: `singer`, `rival`, `crowd`, `paparazzi`,
-  `carpet`, `filmset`, `street`, `trophy`, and since round R8a `tvshow`,
-  `studio`, `arena`, `podium`. /core's `sceneOf` gives each lead its scene
+  (round R8a). The thirteen scenes: `singer`, `rival`, `crowd`, `paparazzi`,
+  `carpet`, `filmset`, `street`, `trophy`, since round R8a `tvshow`,
+  `studio`, `arena`, `podium`, and since round R8d `room` (spring's card's;
+  no paper asks for it yet). /core's `sceneOf` gives each lead its scene
   in `frontPages`.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
   `beats` entry per season (`paper`, `key`), and optional `award` (round
@@ -287,11 +288,14 @@ Round 2c adds the stat bar's tooltips and the countdown's levels:
   `summer`, `autumn` or `winter` — the light on the desk and the weather
   in a paper's ear. The names players read stay in `actNameKeys`.
 - `seasonScenes` (round R8a): the season cards' photographs — a scene by
-  season id, `{ "summer": "arena", "autumn": "street", "winter": "carpet" }`,
-  printed light on ink above the card's date (the street in the card's own
-  season). The first season's card is the opening, over the title's
-  photograph: validate holds that it has none, that every key is a season
-  in `seasons` and every value a scene.
+  season id, `{ "spring": "room", "summer": "arena", "autumn": "street",
+  "winter": "carpet" }`, printed light on ink above the card's date (the
+  street in the card's own season). It may name the first season (round
+  R8d): its card is the opening, which shows it. Validate holds that every
+  key is a season in `seasons` and every value a scene.
+- `actOpenerKeys`: each season's opener variants, one list per act. The
+  first season's may be empty when `openingKeys` is written (round R8d):
+  the opening is its card, and validate asks no opener of it.
 
 ## Desk scripts — `content/scripts.json`
 
@@ -391,6 +395,6 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - variants per line group — warnings: a group needs more the more often it is seen per run (4+ a run → 4, 2 to 4 → 3, under 2 → 2; once-per-run items → 2), from `sim/appearances.json` (`npm run sim:variants`)
 - tier words: one word of at most 10 characters
 - the desk (round V1a): `rules.seasons` one per act, a major's `note` colour, a paper's `issue`, the box office (its paper, rows, takings, the player's lane), and every desk key a paper or the box office needs — the film titles not yet written are a warning
-- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener, the opening
+- player-facing prose not yet written — warnings, not errors: a card without a headline, a scandal without its headline or in-hand line, a major without name or goal line, a minor without name or text, a gate without flavour, a season without an opener (the first needs none when the opening is written, round R8d), the opening
 
 Load failures are loud in dev, graceful in the shipped build.

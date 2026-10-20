@@ -1,8 +1,9 @@
 // The feed (docs/ui-plan.md §3; §13, decisions 5 and 18): the run's events, aggregated per action.
 // One headline per card played, in its register, with its resource deltas beneath; draws merged into one
-// line; scandals as the lead story; a season opener when a season starts; the manager's messages as each
-// month opens, and their month-end perk (round 2b). An explanation attaches to the event that caused it:
-// the month-end residue, a gate's heat, the line moving. Pure: steps in, lines out.
+// line; scandals as the lead story; a season opener when a season starts (none for the first, whose card is the
+// opening: round R8d); the manager's messages as each month opens, and their month-end perk (round 2b). An
+// explanation attaches to the event that caused it: the month-end residue, a gate's heat, the line moving. Pure:
+// steps in, lines out.
 // How far the line moved is /core's number (lineMoved); nothing here compares states.
 
 import {
@@ -141,7 +142,8 @@ export function feedLines(steps: readonly PlayedStep[]): FeedLine[] {
     const enterMonth = (act: number, turn: number) => {
       if (act !== lastAct) {
         flush();
-        push('opener', seasonOpener(step.after, act));
+        // A season with no opener prints none: the first, whose card is the opening (round R8d).
+        if (c.rules.actOpenerKeys?.[act - 1]?.length) push('opener', seasonOpener(step.after, act));
         lastAct = act;
         if (step.action?.type === 'CHOOSE_GATE') tellLine(); // the season transition says the line tightened
       }
