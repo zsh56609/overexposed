@@ -230,7 +230,7 @@ Band population, persona classes, the band table and diagnostics: [`docs/sim.md`
 | 11/2–3 | Fixes only, the itch page; **submit 11/3 JST** |
 | **11/5 04:00 JST** | **Deadline — treat 11/4 as the real one** |
 
-Versions: R1 v0.1, R2 v0.2, R3 v0.3, R4 v0.4, R5 v0.5, R6 v0.6, R7 v0.7, the submission v1.0.
+Versions: R1 v0.1, R2 v0.2, R3 v0.3, R4 v0.4, R5 v0.5, R6 v0.6, R7 v0.7, R8a + R8b v0.8, the submission v1.0.
 
 Cut for the jam: hand-painted illustration and the photo collage (§6); the year in review as its own phase (the awards night shows the year in front pages). The current task is in [`docs/status.md`](docs/status.md).
 

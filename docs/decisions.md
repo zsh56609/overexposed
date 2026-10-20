@@ -6,6 +6,14 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8b, Part D: v0.8
+
+- v0.8 is R8a and R8b's build (`package.json` 0.8.0; the credits' foot reads v0.8), a release
+  candidate: its zip replaces v0.7 on itch. AGENTS.md §7 lists "R8a + R8b v0.8".
+- R8b's new words are THE NEW WORDS the author approved, kept in `docs/writing/draft-v11.md`; a
+  script compared them with `i18n/en.json` key by key (22 keys: 20 new, 2 moved;
+  `ui.credits.read` gone).
+
 ## 2026-10-20 — Round R8b, Part C: the credits laid out again
 
 - Each credit's role stands over its name, one left edge: the role as before (a deck section's
