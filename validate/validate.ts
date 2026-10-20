@@ -115,7 +115,7 @@ const CARD_FIELDS = [
 const GATE_FIELDS = ['id', 'act', 'nameKey', 'flavorKeys', 'requires', 'onPass', 'onFail', 'photo'];
 const ENDINGS_FIELDS = ['axes', 'majors', 'minors'];
 const AXIS_FIELDS = ['id', 'key', 'from', 'sides', 'unlisted'];
-const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note'];
+const MAJOR_FIELDS = ['id', 'on', 'nameKey', 'goalKey', 'note', 'scene'];
 const MINOR_FIELDS = ['id', 'major', 'conditions', 'fallback', 'nameKey', 'textKeys', 'goalKey'];
 const AWARD_FIELDS = ['id', 'nameKey', 'citationKey', 'howKey', 'shortKey', 'trophy', 'conditions', 'fallback'];
 /** Awards are a separate list, capped at 12 (docs/ui-plan.md §13, decision 20; raised from 8 in round R8c). */
@@ -827,6 +827,8 @@ function checkEndings(v: Ctx, raw: unknown, rules: Obj | null): { majors: Obj[];
     v.key(m.goalKey, `${where}.goalKey`);
     // Its sticky note on the mirror (round V1a).
     if (m.note !== undefined && !(NOTE_COLOURS as readonly unknown[]).includes(m.note)) v.error('schema', `${where}.note`, `must be one of ${NOTE_COLOURS.join(', ')}, got ${q(m.note)}`);
+    // The awards night's backdrop (round R8c, C1): one of the scenes, light on ink.
+    if (!(SCENE_IDS as readonly unknown[]).includes(m.scene)) v.error('references', `${where}.scene`, `the night's backdrop: must be one of ${SCENE_IDS.join(', ')}, got ${q(m.scene)}`);
     if (!isObj(m.on)) return v.error('schema', `${where}.on`, 'must name its side of every axis, like { "fame": "known" }');
     v.fields(m.on, [...axisSides.keys()], `${where}.on`);
     for (const [axis, sides] of axisSides) {

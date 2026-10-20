@@ -35,6 +35,82 @@ const OVAL = { w: 560, h: 200, cell: 3.6 } as const;
 const lights = new Map<string, string>();
 const lightKey = ([scene, season]: LightJob): string => `${scene}:${season}`;
 
+/**
+ * The awards night's backdrop (round R8c, C2 and C3): the major's scene light on ink, 1100×393 stage pixels times the
+ * stage's factor, its dot cell 4.4 times the same; winter for all four (only the street draws by season). Its own cache,
+ * by scene and size, kept for the page's life — PLAY AGAIN into the same major finds it; not the ovals' map, keyed by
+ * scene and season (carpet in winter is also winter's oval, at another size).
+ */
+const BACKDROP = { w: 1100, h: 393, cell: 4.4 } as const;
+const backdrops = new Map<string, string>();
+const backdropKey = ([scene, , w, h]: LightJob): string => `${scene}:${w}x${h}`;
+
+/** The backdrop's light job for a scene, at the stage's factor now. */
+export function backdropJob(scene: SceneId): LightJob {
+  const k = stageFactor();
+  return [scene, 'winter', Math.round(BACKDROP.w * k), Math.round(BACKDROP.h * k), BACKDROP.cell * k] as const;
+}
+
+/** The backdrop if it is drawn already. */
+export const backdropNow = (job: LightJob): string | null => backdrops.get(backdropKey(job)) ?? null;
+
+/**
+ * Draws the backdrop off the main thread: one light job for the photo worker, posted when the night mounts. Without a
+ * worker (no Worker or OffscreenCanvas, or the worker fails), `onPage` decides when it is drawn on the page — when it is
+ * idle, after the night's reveal. Resolves with its URL, cached.
+ */
+export function drawBackdrop(job: LightJob, onPage: (draw: () => void) => void): Promise<string> {
+  const hit = backdropNow(job);
+  if (hit) return Promise.resolve(hit);
+  return new Promise<string>((resolve) => {
+    // The first drawing kept; one that comes after it (another night's request) gives way to it.
+    const keep = (url: string) => {
+      const was = backdrops.get(backdropKey(job));
+      if (was === undefined) backdrops.set(backdropKey(job), url);
+      else if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+      resolve(was ?? url);
+    };
+    let settled = false;
+    const page = () => {
+      if (settled) return;
+      settled = true;
+      onPage(() => keep(renderLightCanvas(...job, t('desk.photo.director'), false).toDataURL()));
+    };
+    if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') {
+      page();
+      return;
+    }
+    try {
+      const worker = new Worker(new URL('./photo-worker.ts', import.meta.url), { type: 'module' });
+      const timer = window.setTimeout(() => fall(), 15000);
+      const fall = () => {
+        window.clearTimeout(timer);
+        worker.terminate();
+        page();
+      };
+      worker.onmessage = (event: MessageEvent<{ light?: LightJob; blob?: Blob; done?: boolean; error?: string }>) => {
+        if (settled) return;
+        const m = event.data;
+        if (m.error) return fall();
+        if (m.light && m.blob) {
+          settled = true;
+          window.clearTimeout(timer);
+          worker.terminate();
+          keep(URL.createObjectURL(m.blob));
+        } else if (m.done) fall();
+      };
+      worker.onerror = (event) => {
+        event.preventDefault();
+        fall();
+      };
+      worker.onmessageerror = fall;
+      worker.postMessage({ lights: [job], directorLabel: t('desk.photo.director') });
+    } catch {
+      page();
+    }
+  });
+}
+
 /** The season cards' ovals content asks for (rules.seasonScenes), at the stage's factor now. */
 export function lightJobs(): LightJob[] {
   const k = stageFactor();

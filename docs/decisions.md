@@ -6,6 +6,22 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part C: the night's backdrop
+
+- Behind the night's top, the major's scene printed light on ink (renderLightCanvas, as the
+  season cards' ovals): The Breakthrough the arena, The Long Game the studio, Overexposed the
+  red carpet, The Hard Way the street — winter for all four, set in /ui (only the street draws
+  by season). Content: a major's `scene`, required, one of SCENE_IDS.
+- Faint and feathered (opacity .26, a radial mask), over the night's ground, under the
+  spotlight and the curtains; 1100×393 at 90, 8, drawn at the stage's factor with a dot cell
+  of 4.4 (the ovals' 3.6).
+- Drawn off the main thread — one light job for the photo worker, posted when the night
+  mounts — and faded in over 600 ms when it comes; it never delays the reveal. Without a
+  worker it is drawn on the page when idle, after the reveal. Its own cache, by scene and
+  size: not the ovals' (keyed by scene and season; carpet in winter is also winter's oval, at
+  another size). check/photo-worker.ts compares one backdrop-sized job, worker against page:
+  exact in Chromium and Firefox.
+
 ## 2026-10-20 — Round R8c, Part B: trophies, on the night and on the shelf
 
 - Every award has a trophy, the author's drawing (seven: a gold record, a gramophone with

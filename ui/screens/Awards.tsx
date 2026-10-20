@@ -6,8 +6,9 @@
 // folded away. Everything comes from content and /core; no rule is computed here.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getMajor, getManager, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState } from '../../core/index.ts';
+import { getMajor, getManager, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState, type SceneId } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
+import { backdropJob, backdropNow, drawBackdrop } from '../desk/photo-preload.ts';
 import { recordAwards, recordEnding } from '../collection.ts';
 import { Face } from '../Face.tsx';
 import { t } from '../i18n.ts';
@@ -92,6 +93,45 @@ interface AwardsProps {
   readonly beat: string;
 }
 
+/**
+ * The night's backdrop (round R8c, C1–C3): the major's scene light on ink behind the night's top. Drawn off the main
+ * thread from the night's mount; it never holds the reveal. Without a worker it is drawn on the page when the page is
+ * idle after the reveal — at once when the night is shown at once.
+ */
+function useBackdrop(scene: SceneId | null, revealed: boolean): string | null {
+  const job = useMemo(() => (scene ? backdropJob(scene) : null), [scene]);
+  const [url, setUrl] = useState<string | null>(() => (job ? backdropNow(job) : null));
+  const shown = useRef(revealed);
+  shown.current = revealed;
+  const waiting = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    if (!job || url) return;
+    let live = true;
+    void drawBackdrop(job, (draw) => {
+      const go = () => {
+        const later = (fn: () => void) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 2000 }) : window.setTimeout(fn, 40));
+        later(() => {
+          if (live) draw();
+        });
+      };
+      if (shown.current) go();
+      else waiting.current = go;
+    }).then((u) => {
+      if (live) setUrl(u);
+    });
+    return () => {
+      live = false;
+    };
+  }, [job]);
+  useEffect(() => {
+    if (!revealed || !waiting.current) return;
+    const go = waiting.current;
+    waiting.current = null;
+    go();
+  }, [revealed]);
+  return url;
+}
+
 /** When a box of the night's awards comes (s): a plaque as before, 0.3 s apart from 2.45 s; a box's entries 0.12 s apart after it. */
 const boxDelay = (i: number) => ({ animationDelay: `${2.45 + i * 0.3}s` });
 const entryDelay = (i: number, k: number) => ({ animationDelay: `${2.45 + i * 0.3 + 0.12 * (k + 1)}s` });
@@ -156,6 +196,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
   const awards = yearAwards(s);
   const layout = nightLayout(awards);
   useNightSounds(cheered(c, majorId), layout.plaques.length + (layout.box ? 1 : 0), revealed);
+  const backdrop = useBackdrop(getMajor(c, majorId)?.scene ?? null, revealed);
   // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
   const rival = rivalArc(c, s.seed);
   const last = lastWord(s);
@@ -178,6 +219,8 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
         setRevealed(true);
       }}
     >
+      {/* The backdrop (round R8c, C2): the night's first child, over its ground, under the spotlight and the curtains. */}
+      {backdrop && <img className="backdrop" src={backdrop} alt="" data-deco="1" data-hook="backdrop" />}
       <div className="spot" data-deco="1" />
       <div className="floorA" data-deco="1" />
       <div className="curtL" data-deco="1" />

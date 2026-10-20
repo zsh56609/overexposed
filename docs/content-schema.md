@@ -98,8 +98,9 @@ Two levels ([`design/content-expansion.md`](design/content-expansion.md) §1).
   carry them).
 - `majors`, in goals-board order: `id`, `on` (a side per axis),
   `nameKey`, `goalKey`, optional `note` (round V1a) — the colour of its
-  sticky note on the mirror: `yellow`, `green`, `blue` or `pink`. Every
-  corner of the axes has exactly one major.
+  sticky note on the mirror: `yellow`, `green`, `blue` or `pink` — and
+  `scene` (round R8c), one of `SCENE_IDS`: the awards night's backdrop,
+  printed light on ink. Every corner of the axes has exactly one major.
 - `minors`, in resolution order within their major: `id`, `major`,
   `nameKey`, `textKeys` (the text's variants, one per run), optional
   `goalKey`, and either `conditions` or `fallback: true` — exactly one

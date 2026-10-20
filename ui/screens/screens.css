@@ -168,6 +168,14 @@
 .awards-night .curtL { left: 0; }
 .awards-night .curtR { right: 0; box-shadow: inset 18px 0 30px rgba(0, 0, 0, .6); }
 .awards-night .valance { position: absolute; left: 0; right: 0; top: 0; height: 26px; z-index: 3; background: repeating-linear-gradient(90deg, #5e1119 0 30px, #431016 30px 60px); box-shadow: 0 8px 16px rgba(0, 0, 0, .6); }
+/* The night's backdrop (round R8c, C2; r8c-awards.html .backdrop-demo .bg): the major's scene printed light on ink, faint
+   and feathered behind the night's top — over the night's ground, under the spotlight and the curtains. It fades in
+   over 600 ms when it comes; reduced motion or motion off, no fade. */
+.awards-night .backdrop { position: absolute; left: 90px; top: 8px; width: 1100px; height: 393px; z-index: 0; opacity: .26; pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 56% 50% at 50% 40%, #000 34%, transparent 80%); mask-image: radial-gradient(ellipse 56% 50% at 50% 40%, #000 34%, transparent 80%);
+  animation: awards-backdrop .6s ease-out both; }
+@keyframes awards-backdrop { from { opacity: 0; } to { opacity: .26; } }
+:root:is([data-motion-resolved='reduced'], [data-motion='off']) .awards-night .backdrop { animation: none; }
 .awards-night .spot { position: absolute; left: 340px; top: 0; width: 600px; height: 720px; z-index: 1; background: radial-gradient(ellipse at 50% 0%, rgba(255, 236, 190, .22), rgba(255, 236, 190, .05) 45%, transparent 70%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
 .awards-night .floorA { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 1; background: radial-gradient(ellipse at 50% 0%, rgba(255, 230, 180, .12), transparent 60%), linear-gradient(180deg, #120d0b, #050404); }
 .awards-night .a-top { position: absolute; left: 160px; right: 160px; top: 34px; z-index: 5; display: flex; flex-direction: column; align-items: center; }

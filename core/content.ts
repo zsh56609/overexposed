@@ -274,6 +274,8 @@ export interface MajorDef {
   readonly goalKey: string;
   /** Its sticky note's colour on the mirror (round V1a). */
   readonly note?: NoteColour;
+  /** The awards night's backdrop (round R8c, C1): the scene printed light on ink behind the night's top, in winter. */
+  readonly scene: SceneId;
 }
 
 export interface MinorDef {

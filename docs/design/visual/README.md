@@ -136,6 +136,14 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
   columns filled row by row (22×27, 12 px, 9.5 px). A fresh award in a box has no chip but a 6 px `#ffcf85` dot at
   its trophy's upper right. A box comes as a plaque does (2.45 s + 0.3 s a box), its entries 0.12 s apart after it;
   applause once a box; a click, reduced motion or motion off show it all at once.
+- **The night's backdrop** (round R8c): the major's scene printed light on ink, as the season cards' ovals are —
+  The Breakthrough the arena, The Long Game the studio, Overexposed the red carpet, The Hard Way the street, all in
+  winter — behind the night's top: an image, the night's first child, at 90, 8, 1100×393 on the stage, over the
+  night's ground and under the spotlight and the curtains, opacity .26, feathered by a radial mask (`ellipse 56% 50%
+  at 50% 40%`, solid to 34%, gone at 80%). Drawn at the stage's factor (its dot cell 4.4 times it) by the photo worker
+  when the night mounts; it fades in over 600 ms when it comes (reduced motion or motion off: no fade) and never holds
+  the reveal. Without a worker it is drawn on the page when the page is idle after the reveal. Its own cache, by scene
+  and size, for the page's life.
 - **PLAY AGAIN in brass** (round R8c): `linear-gradient(180deg, #e9c87a, #c9a04a)`, ink `#1a120a`, a warm glow and
   an inner highlight; hovered, `#f6dc98` → `#dcb45a`. Its size and place as before, the last front page's width.
 
