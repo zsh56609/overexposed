@@ -37,11 +37,13 @@ import {
   SEASON_IDS,
   NOTE_COLOURS,
   SCRIPT_LINE_KINDS,
+  STANCES,
   RESOURCE_KEYS,
   TROPHY_IDS,
   scandalGroup,
   YEAR_ONLY_KEYS,
   YEAR_STAT_KEYS,
+  RIVAL_TERMS,
 } from '../core/index.ts';
 
 export const CHECKS = {
@@ -60,7 +62,7 @@ export const CHECKS = {
   boundaries: 'code boundaries (CLAUDE.md §0)',
   sound: "the sound module: the author's, copied unchanged",
   avatars: "the faces: the author's ten portraits, unchanged",
-  photos: "the photos: the author's seven drawings, unchanged",
+  photos: "the photos: the author's nine drawings, unchanged",
   trophies: "the trophies: the author's seven drawings, unchanged",
   notes: "the manager's notes: a line per note and manager, and their marks",
 } as const;
@@ -1271,7 +1273,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
   const endingIds = new Set([...endings.majors, ...endings.minors].map((e) => e.id).filter(isStr));
   const awards = checkAwards(v, raw.awards, endingIds, isObj(i18n) ? i18n : {});
   checkReferences(v, rules, cards);
-  checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)), isObj(i18n) ? i18n : {});
+  checkPress(v, raw.press, rules, new Set(endings.majors.map((m) => m.id)), isObj(i18n) ? i18n : {}, new Set(awards.map((a) => a.id)));
   checkManagers(v, raw.managers, rules, raw.endings);
   checkFaces(v, rules, cards);
   checkScripts(v, raw.scripts, rules);
@@ -1300,7 +1302,7 @@ export function validateContent(raw: RawContent, i18n?: unknown, appearances?: A
 const PRESS_FIELDS = ['papers', 'route', 'subjects', 'earlyLane', 'page', 'scenes', 'rival', 'boxOffice'];
 const PAGE_FIELDS = ['slots', 'worldMin', 'loud', 'money', 'scandal', 'spillover', 'frenzyAt', 'spilloverFrom', 'overwhelmScandalFrom', 'overwhelmLaneFrom', 'filler'];
 
-function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>, i18n: Obj): void {
+function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlySet<unknown>, i18n: Obj, awardIds: ReadonlySet<unknown>): void {
   const file = 'content/press.json';
   if (raw === undefined) return v.error('schema', file, 'is missing: the papers every line prints in');
   if (!isObj(raw)) return v.error('schema', file, 'must be an object: { papers, route, subjects, earlyLane }');
@@ -1497,7 +1499,9 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
   // The desk's shared words (round V1a): the kickers every paper uses, the captions.
   for (const k of ['paper.kicker.brief', 'paper.kicker.scandal', 'paper.kicker.justIn', 'paper.caption.player', 'paper.caption.scandal', 'paper.caption.rival', 'paper.caption.world', 'paper.dek', 'paper.dek.scandal']) v.key(k, `${file} (desk)`);
 
-  // The rival: one arc per run, a beat per season in a named paper, a closing line, the major she ends in.
+  // The rival: one arc per run, a beat per season in a named paper, the major she ends in, the award she is up for
+  // (round R8c, D3), and her words on the night (D4, D5): a line for each of the terms — won or lost when she has an
+  // award — and a last word for each but unmet.
   const rival = raw.rival;
   if (rival !== undefined) {
     const at = `${file} rival`;
@@ -1505,9 +1509,14 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
     else {
       v.fields(rival, ['arcs'], at);
       checkList(v, rival.arcs, `${at} arcs`, 'arc', (arc, where) => {
-        v.fields(arc, ['id', 'major', 'beats', 'endingKey'], where);
+        v.fields(arc, ['id', 'major', 'beats', 'award'], where);
         if (!majorIds.has(arc.major)) v.error('references', `${where}.major`, `no major ending with id ${q(arc.major)}`);
-        v.key(arc.endingKey, `${where}.endingKey`);
+        if (arc.award !== undefined && !awardIds.has(arc.award)) v.error('references', `${where}.award`, `no award with id ${q(arc.award)}`);
+        if (isStr(arc.id))
+          for (const terms of RIVAL_TERMS.filter((x) => x !== 'unmet')) {
+            for (const end of arc.award === undefined ? [''] : ['.won', '.lost']) v.key(`rival.${arc.id}.end.${terms}${end}`, `${where} (the night: her line)`);
+            v.key(`rival.${arc.id}.last.${terms}`, `${where} (the night: her last word)`);
+          }
         if (!Array.isArray(arc.beats) || arc.beats.length !== v.acts) v.error('structure', `${where}.beats`, `must give one beat per season (${v.acts})`);
         else
           arc.beats.forEach((beat, i) => {
@@ -1716,7 +1725,7 @@ function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
 // chain, messages and choices. Every event has a choice with no requirement — the player can always answer.
 
 const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'photo', 'choices'];
-const EVENT_CHOICE_FIELDS = ['replyKey', 'requires', 'effects', 'press', 'outcomeKey'];
+const EVENT_CHOICE_FIELDS = ['replyKey', 'stance', 'requires', 'effects', 'press', 'outcomeKey'];
 /** Events have their own budget (AGENTS.md → Content budget): a ceiling, not a target. */
 const EVENT_BUDGET = 28;
 
@@ -1836,6 +1845,11 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
       if (!isObj(ch)) return v.error('schema', at, 'must be an object');
       v.fields(ch, EVENT_CHOICE_FIELDS, at);
       v.key(ch.replyKey, `${at}.replyKey`);
+      // The side an answer to Juno takes (round R8c, D1): on a rival event's choices only, "with" or "against".
+      if (ch.stance !== undefined) {
+        if (e.category !== 'rival') v.error('schema', `${at}.stance`, 'a stance is the side an answer to the rival takes: on a rival event only');
+        else if (!(STANCES as readonly unknown[]).includes(ch.stance)) v.error('schema', `${at}.stance`, `must be one of ${STANCES.join(', ')}, got ${q(ch.stance)}`);
+      }
       v.key(ch.outcomeKey, `${at}.outcomeKey`);
       if (ch.requires !== undefined) checkCondition(v, ch.requires, `${at}.requires`);
       checkEffects(v, ch.effects, `${at}.effects`, owner);
@@ -1937,8 +1951,11 @@ export function checkAvatars(references: Readonly<Record<string, string | null>>
  * aside — each drawn on a 400×300 box, their ids unique across the seven.
  */
 export function checkPhotos(references: Readonly<Record<string, string | null>>, copies: Readonly<Record<string, string>> | null): Issue[] {
-  return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: () => 'r8b-photos', ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos', one: 'photo' }, references, copies);
+  return checkDrawings({ check: 'photos', file: 'ui/photos.ts', dir: photoDir, ids: PHOTO_IDS, box: '0 0 400 300', list: 'PHOTO_IDS', what: 'photos', one: 'photo' }, references, copies);
 }
+
+/** The folder each photo's drawing is in: r8b-photos/ for the seven of round R8b, r8c-photos/ for Juno's two. */
+export const photoDir = (id: string): string => (['carpet_view', 'small_room'].includes(id) ? 'r8c-photos' : 'r8b-photos');
 
 /** The folder each trophy's drawing is in (round R8c): r8c-trophies/. */
 export const trophyDir = (): string => 'r8c-trophies';

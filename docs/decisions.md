@@ -6,6 +6,33 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part D: Juno
+
+- The author: how Juno's year ends should say what she won, or that you took it from her,
+  and answer what passed between you.
+- Which side you were on: a rival event's choice may carry a stance. With her (12):
+  juno_hello a; juno_credit a; juno_soundalike b; juno_interview a, b; juno_shortlist a, b;
+  juno_carpet a; juno_video a, b; juno_unsigned a, b. Against her (1): juno_soundalike a.
+  Her terms (core, rivalTerms): unmet — no rival event answered; cold — any answer against;
+  warm — two or more with; neutral — the rest. In player-like runs (300 seeds a persona, each
+  manager): unmet 43%, cold 17–20%, neutral 26–29%, warm 10–11%.
+- Her award is said outright: breakthrough Best New Artist, crossover Breakthrough
+  Performance, fade Critics' Choice; crash none (she is not nominated). Her line on the night
+  (rivalLine, chosen in core, not in /ui): rival.<arc>.end.<terms>, unmet read as neutral,
+  then .won if she took her award or .lost if the player did — 21 lines; the arcs'
+  endingKey and the four rival.<arc>.ending lines go.
+- Her last word under the second front page (the author confirmed its place), when she was
+  answered: rival.<arc>.last.<terms>, 12 in all; at 4.75 s, between the manager's (4.6) and
+  the bottom block (4.9). The manager's block narrows to the first front page.
+- Her two photographs, as R8b's: juno_carpet the premiere's carpet after her first message,
+  juno_unsigned the small room after hers; juno_unsigned's second message changed (THE NEW
+  WORDS) so the thread keeps its room (21 px to spare with the replies showing, 4 without
+  the change; juno_carpet 39). validate finds each photo's drawing in its own folder.
+- check:preview holds her terms, line and last word to an oracle of its own after every
+  finished run; check:overflow puts each of her 21 lines in her place (one line, the top
+  above the label) and shows every last word, hers beside the manager's longest and each
+  manager's beside her longest, on the stage and clear of the bottom block.
+
 ## 2026-10-20 — Round R8c, Part C: the night's backdrop
 
 - Behind the night's top, the major's scene printed light on ink (renderLightCanvas, as the

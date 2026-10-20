@@ -262,6 +262,22 @@ window.__plainAudit = (where) => {
   const foot = document.querySelector('.p-credits .ver');
   if (document.querySelector('.p-credits') && !foot) add('the credits have no foot');
   if (foot && lines(foot) > 1) add('the credits\\' foot wraps:' + text(foot));
+  // Juno on the night (round R8c, D4 and D5): her line one line, the night's top ending above the awards\\' label; the
+  // last words\\' blocks on the stage and clear of the bottom block (PLAY AGAIN and the counters).
+  const night = [...document.querySelectorAll('.awards-night')].find((n) => n.offsetParent !== null);
+  if (night) {
+    const line = night.querySelector('.a-rival');
+    if (line && lines(line) > 1) add('Juno\\'s line runs to ' + lines(line) + ' lines:' + text(line));
+    const top = night.querySelector('.a-top'), label = night.querySelector('.a-label');
+    if (top && label && top.getBoundingClientRect().bottom > label.getBoundingClientRect().top + 0.5) add('the night\\'s top runs ' + (top.getBoundingClientRect().bottom - label.getBoundingClientRect().top).toFixed(1) + ' px into the awards\\' label');
+    const bottom = night.querySelector('.a-bottom')?.getBoundingClientRect();
+    for (const w of night.querySelectorAll('.lastword')) {
+      if (w.offsetParent === null) continue;
+      const r = w.getBoundingClientRect();
+      if (r.left < stage.left - 0.5 || r.top < stage.top - 0.5 || r.right > stage.right + 0.5 || r.bottom > stage.bottom + 0.5) add('a last word runs off the stage:' + text(w));
+      if (bottom && r.left < bottom.right && bottom.left < r.right && r.top < bottom.bottom && bottom.top < r.bottom) add('a last word meets the bottom block (PLAY AGAIN and the counters):' + text(w));
+    }
+  }
   // The business cards' faces (round R8a): no text on a card runs under its face — the name, the role and the quote
   // wrap beside it. Measured with the card's own tilt off, so a line's box is the line itself, then the tilt put back.
   for (const card of document.querySelectorAll('.manager-choice .bcard')) {
@@ -467,11 +483,13 @@ const DRIVE = (runs: number) => `(async () => {
   const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0, doors: { pairs: 0, apart: 0, tallest: 0, bottom: 0, clear: Infinity, worst: 0, worstBottom: 0 } };
   const longest = { ends: null, night: null };
   // The nights with five to eight awards (round R8c, B3): few years win five and seven is rare, so these are chosen
-  // lists, shown in the night's place by the night's own component (ui/dev/plaques.tsx) — the plaques the longest
+  // lists, shown in the night's place by the night's own component (ui/dev/night.tsx) — the plaques the longest
   // names and citations, the box the longest names and short lines, every boxed one fresh. The tightest line's room.
-  seen.nights = { lists: 0, tightest: null };
+  // Then every line of Juno's in her place (D4: 21), and every last word (D5): each of hers (12) beside the manager's
+  // longest, each manager's for each major (8) beside her longest.
+  seen.nights = { lists: 0, tightest: null, lines: 0, words: 0 };
   const nights = async () => {
-    const fx = await import('/ui/dev/plaques.tsx');
+    const fx = await import('/ui/dev/night.tsx');
     const core = await import('/core/index.ts');
     const text = await import('/ui/text.ts');
     const { content } = await import('/ui/content.ts');
@@ -496,6 +514,31 @@ const DRIVE = (runs: number) => `(async () => {
         if (!seen.nights.tightest || room < seen.nights.tightest.room) seen.nights.tightest = { room: Math.round(room * 10) / 10, what: el.textContent + ' (' + n + ')' };
       }
       seen.nights.lists++;
+      undo();
+    }
+    const { t } = await import('/ui/i18n.ts');
+    const arcs = c.press?.rival?.arcs ?? [];
+    const keys = arcs.flatMap((a) => ['neutral', 'warm', 'cold'].flatMap((terms) => (a.award ? ['rival.' + a.id + '.end.' + terms + '.won', 'rival.' + a.id + '.end.' + terms + '.lost'] : ['rival.' + a.id + '.end.' + terms])));
+    const line = document.querySelector('.awards-night .a-rival');
+    if (line) {
+      const was = line.textContent;
+      for (const key of keys) {
+        line.textContent = t(key);
+        plain('Juno\\'s lines');
+        seen.nights.lines++;
+      }
+      line.textContent = was;
+    }
+    const words = arcs.flatMap((a) => ['neutral', 'warm', 'cold'].map((terms) => 'rival.' + a.id + '.last.' + terms));
+    const lasts = (c.managers?.managers ?? []).flatMap((m) => Object.values(m.lastWord ?? {}).map((bubbles) => ({ manager: m.id, bubbles })));
+    const size = (keys) => keys.reduce((n, k) => n + t(k).length, 0);
+    const longestLast = [...lasts].sort((x, y) => size(y.bubbles) - size(x.bubbles))[0] ?? null;
+    const longestWord = [...words].sort((x, y) => t(y).length - t(x).length)[0] ?? null;
+    for (const [last, word] of [...words.map((w) => [longestLast, w]), ...lasts.map((l) => [l, longestWord])]) {
+      const undo = fx.showWords(c, last, word);
+      await sleep(20);
+      plain('the last words');
+      seen.nights.words++;
       undo();
     }
   };
@@ -635,7 +678,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null }; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -673,9 +716,9 @@ try {
         );
         // The nights with five to eight awards (round R8c, B3), from chosen lists: the tightest line in a box.
         const nt = out.nights;
-        console.log(`overflow check, ${tag}: the night with 5, 6, 7 and 8 awards (${nt.lists} chosen lists) — the tightest line in a box ${nt.tightest ? `"${nt.tightest.what}", ${nt.tightest.room} px to spare` : '-'}`);
-        if (nt.lists !== 4) {
-          console.log('OVERFLOW nights  the nights with five to eight awards were not all shown');
+        console.log(`overflow check, ${tag}: the night with 5, 6, 7 and 8 awards (${nt.lists} chosen lists) — the tightest line in a box ${nt.tightest ? `"${nt.tightest.what}", ${nt.tightest.room} px to spare` : '-'}; Juno's ${nt.lines} lines in her place, ${nt.words} pairs of last words`);
+        if (nt.lists !== 4 || nt.lines !== 21 || nt.words !== 20) {
+          console.log(`OVERFLOW nights  not all shown: ${nt.lists} of 4 lists, ${nt.lines} of 21 lines, ${nt.words} of 20 pairs of last words`);
           failed = true;
         }
         for (const [what, n] of out.issues.slice(0, 20)) console.log(`OVERFLOW ${n}x  ${what}`);
@@ -702,6 +745,16 @@ try {
         const rooms = Object.entries(evs.spare).sort((a, b) => a[1] - b[1]);
         const texts = new Set(rooms.map(([w]) => w.split(' ')[0]));
         console.log(`overflow check, ${tag}: ${texts.size} texts with their photographs in ${rooms.length} states — the tightest ${rooms[0]?.[0] ?? '-'}, ${rooms[0]?.[1] ?? '-'} px to spare`);
+        // Juno's two (round R8c, D7): each text's tightest state.
+        const juno = ['juno_carpet', 'juno_unsigned'].map((id) => {
+          const own = rooms.filter(([w]) => w.split(' ')[0] === id);
+          return `${id} ${own.length ? `${own[0]?.[1]} px (${own[0]?.[0].split(' ').slice(1).join(' ')})` : 'not shown'}`;
+        });
+        console.log(`overflow check, ${tag}: Juno's texts with their photographs — ${juno.join(', ')}`);
+        if (juno.some((x) => x.endsWith('not shown'))) {
+          console.log('OVERFLOW events  a text of Juno\'s with its photograph was not shown');
+          failed = true;
+        }
         if (texts.size === 0) {
           console.log('OVERFLOW events  no text showed a photograph');
           failed = true;

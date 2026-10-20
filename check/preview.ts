@@ -42,6 +42,10 @@ import {
   rememberedFlags,
   runChains,
   lastWord,
+  rivalArc,
+  rivalLastWord,
+  rivalLine,
+  rivalTerms,
   moodOf,
   getGate,
   getManager,
@@ -87,7 +91,7 @@ if (errors.length > 0) throw new Error('content fails validation; run npm run va
 const content = raw as Content;
 
 let mismatches = 0;
-const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, sceneOverrides: 0, quiet: 0, lastWords: 0, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, perkRows: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
+const counts = { desks: 0, deskIssues: 0, paperStories: 0, photos: 0, boxOffices: 0, handCards: 0, valueCards: 0, offers: 0, extraOffers: 0, laneOffers: 0, scenes: 0, sceneOverrides: 0, quiet: 0, lastWords: 0, rivals: 0, rivalTerms: { unmet: 0, cold: 0, neutral: 0, warm: 0 } as Record<string, number>, statBars: 0, dates: 0, messages: 0, messageMonths: 0, perkLines: 0, perkRows: 0, rerolls: 0, freeRerolls: 0, pages: 0, months: 0, states: 0, plays: 0, blocked: 0, endTurns: 0, gates: 0, draftCards: 0, crossings: 0, monthEndScandals: 0, copies: 0, finalGates: 0, headlines: 0, eitherWay: 0, awardsShown: 0, tierStates: 0, events: 0, eventChoices: 0, eventLines: 0, eventRuns: 0 };
 const report = (what: string, seed: number, turn: number, detail: string) => {
   mismatches++;
   if (mismatches <= 20) console.log(`MISMATCH ${what}  seed=${seed} turn=${turn}  ${detail}`);
@@ -519,6 +523,33 @@ function checkMessages(history: readonly PlayedStep[], seed: number): void {
     if (!last || last.bubbles.length !== 2 || !last.bubbles.every((k) => k.includes(`.last.${major}`))) report('last word', seed, 12, `${JSON.stringify(last)} for ${major}`);
     else counts.lastWords++;
   }
+  // Juno at the year's end (round R8c, D6), against the check's own reading: her terms from the run's answers and the
+  // stances in content (any against: cold; else two or more with: warm; any answered: neutral), her line from her arc
+  // and whether the year won her award, her last word unless she was never answered.
+  if (end?.phase === 'ended') {
+    const arc = rivalArc(end.content, end.seed);
+    let met = false;
+    let against = false;
+    let withHer = 0;
+    for (const r of end.eventLog) {
+      const ev = getEvent(end.content, r.eventId);
+      if (ev?.category !== 'rival') continue;
+      met = true;
+      const stance = ev.choices[r.choice]?.stance;
+      if (stance === 'against') against = true;
+      if (stance === 'with') withHer++;
+    }
+    const terms = !met ? 'unmet' : against ? 'cold' : withHer >= 2 ? 'warm' : 'neutral';
+    const took = arc?.award === undefined ? '' : yearAwards(end).includes(arc.award) ? '.lost' : '.won';
+    const line = arc ? `rival.${arc.id}.end.${terms === 'unmet' ? 'neutral' : terms}${took}` : null;
+    const word = arc && terms !== 'unmet' ? `rival.${arc.id}.last.${terms}` : null;
+    const got = { terms: rivalTerms(end), line: rivalLine(end), word: rivalLastWord(end) };
+    if (got.terms !== terms || got.line !== line || got.word !== word) report('rival', seed, 12, `${JSON.stringify(got)}, the oracle ${JSON.stringify({ terms, line, word })}`);
+    else {
+      counts.rivals++;
+      counts.rivalTerms[terms] = (counts.rivalTerms[terms] ?? 0) + 1;
+    }
+  }
   const perk = monthEndLines(history);
   counts.perkLines += perk.length;
   // A month-end line (round R5, B1) at every month end where the perk acted, by the oracle, and at no other.
@@ -896,7 +927,7 @@ console.log(
     `${counts.events} events (${counts.eventChoices} answers previewed, ${counts.eventLines} printing a line; ${counts.eventRuns} runs' event logs), ${counts.gates} gate choices (${counts.finalGates} final, naming an ending (major · minor) and its awards; ${counts.eitherWay} final gates said "either way", ` +
     `${counts.awardsShown} showed each option's awards), ${counts.draftCards} draft offers, stat tiers and the goals board at ${counts.tierStates} states, ` +
     `${bagSequences} shuffle-bag sequences, ${counts.months} months of front pages (${counts.pages} pages, ${counts.scenes} lead photographs, ${counts.sceneOverrides} of them an override's) recomposed, ` +
-    `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines, each where the perk acted, and ${counts.perkRows} END TURN previews with its row) re-read, ${counts.lastWords} last words, ` +
+    `${counts.messageMonths} months of manager messages (${counts.messages} messages of two bubbles, ${counts.quiet} quiet months, ${counts.perkLines} month-end lines, each where the perk acted, and ${counts.perkRows} END TURN previews with its row) re-read, ${counts.lastWords} last words, ${counts.rivals} of Juno's nights (her terms ${Object.entries(counts.rivalTerms).map(([k, n]) => `${k} ${n}`).join(', ')}: her line and last word to the oracle), ` +
     `${counts.offers} offers dealt (${counts.extraOffers} with the manager's extra card, labelled), ${counts.rerolls} reroll prices (${counts.freeRerolls} free), ${counts.laneOffers} lane-weighted offers, ${counts.statBars} stat bars with their tooltips and ${counts.dates} dates, ` +
     `${counts.desks} desks against /core (${counts.deskIssues} issues before END TURN equal to the month printed; ${counts.paperStories} stories, ${counts.photos} photographs, ${counts.boxOffices} box offices on the papers; ${counts.handCards} cards in the fan, ${counts.valueCards} faces of values) ` +
     `(${((performance.now() - t0) / 1000).toFixed(1)}s)`,

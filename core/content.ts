@@ -34,10 +34,11 @@ export type AvatarId = (typeof AVATAR_IDS)[number];
 
 /**
  * The photographs some texts carry (round R8b; docs/design/visual/ref/r8b-photos/, drawn into ui/photos.ts): Mum's
- * Sunday table, Lio's desk, Sam's band's poster, the photographer's shot of the player. A text names one and where in
- * its thread it comes (EventDef.photo); a letter has none.
+ * Sunday table, Lio's desk, Sam's band's poster, the photographer's shot of the player; and Juno's two (round R8c,
+ * r8c-photos/): the premiere's carpet, the small room. A text names one and where in its thread it comes
+ * (EventDef.photo); a letter has none.
  */
-export const PHOTO_IDS = ['gran_coat', 'sunday_table', 'luccas', 'flash_shot', 'console', 'gig_poster', 'panel_tv'] as const;
+export const PHOTO_IDS = ['gran_coat', 'sunday_table', 'luccas', 'flash_shot', 'console', 'gig_poster', 'panel_tv', 'carpet_view', 'small_room'] as const;
 export type PhotoId = (typeof PHOTO_IDS)[number];
 
 /**
@@ -412,12 +413,16 @@ export interface RivalBeatDef {
   readonly key: string;
 }
 
-/** The rival's year, fixed by the seed at the run's start: a beat per season, a closing line, her major. */
+/**
+ * The rival's year, fixed by the seed at the run's start: a beat per season, her major, and the award she is up for
+ * (round R8c, D3: none in a year she is not nominated). Her line on the night is rivalLine's (core/rival.ts).
+ */
 export interface RivalArcDef {
   readonly id: string;
   readonly major: string;
   readonly beats: readonly RivalBeatDef[];
-  readonly endingKey: string;
+  /** An award id: hers if the player does not win it. */
+  readonly award?: string;
 }
 
 /**
@@ -750,8 +755,21 @@ export interface EventPressDef {
   readonly lineKeys: readonly string[];
 }
 
+/** The side an answer to Juno takes (round R8c, D1): with her, or against her. A rival event's choice may carry one. */
+export const STANCES = ['with', 'against'] as const;
+export type Stance = (typeof STANCES)[number];
+
+/**
+ * How things stand between the player and Juno at the year's end (round R8c, D2): unmet — no rival event answered;
+ * cold — an answer against her; warm — two or more with her; neutral — the rest.
+ */
+export const RIVAL_TERMS = ['unmet', 'cold', 'warm', 'neutral'] as const;
+export type RivalTerms = (typeof RIVAL_TERMS)[number];
+
 export interface EventChoiceDef {
   readonly replyKey: string;
+  /** On a rival event's choice (round R8c, D1): the side the answer takes. Without one, neither. */
+  readonly stance?: Stance;
   /** Unmet: the choice shows, disabled, with what it needs. */
   readonly requires?: Condition;
   readonly effects: readonly Effect[];

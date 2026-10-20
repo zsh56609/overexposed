@@ -220,25 +220,24 @@
         "id": "breakthrough",
         "major": "breakthrough",
         "beats": [{ "paper": "bside", "key": "rival.breakthrough.1" }, { "paper": "flash", "key": "rival.breakthrough.2" }, { "paper": "bside", "key": "rival.breakthrough.3" }, { "paper": "flash", "key": "rival.breakthrough.4" }],
-        "endingKey": "rival.breakthrough.ending"
+        "award": "best_new_artist"
       },
       {
         "id": "crash",
         "major": "overexposed",
-        "beats": [{ "paper": "flash", "key": "rival.crash.1" }, { "paper": "flash", "key": "rival.crash.2" }, { "paper": "flash", "key": "rival.crash.3" }, { "paper": "flash", "key": "rival.crash.4" }],
-        "endingKey": "rival.crash.ending"
+        "beats": [{ "paper": "flash", "key": "rival.crash.1" }, { "paper": "flash", "key": "rival.crash.2" }, { "paper": "flash", "key": "rival.crash.3" }, { "paper": "flash", "key": "rival.crash.4" }]
       },
       {
         "id": "crossover",
         "major": "breakthrough",
         "beats": [{ "paper": "bside", "key": "rival.crossover.1" }, { "paper": "marquee", "key": "rival.crossover.2" }, { "paper": "marquee", "key": "rival.crossover.3" }, { "paper": "marquee", "key": "rival.crossover.4" }],
-        "endingKey": "rival.crossover.ending"
+        "award": "breakthrough_performance"
       },
       {
         "id": "fade",
         "major": "long_game",
         "beats": [{ "paper": "bside", "key": "rival.fade.1" }, { "paper": "bside", "key": "rival.fade.2" }, { "paper": "flash", "key": "rival.fade.3" }, { "paper": "bside", "key": "rival.fade.4" }],
-        "endingKey": "rival.fade.ending"
+        "award": "critics_choice"
       }
     ]
   }

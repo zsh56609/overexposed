@@ -2,11 +2,12 @@
 // ending under a spotlight between the curtains — the major as the category, the minor as the title, its prose;
 // the year's awards as winner plaques, each with its trophy (round R8c: one to four plaques; five or six, three and a
 // box for the rest; seven or eight, two and a wide box); the year told back in four front pages, one a season (/core's seasonPages);
-// Juno Vale's closing line; the manager's last word; the endings found and PLAY AGAIN. The run's numbers stay,
+// Juno Vale's closing line (round R8c: what she won or lost, and how things stand between you); the manager's last
+// word under the first front page, and Juno's under the second; the endings found and PLAY AGAIN. The run's numbers stay,
 // folded away. Everything comes from content and /core; no rule is computed here.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getMajor, getManager, lastWord, majorOf, rivalArc, seasonPages, yearAwards, type ContentIndex, type GameState, type SceneId } from '../../core/index.ts';
+import { getMajor, getManager, lastWord, majorOf, rivalLastWord, rivalLine, seasonPages, yearAwards, type ContentIndex, type GameState, type SceneId } from '../../core/index.ts';
 import { photoUrl } from '../desk/halftone.ts';
 import { backdropJob, backdropNow, drawBackdrop } from '../desk/photo-preload.ts';
 import { recordAwards, recordEnding } from '../collection.ts';
@@ -132,6 +133,52 @@ function useBackdrop(scene: SceneId | null, revealed: boolean): string | null {
   return url;
 }
 
+/** The night's two last words (round R8c, D5): the manager's, and Juno's when she was answered. */
+export interface NightWordsProps {
+  readonly c: ContentIndex;
+  /** The manager's last word: their id and the bubbles' keys (core/manager.ts lastWord). */
+  readonly last: { readonly manager: string; readonly bubbles: readonly string[] } | null;
+  /** Juno's last word, a key (core/rival.ts rivalLastWord). */
+  readonly rival: string | null;
+}
+
+/**
+ * The night's last words (round R8c, D5): the manager's under the first front page (4.6 s), Juno's under the second
+ * (4.75 s) — a face, a name, the bubbles, each block one front page wide. Her name and face are the rival's events'
+ * speaker's, from content.
+ */
+export function NightWords({ c, last, rival }: NightWordsProps) {
+  // The manager's face begins the last word's name row (round R8a), 22 px, as on the desk.
+  const lastFace = last ? getManager(c, last.manager)?.avatar : undefined;
+  const her = c.events.find((e) => e.category === 'rival')?.speaker;
+  return (
+    <>
+      {last && (
+        <div className="lastword rv" style={{ animationDelay: '4.6s' }} data-hook="last-word">
+          <small>
+            {lastFace && <Face id={lastFace} size={22} />}
+            {t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })}
+          </small>
+          {last.bubbles.map((key) => (
+            <div key={key} className={prose(t(key), 'bub')}>
+              {t(key)}
+            </div>
+          ))}
+        </div>
+      )}
+      {rival && (
+        <div className="lastword rivalword rv" style={{ animationDelay: '4.75s' }} data-hook="rival-word">
+          <small>
+            {her?.avatar && <Face id={her.avatar} size={22} />}
+            {her?.nameKey ? t(her.nameKey) : ''}
+          </small>
+          <div className={prose(t(rival), 'bub')}>{t(rival)}</div>
+        </div>
+      )}
+    </>
+  );
+}
+
 /** When a box of the night's awards comes (s): a plaque as before, 0.3 s apart from 2.45 s; a box's entries 0.12 s apart after it. */
 const boxDelay = (i: number) => ({ animationDelay: `${2.45 + i * 0.3}s` });
 const entryDelay = (i: number, k: number) => ({ animationDelay: `${2.45 + i * 0.3 + 0.12 * (k + 1)}s` });
@@ -197,11 +244,9 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
   const layout = nightLayout(awards);
   useNightSounds(cheered(c, majorId), layout.plaques.length + (layout.box ? 1 : 0), revealed);
   const backdrop = useBackdrop(getMajor(c, majorId)?.scene ?? null, revealed);
-  // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's.
-  const rival = rivalArc(c, s.seed);
-  const last = lastWord(s);
-  // The manager's face begins the last word's name row (round R8a), 22 px, as on the desk.
-  const lastFace = last ? getManager(c, last.manager)?.avatar : undefined;
+  // The rival's year, closed under the awards (E7): fixed by the seed, never chosen to contrast the player's. Her line
+  // (round R8c, D4) says what she won or lost and how things stand between you, both read by /core.
+  const rival = rivalLine(s);
   const delay = (sec: number) => ({ animationDelay: `${sec}s` });
   return (
     <div
@@ -242,8 +287,8 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
           {text}
         </p>
         {rival && (
-          <p className={prose(t(rival.endingKey), 'a-rival rv')} style={delay(1.9)}>
-            {t(rival.endingKey)}
+          <p className={prose(t(rival), 'a-rival rv')} style={delay(1.9)} data-hook="rival-line">
+            {t(rival)}
           </p>
         )}
       </div>
@@ -271,19 +316,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
           );
         })}
       </div>
-      {last && (
-        <div className="lastword rv" style={delay(4.6)}>
-          <small>
-            {lastFace && <Face id={lastFace} size={22} />}
-            {t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })}
-          </small>
-          {last.bubbles.map((key) => (
-            <div key={key} className={prose(t(key), 'bub')}>
-              {t(key)}
-            </div>
-          ))}
-        </div>
-      )}
+      <NightWords c={c} last={lastWord(s)} rival={rivalLastWord(s)} />
       <div className="a-bottom rv" style={delay(4.9)}>
         <button className="again play-again" onClick={onRestart}>
           {t('ui.ending.playAgain')}

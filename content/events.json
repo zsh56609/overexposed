@@ -195,6 +195,7 @@
       "choices": [
         {
           "replyKey": "event.juno_hello.a.reply",
+          "stance": "with",
           "effects": [
             { "op": "slots", "value": -1 },
             { "op": "resource", "target": "craft", "value": 3 },
@@ -223,6 +224,7 @@
       "choices": [
         {
           "replyKey": "event.juno_credit.a.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "capital", "value": 3 }],
           "outcomeKey": "event.juno_credit.a.outcome"
         },
@@ -245,6 +247,7 @@
       "choices": [
         {
           "replyKey": "event.juno_soundalike.a.reply",
+          "stance": "against",
           "effects": [
             { "op": "resource", "target": "hype", "value": 6 },
             { "op": "resource", "target": "heat", "value": 4 },
@@ -255,6 +258,7 @@
         },
         {
           "replyKey": "event.juno_soundalike.b.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 2 }, { "op": "resource", "target": "heat", "value": -1 }],
           "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_soundalike.b.press.1"] },
           "outcomeKey": "event.juno_soundalike.b.outcome"
@@ -277,11 +281,13 @@
       "choices": [
         {
           "replyKey": "event.juno_interview.a.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 2 }],
           "outcomeKey": "event.juno_interview.a.outcome"
         },
         {
           "replyKey": "event.juno_interview.b.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 3 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_interview.b.press.1"] },
           "outcomeKey": "event.juno_interview.b.outcome"
@@ -309,11 +315,13 @@
       "choices": [
         {
           "replyKey": "event.juno_shortlist.a.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 1 }],
           "outcomeKey": "event.juno_shortlist.a.outcome"
         },
         {
           "replyKey": "event.juno_shortlist.b.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 5 }, { "op": "resource", "target": "heat", "value": 2 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_shortlist.b.press.1"] },
           "outcomeKey": "event.juno_shortlist.b.outcome"
@@ -334,9 +342,11 @@
         "weight": 3
       },
       "messageKeys": ["event.juno_carpet.message.1", "event.juno_carpet.message.2"],
+      "photo": { "id": "carpet_view", "after": 1 },
       "choices": [
         {
           "replyKey": "event.juno_carpet.a.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 2 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_carpet.a.press.1"] },
           "outcomeKey": "event.juno_carpet.a.outcome"
@@ -366,11 +376,13 @@
       "choices": [
         {
           "replyKey": "event.juno_video.a.reply",
+          "stance": "with",
           "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "heat", "value": -2 }],
           "outcomeKey": "event.juno_video.a.outcome"
         },
         {
           "replyKey": "event.juno_video.b.reply",
+          "stance": "with",
           "effects": [{ "op": "resource", "target": "hype", "value": 3 }, { "op": "resource", "target": "heat", "value": 2 }],
           "press": { "paper": "flash", "kind": "loud", "lineKeys": ["event.juno_video.b.press.1"] },
           "outcomeKey": "event.juno_video.b.outcome"
@@ -391,14 +403,17 @@
         "weight": 3
       },
       "messageKeys": ["event.juno_unsigned.message.1", "event.juno_unsigned.message.2"],
+      "photo": { "id": "small_room", "after": 1 },
       "choices": [
         {
           "replyKey": "event.juno_unsigned.a.reply",
+          "stance": "with",
           "effects": [{ "op": "slots", "value": -1 }, { "op": "resource", "target": "craft", "value": 4 }, { "op": "setFlag", "flag": "juno_cowrite" }],
           "outcomeKey": "event.juno_unsigned.a.outcome"
         },
         {
           "replyKey": "event.juno_unsigned.b.reply",
+          "stance": "with",
           "effects": [
             { "op": "slots", "value": -1 },
             { "op": "resource", "target": "craft", "value": 2 },

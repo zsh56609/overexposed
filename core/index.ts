@@ -2,6 +2,7 @@ export * from './content.ts';
 export * from './rng.ts';
 export * from './state.ts';
 export { awardHolds, yearAwards } from './awards.ts';
+export { rivalLastWord, rivalLine, rivalTerms } from './rival.ts';
 export { axisSide, endingIfYearEndedNow, majorNow, majorOf, majorRequirements, type EndingResult, type MajorClause } from './endings.ts';
 export { currentLane, establishedLanes, lanePlays, laneShares, nextEstablishedLane } from './lanes.ts';
 export {

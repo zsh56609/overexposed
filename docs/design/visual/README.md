@@ -144,6 +144,12 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
   when the night mounts; it fades in over 600 ms when it comes (reduced motion or motion off: no fade) and never holds
   the reveal. Without a worker it is drawn on the page when the page is idle after the reveal. Its own cache, by scene
   and size, for the page's life.
+- **Juno on the night** (round R8c): her line under the minor's text says what she won — or that you took it from her —
+  and answers what passed between you (one line, so the top ends above the awards' label). Under the second front
+  page, when you answered her at all, her last word: a block like the manager's (left 406, top 568, one front page
+  wide), its small line her face (22 px) and her name, one bubble in the manager's bubble look; it comes at 4.75 s,
+  between the manager's word (4.6) and the bottom block (4.9). The manager's block narrows to the first front page
+  (226 wide, its bubbles too), at left 164 as before.
 - **PLAY AGAIN in brass** (round R8c): `linear-gradient(180deg, #e9c87a, #c9a04a)`, ink `#1a120a`, a warm glow and
   an inner highlight; hovered, `#f6dc98` → `#dcb45a`. Its size and place as before, the last front page's width.
 
@@ -196,7 +202,8 @@ italic line.
     "↺ remembered" marks a choice that sets a flag a later event may call back. After
     replying: typing dots, then their answer — the outcome line.
   - *A photo in a thread* (round R8b): some send a photograph with their text — Mum the Sunday table and Gran in her
-    coat, Lio the desk, Sam his band's poster, the photographer last night's shot of you, Priya the panel show's set.
+    coat, Lio the desk, Sam his band's poster, the photographer last night's shot of you, Priya the panel show's set,
+    and Juno (round R8c, `r8c-photos/`) the premiere's carpet and the small room she plays now.
     It arrives as one more message, in its place: typing dots, then the photo, on the messages' rhythm and with the
     bubble's sound. Its bubble is the photograph itself — 200×150, an incoming message's alignment, radius 15 with the
     sender's corner (bottom left) 4, no padding, a 1 px ring `rgba(255,255,255,.06)`; its alt is empty, the words

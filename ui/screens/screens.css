@@ -234,9 +234,12 @@
 .awards-night .fp.paper-flash .h { text-transform: uppercase; }
 .awards-night .fp.red .h { color: #D92B1F; }
 .awards-night .fp .mini { position: absolute; right: 11px; bottom: 9px; width: 62px; height: 46px; object-fit: cover; }
-.awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 420px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
+/* The night's last words (round R8c, D5; r8c-awards.html .word): the manager's under the first front page, Juno's under
+   the second, each one front page wide. */
+.awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 226px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
+.awards-night .lastword.rivalword { left: 406px; }
 .awards-night .lastword small { display: flex; align-items: center; gap: 7px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
-.awards-night .lastword .bub { max-width: 420px; background: #1f2a35; color: #eef3f6; font-size: 12px; line-height: 1.35; padding: 7px 12px; border-radius: 12px 12px 12px 3px; box-shadow: 0 6px 12px rgba(0, 0, 0, .4); }
+.awards-night .lastword .bub { max-width: 226px; background: #1f2a35; color: #eef3f6; font-size: 12px; line-height: 1.35; padding: 7px 12px; border-radius: 12px 12px 12px 3px; box-shadow: 0 6px 12px rgba(0, 0, 0, .4); }
 /* The bottom block stands right-aligned on the front pages' right edge (round R4, A6): the mirror of the manager's last
    word, which stands on their left edge. Four pages of 226 px, 16 px apart, centred: 164 px in from either side. */
 .awards-night .a-bottom { position: absolute; right: 164px; top: 568px; z-index: 5; display: flex; flex-direction: column; align-items: flex-end; gap: 14px; text-align: right; }

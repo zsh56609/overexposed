@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
 import { AVATAR_IDS, PHOTO_IDS, TROPHY_IDS } from '../core/index.ts';
-import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, checkTrophies, trophyDir, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, checkTrophies, photoDir, trophyDir, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -32,7 +32,7 @@ const photos = await import('../ui/photos.ts').then(
   (m: { PHOTOS: Readonly<Record<string, string>> }) => m.PHOTOS,
   () => null,
 );
-issues.push(...checkPhotos(Object.fromEntries(PHOTO_IDS.map((id) => [id, text(`docs/design/visual/ref/r8b-photos/${id}.svg`)])), photos));
+issues.push(...checkPhotos(Object.fromEntries(PHOTO_IDS.map((id) => [id, text(`docs/design/visual/ref/${photoDir(id)}/${id}.svg`)])), photos));
 // The trophies (round R8c): the strings ui/trophies.ts holds, against the author's files.
 const trophies = await import('../ui/trophies.ts').then(
   (m: { TROPHIES: Readonly<Record<string, string>> }) => m.TROPHIES,

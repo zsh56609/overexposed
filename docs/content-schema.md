@@ -186,7 +186,13 @@ Phase 2a ([`design/content-expansion.md`](design/content-expansion.md)
   `studio`, `arena`, `podium`. /core's `sceneOf` gives each lead its scene
   in `frontPages`.
 - `rival.arcs`: `id`, `major` (the major ending her year ends in), one
-  `beats` entry per season (`paper`, `key`), `endingKey`.
+  `beats` entry per season (`paper`, `key`), and optional `award` (round
+  R8c), an award id: hers if the player does not win it (none in a year she
+  is not nominated). No `endingKey` since round R8c: her line on the night is
+  /core's `rivalLine` — `rival.<arc>.end.<terms>` (`neutral`, `warm`,
+  `cold`; unmet reads as neutral), then `.won` or `.lost` when the arc has an
+  award — and her last word `rivalLastWord`, `rival.<arc>.last.<terms>`
+  (none if she was never answered). validate holds every arc to all its keys.
 - `boxOffice` (round V1a, README §2): the weekend box office one paper
   prints — `paper`; `titleKeys`, the films, a ring in an order the seed
   chooses, one opening at the top each month while the rest slide down;
@@ -337,11 +343,16 @@ An `avatar` is one of the closed list in `core/content.ts`, `AVATAR_IDS`:
   and `after`, the message it comes after (1 … the number of messages). It
   arrives in the thread as one more message; it is not a message's words. A
   letter has none; validate checks the id, the range and the form.
-- `choices` (two or three): `replyKey`, optional
+- `choices` (two or three): `replyKey`, optional `stance` (round R8c, a
+  rival event's choices only: `with` or `against` — the side the answer
+  takes with Juno; without one, neither), optional
   `requires` (a condition — unmet, the choice shows disabled with
   "Needs …"), `effects` (the closed set; money in thousands), optional
   `press` `{ paper, kind: loud | scandal, lineKeys }` (printed when
   chosen), `outcomeKey`. Every event has a choice with no requirement.
+  Her terms at the year's end (/core's `rivalTerms`, round R8c): unmet — no
+  rival event answered; cold — any answer against her; warm — two or more
+  with her; neutral — the rest.
 
 `rules.events`: `months` (the months an event may open — 2, 4, 6, 8, 10,
 12), `maxChains` (2), `laneWeight` (2). At each: an open chain's eligible
@@ -371,7 +382,8 @@ The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.
 - events: months, speaker and form, chains (one opener each), conditions, lanes, rival arcs (ids in `press.rival.arcs`), a weight from 1 to 5, messages and choices (one with no requirement), the event budget
 - the faces (round R8a): every text's speaker and every manager names an `avatar` in `AVATAR_IDS`, a letter none; `ui/avatars.ts` holds one portrait for each, equal to its file in `docs/design/visual/ref/r8a-avatars/`, on a 100×100 box, their ids unique across the ten
 - the trophies (round R8c): `ui/trophies.ts` holds the author's seven drawings, each equal to its file in `docs/design/visual/ref/r8c-trophies/`, on a 120×150 box, one for each of `TROPHY_IDS` and no more, their ids unique across the seven
-- the photos (round R8b): a text's `photo` names one of `PHOTO_IDS` after one of its messages, a letter none; `ui/photos.ts` holds the seven drawings, each equal to its file in `docs/design/visual/ref/r8b-photos/`, on a 400×300 box, their ids unique across the seven
+- the photos (round R8b): a text's `photo` names one of `PHOTO_IDS` after one of its messages, a letter none; `ui/photos.ts` holds the nine drawings, each equal to its file in its folder — `docs/design/visual/ref/r8b-photos/` for the seven of round R8b, `r8c-photos/` for Juno's two (round R8c) — on a 400×300 box, their ids unique across the nine
+- a rival event's choice may carry a `stance`, `with` or `against`, and no other event's; a rival arc's `award` names an award, and the arc has all its lines (`rival.<arc>.end.<terms>`, won and lost where it has an award: 21 in all) and its three last words (12 in all)
 - the manager's notes (round R8b): each of the six (`NOTE_IDS`, `ui/notes.ts`) in every manager's words, `.touch` too for the two that say "hold" (`TOUCH_NOTES`), and a signature per manager; marks are checked in `notes.*` lines only — `[hype]`, `[craft]`, `[heat]` are drawn as the stat bar's icons, any other is an error; a `notes.*` key no note uses is a warning
 - every flag set or read has both labels, positive and negative (an error, never a template)
 - `rules.tiers`: a word per tier, boundaries in order
