@@ -146,7 +146,7 @@ export function App() {
   return (
     <>
       <Run key={run.id} run={run} onRestart={restart} />
-      {ink && <div className={`ink ${ink}`} aria-hidden="true" />}
+      {ink && <div className={`ink-fade ${ink}`} aria-hidden="true" />}
     </>
   );
 }

@@ -16,6 +16,7 @@ import { motionMode } from '../motion.ts';
 import { markLit, markSeen, NOTE_IDS, NOTE_MARKS, notesTurnedOn, TOUCH_NOTES, useNotesStore, type NoteId, type NoteMark } from '../notes.ts';
 import type { PlayedStep } from '../queue.ts';
 import { setSetting, useSettings } from '../settings.ts';
+import { Named } from '../Named.tsx';
 import './notes.css';
 
 export interface NotesProps {
@@ -422,7 +423,7 @@ export function Notes(p: NotesProps) {
           key={shown.id}
           ref={note}
           type="button"
-          className={`oxn${faded ? ' faded' : ''}`}
+          className={`oxn ink${faded ? ' faded' : ''}`}
           data-note={shown.id}
           aria-label={plain(line)}
           style={{ left: base.left, top: placed ? placed.place.top : -999, width: base.width, visibility: placed ? undefined : 'hidden', ['--r' as string]: `${base.deg}deg` }}
@@ -438,7 +439,7 @@ export function Notes(p: NotesProps) {
               <path d={leaving.arrow} />
             </svg>
           )}
-          <div className="oxn out" aria-hidden="true" style={{ left: leaving.place.left, top: leaving.place.top, width: leaving.place.width, ['--r' as string]: `${leaving.place.deg}deg` }}>
+          <div className="oxn ink out" aria-hidden="true" style={{ left: leaving.place.left, top: leaving.place.top, width: leaving.place.width, ['--r' as string]: `${leaving.place.deg}deg` }}>
             <NoteInk line={leaving.line} sign={sign} craft={p.craftIcon} />
           </div>
         </>
@@ -456,7 +457,9 @@ function NoteInk({ line, sign, craft }: { line: string; sign: string; craft: Ico
         ✕
       </b>
       <p>{words(line, craft)}</p>
-      <span className="sig">{sign}</span>
+      <span className="sig">
+        <Named text={sign} />
+      </span>
     </>
   );
 }

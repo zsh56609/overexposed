@@ -646,7 +646,7 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
     for (let k = 0; k < 80 && !open; k++) {
       await sleep(250);
       // The ink gone first: a click during PLAY AGAIN's fade only completes it (D7).
-      open = (await page.evaluate<boolean>(`!!document.querySelector('.title-screen:not(.dim) .begin') && !document.querySelector('.ink')`)) ? await centre(page, '.title-screen .settings-open') : null;
+      open = (await page.evaluate<boolean>(`!!document.querySelector('.title-screen:not(.dim) .begin') && !document.querySelector('.ink-fade')`)) ? await centre(page, '.title-screen .settings-open') : null;
     }
     if (open) await page.click(...open);
     for (let k = 0; k < 20 && !(await page.evaluate<boolean>(`!!document.querySelector('[data-setting="notes"]')`)); k++) await sleep(150);

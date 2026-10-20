@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadRawContent, readJson, readSources, ROOT } from './load.ts';
 import { AVATAR_IDS, PHOTO_IDS, TROPHY_IDS } from '../core/index.ts';
-import { CHECKS, checkAvatars, checkBoundaries, checkNotes, checkPhotos, checkSoundModule, checkTrophies, photoDir, trophyDir, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
+import { CHECKS, checkAvatars, checkBoundaries, checkNames, checkNotes, checkPhotos, checkSoundModule, checkTrophies, photoDir, trophyDir, validateContent, type Appearances, type CheckId, type Issue, type ValidationResult } from './validate.ts';
 
 const SOURCE_DIRS = ['core', 'sim', 'validate', 'check', 'ui'];
 
@@ -39,6 +39,16 @@ const trophies = await import('../ui/trophies.ts').then(
   () => null,
 );
 issues.push(...checkTrophies(Object.fromEntries(TROPHY_IDS.map((id) => [id, text(`docs/design/visual/ref/${trophyDir()}/${id}.svg`)])), trophies));
+// The people's names (round R8c): their colours, every name in the words, the split.
+const people = await import('../ui/people.ts').then(
+  (m: { PEOPLE: Readonly<Record<string, { names: readonly string[]; lit: string; ink: string }>> }) => m.PEOPLE,
+  () => null,
+);
+const split = await import('../ui/names.ts').then(
+  (m: { splitNames: (text: string) => readonly { text: string; person: string | null }[] }) => m.splitNames,
+  () => null,
+);
+issues.push(...checkNames(people, split, readJson('i18n/en.json')));
 // The manager's notes (round R8b): ui/notes.ts's six in every manager's words, and only the marks they draw.
 const notes = await import('../ui/notes.ts').then(
   (m: { NOTE_IDS: readonly string[]; TOUCH_NOTES: readonly string[]; NOTE_MARKS: readonly string[] }) => ({ ids: m.NOTE_IDS, touch: m.TOUCH_NOTES, marks: m.NOTE_MARKS }),

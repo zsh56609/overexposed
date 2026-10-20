@@ -15,6 +15,7 @@ import { motionMode } from '../motion.ts';
 import { previewEventChoice, type EventChoicePreview, type Legal, type LinesSoFar } from '../preview.ts';
 import type { BeatKind } from '../timeline.ts';
 import { Face } from '../Face.tsx';
+import { isPerson, Named, PersonName } from '../Named.tsx';
 import { calendarLabel, mastheadName } from '../text.ts';
 import { loadPhotos, photosReady, usePhoto } from '../textPhotos.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
@@ -193,7 +194,9 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
     <div className="scr event-screen ev-text" data-event={ev.id} data-form="text" data-arriving={arrival.done ? undefined : '1'} onClickCapture={onClickCapture}>
       <div className="evcap">
         <small>{t('ui.event.kicker', { date: calendarLabel(c, s.turn), category: category ? t(category.nameKey) : ev.category })}</small>
-        <b className={prose(t(ev.titleKey ?? ''))}>{t(ev.titleKey ?? '')}</b>
+        <b className={prose(t(ev.titleKey ?? ''))}>
+          <Named text={t(ev.titleKey ?? '')} />
+        </b>
         {category && <i>{t(category.lineKey)}</i>}
       </div>
       <div className="phone-big">
@@ -202,7 +205,8 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
             {/* Their face (round R8a); a sender without one keeps the initial. */}
             <div className={`ph-av${ev.speaker.avatar ? ' has-face' : ''}`}>{ev.speaker.avatar ? <Face id={ev.speaker.avatar} size={40} /> : (Array.from(name)[0] ?? '')}</div>
             <div>
-              <b>{name}</b>
+              {/* Coloured whole by the speaker's face (round R8c, E3): the unknown number grey. */}
+              <b>{isPerson(ev.speaker.avatar) ? <PersonName person={ev.speaker.avatar}>{name}</PersonName> : name}</b>
               {label && <small>{label}</small>}
             </div>
           </div>
@@ -214,14 +218,18 @@ function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
                 </div>
               ) : (
                 <div key={item.key} className={prose(item.text, 'm in')}>
-                  {item.text}
+                  <Named text={item.text} />
                 </div>
               ),
             )}
             {arrival.typing && <TypingDots />}
             {answer && <div className={prose(answer.reply, 'm out')}>{answer.reply}</div>}
             {answer && !replied && <TypingDots late />}
-            {answer && replied && <div className={prose(answer.outcome, 'm in reply')}>{answer.outcome}</div>}
+            {answer && replied && (
+              <div className={prose(answer.outcome, 'm in reply')}>
+                <Named text={answer.outcome} />
+              </div>
+            )}
           </div>
           {chosen === null && (
             <div className={`replies${arrival.done ? ' on' : ''}`}>

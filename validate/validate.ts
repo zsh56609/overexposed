@@ -65,6 +65,7 @@ export const CHECKS = {
   photos: "the photos: the author's nine drawings, unchanged",
   trophies: "the trophies: the author's seven drawings, unchanged",
   notes: "the manager's notes: a line per note and manager, and their marks",
+  names: "the people's names: a colour pair each, every name in the words, the split",
 } as const;
 export type CheckId = keyof typeof CHECKS;
 
@@ -2005,6 +2006,48 @@ export function checkNotes(
     for (const [, mark] of value.matchAll(/\[([^\]]*)\]/g)) {
       if (!notes.marks.includes(mark ?? '')) err(`i18n/en.json ${q(key)}`, `[${mark}] is not a mark: only [${notes.marks.join('], [')}]`);
     }
+  }
+  return issues;
+}
+
+/**
+ * The people's names (round R8c, E4): every face (AVATAR_IDS) and Gran has a colour pair in ui/people.ts; every name
+ * there occurs in the words (a renamed person shows up as a stale name); and ui/names.ts splits four cases right.
+ */
+export function checkNames(
+  people: Readonly<Record<string, { readonly names: readonly string[]; readonly lit: string; readonly ink: string }>> | null,
+  split: ((text: string) => readonly { readonly text: string; readonly person: string | null }[]) | null,
+  i18n: unknown,
+): Issue[] {
+  const issues: Issue[] = [];
+  const err = (where: string, message: string) => issues.push({ level: 'error', check: 'names', where, message });
+  if (people === null || split === null) {
+    err('ui/people.ts', 'missing: the people, or the split of their names (ui/names.ts)');
+    return issues;
+  }
+  const colour = /^#[0-9a-f]{6}$/i;
+  for (const id of [...AVATAR_IDS, 'gran']) {
+    const p = people[id];
+    if (!p) err(`ui/people.ts ${id}`, 'no colours: every face, and Gran, has a lit and an ink colour');
+    else if (!colour.test(p.lit) || !colour.test(p.ink)) err(`ui/people.ts ${id}`, `colours must be #rrggbb, got ${q(p.lit)} and ${q(p.ink)}`);
+  }
+  const words = isObj(i18n) ? Object.values(i18n).filter(isStr) : [];
+  for (const [id, p] of Object.entries(people))
+    for (const name of p.names) {
+      const whole = new RegExp(`(?<![\\p{L}\\p{N}_])${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\p{L}\\p{N}_])`, 'u');
+      if (!words.some((w) => whole.test(w))) err(`ui/people.ts ${id}`, `${q(name)} occurs nowhere in i18n/en.json: a stale name`);
+    }
+  const cases: readonly [string, string | null][] = [
+    ["Don't watch Juno Vale. Beat her.", 'juno'],
+    ["Sam's band.", 'sam'],
+    ['Gran wants a ticket.', 'gran'],
+    ['Samples', null],
+  ];
+  for (const [text, person] of cases) {
+    const found = split(text).filter((piece) => piece.person !== null);
+    const ok = person === null ? found.length === 0 : found.length === 1 && found[0]?.person === person;
+    if (!ok) err('ui/names.ts', `${q(text)} gives ${found.length ? found.map((f) => `${f.person} (${q(f.text)})`).join(', ') : 'no name'}, not ${person === null ? 'none' : `one ${person}`}`);
+    if (split(text).map((piece) => piece.text).join('') !== text) err('ui/names.ts', `${q(text)}: the pieces change the characters`);
   }
   return issues;
 }

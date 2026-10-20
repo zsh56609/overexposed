@@ -19,6 +19,7 @@ import { useArrivalSound } from '../sound/arrival.ts';
 import { cue } from '../sound/sound.ts';
 import { awardCitation, awardHow, awardName, cardName, flagName, money } from '../text.ts';
 import { Trophy } from '../Trophy.tsx';
+import { Named } from '../Named.tsx';
 
 export type PanelId = 'deck' | 'scrapbook' | 'settings' | 'credits' | 'numbers';
 
@@ -312,7 +313,7 @@ export function NumbersPanel({ s, steps, onClose }: { s: GameState; steps: reado
           <b>{t('ui.ending.scandals')}</b>
         </div>
         <div className="nrow">
-          <b>{flags.length ? t('ui.ending.flags', { flags: flags.map(flagName).join(', ') }) : t('ui.ending.noFlags')}</b>
+          <b>{flags.length ? <Named text={t('ui.ending.flags', { flags: flags.map(flagName).join(', ') })} /> : t('ui.ending.noFlags')}</b>
         </div>
         <div className="nrow">
           <b>{t('ui.ending.doors', { passed: s.gateHistory.filter((g) => g.passed).length, total: s.gateHistory.length })}</b>

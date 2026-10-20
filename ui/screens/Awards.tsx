@@ -17,6 +17,7 @@ import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
 import { awardCitation, awardName, awardShort, majorName, managerName, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
 import { Trophy, trophyOf } from '../Trophy.tsx';
+import { isPerson, Named, PersonName } from '../Named.tsx';
 import { cue, music } from '../sound/sound.ts';
 import { AwardDots, FoundDots, prose } from './common.tsx';
 
@@ -157,11 +158,11 @@ export function NightWords({ c, last, rival }: NightWordsProps) {
         <div className="lastword rv" style={{ animationDelay: '4.6s' }} data-hook="last-word">
           <small>
             {lastFace && <Face id={lastFace} size={22} />}
-            {t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })}
+            <Named text={t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })} />
           </small>
           {last.bubbles.map((key) => (
             <div key={key} className={prose(t(key), 'bub')}>
-              {t(key)}
+              <Named text={t(key)} />
             </div>
           ))}
         </div>
@@ -170,9 +171,11 @@ export function NightWords({ c, last, rival }: NightWordsProps) {
         <div className="lastword rivalword rv" style={{ animationDelay: '4.75s' }} data-hook="rival-word">
           <small>
             {her?.avatar && <Face id={her.avatar} size={22} />}
-            {her?.nameKey ? t(her.nameKey) : ''}
+            {her?.nameKey && isPerson(her.avatar) ? <PersonName person={her.avatar}>{t(her.nameKey)}</PersonName> : her?.nameKey ? t(her.nameKey) : ''}
           </small>
-          <div className={prose(t(rival), 'bub')}>{t(rival)}</div>
+          <div className={prose(t(rival), 'bub')}>
+            <Named text={t(rival)} />
+          </div>
         </div>
       )}
     </>
@@ -288,7 +291,7 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
         </p>
         {rival && (
           <p className={prose(t(rival), 'a-rival rv')} style={delay(1.9)} data-hook="rival-line">
-            {t(rival)}
+            <Named text={t(rival)} />
           </p>
         )}
       </div>

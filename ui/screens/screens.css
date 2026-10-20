@@ -66,6 +66,9 @@
 :root[data-motion-resolved='reduced'] .manager-choice.done .biz.gone { animation: tr-out .2s ease-out forwards; }
 .manager-choice .bcard { display: flex; flex-direction: column; width: 100%; min-height: 262px; padding: 22px 24px; position: relative; text-align: left; box-shadow: 0 22px 34px rgba(0, 0, 0, .6); background: #f5ecda; color: #2a2018; transform: rotate(2deg); }
 .manager-choice .bcard::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: #c9a27a; }
+/* The manager's name in their colour (round R8c, E3), its weight kept: a cream card is paper (ink), Dex's dark one lit. */
+.manager-choice .bcard .nm .pn { font-weight: inherit; color: var(--c-ink); }
+.manager-choice .m-veteran .bcard .nm .pn { color: var(--c); }
 .manager-choice .m-veteran .bcard { background: #141414; color: #e8dcc0; transform: rotate(-2.5deg); }
 .manager-choice .m-veteran .bcard::after { content: none; }
 .manager-choice .m-veteran .bcard::before { content: ""; position: absolute; inset: 10px; border: 1px solid rgba(214, 180, 110, .4); pointer-events: none; }

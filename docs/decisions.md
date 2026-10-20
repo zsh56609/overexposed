@@ -6,6 +6,26 @@ rules).
 
 ---
 
+## 2026-10-20 — Round R8c, Part E: people's colours
+
+- The author: every person's name stands out in their own colour, close to their portrait's.
+  ui/people.ts holds each person's names as running text writes them and two colours, lit on
+  dark grounds and ink on paper, keyed by avatar id, and Gran (no portrait); the unknown number
+  has no name to find, its header grey. ui/names.ts finds names as whole words,
+  case-sensitive, the longest first ("Juno Vale" before "Juno"; "Samples" is no Sam);
+  ui/Named.tsx draws each as .pn, the characters unchanged.
+- Where: a text's title, header name and incoming messages with their answer; the desk's
+  manager bubbles (the who line and the messages); the night's line for Juno and its two last
+  words; the manager cards' names (Dex's dark card lit, Mags's cream card ink, each name's
+  weight kept); the numbers panel's milestones; the manager's notes' signature, in ink.
+  Nowhere else: papers and front pages, captions, letters, doors, cards, tooltips, the
+  replies and the player's own bubble stay as they were.
+- In a frenzy the bubbles' who line turns red as before, but its name keeps its colour.
+- `.ink` names paper, as in the reference; PLAY AGAIN's fade through ink, which held that
+  class, is `.ink-fade` now.
+- validate's new names check: a colour pair for every face and Gran, every name in the words
+  (R9 de-localises), and the split on four cases.
+
 ## 2026-10-20 — Round R8c, Part D: Juno
 
 - The author: how Juno's year ends should say what she won, or that you took it from her,

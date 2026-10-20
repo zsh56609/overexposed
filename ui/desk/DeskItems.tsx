@@ -7,6 +7,7 @@
 
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Face } from '../Face.tsx';
+import { Named } from '../Named.tsx';
 import { isPlaceholder } from '../text.ts';
 import { composeTransforms, motionMode, useMotionMode } from '../motion.ts';
 import { cue } from '../sound/sound.ts';
@@ -462,7 +463,9 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
     <div className="bubbles" data-hook="bubbles" data-revealing={revealing} ref={box}>
       <div className="bub who">
         {messages.avatar && <Face id={messages.avatar} size={22} />}
-        <span>{messages.from}</span>
+        <span>
+          <Named text={messages.from} />
+        </span>
       </div>
       {list.map(({ k, text }) => {
           const mine = rx.get(k);
@@ -476,7 +479,9 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
                 setOpen(open === k ? null : k);
               }}
             >
-              <span className={ph(text)}>{text}</span>
+              <span className={ph(text)}>
+                <Named text={text} />
+              </span>
               {mine && <span className="rx">{mine}</span>}
               {open === k && (
                 <div className="rx-bar">
