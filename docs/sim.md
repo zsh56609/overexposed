@@ -38,7 +38,7 @@ a card's draft value = the odds its `requires` holds when it comes up × its val
 | Card play rate (played ÷ drawn) | player-like runs, pooled | every playable card > 2% |
 | minmaxer vs random ending distribution | those two personas | significantly different (χ² p < 0.01 and total variation ≥ 0.2) |
 | Events per run (round R2) | each player-like persona separately | at least 5 on average |
-| Event replies: no foregone choice | the greedy player-like personas (every one but `random`), pooled, at the appearances where every reply was affordable | no reply taken in more than 90% of its event's appearances; a reply with no effect exempt |
+| Event replies: no foregone choice | the greedy player-like personas (every one but `random`), pooled, at the appearances where every reply was affordable | no reply taken in more than 90% of its event's appearances; a reply with no effect exempt, and juno_credit (round R9a: only comeback meets it, and one persona decides it all one way whatever the replies are worth) |
 | Event replies: every one taken | every run of the batch, any persona | each reply taken at least once; a reply with no effect exempt |
 | Soft-locks | all runs | 0 |
 | Crashes | all runs | 0 |

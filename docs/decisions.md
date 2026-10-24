@@ -6,6 +6,26 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9a, Part B: three numbers and a check
+
+- The four late one-offs came mostly in month 12 (months 8 and 10 go to chain follow-ups, and
+  their hype bars kept them out of 4 and 6), which Part A gives to Juno; with A alone they fell
+  from about a third or a quarter of runs to a fifth or an eighth. The author: widen their
+  months a little. charity_song and panel_show from month 4, hype 25 (were 5 and 30);
+  guest_judge hype 20 (was 25; its months already start at 4); fake_ad from month 4, hype 15
+  (were 6 and 20). With A (Dex, player-like, three seeds): fake_ad 33.4 → 24.5 %, guest_judge
+  33.0 → 20.7 %, panel_show 24.1 → 16.1 %, charity_song 23.6 → 15.2 % — the trial's numbers.
+- juno_credit's b, "I want my name on it.": hype +4 → +5; heat +2 stays.
+- The label deal's pass adds heat +2, the label's publicity machine; the door shows it in its
+  pass column, as every door shows its effects. dealseeker's Breakthrough under Mags was 70.4 %
+  and 70.2 % on two seeds (the band is 70 %); now 66.9, 66.0 and 65.1 % (Dex 65.1, 62.7,
+  64.2 %): the band passes on every seed.
+- sim/report.ts: juno_credit is exempt from the reply cap (BANDS.eventChoiceExempt), its reason
+  in the band's line: only comeback meets it — the other greedy personas turn juno_hello down —
+  and one persona decides it all one way whatever the replies are worth (a at 94 % with b at 4/2,
+  5/2 or 4/1; b at 100 % with 5/1 or 6/2). sam_rent/c, producer_room/a and casting_arc/a stay
+  red: not this round. No band turns red.
+
 ## 2026-10-25 — Round R9a, Part A: Juno's year end
 
 - The author (2026-10-21): a run that never meets Juno misses her year; let her year-end text

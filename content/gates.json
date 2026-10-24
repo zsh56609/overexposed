@@ -56,7 +56,8 @@
     "requires": { "hype": { "min": 50 }, "capital": { "min": 4 } },
     "onPass": [
       { "op": "setFlag", "flag": "signed_label" },
-      { "op": "resource", "target": "capital", "value": 6 }
+      { "op": "resource", "target": "capital", "value": 6 },
+      { "op": "resource", "target": "heat", "value": 2 }
     ],
     "onFail": [{ "op": "resource", "target": "hype", "value": -8 }],
     "photo": { "scene": "podium", "drawing": 0 }

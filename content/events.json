@@ -230,7 +230,7 @@
         },
         {
           "replyKey": "event.juno_credit.b.reply",
-          "effects": [{ "op": "resource", "target": "hype", "value": 4 }, { "op": "resource", "target": "heat", "value": 2 }],
+          "effects": [{ "op": "resource", "target": "hype", "value": 5 }, { "op": "resource", "target": "heat", "value": 2 }],
           "press": { "paper": "bside", "kind": "loud", "lineKeys": ["event.juno_credit.b.press.1"] },
           "outcomeKey": "event.juno_credit.b.outcome"
         }
@@ -637,7 +637,7 @@
       "category": "personal",
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.northfield", "signoffKey": "event.signoff.events_team" },
-      "when": { "months": { "from": 5, "to": 12 }, "condition": { "hype": { "min": 30 } } },
+      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 25 } } },
       "messageKeys": ["event.charity_song.message.2", "event.charity_song.message.3"],
       "choices": [
         {
@@ -665,7 +665,7 @@
       "form": "text",
       "titleKey": "event.panel_show.title",
       "speaker": { "nameKey": "event.speaker.priya.name", "labelKey": "event.speaker.priya.label", "avatar": "priya" },
-      "when": { "months": { "from": 5, "to": 12 }, "condition": { "hype": { "min": 30 } } },
+      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 25 } } },
       "messageKeys": ["event.panel_show.message.1", "event.panel_show.message.2"],
       "photo": { "id": "panel_tv", "after": 1 },
       "choices": [
@@ -720,7 +720,7 @@
       "form": "text",
       "titleKey": "event.guest_judge.title",
       "speaker": { "nameKey": "event.speaker.dana.name", "labelKey": "event.speaker.dana.label", "avatar": "dana" },
-      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 25 } }, "lane": "screen" },
+      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 20 } }, "lane": "screen" },
       "messageKeys": ["event.guest_judge.message.1", "event.guest_judge.message.2"],
       "choices": [
         {
@@ -778,7 +778,7 @@
       "category": "industry",
       "form": "letter",
       "speaker": { "letterheadKey": "event.letterhead.hilltop", "signoffKey": "event.signoff.brand_team" },
-      "when": { "months": { "from": 6, "to": 12 }, "condition": { "hype": { "min": 20 } }, "lane": "celebrity" },
+      "when": { "months": { "from": 4, "to": 12 }, "condition": { "hype": { "min": 15 } }, "lane": "celebrity" },
       "messageKeys": ["event.fake_ad.message.2", "event.fake_ad.message.3"],
       "choices": [
         {

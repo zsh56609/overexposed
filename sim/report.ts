@@ -66,6 +66,12 @@ export const BANDS = {
    * with no effect is exempt, here and from "every reply taken somewhere in the batch".
    */
   eventChoiceMax: 0.9,
+  /**
+   * Exempt from that cap, each with its reason (round R9a, B4): juno_credit — only comeback meets it (the other greedy
+   * personas turn juno_hello down), and one persona decides it all one way whatever the replies are worth (a at 94 %
+   * with b at 4/2, 5/2 or 4/1; b at 100 % with 5/1 or 6/2).
+   */
+  eventChoiceExempt: { juno_credit: 'only comeback meets it, and one persona decides it all one way whatever the replies are worth' },
 } as const;
 
 const METRICS = ['hype', 'craft', 'capital', 'heat', 'scandals', 'threshold', 'crystallised', 'scandalsDrawn'] as const;
@@ -678,10 +684,12 @@ export function buildReport(batch: BatchResult): Report {
       actual: players.map((p) => `${p} ${(events.perRun[p]?.mean ?? 0).toFixed(2)}`).join(', ') + (few.length ? ` (below: ${few.join(', ')})` : ''),
     });
     const judged = events.choices.filter((c) => !c.noEffect);
-    const over = judged.filter((c) => c.share.open !== null && c.share.open > BANDS.eventChoiceMax);
-    const topOpen = [...judged].filter((c) => c.share.open !== null).sort((a, b) => (b.share.open ?? 0) - (a.share.open ?? 0)).slice(0, 3);
+    const exempt: Readonly<Record<string, string>> = BANDS.eventChoiceExempt;
+    const capped = judged.filter((c) => !(c.id in exempt));
+    const over = capped.filter((c) => c.share.open !== null && c.share.open > BANDS.eventChoiceMax);
+    const topOpen = [...capped].filter((c) => c.share.open !== null).sort((a, b) => (b.share.open ?? 0) - (a.share.open ?? 0)).slice(0, 3);
     bands.push({
-      target: `events: no reply taken in > ${pct(BANDS.eventChoiceMax)} of its event's appearances (greedy player-like personas, pooled, where every reply was affordable; a reply with no effect exempt)`,
+      target: `events: no reply taken in > ${pct(BANDS.eventChoiceMax)} of its event's appearances (greedy player-like personas, pooled, where every reply was affordable; a reply with no effect exempt; ${Object.entries(exempt).map(([id, why]) => `${id} exempt: ${why}`).join('; ')})`,
       pass: greedyPlayers.length === 0 ? null : over.length === 0,
       actual:
         over.length === 0
