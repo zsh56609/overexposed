@@ -298,7 +298,12 @@
 .ov .mini .sc { position: absolute; left: 0; top: 0; width: 186px; height: 252px; transform: scale(var(--ms)); transform-origin: 0 0; }
 .scr .mini .card.card { pointer-events: none; box-shadow: none; }
 /* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
-.ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; min-height: 540px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
+/* One size on both pages (round R9a, D1): 580 tall — the awards page needs 579.4; the endings page keeps its top, with
+   more room under it. The two pages share one cell while a page turns (D2), the page going under no pointer. */
+.ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; height: 580px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
+.ov .book .pages { display: grid; }
+.ov .book .pages > .page { grid-area: 1 / 1; min-width: 0; }
+.ov .book .pages > .going { pointer-events: none; }
 .ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 18px; }
 /* Its two pages (round R4, A7): tabs in its head; the awards as the night's plaques with their trophies, in rows of four
    (round R8c, B4), not yet won dimmed, the trophy a silhouette. */
@@ -328,6 +333,36 @@
 .ov .clip.miss::before { display: none; }
 .ov .clip.miss b { font-size: 21px; margin: 0; }
 .ov .clip.miss small { color: rgba(237, 230, 214, .36); }
+
+/* ---------------------------------------------------------------- Hover (round R9a, D3)
+   What the pointer is on lifts a little and catches the light, 0.16 s ease-out, on pointer devices only; silent. The
+   lift and growth are the translate and scale properties, never transform: the night's reveal holds a transform (fill
+   both) and a clipping's tilt is one; translate and scale add to both. Reduced motion or off: the light and the colours,
+   no lift or growth. */
+@media (hover: hover) {
+  .ov .clip, :is(.awards-night, .ov .book) .pl, .awards-night .fp, .awards-night .lastword .bub { transition: translate .16s ease-out, scale .16s ease-out, box-shadow .16s ease-out, border-color .16s ease-out, background-color .16s ease-out; }
+  :is(.awards-night, .ov .book) .pl::before { transition: opacity .16s ease-out; }
+  .ov .clip small, .ov .clip b, .awards-night .pl.rest .rn { transition: color .16s ease-out; }
+  .ov .book .pl.tro.dim > .tr img { transition: filter .16s ease-out; }
+  /* The scrapbook: a clipping found lifts 3 px and grows 2 %; a gap brightens its dashes and its ?; an award won rises
+     3 px and catches the light; one not yet won rises 2 px, its silhouette a shade brighter. */
+  .ov .clip:not(.miss):hover { translate: 0 -3px; scale: 1.02; box-shadow: 0 12px 18px rgba(0, 0, 0, .5); }
+  .ov .clip.miss:hover { border-color: rgba(237, 230, 214, .55); background-color: rgba(237, 230, 214, .04); }
+  .ov .clip.miss:hover small { color: rgba(237, 230, 214, .6); }
+  .ov .clip.miss:hover b { color: rgba(255, 207, 133, .85); }
+  :is(.awards-night, .ov .book) .pl:not(.dim):hover { translate: 0 -3px; border-color: #a3804a; box-shadow: 0 18px 26px rgba(0, 0, 0, .65), inset 0 0 0 1px rgba(214, 180, 110, .28); }
+  :is(.awards-night, .ov .book) .pl:not(.dim):hover::before { opacity: 1; }
+  .ov .book .pl.dim:hover { translate: 0 -2px; border-color: #6e5c3c; }
+  .ov .book .pl.tro.dim:hover > .tr img { filter: grayscale(1) brightness(.62) contrast(.9) opacity(.85); }
+  /* The awards night: a plaque as an award won; the rest's box as a plaque, the row under the pointer its name amber; a
+     front page lifts 4 px and grows 3 %; the manager's and Juno's bubbles grow 3 %, from their tail's corner, as the
+     desk's do. */
+  .awards-night .pl.rest .ri:hover .rn { color: #ffcf85; }
+  .awards-night .fp:hover { translate: 0 -4px; scale: 1.03; box-shadow: 0 18px 28px rgba(0, 0, 0, .7); }
+  .awards-night .lastword .bub { transform-origin: 0 100%; }
+  .awards-night .lastword .bub:hover { scale: 1.03; }
+  :root:is([data-motion-resolved='reduced'], [data-motion='off']) :is(.ov .clip, .ov .book .pl, .awards-night .pl, .awards-night .fp, .awards-night .lastword .bub):hover { translate: none; scale: none; }
+}
 /* House rules and the credits: a narrow panel of rows; a whole row is its switch. */
 .ov .set { position: absolute; left: 420px; top: calc(var(--top) + 96px); width: 440px; background: #15120E; border: 1px solid rgba(255, 220, 170, .2); box-shadow: 0 30px 50px rgba(0, 0, 0, .7); padding: 22px 26px 10px; color: #EDE6D6; }
 .ov .set .pnh b { font-size: 24px; }

@@ -19,6 +19,9 @@
 // - a month's sounds (round R4, B7), from the cue log `?cues` keeps: a deal per card dealt, a pick and a land per
 //   play, a button at END TURN, a stamp for PRINTED, the month at the date; no cue twice for one beat (ticks
 //   excepted); and a click during the next month end (D7) drops the cues of the beats it skips.
+// - hovers lift (round R9a, D3), in Chromium: on the awards night a plaque, a row of the rest's box, a front page and
+//   each bubble; in the scrapbook a clipping, a gap, an award won and one not — the hover's translate or scale (a
+//   gap's dashes, a row's name) in full motion, no lift or growth in reduced, the layout boxes unmoved.
 // Runs the Vite dev server in-process. Usage: node check/interactions.ts [--browsers=chrome,firefox]
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -127,6 +130,97 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
     await sleep(300);
     await eases('a door', '.doors .inv', '.doors .inv', 0);
   } else out.push(['hover eases: no recorded door', false]);
+  return out;
+}
+
+/**
+ * Hovers lift (round R9a, D3), Chromium, by real pointer: the awards night of desk-states' awards:4, then its scrapbook.
+ * Each target is hovered in full motion and in reduced: its translate or scale applies in full and not in reduced (what
+ * changes only its colours, a gap's dashes or a row's name, changes in both), and its layout box — offsets, which
+ * translate and scale leave alone — does not move. The hovers are for pointer devices only: where the page has no hover
+ * (the phone, its touch emulated), nothing moves or changes. It runs first, before a long-press turns touch on.
+ */
+async function hoversLift(page: Page, url: string): Promise<Result[]> {
+  if (page.name !== 'chrome') return [];
+  const out: Result[] = [];
+  const night = states['awards:4'];
+  const last = night?.steps.at(-1);
+  if (!night || last?.[0] !== 'gate' || (await reach(page, url, { ...night, steps: night.steps.slice(0, -1) }, 600)) !== 'ok') return [['hover lifts: the awards night did not replay', false]];
+  // The last door by real input, in full motion: the night's reveal holds its transform (fill both), and a hover adds
+  // to it.
+  await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+  await sleep(400);
+  const door = await centre(page, '.gates .take', last[1]);
+  if (!door) return [['hover lifts: the last door not shown', false]];
+  await page.click(...door);
+  for (let i = 0; i < 300 && !(await page.evaluate<boolean>(`!!document.querySelector('.awards-night.shown')`)); i++) await sleep(50);
+  await sleep(6000);
+  const canHover = await page.evaluate<boolean>(`matchMedia('(hover: hover)').matches`);
+  type Look = { translate: string; scale: string; box: number[]; border: string; color: string };
+  const look = (sel: string) => page.evaluate<Look | null>(`(() => {
+    const el = document.querySelector(${JSON.stringify(sel)});
+    if (!el) return null;
+    const cs = getComputedStyle(el);
+    return { translate: cs.translate, scale: cs.scale, box: [el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight], border: cs.borderTopColor, color: cs.color };
+  })()`);
+  /** Hovers `sel` and reads `read` (default `sel`): `lifts` names the property that must move in full motion only; `tint`, a colour that must change in both. */
+  const hover = async (label: string, sel: string, opts: { read?: string; lifts?: 'translate' | 'scale'; tint?: 'border' | 'color' }) => {
+    for (const mode of ['full', 'reduced'] as const) {
+      await page.evaluate(`document.documentElement.dataset.motion = '${mode}'`);
+      await page.move(4, 4);
+      await sleep(300);
+      const read = opts.read ?? sel;
+      const rest = await look(read);
+      const at = await centre(page, sel);
+      if (!rest || !at) {
+        out.push([`hover lifts: ${label} not found`, false]);
+        return;
+      }
+      await page.move(at[0], at[1]);
+      await sleep(400);
+      const on = (await look(read)) as Look;
+      await page.move(4, 4);
+      const still = JSON.stringify(on.box) === JSON.stringify(rest.box);
+      const parts: string[] = [];
+      let ok = still;
+      if (opts.lifts) {
+        const moved = on[opts.lifts] !== 'none' && on[opts.lifts] !== rest[opts.lifts];
+        parts.push(`${opts.lifts} ${on[opts.lifts]}`);
+        ok &&= mode === 'full' && canHover ? moved : !moved;
+      }
+      if (opts.tint) {
+        const changed = on[opts.tint] !== rest[opts.tint];
+        parts.push(`${opts.tint} ${on[opts.tint]}`);
+        ok &&= canHover ? changed : !changed;
+      }
+      out.push([`hover ${mode}${canHover ? '' : ' (no hover: nothing moves)'}: ${label} — ${parts.join(', ')}${still ? '' : '; its layout box moved'}`, ok]);
+    }
+  };
+  await hover('a plaque on the night', '.awards-night .plaques .pl.tro', { lifts: 'translate', tint: 'border' });
+  if (await page.evaluate<boolean>(`!!document.querySelector('.awards-night .pl.rest .ri')`)) {
+    await hover("a row of the night's box", '.awards-night .pl.rest .ri', { read: '.awards-night .pl.rest', lifts: 'translate' });
+    await hover("a row of the night's box, its name", '.awards-night .pl.rest .ri', { read: '.awards-night .pl.rest .ri .rn', tint: 'color' });
+  } else out.push(["hover lifts: the night's box not shown (fewer than five awards)", false]);
+  await hover('a front page', '.awards-night .review .fp', { lifts: 'scale' });
+  await hover("the manager's bubble", '.awards-night .lastword:not(.rivalword) .bub', { lifts: 'scale' });
+  if (await page.evaluate<boolean>(`!!document.querySelector('.awards-night .rivalword .bub')`)) await hover("Juno's bubble", '.awards-night .rivalword .bub', { lifts: 'scale' });
+  else out.push(["hover lifts: Juno's bubble not shown", false]);
+  // The scrapbook, from the night's own link.
+  await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+  const link = await centre(page, '.awards-night .scrapbook-open');
+  if (!link) return [...out, ['hover lifts: no scrapbook link on the night', false]];
+  await page.click(...link);
+  await sleep(500);
+  await hover('a clipping found', '.ov .clip:not(.miss)', { lifts: 'translate' });
+  await hover('a gap', '.ov .clip.miss', { tint: 'border' });
+  await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+  const tab = await centre(page, '.ov .tab[data-tab="awards"]');
+  if (tab) await page.click(...tab);
+  await sleep(600);
+  await hover('an award won', '.ov .book .pl.tro:not(.dim)', { lifts: 'translate', tint: 'border' });
+  await hover('an award not yet won', '.ov .book .pl.tro.dim', { lifts: 'translate', tint: 'border' });
+  await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
+  console.log(`  hovers ${page.name}${canHover ? '' : ' (no hover)'}: ${out.map(([what]) => what.replace(/^hover /, '')).join('; ')}`);
   return out;
 }
 
@@ -585,7 +679,7 @@ try {
     for (const size of sizesFromArgs(process.argv)) {
     const page = await launch(browser, size);
     try {
-      const results = [...(await tooltips(page, url)), ...(await mirrorTips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
+      const results = [...(await hoversLift(page, url)), ...(await tooltips(page, url)), ...(await mirrorTips(page, url)), ...(await bubblesAndMetronome(page, url)), ...(await papers(page, url)), ...(await hand(page, url)), ...(await bubblesStay(page, url)), ...(await hoversEase(page, url)), ...(await monthCues(page, url))];
       // Every keyframe animated over the runs, CSS-valid (round R5, B3): the phone's shake, the hand, the month's pile.
       const rejected = await badKeyframes(page);
       results.push([`no keyframe value CSS rejects${rejected.length ? `: ${rejected.slice(0, 3).map((b) => `${b.element} ${b.property}: ${b.value}`).join('; ')}` : ''}`, rejected.length === 0]);

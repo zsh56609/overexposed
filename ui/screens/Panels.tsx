@@ -3,7 +3,7 @@
 // Every label is the mockup's, approved; every card, ending and goal line comes from content. Over the desk a panel
 // starts below the stat bar, which stays in view; Escape or a click on the dimmed scene closes it.
 
-import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { establishedLanes, scandalCount, type CardInstance, type GameState, type SeasonId } from '../../core/index.ts';
 import { content } from '../content.ts';
 import { CardPicture, Value } from '../desk/Hand.tsx';
@@ -146,33 +146,68 @@ const SHELF_ROW = 4;
 /** The clippings' tilts, as the mockup pins them. */
 const TILT = [-2, 1.5, -1, 2];
 
+type ScrapbookPage = 'endings' | 'awards';
+/**
+ * The page turn (round R9a, D2): the page going slides out and the next slides in, overlapping, each fading — 28 px over
+ * 240 ms; reduced motion, a 150 ms crossfade with no travel; motion off, the page changes at once.
+ */
+const TURN = { px: 28, ms: 240, reducedMs: 150, easing: 'cubic-bezier(.2, .7, .2, 1)' } as const;
+
 /**
  * The scrapbook: two pages, the endings found and the awards won (round R4, A7), switched by two tabs in its head; it
  * opens on the endings, and its title counts the open page. The awards page is a shelf of all twelve as the awards
  * night's plaques with their trophies (round R8c), in rows of four: one won bright, Winner and its citation; one not yet
- * won dimmed, its trophy a silhouette, its name and how it is won.
+ * won dimmed, its trophy a silhouette, its name and how it is won. The book is one size on both pages (round R9a, D1),
+ * and the page turns with a slide and the sound of a panel opening (D2): the title changes at the click; the page going
+ * holds no input and leaves the DOM when its slide ends; a click during a turn ends it and starts the next.
  */
 export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: ReadonlySet<string>; awards: ReadonlySet<string>; overDesk: boolean; onClose: () => void }) {
   const { majors, minors } = content.endings;
-  const [page, setPage] = useState<'endings' | 'awards'>('endings');
+  const [page, setPage] = useState<ScrapbookPage>('endings');
+  // The turn in flight: the page going (round R9a, D2). Endings → Awards, it leaves to the left; back, to the right.
+  const [turn, setTurn] = useState<{ readonly from: ScrapbookPage; readonly n: number } | null>(null);
+  const going = useRef<HTMLDivElement>(null);
+  const coming = useRef<HTMLDivElement>(null);
   const n = minors.filter((m) => found.has(m.id)).length;
   const list = content.awards ?? [];
   const won = list.filter((a) => awards.has(a.id)).length;
+  const open = (next: ScrapbookPage) => {
+    if (next === page) return;
+    cue('open');
+    setTurn(motionMode() === 'off' ? null : { from: page, n: (turn?.n ?? 0) + 1 });
+    setPage(next);
+  };
+  useLayoutEffect(() => {
+    if (!turn) return;
+    const mode = motionMode();
+    const dx = mode === 'full' ? (turn.from === 'endings' ? -TURN.px : TURN.px) : 0;
+    const timing: KeyframeAnimationOptions = { duration: mode === 'full' ? TURN.ms : TURN.reducedMs, easing: TURN.easing, fill: 'both' };
+    const out = going.current?.animate([{ opacity: 1, transform: 'translateX(0)' }, { opacity: 0, transform: `translateX(${dx}px)` }], timing);
+    const into = coming.current?.animate([{ opacity: 0, transform: `translateX(${-dx}px)` }, { opacity: 1, transform: 'translateX(0)' }], timing);
+    let live = true;
+    const done = () => {
+      if (live) setTurn(null);
+    };
+    if (out) out.onfinish = done;
+    else done();
+    return () => {
+      live = false;
+      out?.cancel();
+      into?.cancel();
+    };
+  }, [turn]);
   const tabs = (
     <nav className="tabs" role="tablist">
       {(['endings', 'awards'] as const).map((id) => (
-        <button key={id} className={`tab${page === id ? ' on' : ''}`} role="tab" aria-selected={page === id} data-tab={id} onClick={() => setPage(id)}>
+        <button key={id} className={`tab${page === id ? ' on' : ''}`} role="tab" aria-selected={page === id} data-tab={id} onClick={() => open(id)}>
           {t(id === 'endings' ? 'ui.scrapbook.tabEndings' : 'ui.scrapbook.tabAwards')}
         </button>
       ))}
     </nav>
   );
   const title = page === 'endings' ? t('ui.scrapbook.title', { n, total: minors.length }) : t('ui.scrapbook.awardsTitle', { n: won, total: list.length });
-  return (
-    <Overlay id="scrapbook" label={t('ui.scrapbook.kicker')} overDesk={overDesk} onClose={onClose}>
-      <div className="book" data-page={page}>
-        <Head kicker={t('ui.scrapbook.kicker')} title={title} close={t('ui.scrapbook.close')} onClose={onClose} tabs={tabs} />
-        {page === 'awards' ? (
+  const pageOf = (shown: ScrapbookPage) =>
+        shown === 'awards' ? (
           <div className="awards-page">
             {Array.from({ length: Math.ceil(list.length / SHELF_ROW) }, (_, r) => list.slice(r * SHELF_ROW, (r + 1) * SHELF_ROW)).map((row, r) => (
               <div key={r} className="prow">
@@ -226,7 +261,21 @@ export function ScrapbookPanel({ found, awards, overDesk, onClose }: { found: Re
             </div>
           ))}
         </div>
-        )}
+        );
+  return (
+    <Overlay id="scrapbook" label={t('ui.scrapbook.kicker')} overDesk={overDesk} onClose={onClose}>
+      <div className="book" data-page={page}>
+        <Head kicker={t('ui.scrapbook.kicker')} title={title} close={t('ui.scrapbook.close')} onClose={onClose} tabs={tabs} />
+        <div className="pages">
+          {turn && (
+            <div key={`going-${turn.n}`} ref={going} className="page going" aria-hidden="true" data-going={turn.from}>
+              {pageOf(turn.from)}
+            </div>
+          )}
+          <div key={page} ref={coming} className="page">
+            {pageOf(page)}
+          </div>
+        </div>
       </div>
     </Overlay>
   );

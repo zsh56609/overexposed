@@ -251,7 +251,21 @@ window.__plainAudit = (where) => {
   if (book && shelf.length > 0) {
     const b = book.getBoundingClientRect(), last = shelf[shelf.length - 1].getBoundingClientRect();
     if (last.bottom > b.bottom + 0.5) add('the shelf\\'s last row ends ' + (last.bottom - b.bottom).toFixed(1) + ' px below the book');
+  }
+  // The book one size on both pages (round R9a, D1): 580 tall, its page inside it, the book on the stage — the height
+  // and the room under each page kept for the report.
+  if (book) {
+    const k = stage.height / 720, b = book.getBoundingClientRect(), pg = book.querySelector('.pages > .page:not(.going)');
+    const h = b.height / k;
+    if (Math.abs(h - 580) > 0.5) add('the scrapbook is ' + h.toFixed(1) + ' px tall on its ' + book.dataset.page + ' page, not 580');
     if (b.top < stage.top - 0.5 || b.bottom > stage.bottom + 0.5) add('the book runs off the stage');
+    if (pg) {
+      const room = (b.bottom - pg.getBoundingClientRect().bottom) / k;
+      if (room < -0.5) add('the scrapbook\\'s ' + book.dataset.page + ' page ends ' + (-room).toFixed(1) + ' px below the book');
+      const seen = (window.__book ??= {});
+      const was = seen[book.dataset.page];
+      if (!was || room < was.room) seen[book.dataset.page] = { h: Math.round(h * 10) / 10, room: Math.round(room * 10) / 10 };
+    }
   }
   // The credits (round R7, A2; round R8b, C4): a role on one line, a name on at most two, the foot on one — and a foot.
   const lines = (el) => { const r = document.createRange(); r.selectNodeContents(el); const tops = []; for (const b of r.getClientRects()) if (b.width >= 1 && !tops.some((y) => Math.abs(y - b.top) < 3)) tops.push(b.top); return tops.length; };
@@ -677,7 +691,7 @@ const DRIVE = (runs: number) => `(async () => {
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
@@ -694,7 +708,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; book: Record<string, { h: number; room: number }> | null; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -726,6 +740,13 @@ try {
         );
         // The opening card (round R8d, A2): spring's oval to CONTINUE's foot.
         console.log(`overflow check, ${tag}: the opening card — ${out.opening ? `spring's oval from y ${out.opening.top} to CONTINUE's foot at y ${out.opening.bottom} of 720` : 'not measured'}`);
+        // The scrapbook one size (round R9a, D1): both pages, each its height and the least room under its page.
+        const pages = ['endings', 'awards'].map((p) => (out.book?.[p] ? `${p} ${out.book[p]!.h} tall, ${out.book[p]!.room} px under its page` : `${p} not seen`));
+        console.log(`overflow check, ${tag}: the scrapbook — ${pages.join('; ')}`);
+        if (pages.some((p) => p.endsWith('not seen'))) {
+          failed = true;
+          console.log('OVERFLOW scrapbook  a page of the scrapbook was not seen');
+        }
         if (!out.opening) {
           failed = true;
           console.log('OVERFLOW opening  the opening card was not measured');

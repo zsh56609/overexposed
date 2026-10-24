@@ -6,6 +6,45 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9a, Part D: the scrapbook and the night
+
+- The author: the scrapbook's two pages are two sizes; make them one, and turn the page with a
+  slide and a sound, nothing showy. Every ending and award should answer the pointer, in the
+  scrapbook and on the awards night: its awards, its front pages, the manager's and Juno's
+  bubbles.
+- One size: the book is 580 tall on both pages (height, not min-height; the awards page needs
+  579.4 at 1280×720). The endings page keeps its top, with more room under it (84 px under its
+  page; the awards page 24.6, its padding). check:overflow holds both pages at every size: the
+  book 580, its page inside it, the book on the stage.
+- The page turn: the page going slides out and the next slides in, overlapping — 28 px, 240 ms,
+  cubic-bezier(.2, .7, .2, 1), each fading — the two pages in one grid cell under the heading.
+  Endings → Awards, the old page leaves to the left and the awards come in from the right; back,
+  mirrored. The title changes at the click. The sound is cue('open'), the sheet drawn out as
+  the scrapbook opens: once a turn, none for the tab already open. A click during a turn ends the
+  turn in flight and starts the next. The page going holds no input (pointer-events none,
+  aria-hidden) and leaves the DOM when its slide ends. Reduced motion: a 150 ms crossfade, no
+  travel; motion off: the page changes at once, the sound still played. Played with the Web
+  Animations API, so the panels' reduced-motion rule (animation-duration .01 ms on `.scr *`)
+  does not cut the crossfade.
+- Hover: what the pointer is on lifts a little and catches the light — in the scrapbook a
+  clipping found (3 px, 2 %, shadow 0 12px 18px rgba(0,0,0,.5)), a gap (dashes .55 on a .04
+  fill, its small line .6, its ? amber .85), an award won (3 px, border #a3804a, its light to 1,
+  shadow 0 18px 26px rgba(0,0,0,.65), the inner line .28) and one not yet won (2 px, border
+  #6e5c3c, the silhouette at brightness .62 and opacity .85); on the night a plaque (as an award
+  won), the rest's box (as a plaque) and its row (the name amber #ffcf85), a front page (4 px,
+  3 %, shadow 0 18px 28px rgba(0,0,0,.7)), the manager's and Juno's bubbles (3 %, from the tail's
+  corner). 0.16 s ease-out; pointer devices only (`@media (hover: hover)`); reduced motion or
+  off: the light and the colours, no lift or growth. The lift and growth are the `translate`
+  and `scale` properties, never `transform` — the night's reveal holds a transform with fill
+  both, and a clipping's tilt is one; translate and scale add to both. Silent: a pointer moving
+  along a row of plaques would chatter.
+- check:interactions, Chromium, by real pointer, at the three sizes: on the awards night of
+  desk-states' awards:4, reached by its last door in full motion, a plaque, a row of the box, a
+  front page and each bubble; in its scrapbook a clipping, a gap, an award won and one not — the
+  translate or scale in full motion and not in reduced, the colours in both, the layout boxes
+  unmoved. It runs before the long-press tests, which turn touch emulation on; on the phone size
+  (touch emulated from the start, no hover) it holds that nothing moves or changes.
+
 ## 2026-10-25 — Round R9a, Part C: three fixes
 
 - The PRINTED stamp (the author: sometimes, as the next month starts, the paper still wears

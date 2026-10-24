@@ -164,6 +164,11 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
   wide), its small line her face (22 px) and her name, one bubble in the manager's bubble look; it comes at 4.75 s,
   between the manager's word (4.6) and the bottom block (4.9). The manager's block narrows to the first front page
   (226 wide, its bubbles too), at left 164 as before.
+- **Hover on the night** (round R9a, as in the scrapbook: pointer devices only, 0.16 s ease-out, silent; `translate`
+  and `scale`, which add to the reveal's held transform): a plaque as an award won; the rest's box as a plaque, the row
+  under the pointer its name amber (`#ffcf85`); a front page lifts 4 px and grows 3 % (shadow
+  `0 18px 28px rgba(0,0,0,.7)`); the manager's and Juno's bubbles grow 3 %, as the desk's do, from their tail's corner.
+  Reduced motion or off: the light and the colours, no lift or growth.
 - **PLAY AGAIN in brass** (round R8c): `linear-gradient(180deg, #e9c87a, #c9a04a)`, ink `#1a120a`, a warm glow and
   an inner highlight; hovered, `#f6dc98` → `#dcb45a`. Its size and place as before, the last front page's width.
 
@@ -281,7 +286,22 @@ italic line.
   "Endings found · N of 14". Its awards page is a shelf (round R8c): the twelve as the
   night's plaques with their trophies, in rows of four; one not yet won dimmed, its
   trophy a silhouette (`grayscale(1) brightness(.42) contrast(.9) opacity(.75)`), its
-  how-line 10 px.
+  how-line 10 px. Since round R9a the book is one size on both pages, 580 tall (the endings
+  page keeps its top, with more room under it), and the page turns: the page going slides
+  out and the next slides in, overlapping — 28 px, 240 ms, `cubic-bezier(.2, .7, .2, 1)`,
+  each fading; Endings → Awards the old page leaves to the left and the awards come in from
+  the right, back mirrored; the title changes at the click; the sound of a panel opening,
+  once a turn (none for the tab already open); a click during a turn ends it and starts the
+  next; the page going holds no input and leaves when its slide ends. Reduced motion: a
+  150 ms crossfade, no travel; motion off: at once, the sound still played. **Hover**
+  (pointer devices only, 0.16 s ease-out, silent): a clipping found lifts 3 px and grows
+  2 % (shadow `0 12px 18px rgba(0,0,0,.5)`); a gap brightens — dashes `rgba(237,230,214,.55)`
+  on a faint fill (`.04`), its small line `.6`, its ? amber `rgba(255,207,133,.85)`; an award
+  won rises 3 px, its border `#a3804a`, its light to 1, its shadow `0 18px 26px rgba(0,0,0,.65)`
+  with the inner line at `.28`; one not yet won rises 2 px, its border `#6e5c3c`, its
+  silhouette a shade brighter (brightness .62, opacity .85). The lift and growth are the
+  `translate` and `scale` properties, never `transform`, so a clipping keeps its tilt;
+  reduced motion or off: the light and the colours, no lift or growth.
 - **Settings — "House rules".** Mark my stories (on), Sound effects (on), Music (on), Reduce motion
   (off), Manager's notes (on; round R8b, §11). Sound effects carries the effects; Music the six tracks — switched back on, the game's current
   track comes back (round R4). Credits share this panel's style (round R7; laid out again in round
@@ -309,7 +329,8 @@ fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `p
   picks, the cards leaving. An answer: send and a bubble on the phone; a letter's SENT stamp.
 - **The screens' own sounds.** A hand card under the mouse (mouse only, at most every 60 ms); the stamps
   (TAKEN, SIGNED, ACCEPTED); the offers rising (three deals, 70 ms apart) and the offer taken flying to the
-  deck (a deal); the doors laid out; a panel opening and closing; the phone's buzz and each bubble; a letter
+  deck (a deal); the doors laid out; a panel opening and closing (and the scrapbook's page turn, as a panel opening,
+  round R9a); the phone's buzz and each bubble; a letter
   landing; BEGIN's flash; Continue, the tickets and PLAY AGAIN (a button); on the awards night an ovation
   as it names The Breakthrough or Overexposed, and applause for each plaque, 0.3 s apart.
 - **No ambience** (round R6). R4 put the room's tone under the desk, with the season's weather; on ordinary
