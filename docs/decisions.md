@@ -6,6 +6,21 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9a, Part E: v0.9.1
+
+- v0.9.1 is R9a (`package.json` and the lock 0.9.1). The credits' foot shows the patch when there
+  is one: v0.9.1 (it read major and minor only, so 0.9.1 would have shown as v0.9); a patch of 0
+  still reads v0.9, v1.0.
+- AGENTS.md's versions line, the one change to it: "Versions: R1 to R7 v0.1 to v0.7 (one each),
+  R8a + R8b v0.8, R8c + R8d v0.9, R9a v0.9.1, the submission v1.0." — 11 bytes shorter; the file
+  is 24,560 bytes.
+- The zip, as R8d's, from this round's last commit: overexposed-v0.9.1.zip.
+- check/desk-states.json was recorded again with Part A and with Part B, as its header asks:
+  of its 51 states, 29 are as before the round (the early ones, cdCrossed among them); 21 take
+  other steps or another seed — the runs that meet a moved event, most of the endings and
+  awards:4 among them (now five awards) — and card:fan_meetup takes the place of
+  card:award_campaign (the tool keeps a card's own state only for a card no other state holds).
+
 ## 2026-10-25 — Round R9a, Part D: the scrapbook and the night
 
 - The author: the scrapbook's two pages are two sizes; make them one, and turn the page with a

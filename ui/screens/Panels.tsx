@@ -414,11 +414,11 @@ export function CreditsPanel({ overDesk, onClose }: { overDesk: boolean; onClose
             </span>
           </div>
         ))}
-        {/* The foot, a row of its own (round R8b, C2): the jam left, the build's version right (major and minor, as the
-            itch page names builds). */}
+        {/* The foot, a row of its own (round R8b, C2): the jam left, the build's version right, as the itch page names
+            builds — major and minor, and the patch when there is one (v0.9.1, round R9a). */}
         <div className="ver">
           <span>{t('ui.credits.jam')}</span>
-          <b>{t('ui.credits.version', { version: __APP_VERSION__.split('.').slice(0, 2).join('.') })}</b>
+          <b>{t('ui.credits.version', { version: __APP_VERSION__.replace(/\.0$/, '') })}</b>
         </div>
       </div>
     </Overlay>
