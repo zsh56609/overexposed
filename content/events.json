@@ -309,7 +309,8 @@
         "months": { "from": 12, "to": 12 },
         "condition": { "hype": { "min": 30 }, "flags": { "not": ["juno_feud"] } },
         "rival": ["breakthrough"],
-        "weight": 3
+        "weight": 3,
+        "first": true
       },
       "messageKeys": ["event.juno_shortlist.message.1", "event.juno_shortlist.message.2"],
       "choices": [
@@ -339,9 +340,11 @@
         "months": { "from": 12, "to": 12 },
         "condition": { "flags": { "not": ["juno_feud"] } },
         "rival": ["crossover"],
-        "weight": 3
+        "weight": 3,
+        "first": true
       },
       "messageKeys": ["event.juno_carpet.message.1", "event.juno_carpet.message.2"],
+      "unmetMessageKeys": ["event.juno_carpet.unmet.1", "event.juno_carpet.unmet.2"],
       "photo": { "id": "carpet_view", "after": 1 },
       "choices": [
         {
@@ -368,9 +371,10 @@
       "speaker": { "nameKey": "event.speaker.juno.name", "avatar": "juno" },
       "when": {
         "months": { "from": 12, "to": 12 },
-        "condition": { "flags": { "any": ["juno_cowrite", "juno_declined"], "not": ["juno_feud"] } },
+        "condition": { "flags": { "not": ["juno_feud"] } },
         "rival": ["crash"],
-        "weight": 3
+        "weight": 3,
+        "first": true
       },
       "messageKeys": ["event.juno_video.message.1", "event.juno_video.message.2"],
       "choices": [
@@ -398,9 +402,10 @@
       "speaker": { "nameKey": "event.speaker.juno.name", "avatar": "juno" },
       "when": {
         "months": { "from": 12, "to": 12 },
-        "condition": { "flags": { "any": ["juno_cowrite", "juno_declined"], "not": ["juno_feud"] } },
+        "condition": { "flags": { "not": ["juno_feud"] } },
         "rival": ["fade"],
-        "weight": 3
+        "weight": 3,
+        "first": true
       },
       "messageKeys": ["event.juno_unsigned.message.1", "event.juno_unsigned.message.2"],
       "photo": { "id": "small_room", "after": 1 },

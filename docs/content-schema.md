@@ -338,8 +338,20 @@ An `avatar` is one of the closed list in `core/content.ts`, `AVATAR_IDS`:
   (`rivalArc(content, seed)`, core/press.ts), so the test is a pure read —
   and an optional `weight` (round R7), a whole number from 1 to 5
   (default 1), multiplying its weight in the draw together with the
-  lane's.
-- `messageKeys`; optional `photo` (round R8b), a text's photograph:
+  lane's — and an optional `first` (round R9a): `true` on a one-off (no
+  `chain`) that comes before the draw. When it can come — its months, its
+  rival years, its condition, not met yet — it takes the month, yielding
+  only to a due follow-up; several at once are drawn among themselves by
+  weight. The last run's memory never holds it back. Juno's four year-end
+  texts carry it. Validate holds it true or absent, on a one-off only (a
+  follow-up already comes before the draw, and an opener is drawn).
+- `messageKeys`; optional `unmetMessageKeys` (round R9a), a rival text's
+  bubbles for a run that has answered no rival event yet (`rivalTerms`
+  unmet): one key for each of `messageKeys`, so a photograph keeps its
+  place, read through /core's `eventMessageKeys` — the carpet's first
+  contact for a run that never met her. Validate holds it to a rival
+  text, as many as `messageKeys`, every key in en.json. Optional `photo`
+  (round R8b), a text's photograph:
   `{ id, after }` — `id` one of `PHOTO_IDS` in `core/content.ts`
   (`gran_coat`, `sunday_table`, `luccas`, `flash_shot`, `console`,
   `gig_poster`, `panel_tv`: the author's drawings in
@@ -360,14 +372,15 @@ An `avatar` is one of the closed list in `core/content.ts`, `AVATAR_IDS`:
 
 `rules.events`: `months` (the months an event may open — 2, 4, 6, 8, 10,
 12), `maxChains` (2), `laneWeight` (2). At each: an open chain's eligible
-follow-up (the earliest-opened chain first), else one drawn with the game's
-RNG among the eligible openers and one-offs, each by its weight; each at
-most once a run. A choice is "↺ remembered" when it sets a flag some
+follow-up (the earliest-opened chain first), else an eligible one-off
+marked `first` (round R9a; several drawn among themselves by weight), else
+one drawn with the game's RNG among the eligible openers and one-offs, each
+by its weight; each at most once a run. A choice is "↺ remembered" when it sets a flag some
 event's condition reads. Events have their own budget: 28.
 
 ## i18n keys
 
-The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `award.<id>.how` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `event.<id>.title` · `event.<id>.message.<n>` · `event.<id>.<a|b|c>.reply` · `event.<id>.<a|b|c>.outcome` · `event.<id>.<a|b|c>.press.<n>` · `event.speaker.<who>.name` · `event.speaker.<who>.label` · `event.letterhead.<house>` · `event.signoff.<who>` · `event.category.<category>.name` · `event.category.<category>.line` · `notes.<note>.<manager>` · `notes.<note>.<manager>.touch` (the actions and mirror notes, under touch) · `notes.sign.<manager>` · `ui.<area>.<label>`
+The key convention: `card.<id>.name` · `card.<id>.text` · `card.<id>.headline.<n>` · `card.<id>.inhand.<n>` (scandals) · `gate.<stem>.name` · `gate.<stem>.flavor.<n>` · `ending.<id>.name` · `ending.<id>.goal` (majors; a minor's optional) · `ending.<id>.text.<n>` (minors) · `act.<season>.name` · `act.<season>.opener.<n>` · `story.opening.<n>` — `<n>` numbers a group's variants from 1 · `award.<id>.name` · `award.<id>.citation` · `award.<id>.how` · `flag.<id>.positive` · `flag.<id>.negative` · `tier.<stat>.<n>` (lowest first) · `paper.<id>.masthead` · `press.subject.<noun>` · `event.<id>.title` · `event.<id>.message.<n>` · `event.<id>.unmet.<n>` (round R9a) · `event.<id>.<a|b|c>.reply` · `event.<id>.<a|b|c>.outcome` · `event.<id>.<a|b|c>.press.<n>` · `event.speaker.<who>.name` · `event.speaker.<who>.label` · `event.letterhead.<house>` · `event.signoff.<who>` · `event.category.<category>.name` · `event.category.<category>.line` · `notes.<note>.<manager>` · `notes.<note>.<manager>.touch` (the actions and mirror notes, under touch) · `notes.sign.<manager>` · `ui.<area>.<label>`
 
 ## What validate checks
 

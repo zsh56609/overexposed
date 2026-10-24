@@ -4,8 +4,10 @@
 // content's events come two at the limits the schema allows, which no event reaches yet: a text of three messages
 // and three replies, a letter of four paragraphs and three choices — built only from the content's own words, the
 // longest of each, with the most effects and the longest requirement. Driven from the checks:
-// window.__events.show(index, mode) renders one and reports how many there are; window.__events.acted lists the
-// actions its replies sent (check:clicks). Dev-only: Vite serves it, the build never includes it.
+// window.__events.show(index, mode, met?) renders one and reports how many there are; window.__events.acted lists the
+// actions its replies sent (check:clicks). A rival text with a thread for a run that never answered her (round R9a, A4:
+// window.__events.unmet) shows it by default, and its met thread with `met`. Dev-only: Vite serves it, the build never
+// includes it.
 
 import { useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -78,33 +80,39 @@ const photos = loadPhotos();
 const base = content.events ? createInitialState(7, { ...content, events: { ...content.events, events } }, { strict: true }) : plain;
 /** The event month whose date line runs longest: the limits are shown in it. */
 const longestMonth = longest(months, (m) => calendarLabel(base.content, m).length, 1)[0] ?? 1;
-let shown: { index: number; mode: Mode } = { index: 0, mode: 'choices' };
+let shown: { index: number; mode: Mode; met: boolean } = { index: 0, mode: 'choices', met: false };
 const listeners = new Set<() => void>();
 const acted: Action[] = [];
 
 declare global {
   interface Window {
-    __events: { show(index: number, mode: Mode): number; ids: readonly string[]; acted: Action[]; photos: Promise<unknown> };
+    __events: { show(index: number, mode: Mode, met?: boolean): number; ids: readonly string[]; unmet: readonly boolean[]; acted: Action[]; photos: Promise<unknown> };
   }
 }
 window.__events = {
   ids: events.map((e) => e.id),
+  unmet: events.map((e) => e.unmetMessageKeys !== undefined),
   acted,
   photos,
-  show(index, mode) {
-    shown = { index, mode };
+  show(index, mode, met = false) {
+    shown = { index, mode, met };
     for (const fn of listeners) fn();
     return events.length;
   },
 };
 
-/** The event waiting in its first event month, with money to spare and heat to cool — or no money at all, to show what a choice needs. */
-function stateFor(index: number, mode: Mode): GameState {
+/**
+ * The event waiting in its first event month, with money to spare and heat to cool — or no money at all, to show what a
+ * choice needs. No rival event answered yet, unless `met`: then another rival event answered earlier (round R9a, A4).
+ */
+function stateFor(index: number, mode: Mode, met: boolean): GameState {
   const ev = events[index];
   if (!ev) return base;
   const turn = ev.id.startsWith('limit_') ? longestMonth : (months.find((m) => m >= ev.when.months.from) ?? ev.when.months.from);
   const capital = mode === 'broke' ? 0 : 9;
-  return { ...base, phase: 'event', event: ev.id, turn, act: Math.ceil(turn / base.content.rules.turnsPerAct), resources: { ...base.resources, capital, hype: 40, heat: 5 }, events: [] };
+  const earlier = met ? own.find((e) => e.category === 'rival' && e.id !== ev.id) : undefined;
+  const eventLog = earlier ? [{ eventId: earlier.id, turn: months[0] ?? 1, choice: 0 }] : [];
+  return { ...base, phase: 'event', event: ev.id, turn, act: Math.ceil(turn / base.content.rules.turnsPerAct), resources: { ...base.resources, capital, hype: 40, heat: 5 }, eventLog, events: [] };
 }
 
 function Events() {
@@ -115,7 +123,7 @@ function Events() {
     },
     () => shown,
   );
-  const s = stateFor(now.index, now.mode);
+  const s = stateFor(now.index, now.mode, now.met);
   const ev = events[now.index];
   const lines = { ...readLines([{ before: null, after: s, events: [] }]), lane: null };
   // Answered: the reply and outcome that run longest.
@@ -125,7 +133,7 @@ function Events() {
       <IconDefs />
       <div className="screen-scrim" />
       <EventScreen
-        key={`${now.index}:${now.mode}`}
+        key={`${now.index}:${now.mode}:${now.met}`}
         s={s}
         chosen={now.mode === 'answered' ? answer : null}
         beats={now.mode === 'answered' ? ['eventSend', 'eventReply'] : []}

@@ -5,18 +5,20 @@
 //
 //   1. A follow-up of an open chain whose condition holds and whose first month has come takes the month — the
 //      earliest-opened chain first, one a month.
-//   2. Otherwise one event is drawn among the eligible openers and one-offs, each by its weight (when.weight, round
+//   2. Otherwise a one-off marked when.first (round R9a, A1; Juno's year-end texts) that can come takes it — several
+//      at once are drawn among themselves by weight, as the pool is; the memory never holds one back.
+//   3. Otherwise one event is drawn among the eligible openers and one-offs, each by its weight (when.weight, round
 //      R7) — an event of the established lane ×rules.events.laneWeight besides. An event comes at most once a run;
 //      once rules.events.maxChains chains are open, openers are no longer drawn. The pool first leaves out the events
 //      the last run met (its memory, round R7, E3), and falls back to the whole pool only when nothing else is
-//      eligible; the memory never holds back a follow-up (step 1).
+//      eligible; the memory never holds back a follow-up (step 1) or a first (step 2).
 // An event may name the rival's years it comes in (when.rival, round R7): the run's arc is fixed by its seed.
-//   3. Nothing eligible: no event that month.
+//   4. Nothing eligible: no event that month.
 
 import { evaluate, explainCondition, type ClauseReport, type ConditionSubject } from './conditions.ts';
 import { getEvent, type ContentIndex, type Effect, type EventDef, type EventPressDef, type FlagTest } from './content.ts';
 import type { RunMemory } from './memory.ts';
-import { rivalArc } from './rival.ts';
+import { rivalArc, rivalTerms } from './rival.ts';
 import type { EventRecord } from './state.ts';
 
 /** What the event queries read: the condition subject, the run's seed (its rival's year), the established lane, the events met so far. */
@@ -49,7 +51,8 @@ export function runChains(s: Pick<EventSubject, 'content' | 'eventLog'>): { read
 
 /**
  * What may come at the start of this month: the follow-up that takes it, or the pool one is drawn from, each with
- * its weight. Both empty outside an event month, or when nothing is eligible.
+ * its weight — the one-offs marked first that can come (round R9a), else the eligible openers and one-offs. Both
+ * empty outside an event month, or when nothing is eligible.
  */
 export function eventCandidates(s: EventSubject): { readonly followUp: EventDef | null; readonly pool: readonly { readonly event: EventDef; readonly weight: number }[] } {
   const c = s.content;
@@ -65,12 +68,24 @@ export function eventCandidates(s: EventSubject): { readonly followUp: EventDef 
     const followUp = c.events.find((ev) => ev.chain?.id === chain.chain && ev.chain.role === 'followUp' && eligible(ev));
     if (followUp) return { followUp, pool: [] };
   }
+  const weighed = (event: EventDef) => ({ event, weight: (event.when.weight ?? 1) * (event.when.lane !== undefined && event.when.lane === s.establishedLane ? rules.laneWeight : 1) });
+  // Before the draw (round R9a, A1): a one-off marked first that can come takes the month; the reducer draws among
+  // several by weight, as it draws the pool. The memory never holds one back.
+  const first = c.events.filter((ev) => ev.when.first === true && ev.chain === undefined && eligible(ev));
+  if (first.length > 0) return { followUp: null, pool: first.map(weighed) };
   const canOpen = chains.length < rules.maxChains;
-  const pool = c.events
-    .filter((ev) => ev.chain?.role !== 'followUp' && (ev.chain?.role !== 'opener' || canOpen) && eligible(ev))
-    .map((event) => ({ event, weight: (event.when.weight ?? 1) * (event.when.lane !== undefined && event.when.lane === s.establishedLane ? rules.laneWeight : 1) }));
+  const pool = c.events.filter((ev) => ev.chain?.role !== 'followUp' && (ev.chain?.role !== 'opener' || canOpen) && eligible(ev)).map(weighed);
   const fresh = s.memory.events.length === 0 ? pool : pool.filter((p) => !s.memory.events.includes(p.event.id));
   return { followUp: null, pool: fresh.length > 0 ? fresh : pool };
+}
+
+/**
+ * An event's messages as the run stands (round R9a, A4): a rival text's unmetMessageKeys while the run has answered no
+ * rival event (rivalTerms: unmet), else its messageKeys. The event screen reads them in the state the event waits in, so
+ * the thread does not change as the answer lands.
+ */
+export function eventMessageKeys(s: { readonly content: ContentIndex; readonly eventLog: readonly EventRecord[] }, ev: EventDef): readonly string[] {
+  return ev.unmetMessageKeys && rivalTerms(s) === 'unmet' ? ev.unmetMessageKeys : ev.messageKeys;
 }
 
 /** Whether a choice can be made now — its requirement holds — and, when not, the clauses it still needs. */

@@ -800,9 +800,20 @@ export interface EventDef {
     readonly rival?: readonly string[];
     /** Its weight in the draw (round R7, B2): a whole number from 1 to 5, together with the lane's. Absent: 1. */
     readonly weight?: number;
+    /**
+     * Before the draw (round R9a, A1): a one-off that can come this month takes it — its months, its rival years, its
+     * condition, not met yet — yielding only to a due follow-up; several at once are drawn among themselves by weight.
+     * The last run's memory never holds it back. True or absent, on a one-off only.
+     */
+    readonly first?: boolean;
   };
   /** A text's bubbles (up to three) or a letter's paragraphs (up to four). */
   readonly messageKeys: readonly string[];
+  /**
+   * A rival text's bubbles for a run that has answered no rival event yet (round R9a, A4; core/rival.ts rivalTerms,
+   * unmet): one for one with messageKeys, so a photograph keeps its place. Read through eventMessageKeys.
+   */
+  readonly unmetMessageKeys?: readonly string[];
   /**
    * A photograph the sender sends (round R8b): it comes in the thread as one more message, after its `after`-th
    * message (1 … the number of messages). Only a text has one; it is not a message's words.

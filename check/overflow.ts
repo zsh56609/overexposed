@@ -45,8 +45,9 @@ const PATCH = `(async () => {
   window.__scenes = content.default.scripts.map((sc) => ({ heading: s[sc.headingKey], lines: sc.lines.map((l) => ({ kind: l.kind, text: s[l.key] })) }));
   const groups = new Map();
   for (const [k, v] of Object.entries(s)) {
-    // An event's messages are a sequence, not variants (round R2): the events page shows each as written.
-    if (typeof v !== 'string' || k.startsWith('script.') || (k.startsWith('event.') && k.includes('.message.'))) continue;
+    // An event's messages are a sequence, not variants (round R2), and so is a rival text's unmet thread (round R9a):
+    // the events page shows each as written.
+    if (typeof v !== 'string' || k.startsWith('script.') || (k.startsWith('event.') && (k.includes('.message.') || k.includes('.unmet.')))) continue;
     const g = k.startsWith('press.subject.') ? 'press.subject.*' : k.replace(/\\.\\d+(?=\\.|$)/g, '.#');
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g).push(k);
@@ -449,10 +450,12 @@ const ALL_EVENTS = `(async () => {
   const spare = {};
   const n = window.__events.show(0, 'choices');
   for (let i = 0; i < n; i++) {
+    // A rival text with a thread for a run that never answered her (round R9a, A4): both threads, unmet and met.
+    for (const met of window.__events.unmet[i] ? [false, true] : [null])
     for (const mode of ['choices', 'broke', 'answered']) {
-      window.__events.show(i, mode);
+      window.__events.show(i, mode, met === true);
       await sleep(40);
-      const where = window.__events.ids[i] + ' ' + mode;
+      const where = window.__events.ids[i] + ' ' + mode + (met === null ? '' : met ? ' met' : ' unmet');
       // Broke: only where a reply needs money, so one shows disabled with what it needs.
       if (mode === 'broke') { if (!document.querySelector('.event-screen .choose.off')) continue; disabled++; }
       shown++;
@@ -764,10 +767,11 @@ try {
         const rooms = Object.entries(evs.spare).sort((a, b) => a[1] - b[1]);
         const texts = new Set(rooms.map(([w]) => w.split(' ')[0]));
         console.log(`overflow check, ${tag}: ${texts.size} texts with their photographs in ${rooms.length} states — the tightest ${rooms[0]?.[0] ?? '-'}, ${rooms[0]?.[1] ?? '-'} px to spare`);
-        // Juno's two (round R8c, D7): each text's tightest state.
-        const juno = ['juno_carpet', 'juno_unsigned'].map((id) => {
-          const own = rooms.filter(([w]) => w.split(' ')[0] === id);
-          return `${id} ${own.length ? `${own[0]?.[1]} px (${own[0]?.[0].split(' ').slice(1).join(' ')})` : 'not shown'}`;
+        // Juno's two (round R8c, D7): each text's tightest state — the carpet's in both its threads, a run that never
+        // answered her and one that did (round R9a, A4).
+        const juno = [['juno_carpet', 'unmet'], ['juno_carpet', 'met'], ['juno_unsigned', '']].map(([id, form]) => {
+          const own = rooms.filter(([w]) => w.split(' ')[0] === id && (w.split(' ')[2] ?? '') === form);
+          return `${id}${form ? ` ${form}` : ''} ${own.length ? `${own[0]?.[1]} px (${own[0]?.[0].split(' ')[1]})` : 'not shown'}`;
         });
         console.log(`overflow check, ${tag}: Juno's texts with their photographs — ${juno.join(', ')}`);
         if (juno.some((x) => x.endsWith('not shown'))) {

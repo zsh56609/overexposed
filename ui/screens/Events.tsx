@@ -7,7 +7,7 @@
 // letter leaves. Every word from content and the approved labels; every chip from the reducer (ui/preview.ts).
 
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
-import { getEvent, type Action, type EventDef, type GameState } from '../../core/index.ts';
+import { eventMessageKeys, getEvent, type Action, type EventDef, type GameState } from '../../core/index.ts';
 import { Value } from '../desk/Hand.tsx';
 import { clauseChip, eventEffectChips, outcomeChips, type ValueChip } from '../desk/model.ts';
 import { t } from '../i18n.ts';
@@ -173,8 +173,9 @@ interface FormProps {
 function PhoneEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const c = s.content;
   // The thread (round R8b): the messages and, if the sender sends one, a photo after its message — one more message on
-  // the phone, never a message's words.
-  const items: ThreadItem[] = ev.messageKeys.flatMap((k, i): ThreadItem[] => [{ kind: 'message', key: `m${i}`, text: t(k) }, ...(ev.photo && ev.photo.after === i + 1 ? [{ kind: 'photo' as const, key: 'photo' }] : [])]);
+  // the phone, never a message's words. A rival text a run never answered her before reads its unmet thread (round
+  // R9a, A4), in the state the event waits in.
+  const items: ThreadItem[] = eventMessageKeys(s, ev).flatMap((k, i): ThreadItem[] => [{ kind: 'message', key: `m${i}`, text: t(k) }, ...(ev.photo && ev.photo.after === i + 1 ? [{ kind: 'photo' as const, key: 'photo' }] : [])]);
   const photo = usePhoto(ev.photo?.id ?? null);
   const arrival = useArrival(items.length, chosen !== null, ev.photo ? { at: items.findIndex((x) => x.kind === 'photo'), ready: photosReady, until: loadPhotos } : null);
   const category = c.eventCategories?.[ev.category];
@@ -265,17 +266,18 @@ function LetterEvent({ s, ev, views, chosen, beats, legal, act }: FormProps) {
   const desk = paper ? `${t(ev.speaker.letterheadKey ?? '')} · ${calendarLabel(c, s.turn)}` : calendarLabel(c, s.turn);
   const sent = beats.includes('eventReply');
   const answer = chosen === null ? null : (views[chosen] ?? null);
+  const paragraphs = eventMessageKeys(s, ev);
   // A letter lands (round R4, B2); its SENT stamp is the answer's beat (ui/sound/director.ts).
   useArrivalSound(() => cue('letter'));
   return (
     <div className="scr event-screen ev-letter" data-event={ev.id} data-form="letter">
-      <div className={`letter${paper ? ` lh-${paper}` : ' lh-house'}${ev.messageKeys.length >= 4 ? ' long' : ''}${chosen !== null ? ' done' : ''}${sent ? ' sent-on' : ''}`}>
+      <div className={`letter${paper ? ` lh-${paper}` : ' lh-house'}${paragraphs.length >= 4 ? ' long' : ''}${chosen !== null ? ' done' : ''}${sent ? ' sent-on' : ''}`}>
         <div className="lhd">
           <b>{head}</b>
           <span>{desk}</span>
         </div>
         <div className="lbody">
-          {ev.messageKeys.map((k, i) => (
+          {paragraphs.map((k, i) => (
             <p key={i} className={prose(t(k))}>
               {t(k)}
             </p>

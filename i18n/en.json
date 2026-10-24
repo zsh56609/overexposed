@@ -1426,6 +1426,8 @@
   "event.juno_carpet.title": "Juno needs a plus-one.",
   "event.juno_carpet.message.1": "they've sat me with the film people tonight. I don't know a single one",
   "event.juno_carpet.message.2": "walk the carpet with me? I'll owe you",
+  "event.juno_carpet.unmet.1": "hi, it's juno vale. we've never met but I don't know a soul here",
+  "event.juno_carpet.unmet.2": "weird ask, I know. be my plus-one?",
   "event.juno_carpet.a.reply": "I'm your plus-one.",
   "event.juno_carpet.a.press.1": "JUNO VALE AND THE {SUBJECT} STEAL THE CARPET",
   "event.juno_carpet.a.outcome": "lifesaver. I'll introduce you to a director. maybe three",

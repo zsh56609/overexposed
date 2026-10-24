@@ -6,6 +6,43 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9a, Part A: Juno's year end
+
+- The author (2026-10-21): a run that never meets Juno misses her year; let her year-end text
+  come. 57 % of runs exchanged a text with her: juno_hello is one draw among many in months
+  4–8, her month-12 text a weight-3 draw, and juno_video and juno_unsigned also needed her first
+  text. The author's choices: her year-end text comes before the draw, yielding only to a due
+  follow-up; video and unsigned need no first text; a run that never met her gets a first
+  contact in the carpet's text; the shortlist keeps hype 30.
+- The rule is `when.first` (core/content.ts): on a one-off, when it can come — its months, its
+  rival years, its condition, not met yet (eventCandidates' `eligible`) — it takes the month
+  before the draw; a due follow-up still comes first; the last run's memory never holds it
+  back; several at once are drawn among themselves by weight, with the game's RNG. It sits in
+  core/events.ts eventCandidates after the follow-ups and before the openers' cap, and returns
+  them as the pool: the reducer's draw (offerEvent) is unchanged. Validate: true or absent, on
+  a one-off only (a follow-up already comes before the draw, and an opener is drawn).
+- Her four year-end texts take it — juno_shortlist, juno_carpet, juno_video, juno_unsigned —
+  their weights kept. Video and unsigned need no first text: their condition only keeps a feud
+  out. The shortlist keeps hype 30.
+- The carpet for a run that never met her: `unmetMessageKeys`, a rival text's bubbles while no
+  rival event has been answered (rivalTerms unmet), replacing messageKeys one for one so the
+  photograph keeps its place; /core's eventMessageKeys(state, event) reads it. The event screen
+  reads it in the state the event waits in (App shows the event from the pre-answer state until
+  it is published), so the thread does not change as the answer lands. Validate: a rival text
+  only, as many as messageKeys, every key in en.json. Its words are THE NEW WORDS
+  (docs/writing/draft-v13.md).
+- The events page shows a rival text both ways (`show(index, mode, met)`), and check:overflow
+  audits both: the carpet keeps 39 px to spare unmet and met. Its longest-variant patch leaves
+  the unmet thread as written, as it leaves an event's messages: two lines of one thread are
+  not variants.
+- With A alone (sim, three seeds, both managers, player-like pooled): runs that exchange a text
+  with her 57.6 % → 98.1 %; her events a run 1.25 → 1.78; her terms at the year's end unmet
+  42.4 % → 1.9 %. Her year-end text's share of its year: breakthrough 29.8 → 69.2 % (hype 30),
+  crash 13.4 → 80.3 %, crossover 38.4 → 79.8 %, fade 12.9 → 79.6 % — the rest a feud, or a
+  follow-up due. The four late one-offs fall (Part B widens them).
+- check/desk-states.json recorded again: its runs to month 12 meet the new texts; 40 of its 51
+  states are unchanged (cdCrossed among them).
+
 ## 2026-10-21 — Round R8d, Part D: v0.9, again
 
 - R8c's zip is void: it was never uploaded. v0.9 is built again from this round's last commit

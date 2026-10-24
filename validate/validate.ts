@@ -1733,7 +1733,7 @@ function checkScripts(v: Ctx, raw: unknown, rules: Obj | null): void {
 // Events (content/events.json, round R2): the categories that caption them, and each event's months, speaker,
 // chain, messages and choices. Every event has a choice with no requirement — the player can always answer.
 
-const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'photo', 'choices'];
+const EVENT_FIELDS = ['id', 'category', 'form', 'titleKey', 'speaker', 'chain', 'when', 'messageKeys', 'unmetMessageKeys', 'photo', 'choices'];
 const EVENT_CHOICE_FIELDS = ['replyKey', 'stance', 'requires', 'effects', 'press', 'outcomeKey'];
 /** Events have their own budget (AGENTS.md → Content budget): a ceiling, not a target. */
 const EVENT_BUDGET = 28;
@@ -1804,9 +1804,9 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
     }
     let firstAct = 1;
     const w = isObj(e.when) ? e.when : null;
-    if (!w) v.error('schema', `${where}.when`, 'must be { months, condition?, lane?, rival?, weight? }');
+    if (!w) v.error('schema', `${where}.when`, 'must be { months, condition?, lane?, rival?, weight?, first? }');
     else {
-      v.fields(w, ['months', 'condition', 'lane', 'rival', 'weight'], `${where}.when`);
+      v.fields(w, ['months', 'condition', 'lane', 'rival', 'weight', 'first'], `${where}.when`);
       const m = isObj(w.months) ? w.months : null;
       if (!m) v.error('schema', `${where}.when.months`, 'must be { from, to? }');
       else {
@@ -1828,12 +1828,29 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
         else w.rival.forEach((id, i) => { if (!arcIds.has(id as string)) v.error('references', `${where}.when.rival[${i}]`, `no rival arc with id ${q(id)} in press.rival.arcs`); });
       }
       v.int(w.weight, `${where}.when.weight`, [1, 5], { optional: true });
+      // Before the draw (round R9a, A1): true or absent, on a one-off only — a follow-up already comes before the draw,
+      // and an opener is drawn.
+      if (w.first !== undefined) {
+        if (w.first !== true) v.error('schema', `${where}.when.first`, `must be true, or absent; got ${q(w.first)}`);
+        else if (e.chain !== undefined) v.error('structure', `${where}.when.first`, 'on a one-off only: a follow-up already comes before the draw, and an opener is drawn');
+      }
     }
     if (!Array.isArray(e.messageKeys) || e.messageKeys.length === 0) v.error('schema', `${where}.messageKeys`, 'must be a non-empty list of keys');
     else {
       const max = e.form === 'letter' ? 4 : 3;
       if (e.messageKeys.length > max) v.error('ranges', `${where}.messageKeys`, `a ${String(e.form)} holds at most ${max}`);
       e.messageKeys.forEach((k, i) => v.key(k, `${where}.messageKeys[${i}]`));
+    }
+    // A rival text's thread for a run that has answered no rival event (round R9a, A4): on a rival text only, one key for
+    // each of messageKeys, so a photograph keeps its place; every key exists (the i18n check).
+    if (e.unmetMessageKeys !== undefined) {
+      const um = e.unmetMessageKeys;
+      if (e.category !== 'rival' || e.form !== 'text') v.error('schema', `${where}.unmetMessageKeys`, 'the thread for a run that never answered the rival: on a rival text only');
+      if (!Array.isArray(um) || um.length === 0) v.error('schema', `${where}.unmetMessageKeys`, 'must be a non-empty list of keys');
+      else {
+        if (Array.isArray(e.messageKeys) && um.length !== e.messageKeys.length) v.error('ranges', `${where}.unmetMessageKeys`, `one for each of messageKeys: ${e.messageKeys.length}, got ${um.length}`);
+        um.forEach((k, i) => v.key(k, `${where}.unmetMessageKeys[${i}]`));
+      }
     }
     // A photograph in a text (round R8b): one of PHOTO_IDS, after one of its messages; a letter has none.
     if (e.photo !== undefined) {
