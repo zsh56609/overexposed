@@ -17,6 +17,8 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
   const cleanups=useRef<(()=>void)[]>([]);
   const rolls=useRef(new Map<string,()=>void>());
   const last=useRef(-1);
+  // The PRINTED stamp on the front paper's node while it is there (round R9a, C1).
+  const stampOn=useRef<HTMLElement|null>(null);
   const cards=useMemo(()=>{
     const history=snap.steps.filter(s=>s.id!==step.id);
     const lines={...readLines([...history,step]),lane:establishedLanes(history).at(-1)??null};
@@ -63,7 +65,21 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         if(paper) {
           const stamp=document.createElement('div');stamp.className='month-stamp';stamp.textContent=t('ui.motion.printed');paper.appendChild(stamp);
           animate(stamp,[{opacity:0,transform:'rotate(-12deg) scale(2.2)'},{opacity:.9,transform:'rotate(-12deg) scale(1)'}],280);
+          stampOn.current=stamp;
           cleanups.current.push(()=>stamp.remove());
+        }
+      }
+      // The stamp leaves with its issue (round R9a, C1): Papers keys a paper by its id, so at 'publish' the front node
+      // renders the new month's issue — the stamp fades as the date turns (200 ms; reduced 150) and is off the paper at
+      // 'publish' at the latest. A month end that goes to the doors has no date beat: there it fades from 'publish'.
+      const stamp=stampOn.current;
+      if(stamp&&(beat.kind==='date'||beat.kind==='publish')) {
+        const dated=plan!.beats.some(b=>b.kind==='date');
+        if(beat.kind==='publish'&&dated) {stamp.remove();stampOn.current=null;}
+        else if(beat.kind==='date'||!dated) {
+          const fade=stamp.animate([{opacity:getComputedStyle(stamp).opacity},{opacity:0}],{duration:reduced?150:200,fill:'forwards',easing:'ease-out'});
+          fade.onfinish=()=>{stamp.remove();if(stampOn.current===stamp)stampOn.current=null;};
+          cleanups.current.push(()=>fade.cancel());
         }
       }
       if(beat.kind==='scandalLift') {

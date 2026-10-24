@@ -4,7 +4,7 @@ import { badKeyframes, ROOT } from './desk-replay.ts';
 import { checkFlights } from './flight.ts';
 import { checkD7 } from './motion.ts';
 import { checkPreviewInput } from './preview-input.ts';
-import { checkBoundaryInput, checkMonthEntry, checkMonthInput, checkOsMotion, checkPileInput } from './month-input.ts';
+import { checkBoundaryInput, checkMonthEntry, checkMonthInput, checkOsMotion, checkPileInput, checkStampInput } from './month-input.ts';
 import { mkdirSync,writeFileSync } from 'node:fs';
 const server=await createServer({root:ROOT,logLevel:'error',server:{port:5197,strictPort:false}});await server.listen();
 try {
@@ -19,7 +19,8 @@ try {
     else if(process.argv.includes('--pile-only'))await checkPileInput(page,url);
     else if(process.argv.includes('--boundaries-only'))await checkBoundaryInput(page,url);
     else if(process.argv.includes('--flights-only'))await checkFlights(page,url);
-    else {if(!process.argv.includes('--month-only')){await checkMonthEntry(page,url);await checkD7(page,url);await checkFlights(page,url);await checkPreviewInput(page,url);await checkPileInput(page,url);await checkBoundaryInput(page,url);await checkOsMotion(page,url);}await checkMonthInput(page,url);}
+    else if(process.argv.includes('--stamp-only'))await checkStampInput(page,url);
+    else {if(!process.argv.includes('--month-only')){await checkMonthEntry(page,url);await checkD7(page,url);await checkFlights(page,url);await checkPreviewInput(page,url);await checkPileInput(page,url);await checkBoundaryInput(page,url);await checkStampInput(page,url);await checkOsMotion(page,url);}await checkMonthInput(page,url);}
     // Every keyframe the runs animated, CSS-valid (round R5, B3): one CSS rejects is dropped without a word.
     const rejected=await badKeyframes(page);
     if(rejected.length)throw Error(`${rejected.length} keyframe value(s) CSS rejects, first: ${rejected.slice(0,3).map(b=>`${b.element} ${b.property}: ${b.value}`).join('; ')}`);

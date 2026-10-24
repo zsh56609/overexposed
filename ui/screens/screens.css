@@ -356,7 +356,9 @@
 /* A text: the caption to the left of the phone come up large; its thread; the replies with their effects. */
 .event-screen .evcap { position: absolute; left: 150px; top: 240px; width: 250px; color: #EDE6D6; }
 .event-screen .evcap small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase; color: #ffcf85; }
-.event-screen .evcap b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.1; margin-top: 6px; }
+/* The caption breaks evenly (round R9a, C3): no line of one word, a hyphen kept with its word ("Juno needs" / "a plus-one.");
+   where text-wrap is not supported it wraps as before. */
+.event-screen .evcap b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.1; margin-top: 6px; text-wrap: balance; }
 .event-screen .evcap i { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.4; color: #bfb3a0; margin-top: 8px; }
 .event-screen .phone-big { position: absolute; left: 470px; top: 22px; width: 340px; height: 624px; border-radius: 40px; background: #0b0d10; box-shadow: 0 0 0 3px #2a2d33, 0 30px 50px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); }
 .event-screen .ph-screen { position: absolute; inset: 12px; border-radius: 29px; background: #10151b; overflow: hidden; display: flex; flex-direction: column; }

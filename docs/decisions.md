@@ -6,6 +6,35 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9a, Part C: three fixes
+
+- The PRINTED stamp (the author: sometimes, as the next month starts, the paper still wears
+  last month's PRINTED, gone a moment later). The stamp beat appended it to the front paper's
+  node and removed it only when the step settled; Papers keys a paper by its id, so at 'publish'
+  that node rendered the new month's issue with the stamp still on it — about 0.9 s on a month
+  that opens straight into play (the end of months 2 and 8, and of 5 and 11 with no event), 0.2 s
+  under the dim of offers or an event. Settled: the stamp leaves with its issue. It fades out as
+  the date turns (the 'date' beat: 200 ms, reduced 150 ms) and is off the paper at 'publish' at
+  the latest, before the new issue renders on its node; a month end that goes to the doors has no
+  date beat, and there it fades from 'publish'. The unmount cleanup stays. check:motion plays
+  desk-states' cdCrossed (April into May) by real input and watches each frame: the stamp on the
+  front page before the date turns, none in the DOM once it reads May — on the old code it fails
+  (the stamp in all 40 frames after).
+- The colour dots, faster: fillDots fills each dot its own path (beginPath, arc, fill), the
+  colours in the order they first came and the dots in theirs; positions, sizes and colours are
+  the same, only antialiased pixels where two dots of one colour overlap can differ. One path of
+  many circles loses a GPU canvas's fast path for a single circle. The papers' black-and-white
+  halftone already filled a dot at a time and does not change; check/photo-worker.ts keeps exact
+  parity (both draw through fillDots). R8d's B7 on the same machine: the title at 2560×1440 135–137
+  → 45–46 ms drawn (165 → 74 ms in the worker, PNG included), the backdrop 88–90 → 59 ms, an oval
+  24–25 → 21 ms, a door about the same.
+- The texts' captions break more evenly: `text-wrap: balance` on `.event-screen .evcap b`. The
+  carpet's "Juno needs a plus-" / "one." reads "Juno needs" / "a plus-one." in all three
+  browsers. The captions whose last line is one word, 12 → 3 in Chromium — the three-word ones,
+  which cannot break otherwise ("The same" / "shortlist.") — and 4 in Firefox and WebKit, which
+  also keep "A free room" / "tonight.". Where text-wrap is not supported a caption wraps as
+  before.
+
 ## 2026-10-25 — Round R9a, Part B: three numbers and a check
 
 - The four late one-offs came mostly in month 12 (months 8 and 10 go to chain follow-ups, and

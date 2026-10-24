@@ -47,6 +47,38 @@ async function settledHits(page:Page) {
   })()`);
   assert.deepEqual(failures,[],'settled legal hand/END TURN points must be visible and hit their real controls');
 }
+/**
+ * The PRINTED stamp leaves with its issue (round R9a, C1): a month end into a month that opens on play — desk-states'
+ * cdCrossed, April into May — by real input, in full motion. Watched each frame from the page: the stamp is on the front
+ * paper before the date turns, and once the date reads the new month no .month-stamp is in the DOM.
+ */
+export async function checkStampInput(page:Page,url:string) {
+  const fixture=loadStates().cdCrossed;assert.ok(fixture,'check/desk-states.json has no cdCrossed');
+  assert.equal(await reach(page,url,fixture,300),'ok');
+  // The replay ran with motion off; the month end plays in full motion.
+  await page.evaluate(`document.documentElement.dataset.motion='full'`);
+  await page.evaluate(`(()=>{
+    const date=()=>document.querySelector('[data-hook="date"]')?.textContent??'';
+    const w=window.__stamp={from:date(),to:null,before:0,after:0,stamped:0,click:0,shown:null,turned:null};
+    addEventListener('pointerdown',()=>{w.click=performance.now()},{capture:true,once:true});
+    const tick=()=>{
+      const on=!!document.querySelector('.month-stamp');
+      if(date()===w.from){if(on){w.before++;w.shown??=performance.now();}}
+      else {w.to=date();w.turned??=performance.now();w.after++;if(on)w.stamped++;}
+      if(w.after<40)requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  })()`);
+  await page.click(...(await centre(page,'.endbtn'))!);
+  await waitIdle(page);
+  const start=Date.now();
+  while((await page.evaluate<number>('window.__stamp.after'))<40){assert.ok(Date.now()-start<10000,`${page.name}: the date never turned`);await sleep(50);}
+  const w=await page.evaluate<{from:string;to:string|null;before:number;after:number;stamped:number;click:number;shown:number|null;turned:number|null}>('window.__stamp');
+  assert.ok(w.before>0,`${page.name}: PRINTED never showed on the front page before the date turned`);
+  assert.equal(w.stamped,0,`${page.name}: PRINTED was still on the paper in ${w.stamped} of the ${w.after} frames after the date read ${w.to}`);
+  const ms=(t:number|null)=>t===null?'-':`${Math.round(t-w.click)} ms`;
+  console.log(`stamp input ${page.name}: ${w.from} into ${w.to} — PRINTED on the front page from ${ms(w.shown)} after END TURN until the date read ${w.to} at ${ms(w.turned)}; in none of the ${w.after} frames after`);
+}
 export async function checkOsMotion(page:Page,url:string) {
   if(!page.reducedMotion){console.log(`SKIP OS preference ${page.name}: this driver cannot emulate the media preference; explicit full/reduced modes are tested separately`);return;}
   const states=loadStates();

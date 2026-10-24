@@ -1524,19 +1524,20 @@ const addDot = (dots: Dots, colour: string, x: number, y: number, r: number): vo
   if (d) d.push(x, y, r);
   else dots.set(colour, [x, y, r]);
 };
-/** Fills the dots a colour at a time, each colour one path. */
+/**
+ * Fills the dots a colour at a time, and each dot its own path (round R9a, C2): a single circle keeps a GPU canvas's fast
+ * path, which one path of many circles loses — the title's 9,889 dots, replayed, took 93 ms a path per colour and 8.4 ms
+ * one by one (R8d, B7). The colours in the order they first came, the dots in theirs: positions, sizes and colours as
+ * before; only antialiased pixels where two dots of one colour overlap can differ.
+ */
 function fillDots(c: G, dots: Dots): void {
   for (const [colour, d] of dots) {
     c.fillStyle = colour;
-    c.beginPath();
     for (let i = 0; i < d.length; i += 3) {
-      const x = d[i] as number;
-      const y = d[i + 1] as number;
-      const r = d[i + 2] as number;
-      c.moveTo(x + r, y);
-      c.arc(x, y, r, 0, 6.2832);
+      c.beginPath();
+      c.arc(d[i] as number, d[i + 1] as number, d[i + 2] as number, 0, 6.2832);
+      c.fill();
     }
-    c.fill();
   }
 }
 
