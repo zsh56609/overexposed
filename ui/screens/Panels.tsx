@@ -75,7 +75,7 @@ function Head({ kicker, title, close, onClose, tabs }: { kicker: string; title: 
         <b>{title}</b>
       </div>
       {tabs}
-      <button className="closeb" onClick={onClose}>
+      <button className="closeb ticket" onClick={onClose}>
         {close}
       </button>
     </div>

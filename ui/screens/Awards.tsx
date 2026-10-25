@@ -321,18 +321,18 @@ export function AwardsNight({ s, steps, onRestart, openScrapbook, openNumbers, b
       </div>
       <NightWords c={c} last={lastWord(s)} rival={rivalLastWord(s)} />
       <div className="a-bottom rv" style={delay(4.9)}>
-        <button className="again play-again" onClick={onRestart}>
+        <button className="again play-again ticket" onClick={onRestart}>
           {t('ui.ending.playAgain')}
         </button>
         <FoundDots minors={c.minors} found={found} />
         <AwardDots awards={c.awards} won={won.won} />
         <nav className="links">
           {openScrapbook && (
-            <button className="link scrapbook-open" onClick={openScrapbook}>
+            <button className="ticket small scrapbook-open" onClick={openScrapbook}>
               {t('ui.title.scrapbook')}
             </button>
           )}
-          <button className="link numbers-toggle" onClick={openNumbers}>
+          <button className="ticket small numbers-toggle" onClick={openNumbers}>
             {t('ui.awards.numbers')}
           </button>
         </nav>

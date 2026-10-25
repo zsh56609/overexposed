@@ -159,7 +159,7 @@ export const Hand = memo(function Hand({ cards, words, endTurn, season, play, en
         })}
       </div>
       <button
-        className={`endbtn end${endTurn.printing ? ' printing' : ''}`}
+        className={`endbtn end ticket${endTurn.printing ? ' printing' : ''}`}
         data-hook="endturn"
         disabled={!endTurn.legal}
         onPointerEnter={(e) => {

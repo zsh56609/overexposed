@@ -79,7 +79,7 @@ import { feedLines } from '../ui/feed.ts';
 import type { PlayedStep } from '../ui/queue.ts';
 import { t } from '../ui/i18n.ts';
 import { statCells } from '../ui/stats.ts';
-import { calendarLabel, cardName, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
+import { calendarLabel, cardName, countWords, dateLine, heatText, lineText, majorClauseLine, money, offerLabels, pageItemText, seasonLabel } from '../ui/text.ts';
 import { deskIssue, deskModel, PHOTO_VARIANTS } from '../ui/desk/model.ts';
 
 const RUNS = Number(process.argv.find((a) => a.startsWith('--runs='))?.slice(7) ?? 60);
@@ -615,9 +615,10 @@ function checkStatBar(s: GameState, seed: number, lane: string | null): void {
 
 /**
  * The desk (round V1a): every number and word the adapter gives the scene, against /core.
- * - The stat bar (README §1): the cells in order; each tier word and number; the icons, craft's by lane; the
- *   countdown, its level, and money; the actions left; the date and the season's marks; every tooltip the
- *   cell's own (held to /core by checkStatBar). The season is content's for the act; the crisis look is the
+ * - The stat bar (README §1): the cells in order, each with its label (round R9b, B1); each tier word and number; the
+ *   icons, craft's by lane; the countdown — its count and its words, its level — and money; the actions left; the deck's
+ *   cards to draw and played; the date and the season's marks; every tooltip the cell's own (held to /core by
+ *   checkStatBar). The season is content's for the act; the crisis look is the
  *   issue's frenzy — in the play phase, the scandals this month would print reaching `frenzyAt`.
  */
 function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], lane: string | null): void {
@@ -630,9 +631,11 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   const order = bar.cells.map((x) => x.id).join(' · ');
   if (order !== 'hype · craft · heat · next · money') bad(`stat bar order ${order}`);
   const icons: Record<string, string> = { hype: 'star', craft: lane === 'screen' ? 'clap' : 'note', heat: 'flame', next: 'paper', money: 'cash' };
+  const labels: Record<string, string> = { hype: t('ui.resource.hype'), craft: t('ui.resource.craft'), heat: t('ui.resource.heat'), next: t('ui.stat.next'), money: t('ui.resource.capital') };
   const tips = statCells(s, lane);
   for (const cell of bar.cells) {
     if (cell.icon !== icons[cell.id]) bad(`${cell.id}: icon ${cell.icon}, lane ${lane}`);
+    if (cell.label !== labels[cell.id]) bad(`${cell.id}: label "${cell.label}", is "${labels[cell.id]}"`);
     const tip = tips.find((x) => x.id === cell.id);
     if (cell.tipHeader !== tip?.tipHeader || cell.tipLine !== tip.tipLine) bad(`${cell.id}: tooltip "${cell.tipHeader}" is not the cell's`);
   }
@@ -642,8 +645,13 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
     const tier = tiers[id];
     if (!cell || !tier || cell.word !== t(tier.nameKey) || cell.number !== String(s.resources[id])) bad(`${id}: shows ${cell?.word} ${cell?.number}, is ${tier ? t(tier.nameKey) : '?'} ${s.resources[id]}`);
   }
+  // The countdown (round R9b, B1): its count big, the rest of its words small, together the line /core gives.
   const next = bar.cells.find((x) => x.id === 'next');
-  if (next?.word !== heatText(heatLine(s)) || next.number !== null || next.level !== countdownLevel(s)) bad(`countdown shows ${next?.word} (${next?.level}), is ${heatText(heatLine(s))} (${countdownLevel(s)})`);
+  const line = heatLine(s);
+  const words = countWords(line.crossed ? 'ui.stat.crossed' : 'ui.stat.toGo', line.toNext);
+  if (next?.number !== String(line.toNext) || next.word !== words.tail || next.lead !== words.lead || !heatText(line).includes(next.number) || next.level !== countdownLevel(s)) bad(`countdown shows ${next?.lead} ${next?.number} ${next?.word} (${next?.level}), is ${heatText(line)} (${countdownLevel(s)})`);
+  // The deck's cell: the deck viewer's counts, the cards still to draw and those played.
+  if (bar.deck.label !== t('ui.deck.open') || bar.deck.toDraw.n !== String(s.deck.length) || bar.deck.played.n !== String(s.discard.length) || bar.deck.toDraw.tail !== countWords('ui.stat.toDraw', s.deck.length).tail || bar.deck.played.tail !== countWords('ui.stat.played', s.discard.length).tail) bad(`deck shows ${bar.deck.toDraw.n} ${bar.deck.toDraw.tail} · ${bar.deck.played.n} ${bar.deck.played.tail}, is ${s.deck.length} to draw · ${s.discard.length} played`);
   const cash = bar.cells.find((x) => x.id === 'money');
   if (cash?.word !== money(s.resources.capital) || cash.number !== null) bad(`money shows ${cash?.word}, is ${money(s.resources.capital)}`);
   const total = c.rules.slotsPerTurn;

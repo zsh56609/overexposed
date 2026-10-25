@@ -90,7 +90,7 @@ const DRIVE = (runs: number) => `(async () => {
   const screenOf = () => document.querySelector('.ov[data-panel]') ? document.querySelector('.ov[data-panel]').dataset.panel : document.querySelector('.season-card') ? 'season' : document.querySelector('.title-screen:not(.dim)') ? 'title' : document.querySelector('.manager-choice') ? 'manager' : document.querySelector('.draft') ? 'draft' : document.querySelector('.gates') ? 'doors' : document.querySelector('.event-screen') ? 'event' : document.querySelector('.ending') ? 'ending' : document.querySelector('.desk .hand') ? 'hand' : 'unknown';
   const CONTROLS = {
     // The title (round R3, amended): BEGIN and its three links.
-    title: ['.title-screen .begin', '.title-screen .tlinks .link'],
+    title: ['.title-screen .begin', '.title-screen .tlinks button'],
     // A season's card, the opening's included (round R3): its button.
     season: ['.season-card .into'],
     credits: ['.p-credits .closeb', '.p-credits a'],
@@ -103,7 +103,7 @@ const DRIVE = (runs: number) => `(async () => {
     doors: ['.gates .take', '.desk .deckbtn', '.desk .setbtn'],
     event: ['.event-screen .choose'],
     hand: ['.desk .endbtn', '.desk .deckbtn', '.desk .setbtn'],
-    ending: ['button.play-again', '.awards-night .link'],
+    ending: ['button.play-again', '.awards-night .links button'],
   };
   const reachable = () => {
     const screen = screenOf();

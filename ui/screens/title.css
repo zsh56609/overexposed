@@ -39,19 +39,13 @@
 .title-screen .dots { display: flex; gap: 5px; }
 .title-screen .dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.4px solid #E9E1CF; flex: none; }
 .title-screen .dots i.f { background: #E9E1CF; }
-.title-screen .tlinks { position: absolute; left: 56px; bottom: 46px; display: flex; gap: 22px; }
-.title-screen .link {
-  padding: 4px 0; border: 0; background: none; cursor: pointer; font: 600 13px 'Libre Franklin', system-ui, sans-serif; color: #CFC6B4;
-  text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(207, 198, 180, .45); transition: color .15s;
-}
-.title-screen .link:hover, .title-screen .link:focus-visible { color: #FFCF85; outline: none; }
-/* BEGIN: bottom right, in END TURN's corner; tabloid red. */
+/* The three links, small tickets (round R9b, B3). */
+.title-screen .tlinks { position: absolute; left: 56px; bottom: 46px; display: flex; gap: 22px; align-items: center; }
+/* BEGIN: bottom right, in END TURN's corner; a red ticket (round R9b, B3). */
 .title-screen .begin {
-  position: absolute; right: 56px; bottom: 52px; width: 250px; height: 56px; padding: 0 0 0 .3em; border: 0; cursor: pointer;
-  background: #D92B1F; color: #FBF6EA; font: 800 19px/56px 'Libre Franklin', system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; text-align: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .5); transition: background-color .15s, box-shadow .15s;
+  position: absolute; right: 56px; bottom: 52px; width: 250px; height: 56px; padding: 0 0 0 .3em;
+  font: 800 19px/56px 'Libre Franklin', system-ui, sans-serif; letter-spacing: .3em; text-transform: uppercase; text-align: center;
 }
-.title-screen .begin:hover, .title-screen .begin:focus-visible { background: #E8392C; box-shadow: 0 8px 22px rgba(0, 0, 0, .55), 0 0 0 2px #FBF6EA; outline: none; }
 
 /* B1, BEGIN: one big flash — the screen goes white like an overexposed photograph — and the opening card develops
    out of it over the dimmed photograph, which keeps only itself. */

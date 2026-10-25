@@ -6,6 +6,54 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9b, Part B: the interface
+
+- The author (round R9b): the stat bar in two rows a cell, the bubbles in liquid glass, the
+  buttons as tickets with depth, the scandal icon as the scandal card, the offers row without
+  "You have …". Every value is the round's; what follows is what the round left to us.
+- The stat bar: one flex row (padding 16 / 14), every cell 34 px high at top 6 (the bar's 1 px
+  foot made centring give 5.5, so the cells take a 6 px top margin), a 1 px divider between every
+  two. The cells keep their tooltips, data-tip and data-hook: number-* on the big number and
+  value-* on the small tier word (value-money on money's big value), countdown on the countdown's
+  value row, held and held-n on the chip, date on the month. Deck & discard and Settings are the
+  cells themselves, `button.cell.deckbtn` and `button.cell.setbtn` (their old class names kept,
+  so the checks' selectors hold); Deck & discard's label carries the cards icon, as the other
+  labels carry theirs; Settings' label has none, its gear being its value. The dot between the
+  two counts is a 3 px circle, 3 px from either. The countdown's words are ui.stat.toGo /
+  ui.stat.crossed with the count taken out (ui/text.ts countWords: the words before and after
+  {n}), as are ui.stat.toDraw and ui.stat.played, so a language that puts a count first or last
+  needs no code. The crossed level's tag sets its figure lining (font-variant-numeric):
+  Playfair's old-style 3, 4, 5, 7 and 9 hang below the line, and in the tag the cell cut them
+  off. A cell clips across and never down (`overflow: clip visible`; hidden where clip is not
+  supported): Playfair's descenders, a p or an old-style 4, reach below an 18 px line, and with
+  `hidden` the cell cut them by up to 1.6 px. The label on screen: 8.5 px at 1280×720, 4.6 px at
+  844×390, 12.75 px at 1920×1080.
+- The bubbles: the round's glass on the desk's bubbles (not the name row), the manager choice's
+  samples and the night's last words; red-tinted in a frenzy; the phone's screen, its bubbles and
+  replies, no blue left. Where backdrop-filter is not supported, the round's solid colours, the
+  replies' too. The photograph's bubble takes no glass (`.m.in:not(.pic)`): with the glass's
+  1 px border its picture sat 1 px inside it, cut. That border makes a text bubble 2 px wider for
+  the same words, so a message can wrap a line sooner: the carpet's met thread has 17 px to spare
+  (39 before), its unmet thread 35 (39), juno_unsigned 17 (21).
+- Tickets: one class in ui/style.css, `.ticket` (`.red`, `.small`). Its rules are written
+  `.ticket.ticket`, to outrank the screens' and the desk's own button resets (`.scr button`,
+  `.desk button`: colour inherited, a background transition), and its `position: relative` is
+  `:where(.ticket)`, weightless, so BEGIN and END TURN stay absolutely placed. END TURN takes
+  the red ticket in a frenzy from `.desk.crisis`, as it took its red before. A keyboard focus
+  ring: a 2 px outline, 3 px out. Each button keeps its size and place to the tenth of a pixel:
+  CONTINUE's and END TURN's 2 px borders became padding, the close buttons' 1.5 px border (drawn
+  1 px at 1×) became 1 px of padding, END TURN's second line is 14 px high, as its old line was.
+  The links are small tickets, their size the round's. The offers' tickets no longer clip
+  themselves; with "You have …" gone, the row centres on the two of them.
+- The scandal icon: the round's path in place of i-paper, the id kept, so every use changed with
+  it — the bar, the held chip, card faces, effect chips, the mirror's notes, the doors card, the
+  numbers panel.
+- Checks: check:overflow holds every bar cell's rows inside its width (in place of the date's
+  clearance of the deck button); check:preview the cells' labels, the countdown's count and
+  words, the deck's counts against the deck viewer's; check:interactions eases BEGIN's and END
+  TURN's hover (1 px over 0.12 s) with the other hovers; check:clicks and check:overflow find the
+  links as buttons now, not `.link`.
+
 ## 2026-10-25 — Round R9b, Part A: a new player's first year
 
 - The author (round R9b): a new player's first desk should not open on offers; the stat bar's

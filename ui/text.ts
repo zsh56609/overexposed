@@ -184,6 +184,18 @@ export const mastheadName = (c: ContentIndex, paperId: string): string =>
 export const heatText = (line: { readonly toNext: number; readonly crossed: boolean }): string =>
   t(line.crossed ? 'ui.stat.crossed' : 'ui.stat.toGo', { n: line.toNext });
 
+/** A count among its words (round R9b, B1): the words before and after its {n}, so the stat bar can set the count big. */
+export interface CountWords {
+  readonly lead: string;
+  readonly n: string;
+  readonly tail: string;
+}
+const COUNT_MARK = '\u0000';
+export function countWords(key: string, n: number): CountWords {
+  const [lead = '', tail = ''] = t(key, { n: COUNT_MARK }).split(COUNT_MARK);
+  return { lead: lead.trim(), n: String(n), tail: tail.trim() };
+}
+
 // ---------------------------------------------------------------------------
 // Conditions and effects
 

@@ -63,7 +63,7 @@ export function SeasonCard({ photo = null, awaits = null, date, season, paragrap
         </p>
       ))}
       <button
-        className="go into"
+        className="go into ticket"
         data-hook="into"
         onClick={() => {
           cue('button');

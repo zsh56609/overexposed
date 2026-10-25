@@ -74,11 +74,16 @@ const AUDIT = `window.__deskAudit = (where) => {
   const holds = (el, what) => { if (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1) add(what + ' ' + name(el) + ' holds ' + el.scrollWidth + 'x' + el.scrollHeight + ' in ' + el.clientWidth + 'x' + el.clientHeight + ' "' + el.textContent.slice(0, 50) + '"'); };
   const within = (el, box, what, pad = 0.5) => { const a = S(el.getBoundingClientRect()), b = box; if (a.l < b.l - pad || a.t < b.t - pad || a.r > b.r + pad || a.b > b.b + pad) add(what + ' ' + name(el) + ' at ' + [a.l, a.t, a.r, a.b].map(Math.round) + ' outside ' + [b.l, b.t, b.r, b.b].map(Math.round) + ' "' + el.textContent.slice(0, 40) + '"'); };
   const STAGE = { l: 0, t: 0, r: 1280, b: 720 };
-  // The stat bar: every cell's content on one line in its cell; the date clear of the deck button.
-  for (const c of desk.querySelectorAll('.stats .cell')) holds(c, 'stat cell');
-  const when = desk.querySelector('.stats .when'), deckb = desk.querySelector('.stats .deckbtn');
-  if (when && deckb && S(when.getBoundingClientRect()).l < S(deckb.getBoundingClientRect()).r + 8) add('the date runs into the deck button');
-  if (deckb) holds(deckb, 'deck button');
+  // The stat bar (round R9b, B1): every cell's contents inside its width — its label row and its value row, or the
+  // date's marks and month — each on one line. Across only: a cell lets its type's descenders show below it.
+  for (const c of desk.querySelectorAll('.stats .cell')) {
+    if (c.scrollWidth > c.clientWidth + 1) add('stat cell ' + name(c) + ' holds ' + c.scrollWidth + ' in ' + c.clientWidth + ' across "' + c.textContent.slice(0, 40) + '"');
+    const cb = S(c.getBoundingClientRect());
+    for (const row of c.querySelectorAll(':scope > .hd, :scope > .val, :scope > .strip, :scope > b, :scope > .slotbulbs')) {
+      const rb = S(row.getBoundingClientRect());
+      if (rb.l < cb.l - 0.5 || rb.r > cb.r + 0.5) add('stat cell ' + name(c) + ': its ' + name(row) + ' ' + Math.round(rb.r - rb.l) + ' px wide in ' + Math.round(cb.r - cb.l) + ' "' + row.textContent.slice(0, 30) + '"');
+    }
+  }
   const tip = desk.querySelector('.tip.on'); if (tip) { within(tip, STAGE, 'tooltip'); holds(tip, 'tooltip'); }
   // The papers: each page holds its stories; mastheads, datelines and the box office on their lines.
   for (const p of desk.querySelectorAll('.pp')) {
@@ -362,7 +367,7 @@ const TITLE_AUDIT = `window.__titleAudit = (where) => {
     if (!m || Number(m[1]) !== dots) add('a counter reads "' + row.textContent.trim().slice(0, 40) + '" over ' + dots + ' dots');
   }
   for (const [w, el] of parts) { if (!el) { add('no ' + w); continue; } holds(el, w); within(el, w); }
-  for (const l of t.querySelectorAll('.tlinks .link')) { holds(l, 'link'); within(l, 'link'); }
+  for (const l of t.querySelectorAll('.tlinks button')) { holds(l, 'link'); within(l, 'link'); }
   const boxes = parts.filter(([, el]) => el).map(([w, el]) => [w, S(el.getBoundingClientRect())]);
   for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
     const a = boxes[i][1], b = boxes[j][1];

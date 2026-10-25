@@ -1020,6 +1020,8 @@
   "ui.stat.slotOn": "●",
   "ui.stat.slotOff": "○",
   "ui.stat.crossed": "{n} TO NEXT",
+  "ui.stat.toDraw": "{n} to draw",
+  "ui.stat.played": "{n} played",
   "ui.feed.month": "— {date} —",
   "ui.feed.draws": "You draw {n}: {cards}",
   "ui.feed.delta": "{resource} {delta}",

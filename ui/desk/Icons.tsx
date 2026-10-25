@@ -30,10 +30,10 @@ export function IconDefs() {
           <rect x="3.5" y="6" width="11" height="15" rx="1.6" fill="none" stroke="currentColor" strokeWidth="2" />
           <path d="M8.5 4.2 L19 3 a1.6 1.6 0 0 1 1.8 1.4 L22 16.6 a1.6 1.6 0 0 1-1.4 1.8 L17 18.8" fill="none" stroke="currentColor" strokeWidth="2" />
         </symbol>
+        {/* The scandal (round R9b, B4): the scandal card itself, tilted, its ✕ cut out — one even-odd path and no mask,
+            so the sprite can be mounted twice. */}
         <symbol id="i-paper" viewBox="0 0 24 24">
-          <rect x="3" y="4" width="18" height="16" rx="1.5" fill="none" stroke="currentColor" strokeWidth="2" />
-          <rect x="3" y="4" width="18" height="5" fill="currentColor" />
-          <path d="M6 12.5h6M6 16h6M14.5 12.5h3.5M14.5 16h3.5" stroke="currentColor" strokeWidth="1.6" />
+          <path transform="rotate(-9 12 12)" fill="currentColor" fillRule="evenodd" d="M7.8 3.2 H16.2 A1.8 1.8 0 0 1 18 5 V19 A1.8 1.8 0 0 1 16.2 20.8 H7.8 A1.8 1.8 0 0 1 6 19 V5 A1.8 1.8 0 0 1 7.8 3.2 Z M13.48 8.82 L15.18 10.52 L13.70 12.00 L15.18 13.48 L13.48 15.18 L12.00 13.70 L10.52 15.18 L8.82 13.48 L10.30 12.00 L8.82 10.52 L10.52 8.82 L12.00 10.30 Z" />
         </symbol>
         <symbol id="i-gear" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="5.4" fill="none" stroke="currentColor" strokeWidth="3.4" />

@@ -41,8 +41,9 @@ type Result = [what: string, ok: boolean | 'skipped'];
 /**
  * Hovers ease (round R4, A1): an entrance animation that kept filling its last frame overrode the element's own
  * transition, so a hover's transform landed at once. In full motion, a manager card, an offer, a hand card, a paper,
- * a sticky note, a bubble and a door are hovered with the mouse; 60 ms after each one's own transition delay (the
- * hand's and the offers' are 70 ms), its transform lies strictly between its rest and its hover value.
+ * a sticky note, a bubble and a door are hovered with the mouse — and since round R9b (B3) two tickets, BEGIN and END
+ * TURN, whose lift is 1 px over 0.12 s; 60 ms after each one's own transition delay (the hand's and the offers' are
+ * 70 ms), its transform lies strictly between its rest and its hover value.
  */
 async function hoversEase(page: Page, url: string): Promise<Result[]> {
   const out: Result[] = [];
@@ -91,6 +92,7 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
   await page.evaluate(`document.documentElement.dataset.motion = 'full'`);
   for (let i = 0; i < 100 && !(await centre(page, '.title-screen .begin')); i++) await sleep(50);
   await sleep(400);
+  await eases('BEGIN, a red ticket', '.title-screen .begin', '.title-screen .begin', 0);
   const press = async (sel: string, i = 0) => { const at = await centre(page, sel, i); if (at) await page.click(...at); return !!at; };
   await press('.title-screen .begin');
   await sleep(900);
@@ -118,6 +120,7 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
   await sleep(600);
   await idle();
   await eases('a hand card', '.desk .hand .card:nth-child(2)', '.desk .hand .card:nth-child(2)', 70);
+  await eases('END TURN, a ticket', '.desk .endbtn', '.desk .endbtn', 0);
   // A paper behind, by the strip of it that shows above the front one.
   await eases('a paper', '.desk .news .pp.pos1', '.desk .news .pp.pos1', 0, () => page.evaluate<[number, number] | null>(`(() => { const p = document.querySelector('.desk .news .pp.pos1'); if (!p) return null; const r = p.getBoundingClientRect(); return [r.x + r.width / 2, r.y + 12]; })()`));
   await eases('a sticky note', '.desk .mirror .sticky', '.desk .mirror .sticky', 0);

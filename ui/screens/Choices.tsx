@@ -49,8 +49,8 @@ interface OffersProps {
 /**
  * "Take one." The offered cards wear the hand's faces at 1.1×, four (Dex's) at full size; Dex's extra card has its
  * paper-clipped tag. A click takes a card — the TAKEN stamp, the others fade. Below, the tickets: one more card, or
- * a new offer, greyed out when the money is not there, and the money there is. Nothing previews a card's story:
- * /core has no query for the line an offered card would print.
+ * a new offer, greyed out when the money is not there (the money itself in the stat bar, round R9b, B5). Nothing
+ * previews a card's story: /core has no query for the line an offered card would print.
  */
 export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps) {
   // The card taken flies to Deck & Discard as its pick goes (round R4, A3e).
@@ -89,7 +89,7 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
       </div>
       <div className="row tickets">
         <button
-          className="tkt extra"
+          className="ticket tkt extra"
           disabled={!legal.extraPick || chosen !== null}
           onClick={() => {
             cue('button');
@@ -100,7 +100,7 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
           <em>{money(c.rules.draft.extraPickCost)}</em>
         </button>
         <button
-          className="tkt reroll"
+          className="ticket tkt reroll"
           disabled={!legal.reroll || chosen !== null}
           onClick={() => {
             cue('button');
@@ -116,7 +116,6 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
             </>
           )}
         </button>
-        <span className="have">{t('ui.offers.have', { money: money(s.resources.capital) })}</span>
       </div>
     </div>
   );

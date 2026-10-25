@@ -18,6 +18,43 @@
 }
 
 * { box-sizing: border-box; }
+
+/* Tickets with depth (round R9b, B3): BEGIN, CONTINUE, the offers' tickets, END TURN, the panels' close buttons, PLAY
+   AGAIN, and small, the title's and the awards night's links. A clip-path would clip the drop shadow too, so the button
+   itself is not clipped: transparent, its own stacking context, the shadow as its filter; ::before carries the shape and
+   its body, ::after the inner edges, both clipped, behind the label, taking no pointer. Cream; red (BEGIN, END TURN in a
+   frenzy); small (--n 7 px). Hover lifts it 1 px and pressing sinks it 2 px, 0.12 s ease-out — the shadows only, no
+   movement, under reduced motion or none. Each keeps its own size, place and hit area. `.ticket.ticket` outranks the
+   screens' and the desk's own button resets (`.scr button`, `.desk button`: colour inherited, no transition); its
+   `position: relative` is `:where()`, weightless, so a button placed absolutely (BEGIN, END TURN) stays where it is. */
+:where(.ticket) { position: relative; }
+.ticket.ticket {
+  --n: 11px; isolation: isolate; background: transparent; border: 0; border-radius: 0; cursor: pointer;
+  color: #1b160f; text-shadow: 0 1px 0 rgba(255, 255, 255, .55);
+  filter: drop-shadow(0 2.5px 0 #6f6250) drop-shadow(0 9px 10px rgba(0, 0, 0, .5));
+  transition: transform .12s ease-out, filter .12s ease-out;
+}
+.ticket.ticket::before, .ticket.ticket::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  clip-path: polygon(var(--n) 0, calc(100% - var(--n)) 0, 100% 50%, calc(100% - var(--n)) 100%, var(--n) 100%, 0 50%);
+}
+.ticket.ticket::before { background: radial-gradient(120% 90% at 50% -25%, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 55%), linear-gradient(180deg, #fbf6ea 0%, #ece3d0 52%, #d9cdb5 100%); }
+.ticket.ticket::after { box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 -2px 0 rgba(90, 70, 40, .22); }
+.ticket.ticket:hover:not(:disabled) { transform: translateY(-1px); filter: drop-shadow(0 3.5px 0 #6f6250) drop-shadow(0 12px 14px rgba(0, 0, 0, .5)); }
+.ticket.ticket:active:not(:disabled) { transform: translateY(2px); filter: drop-shadow(0 .5px 0 #6f6250) drop-shadow(0 4px 6px rgba(0, 0, 0, .5)); }
+.ticket.ticket:disabled { opacity: .45; cursor: default; filter: drop-shadow(0 1px 0 #6f6250); }
+.ticket.ticket:focus-visible { outline: 2px solid rgba(255, 207, 133, .7); outline-offset: 3px; }
+/* Red: BEGIN, and END TURN in a frenzy. */
+:is(.ticket.red, .desk.crisis .endbtn.ticket) { color: #fff6f2; text-shadow: 0 -1px 0 rgba(90, 10, 5, .45); filter: drop-shadow(0 2.5px 0 #6e1209) drop-shadow(0 9px 12px rgba(0, 0, 0, .55)); }
+:is(.ticket.red, .desk.crisis .endbtn.ticket)::before { background: radial-gradient(120% 90% at 50% -25%, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 55%), linear-gradient(180deg, #ef5a48 0%, #d4301f 55%, #b3241a 100%); }
+:is(.ticket.red, .desk.crisis .endbtn.ticket)::after { box-shadow: inset 0 1.5px 0 rgba(255, 220, 210, .8), inset 0 -2px 0 rgba(60, 5, 0, .3); }
+:is(.ticket.red, .desk.crisis .endbtn.ticket):hover:not(:disabled) { filter: drop-shadow(0 3.5px 0 #6e1209) drop-shadow(0 12px 16px rgba(0, 0, 0, .55)); }
+:is(.ticket.red, .desk.crisis .endbtn.ticket):active:not(:disabled) { filter: drop-shadow(0 .5px 0 #6e1209) drop-shadow(0 4px 8px rgba(0, 0, 0, .55)); }
+:is(.ticket.red, .desk.crisis .endbtn.ticket):disabled { filter: drop-shadow(0 1px 0 #6e1209); }
+/* Small: the links. */
+.ticket.small { --n: 7px; padding: 6px 13px 5px; font: 800 10px/1.2 'Libre Franklin', system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; }
+:root:is([data-motion-resolved='reduced'], [data-motion='off']) .ticket.ticket { transition: filter .12s ease-out; }
+:root:is([data-motion-resolved='reduced'], [data-motion='off']) .ticket.ticket:is(:hover, :active) { transform: none; }
 /* Nothing behind a screen is ever the page's colour: the page and the stage are ink wherever nothing covers them (round
    R5, B8) — the first paint (index.html carries it inline, before this sheet loads), and the awards night lighting up
    out of the dark. */

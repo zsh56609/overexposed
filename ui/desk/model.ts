@@ -21,6 +21,7 @@ import {
   getCard,
   getEvent,
   getManager,
+  heatLine,
   SCENE_DRAWINGS,
   issueNow,
   majorRequirements,
@@ -60,6 +61,7 @@ import {
   cardName,
   clauseText,
   conditionText,
+  countWords,
   dateLine,
   effectText,
   flagName,
@@ -81,6 +83,7 @@ import {
   signedMoney,
   tagName,
   zoneName,
+  type CountWords,
 } from '../text.ts';
 
 /** How many drawings each photograph scene has (README §2: several variants of the same drawing): core's. */
@@ -92,10 +95,14 @@ export type IconId = 'star' | 'note' | 'clap' | 'flame' | 'paper' | 'cash' | 'ca
 export interface StatCellModel {
   readonly id: 'hype' | 'craft' | 'heat' | 'next' | 'money';
   readonly icon: IconId;
-  /** The bold word: a tier, the countdown, the money. */
+  /** The cell's label (round R9b, B1): the stat's name, "Next scandal", "Money". */
+  readonly label: string;
+  /** The small word beside the big number — a tier, the countdown's words ("to go") — or, for money, the money itself. */
   readonly word: string;
-  /** The small number beside a tier word. */
+  /** The big number: a stat's value, the countdown's count; none for money, whose money is its big value. */
   readonly number: string | null;
+  /** Words before the countdown's count, for a language that puts them there; empty in English. */
+  readonly lead: string;
   readonly level: CountdownLevel | null;
   readonly tipHeader: string;
   readonly tipLine: string;
@@ -105,8 +112,11 @@ export interface StatBarModel {
   readonly cells: readonly StatCellModel[];
   readonly actions: { readonly total: number; readonly left: number; readonly tipHeader: string; readonly tipLine: string };
   readonly when: { readonly date: string; readonly marks: readonly ('past' | 'now' | 'next')[]; readonly tipHeader: string; readonly tipLine: string };
-  /** The deck's button, and House rules' (round R1, G1 and G3). */
-  readonly deck: string;
+  /**
+   * The deck's cell, and House rules' (round R1, G1 and G3): since round R9b (B1) cells of the bar — Deck & discard with
+   * the cards still to draw and played, each its count among its words, the deck viewer's own counts.
+   */
+  readonly deck: { readonly label: string; readonly toDraw: CountWords; readonly played: CountWords };
   readonly settings: string;
   /** The scandals held — deck, hand and discard — on the deck's button, and its tooltip (round R3, D1). */
   readonly held: { readonly n: number; readonly tipHeader: string; readonly tipLine: string };
@@ -418,13 +428,18 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
   const cells = statCells(s, lane);
   const cell = (id: string) => cells.find((x) => x.id === id);
   const icon: Record<string, IconId> = { hype: 'star', craft: lane === 'screen' ? 'clap' : 'note', heat: 'flame', next: 'paper', money: 'cash' };
+  // The countdown's count set big among its words (round R9b, B1): "7" and "to go".
+  const line = heatLine(s);
+  const count = countWords(line.crossed ? 'ui.stat.crossed' : 'ui.stat.toGo', line.toNext);
   const out: StatCellModel[] = (['hype', 'craft', 'heat', 'next', 'money'] as const).map((id) => {
     const x = cell(id);
     return {
       id,
       icon: icon[id] as IconId,
-      word: x?.tier ?? x?.value ?? '',
-      number: x?.tier !== null && x?.tier !== undefined ? x.value : null,
+      label: x?.label ?? '',
+      word: id === 'next' ? count.tail : (x?.tier ?? x?.value ?? ''),
+      number: id === 'next' ? count.n : x?.tier !== null && x?.tier !== undefined ? x.value : null,
+      lead: id === 'next' ? count.lead : '',
       level: x?.level ?? null,
       tipHeader: x?.tipHeader ?? '',
       tipLine: x?.tipLine ?? '',
@@ -445,7 +460,7 @@ export function statBar(s: GameState, lane: string | null): StatBarModel {
       tipHeader: calendarLabel(c, s.turn),
       tipLine: dateLine(c, s.turn),
     },
-    deck: t('ui.deck.open'),
+    deck: { label: t('ui.deck.open'), toDraw: countWords('ui.stat.toDraw', s.deck.length), played: countWords('ui.stat.played', s.discard.length) },
     settings: t('ui.title.settings'),
     held: { n: scandalCount(s), tipHeader: t('ui.tip.held', { n: scandalCount(s) }), tipLine: t('ui.tip.heldLine') },
   };

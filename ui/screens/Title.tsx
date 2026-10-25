@@ -100,17 +100,17 @@ export const TitleScreen = memo(function TitleScreen({ c, found, won, dim = fals
           </div>
         </div>
         <nav className="tlinks">
-          <button className="link scrapbook-open" onClick={scrapbook}>
+          <button className="ticket small scrapbook-open" onClick={scrapbook}>
             {t('ui.title.scrapbook')}
           </button>
-          <button className="link settings-open" onClick={settings}>
+          <button className="ticket small settings-open" onClick={settings}>
             {t('ui.title.settings')}
           </button>
-          <button className="link credits-open" onClick={credits}>
+          <button className="ticket small credits-open" onClick={credits}>
             {t('ui.title.credits')}
           </button>
         </nav>
-        <button className="begin" data-hook="begin" onClick={begin}>
+        <button className="begin ticket red" data-hook="begin" onClick={begin}>
           {t('ui.title.begin')}
         </button>
       </div>
