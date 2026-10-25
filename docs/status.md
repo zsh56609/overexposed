@@ -17,7 +17,7 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-25-r9a.md](reports/2026-10-25-r9a.md).
+[reports/2026-10-25-r9b.md](reports/2026-10-25-r9b.md).
 
 ## Built
 

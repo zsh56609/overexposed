@@ -112,7 +112,9 @@ rules).
   clearance of the deck button); check:preview the cells' labels, the countdown's count and
   words, the deck's counts against the deck viewer's; check:interactions eases BEGIN's and END
   TURN's hover (1 px over 0.12 s) with the other hovers; check:clicks and check:overflow find the
-  links as buttons now, not `.link`.
+  links as buttons now, not `.link`. The tickets are read at every frame for 250 ms and ease if
+  one frame finds them on their way: read once at 60 ms, the next frame of headless WebKit (about
+  70 ms apart) came after so short a transition had ended, and both failed there at every size.
 
 ## 2026-10-25 — Round R9b, Part A: a new player's first year
 
