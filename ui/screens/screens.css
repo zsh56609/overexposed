@@ -304,13 +304,15 @@
 .ov .mini .sc { position: absolute; left: 0; top: 0; width: 186px; height: 252px; transform: scale(var(--ms)); transform-origin: 0 0; }
 .scr .mini .card.card { pointer-events: none; box-shadow: none; }
 /* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
-/* One size on both pages (round R9a, D1): 580 tall — the awards page needs 579.4; the endings page keeps its top, with
-   more room under it. The two pages share one cell while a page turns (D2), the page going under no pointer. */
+/* One size on both pages (round R9a, D1): 580 tall. The same room round both pages' contents (round R9b, D2b): each
+   starts 26 px under the heading, with room left under it — the plaques 124 high, as on the night, the shelf's rows 22
+   apart, the clippings with 2 px more padding and 4 more between them. The two pages share one cell while a page turns
+   (D2), the page going under no pointer. */
 .ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; height: 580px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
 .ov .book .pages { display: grid; }
 .ov .book .pages > .page { grid-area: 1 / 1; min-width: 0; }
 .ov .book .pages > .going { pointer-events: none; }
-.ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 18px; }
+.ov .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 26px; }
 /* Its two pages (round R4, A7): tabs in its head; the awards as the night's plaques with their trophies, in rows of four
    (round R8c, B4), not yet won dimmed, the trophy a silhouette. */
 .ov .book .pnh { align-items: flex-end; }
@@ -318,9 +320,9 @@
 .ov .book .tab { padding: 7px 14px 6px; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b9c4b6; border-bottom: 2px solid transparent; }
 .ov .book .tab.on { color: #f3ead4; border-bottom-color: #ffcf85; }
 .ov .book .tab:hover { color: #ffcf85; }
-.ov .book .awards-page { display: flex; flex-direction: column; gap: 18px; margin-top: 34px; }
+.ov .book .awards-page { display: flex; flex-direction: column; gap: 22px; margin-top: 26px; }
 .ov .book .prow { display: flex; justify-content: center; gap: 16px; }
-.ov .book .pl { flex: 0 0 226px; height: 136px; }
+.ov .book .pl { flex: 0 0 226px; height: 124px; }
 .ov .book .pl.dim { background: linear-gradient(160deg, #1c1a14, #12100c); border-color: #4a3d27; box-shadow: none; }
 .ov .book .pl.dim .t { color: #8f8470; }
 .ov .book .pl.dim .n { color: #b8ac97; }
@@ -329,13 +331,13 @@
 .ov .book .pl.tro.dim > .tr img { filter: grayscale(1) brightness(.42) contrast(.9) opacity(.75); }
 .ov .col h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; margin: 0 0 4px; color: #f3ead4; }
 .ov .col .gl { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; color: #b9c4b6; margin-bottom: 14px; min-height: 32px; }
-.ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 9px 10px 10px; margin-bottom: 17px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
+.ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 11px 12px 12px; margin-bottom: 21px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
 .ov .clip::before { content: ""; position: absolute; left: 50%; top: -7px; width: 36px; height: 12px; margin-left: -18px; background: rgba(255, 240, 200, .55); transform: rotate(-3deg); }
 .ov .clip small { display: block; font-size: 7px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b8281c; }
 .ov .clip b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 15px; line-height: 1.1; margin-top: 2px; }
 .ov .clip i { display: block; height: 3px; background: rgba(21, 18, 14, .25); margin-top: 6px; }
 .ov .clip i + i { width: 68%; }
-.ov .clip.miss { background: transparent; border: 1.5px dashed rgba(237, 230, 214, .32); box-shadow: none; color: rgba(237, 230, 214, .42); text-align: center; padding: 15px 10px; }
+.ov .clip.miss { background: transparent; border: 1.5px dashed rgba(237, 230, 214, .32); box-shadow: none; color: rgba(237, 230, 214, .42); text-align: center; padding: 17px 12px; }
 .ov .clip.miss::before { display: none; }
 .ov .clip.miss b { font-size: 21px; margin: 0; }
 .ov .clip.miss small { color: rgba(237, 230, 214, .36); }

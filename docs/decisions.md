@@ -6,6 +6,31 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9b, Part D2b: the scrapbook's room
+
+- The author (round R9b, one more item): since R9a both pages are 580 tall, but the endings page
+  had 96.6 px under its contents and the awards page 24.6 (6 endings found, 9 awards won,
+  1280×720), and they started 18 and 34 px under the heading. Their values, as given
+  (ui/screens/screens.css): the endings' columns 26 under the heading (were 18); the awards page
+  26 (34), its rows 22 apart (18); the shelf's plaques 124 high (136), as the night's are; a
+  clipping's padding 11 12 12 (9 10 10) and 21 between clippings (17); a gap's padding 17 12
+  (15 10). The comment over the book and the README's scrapbook say so, without a measure.
+- Measured here (Chromium on Windows, 1280×720, with the first of each major found in turn — two
+  in each of the four-ending columns — and the first nine awards won): both pages start 26 px
+  under the heading, as the author measured; the awards page leaves 60.6 px under its contents,
+  as the author measured (24.6 before, as theirs). The endings page leaves 44.4 px (84.4 before),
+  where the author measured 60.6 (96.6 before): here its tallest column sits 12 px lower before
+  the change and 16 px after. Its room hardly moves with which endings are found — every one
+  43.5 px, none 45.2: a clipping and a gap are within a pixel of each other — so the difference
+  is not the collection. The values are left as the author set them; the report gives both.
+- check:overflow holds the scrapbook at its fullest, at every size: reloaded with every ending
+  found and every award won, then with none, every line at its longest — both pages inside the
+  book; every plaque 124 high with its words inside its padding (a won one's name and citation of
+  up to three lines, an unwon one's name and requirement of up to four: 6 px or more to spare);
+  every column of clippings inside the book with each clipping found or not as it is taller (the
+  Breakthrough's four, 41.6 px to spare). The R9a hovers still lift whole: a clipping, a gap, an
+  award won and one not.
+
 ## 2026-10-25 — Round R9b, Part C: words
 
 - THE NEW WORDS, the round's list (docs/writing/draft-v14.md, with its fallbacks): the four NEW

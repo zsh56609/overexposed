@@ -286,8 +286,11 @@ italic line.
   "Endings found · N of 14". Its awards page is a shelf (round R8c): the twelve as the
   night's plaques with their trophies, in rows of four; one not yet won dimmed, its
   trophy a silhouette (`grayscale(1) brightness(.42) contrast(.9) opacity(.75)`), its
-  how-line 10 px. Since round R9a the book is one size on both pages, 580 tall (the endings
-  page keeps its top, with more room under it), and the page turns: the page going slides
+  how-line 10 px. Since round R9a the book is one size on both pages, 580 tall, and since
+  round R9b both pages have the same room round their contents: each starts 26 px under the
+  heading, with room left under it — the plaques 124 high, as on the night, the shelf's rows 22
+  apart, a clipping's padding 11 12 12 and 21 between clippings, a gap's 17 12. And the page
+  turns: the page going slides
   out and the next slides in, overlapping — 28 px, 240 ms, `cubic-bezier(.2, .7, .2, 1)`,
   each fading; Endings → Awards the old page leaves to the left and the awards come in from
   the right, back mirrored; the title changes at the click; the sound of a panel opening,

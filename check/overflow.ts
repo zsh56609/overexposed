@@ -16,6 +16,9 @@
 // - the events (round R2): each one met in the runs, and every event of the content on its own page
 //   (check/events.html) with two more at the schema's limits — with its replies, with one it can't afford, and
 //   answered — on the stage, the letter holding its words, no words over other words.
+// And the scrapbook at its fullest (round R9b, D2b): every ending found and every award won, then none — both pages
+// inside the book, every plaque's words inside its 124 px, every column of clippings inside the book with each clipping
+// found or not as it is taller.
 // With --replays, every state recorded in check/desk-states.json (the reference states, the biggest hand, a hand
 // for every card, every minor ending's screen) is replayed and audited too. Transitions are switched off: the
 // check measures where things settle.
@@ -712,6 +715,87 @@ const DRIVE = (runs: number) => `(async () => {
   return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, doorsCard: window.__doorsCard ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
+/**
+ * Runs in the page (round R9b, D2b): the scrapbook opened from the title, with the collections the page loaded with —
+ * each page's room under it; on the endings page each column's first clipping's top and every clipping's height with
+ * its margin (stage px, so the columns' worst mix can be summed); on the awards page each plaque's words against its
+ * padding box (the least room, and any plaque whose words run out of it).
+ */
+const BOOK_MEASURE = `(async () => {
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const shown = async (sel, yes = true) => { for (let i = 0; i < 150; i++) { if (!!document.querySelector(sel) === yes) return; await sleep(20); } throw new Error('the scrapbook did not ' + (yes ? 'open' : 'close')); };
+  const still = document.createElement('style');
+  still.textContent = '*, *::before, *::after { transition: none !important; animation: none !important; }';
+  document.head.appendChild(still);
+  document.querySelector('.title-screen .scrapbook-open').click();
+  await shown('.p-scrapbook .ov-page, .p-scrapbook .cols');
+  await sleep(40);
+  const k = document.querySelector('.stage').getBoundingClientRect().height / 720;
+  const book = document.querySelector('.ov .book');
+  const room = () => (book.getBoundingClientRect().bottom - book.querySelector('.pages > .page:not(.going)').getBoundingClientRect().bottom) / k;
+  const endings = room();
+  const columns = [...book.querySelectorAll('.cols .col')].map((col) => {
+    const clips = [...col.querySelectorAll('.clip')];
+    // The first clipping's top in layout (a found one is turned, so its box's top is not), from the column's own.
+    return { major: col.dataset.major, top: clips.length ? (col.getBoundingClientRect().top - book.getBoundingClientRect().top) / k + (clips[0].offsetTop - col.offsetTop) : 0, clips: clips.map((c) => ({ minor: c.dataset.minor, h: c.offsetHeight + parseFloat(getComputedStyle(c).marginBottom) })) };
+  });
+  const inner = (book.getBoundingClientRect().height) / k;
+  document.querySelector('.p-scrapbook .tab[data-tab="awards"]').click();
+  await shown('.p-scrapbook .awards-page');
+  for (let i = 0; i < 50 && book.querySelector('.pages > .going'); i++) await sleep(20);
+  await sleep(40);
+  const awards = room();
+  let tightest = Infinity;
+  const out = [];
+  for (const pl of book.querySelectorAll('.awards-page .pl')) {
+    const r = pl.getBoundingClientRect(), cs = getComputedStyle(pl), tx = pl.querySelector('.tx')?.getBoundingClientRect();
+    if (!tx) continue;
+    const top = r.top + (parseFloat(cs.borderTopWidth) + parseFloat(cs.paddingTop)) * k, bottom = r.bottom - (parseFloat(cs.borderBottomWidth) + parseFloat(cs.paddingBottom)) * k;
+    const spare = Math.min(tx.top - top, bottom - tx.bottom) / k;
+    tightest = Math.min(tightest, spare);
+    if (spare < -0.5 || pl.scrollWidth > pl.clientWidth + 1) out.push('a plaque\\'s words run out of it (' + spare.toFixed(1) + ' px): ' + pl.dataset.award + (pl.classList.contains('dim') ? ', not won' : ', won'));
+    if (Math.abs(r.height / k - 124) > 0.5) out.push('a plaque is ' + (r.height / k).toFixed(1) + ' px high, not 124: ' + pl.dataset.award);
+  }
+  document.querySelector('.p-scrapbook .closeb').click();
+  await shown('.p-scrapbook', false);
+  return { endings: Math.round(endings * 10) / 10, awards: Math.round(awards * 10) / 10, book: Math.round(inner * 10) / 10, columns, tightest: Math.round(tightest * 10) / 10, issues: out };
+})()`;
+type BookFill = { endings: number; awards: number; book: number; columns: { major: string; top: number; clips: { minor: string; h: number }[] }[]; tightest: number; issues: string[] };
+
+/**
+ * The scrapbook at its fullest (round R9b, D2b): the ids from the scrapbook itself, then the page loaded again with every
+ * ending found and every award won, and with none — every line at its longest — and measured. The worst column is each
+ * column's clippings, each found or not as it is taller. The collections are left empty.
+ */
+async function bookExtremes(page: Awaited<ReturnType<typeof launch>>, url: string, tag: string): Promise<{ all: BookFill; none: BookFill; worst: { major: string; room: number } }> {
+  await openReady(page, `${url}?seed=20260929`);
+  const ids = await page.evaluate<{ minors: string[]; awards: string[] }>(`(async () => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    document.querySelector('.title-screen .scrapbook-open').click();
+    for (let i = 0; i < 150 && !document.querySelector('.p-scrapbook .cols'); i++) await sleep(20);
+    const minors = [...document.querySelectorAll('.p-scrapbook [data-minor]')].map((e) => e.dataset.minor);
+    document.querySelector('.p-scrapbook .tab[data-tab="awards"]').click();
+    for (let i = 0; i < 150 && !document.querySelector('.p-scrapbook .awards-page'); i++) await sleep(20);
+    return { minors, awards: [...document.querySelectorAll('.p-scrapbook .awards-page [data-award]')].map((e) => e.dataset.award) };
+  })()`);
+  const fill = async (all: boolean): Promise<BookFill> => {
+    await page.evaluate(`localStorage.setItem('overexposed.endingsFound', ${JSON.stringify(JSON.stringify(all ? ids.minors : []))}); localStorage.setItem('overexposed.awardsWon', ${JSON.stringify(JSON.stringify(all ? ids.awards : []))})`);
+    await openReady(page, `${url}?seed=20260929`);
+    await auditStep(page, `${tag} longest-text patch (the scrapbook ${all ? 'full' : 'empty'})`, PATCH);
+    return auditStep<BookFill>(page, `${tag} the scrapbook ${all ? 'full' : 'empty'}`, BOOK_MEASURE);
+  };
+  const all = await fill(true);
+  const none = await fill(false);
+  await page.evaluate(`localStorage.removeItem('overexposed.endingsFound'); localStorage.removeItem('overexposed.awardsWon')`);
+  // Each column's worst mix: its first clipping's top, and each clipping found or not as it is taller.
+  const worst = all.columns.map((col, i) => {
+    const other = none.columns[i];
+    const height = col.clips.reduce((sum, clip, j) => sum + Math.max(clip.h, other?.clips[j]?.h ?? 0), 0);
+    return { major: col.major, room: Math.round((all.book - col.top - height) * 10) / 10 };
+  });
+  return { all, none, worst: worst.reduce((a, b) => (b.room < a.room ? b : a)) };
+}
+
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
 const REPLAY_AUDIT = `(async () => {
   const shown = async (selector, yes = true) => { for (let i=0;i<40;i++) { if (!!document.querySelector(selector) === yes) return; await sleep(10); } throw new Error('audit target did not ' + (yes ? 'open: ' : 'close: ') + selector); };
@@ -830,6 +914,16 @@ try {
         }
         for (const m of [...new Set(evs.issues)].slice(0, 20)) console.log(`OVERFLOW events  ${m}`);
         if (evs.issues.length > 0) failed = true;
+        // The scrapbook at its fullest (round R9b, D2b).
+        const ex = await bookExtremes(page, url, tag);
+        console.log(
+          `overflow check, ${tag}: the scrapbook full and empty — endings ${ex.all.endings} px under the page with every one found, ${ex.none.endings} with none, ` +
+            `the worst column (${ex.worst.major}, each clipping found or not as it is taller) ${ex.worst.room}; awards ${ex.all.awards} px under the page with all won, ${ex.none.awards} with none; ` +
+            `every plaque's words ${Math.min(ex.all.tightest, ex.none.tightest)} px or more inside it`,
+        );
+        const bookIssues = [...ex.all.issues, ...ex.none.issues, ...(Math.min(ex.all.endings, ex.none.endings, ex.all.awards, ex.none.awards) < -0.5 ? ['a page of the scrapbook ends below the book'] : []), ...(ex.worst.room < -0.5 ? [`the column ${ex.worst.major} of clippings, found or not, ends ${-ex.worst.room} px below the book`] : [])];
+        for (const m of bookIssues) console.log(`OVERFLOW scrapbook  ${m}`);
+        if (bookIssues.length > 0) failed = true;
         if (REPLAYS) {
           let n = 0;
           let broke = 0;
