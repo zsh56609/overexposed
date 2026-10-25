@@ -6,6 +6,60 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9b, Part A: a new player's first year
+
+- The author (round R9b): a new player's first desk should not open on offers; the stat bar's
+  note moves to the first desk, and the season's two doors go on the mirror with a note of their
+  own.
+- A new player is a run made with the manager's notes on, unseeded or asking for them (?notes=1):
+  App's own test for the notes, decided once in makeRun as the run is made — a switch turned at
+  the title does not change the run already made; PLAY AGAIN's next run reads it again.
+- core: StateOptions.skipFirstDraft (default false), kept in GameState as skipFirstDraft, since
+  the reducer sees only state. openMonth opens the run's very first month (turn 1) on its hand:
+  startTurn, no draft; every later draft as ever, so such a run has 7 drafts, not 8. Every
+  existing caller passes nothing and plays as before: sim:compare of the default batch before
+  and after is identical in all 18 files.
+- The signing: the step that takes the manager now also deals March's hand. The signing's
+  beats as ever (SIGN: signed 120, undim 600, publish 750), then the hand dealt from the publish
+  as any month without a draft starts (dealLead 100, dealCard 90, dealHold 450, onDraw
+  resources with their draw); the step settles at 1.8 s, or once the hand is down if later
+  (it is down at 1.66 s). Reduced: the signing's four beats 150 ms apart as before, the deal
+  after them quick. The timeline takes the signing whenever nothing of the month comes before
+  its turnStart. No new motion.
+- sim: RunOptions.skipFirstDraft, BatchOptions.skipFirstDraft, and --skip-first-draft on sim,
+  sim:awards, sim:tiers and sim:managers; sim:baseline passes it to all four.
+- The stats note's moment is the first desk's, the actions note's: a hand dealt and not played.
+  NOTE_IDS keeps stats before actions, so the first desk shows the stat bar's note, then the
+  bulbs' once it has gone; it goes on the next play, at month end or when closed. A play before
+  it is closed puts actions off to the next month's first hand. The offers' path is gone: no
+  'offer' screen for the notes, no wait for the offers to be still. Its place and arrow are as
+  they were.
+- The doors card: a white index card taped to the mirror, the current act's two doors —
+  content.gatesByAct[act], fixed per act, so no draw; only while an act has exactly
+  rules.gatesOffered doors, else no card. Its header the doors' own words (ui.doors.kicker,
+  the season in lower case, in acts 1–3; ui.doors.lastKicker in the last act). A row a door:
+  ✓ or ✗ — every requirement met now, evaluate(requires), the test the reducer runs at the door
+  (its Likely) — its name, its requirements as the door states them. One helper for both,
+  model.ts requirementChip (the doors' "Requires" now uses it): the stat's icon and threshold
+  in its value colour, money as money, "Signed to a label" as words. The card's look is the
+  round's: left 734, top 286, width 206, 1.6°, #fbf8f0 with a red top rule, the tape; inside the
+  mirror it stands at 46, 234, above the glass and below the bubbles; not focusable, no tooltip.
+- Beyond the spec: the doors card's header line is its type's size (7.5 px) and a wrapped row's
+  chips line its icons' height (10 px). With a 9 px header line and a 12 px chips line the
+  winter card — Arena Tour and Award Show both wrap their chips — is 88 px and its lowest corner,
+  tilted, hangs 4.9 px below the glass's foot (372). Now it is at most 82.5 px (spring and
+  summer 62.5, autumn 72.5, winter 82.5) and winter's lowest corner is 0.6 px above the foot;
+  every other measure is the round's. check:overflow holds it at every desk state — inside the
+  glass with its tilt, clear of the black card, the three notes, the frenzy's clipping and the
+  manager's bubbles — and reports each season's height and room.
+- The seventh note, doors (notes.doors.<manager>): NOTE_IDS stats, actions, heat, doors, end,
+  mirror, scandal. Its moment: in play, the run has a play, actions left, the doors card on the
+  mirror; it goes on the next play, at month end or when closed. Its place left 404, top 214,
+  width 276, −0.8°, its arrow from its right side to the card's left edge. No touch line. The
+  House rules switch turns itself off once all seven have come. check:notes: the stats note on
+  the first hand, the doors note after a play with actions left, the doors card and the bulbs
+  obstacles that no note may meet, all seven.
+
 ## 2026-10-25 — Round R9a, Part E: v0.9.1
 
 - v0.9.1 is R9a (`package.json` and the lock 0.9.1). The credits' foot shows the patch when there

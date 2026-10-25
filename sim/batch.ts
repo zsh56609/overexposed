@@ -178,7 +178,12 @@ export interface RunOptions {
   readonly manager?: string;
   /** The memory of a run before (round R7, Part E): sim:memory plays a second run from the first's. Absent: none. */
   readonly memory?: RunMemory;
+  /** A new player's run (round R9b, A1; --skip-first-draft): its first month opens without offers. Absent: false. */
+  readonly skipFirstDraft?: boolean;
 }
+
+/** --skip-first-draft (round R9b, A1): every sim script runs a new player's first year with it. */
+export const skipFirstDraftArg = (argv: readonly string[]): boolean => argv.includes('--skip-first-draft');
 
 /** The manager id that runs the base game, without managers (--manager=none). */
 export const NO_MANAGER = 'none';
@@ -291,7 +296,7 @@ export function runOne(content: Content, persona: PersonaId, seed: number, trace
   };
 
   try {
-    state = createInitialState(seed, contentFor(content, options.manager), { strict: true, ...(options.memory ? { memory: options.memory } : {}) });
+    state = createInitialState(seed, contentFor(content, options.manager), { strict: true, ...(options.memory ? { memory: options.memory } : {}), ...(options.skipFirstDraft ? { skipFirstDraft: true } : {}) });
     tally(state, null);
     checkInvariants(state);
     trace?.(state, null);
@@ -392,6 +397,8 @@ export interface BatchOptions {
   readonly replaySample?: number;
   /** The manager every run chooses (default: the first in content). */
   readonly manager?: string;
+  /** Every run a new player's (round R9b, A1): its first month opens without offers. */
+  readonly skipFirstDraft?: boolean;
 }
 
 export interface BatchResult {
@@ -412,7 +419,7 @@ export function runBatch(runs: number, seed: number, options: BatchOptions = {})
   const seeds = runSeeds(seed, runs);
   const t0 = performance.now();
 
-  const run: RunOptions = options.manager === undefined ? {} : { manager: options.manager };
+  const run: RunOptions = { ...(options.manager === undefined ? {} : { manager: options.manager }), ...(options.skipFirstDraft ? { skipFirstDraft: true } : {}) };
   const records: RunRecord[] = [];
   for (const persona of personas) for (const s of seeds) records.push(runOne(content, persona, s, undefined, run));
 

@@ -2,7 +2,8 @@
 // the year ended today", the major and the minor; three sticky notes for the other three majors, each its name and
 // its requirements in the stat bar's words (no goal line since round R8a, E3). In a frenzy some bulbs flicker or go dark and a red
 // clipping is stuck to the glass. Every word is the adapter's (./model.ts). Round R8b (B7): the goal lines come back as
-// tooltips — hovering, a long-press or keyboard focus on the black card shows its major's, on a note its own.
+// tooltips — hovering, a long-press or keyboard focus on the black card shows its major's, on a note its own. Round R9b
+// (A3): the season's two doors on a white index card taped below the notes — not focusable, no tooltip.
 
 import { memo, useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type PointerEvent, type ReactNode } from 'react';
 import { isPlaceholder } from '../text.ts';
@@ -155,6 +156,26 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
             </div>
           );
         })}
+        {mirror?.doors && (
+          <div className="doorscard" data-hook="doors">
+            <i className="tape" aria-hidden="true" />
+            <small>{mirror.doors.kicker}</small>
+            {mirror.doors.rows.map((row) => (
+              <div key={row.gateId} className={`door ${row.met ? 'ok' : 'no'}`} data-gate={row.gateId}>
+                <i>{row.mark}</i>
+                <b className={ph(row.name, '')}>{row.name}</b>
+                <span className="chips">
+                  {row.chips.map((chip, k) => (
+                    <span key={k} className={chip.cls ?? 'words'}>
+                      {chip.icon && <Icon id={chip.icon} />}
+                      {chip.text}
+                    </span>
+                  ))}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
         {mirror && mirror.clipping !== null && (
           <div className="clipM" data-hook="clipping">
             {mirror.clipping}

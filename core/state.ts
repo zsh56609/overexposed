@@ -120,6 +120,8 @@ export interface GameState {
   readonly seed: number;
   /** true: bad content or an illegal action throws (dev, sim). false: degrade gracefully (shipped build). */
   readonly strict: boolean;
+  /** A new player's run (round R9b, A1): its very first month opens on its hand, without offers (StateOptions). */
+  readonly skipFirstDraft: boolean;
   readonly content: ContentIndex;
   readonly rng: RngState;
 
@@ -187,6 +189,11 @@ export interface StateOptions {
   readonly strict?: boolean;
   /** The memory of the last run (round R7, Part E). Absent: none. Events and variants content no longer has are left out. */
   readonly memory?: RunMemory;
+  /**
+   * A new player's first year (round R9b, A1): the run's very first month (act 1, turn 1) opens on its hand, without
+   * offers; every later draft is as ever. Default false.
+   */
+  readonly skipFirstDraft?: boolean;
 }
 
 /**
@@ -213,6 +220,7 @@ export function createInitialState(seed: number, content: Content, options: Stat
   const d: Draft = {
     seed: seed >>> 0,
     strict,
+    skipFirstDraft: options.skipFirstDraft ?? false,
     content: index,
     rng: cursor(seedRng(seed)),
     phase: 'play',

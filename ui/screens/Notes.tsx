@@ -1,6 +1,7 @@
-// The manager's notes (round R8b, Part B; README §9): six short notes in the manager's hand, each at the moment it
-// matters in a new player's first year — the stat bar on the first offer, the bulbs on the first hand, the countdown
-// after heat rises, END TURN once the bulbs are spent, the mirror at the next month's hand, a scandal in the hand.
+// The manager's notes (round R8b, Part B; README §9): seven short notes in the manager's hand, each at the moment it
+// matters in a new player's first year — the stat bar on the first hand, then the bulbs (round R9b, A2: a new player's
+// first month has no offers), the countdown after heat rises, the season's doors after a play (R9b, A4), END TURN once
+// the bulbs are spent, the mirror at the next month's hand, a scandal in the hand.
 // One at a time, never in the way: the layer takes no click but the note's, a preview over a note fades it, a panel
 // hides it. The first time each shows, the eye is drawn to it: a veil with two holes and the target's glow. Every
 // moment is read from the steps' GameEvents and the desk's model, never by comparing state here. App renders this
@@ -27,8 +28,8 @@ export interface NotesProps {
   readonly steps: readonly PlayedStep[];
   /** The desk idle: its data-busy is "0" and no change of scene runs. */
   readonly idle: boolean;
-  /** Which screen is up over the desk: the offers (the draft's screen), another, or none. */
-  readonly screen: 'none' | 'offer' | 'other';
+  /** Whether a screen is up over the desk. */
+  readonly screen: 'none' | 'other';
   /** A panel is open: the note hides, and none comes. */
   readonly panel: boolean;
   /** A card's or END TURN's preview is up: a note it overlaps fades out. */
@@ -37,6 +38,8 @@ export interface NotesProps {
   readonly actionsLeft: number;
   /** Craft's icon as the stat bar shows it: the lane's. */
   readonly craftIcon: IconId;
+  /** The season's doors card is on the mirror (round R9b, A3). */
+  readonly doors: boolean;
 }
 
 interface Up {
@@ -55,10 +58,11 @@ interface Place {
   readonly deg: number;
 }
 
-const FIXED: Readonly<Record<'stats' | 'actions' | 'heat' | 'mirror', Place>> = {
+const FIXED: Readonly<Record<'stats' | 'actions' | 'heat' | 'doors' | 'mirror', Place>> = {
   stats: { left: 44, top: 66, width: 286, deg: -1.2 },
   actions: { left: 318, top: 66, width: 280, deg: 0.9 },
   heat: { left: 300, top: 70, width: 284, deg: -0.8 },
+  doors: { left: 404, top: 214, width: 276, deg: -0.8 },
   mirror: { left: 398, top: 84, width: 268, deg: -1 },
 };
 const END = { left: 994, bottom: 626, width: 262, deg: 1.1 } as const;
@@ -69,6 +73,7 @@ const ARROW: Readonly<Record<NoteId, { readonly from: readonly [number, number];
   stats: { from: [0.68, 0], bend: 0.22 },
   actions: { from: [0.86, 0], bend: -0.24 },
   heat: { from: [0.64, 0], bend: 0.24 },
+  doors: { from: [1, 0.62], bend: -0.2 },
   end: { from: [0.16, 1], bend: 0.38 },
   mirror: { from: [1, 0.34], bend: -0.22 },
   scandal: { from: [0.5, 1], bend: 0.18 },
@@ -85,13 +90,13 @@ function thisMonth(steps: readonly PlayedStep[]): readonly PlayedStep[] {
 }
 
 /** Whether a note's moment holds now (B2), and for the scandal its card. */
-function moment(id: NoteId, p: NotesProps, still: boolean, since: number): { readonly uid: number | null } | null {
+function moment(id: NoteId, p: NotesProps, since: number): { readonly uid: number | null } | null {
   const { s, steps } = p;
   const play = s.phase === 'play' && p.idle && p.screen === 'none';
   const dealtUnplayed = play && !thisMonth(steps).some((st) => has(st, 'play'));
   switch (id) {
+    // The stat bar's and the bulbs' on the first desk, one after the other (round R9b, A2).
     case 'stats':
-      return p.screen === 'offer' && still && p.idle ? { uid: null } : null;
     case 'actions':
       return dealtUnplayed ? { uid: null } : null;
     case 'heat': {
@@ -99,6 +104,9 @@ function moment(id: NoteId, p: NotesProps, still: boolean, since: number): { rea
       const rose = !!last && has(last, 'play') && last.events.some((e) => e.type === 'resource' && e.target === 'heat' && e.delta > 0);
       return play && rose ? { uid: null } : null;
     }
+    // The season's doors (round R9b, A4): after a play, with actions left, while their card is on the mirror.
+    case 'doors':
+      return play && steps.some((st) => has(st, 'play')) && p.actionsLeft > 0 && p.doors ? { uid: null } : null;
     case 'end':
       return play && p.actionsLeft === 0 ? { uid: null } : null;
     case 'mirror':
@@ -116,9 +124,9 @@ function gone(up: Up, p: NotesProps): boolean {
   const any = (type: PlayedStep['events'][number]['type']) => after.some((st) => has(st, type));
   switch (up.id) {
     case 'stats':
-      return p.screen !== 'offer';
     case 'actions':
     case 'heat':
+    case 'doors':
     case 'mirror':
       return any('play') || any('turnEnd');
     case 'end':
@@ -126,30 +134,6 @@ function gone(up: Up, p: NotesProps): boolean {
     case 'scandal':
       return any('turnEnd') || !p.s.hand.some((h) => h.uid === up.uid);
   }
-}
-
-/** An offer is still once its screen has finished coming in: nothing in it, or round it, animates any more. */
-function useStill(on: boolean): boolean {
-  const [still, setStill] = useState(false);
-  useEffect(() => {
-    setStill(false);
-    if (!on) return;
-    let frame = 0;
-    const started = performance.now();
-    const look = () => {
-      const screen = document.querySelector('.scr.offers');
-      const over = screen?.closest('.screen-over');
-      const moving = !screen || [...(over ? over.getAnimations() : []), ...screen.getAnimations({ subtree: true })].some((a) => a.playState === 'running');
-      if (!moving || performance.now() - started > 4000) {
-        setStill(!!screen);
-        return;
-      }
-      frame = requestAnimationFrame(look);
-    };
-    frame = requestAnimationFrame(look);
-    return () => cancelAnimationFrame(frame);
-  }, [on]);
-  return still;
 }
 
 /** The stage's own rectangle on the page, to read the desk's elements in its 1280×720 frame. */
@@ -197,6 +181,10 @@ function target(id: NoteId, uid: number | null): { readonly at: readonly [number
     case 'heat': {
       const box = boxOf(q('.desk .stats [data-hook="countdown"]'));
       return box ? { at: [box.x + box.w / 2, box.y + box.h + 3], box, card: null } : null;
+    }
+    case 'doors': {
+      const box = boxOf(q('.desk [data-hook="doors"]'));
+      return box ? { at: [box.x - 4, box.y + box.h / 2], box, card: null } : null;
     }
     case 'end': {
       const box = boxOf(q('.desk .endbtn'));
@@ -268,7 +256,6 @@ const FLASH = { full: 1400, reduced: 1100 } as const;
 export function Notes(p: NotesProps) {
   const store = useNotesStore();
   const settings = useSettings();
-  const still = useStill(p.screen === 'offer');
   const [up, setUp] = useState<Up | null>(null);
   // The steps since the switch last came on (B2, the mirror's note): a fresh store counts as on from the start.
   const since = useRef({ token: notesTurnedOn(), step: 0 });
@@ -287,11 +274,11 @@ export function Notes(p: NotesProps) {
     if (!p.enabled || p.panel) return null;
     for (const id of NOTE_IDS) {
       if (store.seen.includes(id)) continue;
-      const m = moment(id, p, still, since.current.step);
+      const m = moment(id, p, since.current.step);
       if (m) return { id, uid: m.uid };
     }
     return null;
-  }, [p, still, store.seen]);
+  }, [p, store.seen]);
 
   // One at a time (B3): the one up stays until it goes or is clicked; then the next whose moment holds comes.
   const [flash, setFlash] = useState<{ readonly id: NoteId; readonly key: number } | null>(null);
@@ -313,7 +300,7 @@ export function Notes(p: NotesProps) {
       setFlash({ id: due.id, key: Date.now() });
     }
   }, [p, up, due]);
-  // All six seen and none up: the switch turns itself off (B1).
+  // All seven seen and none up: the switch turns itself off (B1).
   useEffect(() => {
     if (!up && settings.notes && NOTE_IDS.every((id) => store.seen.includes(id))) setSetting('notes', false);
   }, [up, settings.notes, store.seen]);
@@ -475,7 +462,7 @@ interface Geo {
   readonly box: Box | null;
 }
 
-/** A note's place (B2): the four fixed ones; END TURN's set by its bottom and clear of a wide hand; the scandal's by its card. */
+/** A note's place (B2): the five fixed ones; END TURN's set by its bottom and clear of a wide hand; the scandal's by its card. */
 function placeOf(up: Up, s: GameState, h: number): Place {
   if (up.id === 'end') {
     let top = END.bottom - h;
@@ -514,7 +501,7 @@ function Veil({ geo, reduced, card }: { geo: Geo; reduced: boolean; card: boolea
         </defs>
         <rect width="1280" height="720" fill="rgba(6, 4, 2, .46)" mask="url(#oxn-veil-mask)" />
       </svg>
-      {/* The target's glow: a box round it (the stat cells, the bulbs, the countdown, the black card, END TURN); a card's is its own outline. */}
+      {/* The target's glow: a box round it (the stat cells, the bulbs, the countdown, the doors card, the black card, END TURN); a card's is its own outline. */}
       {box && !card && <i className={`oxn-glow${reduced ? ' reduced' : ''}`} aria-hidden="true" style={{ left: box.x, top: box.y, width: box.w, height: box.h }} />}
     </>
   );

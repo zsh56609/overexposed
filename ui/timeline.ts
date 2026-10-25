@@ -37,12 +37,37 @@ export const PACE = {
  * on its own side, the phone glowing once — the manager lives there now; from 0.6 s the dim over the desk lifts
  * (0.35 s); at 0.75 s the month is published — its papers drop, the stat bar and the notes come up — and the desk
  * stays lit, on purpose, until the offers come up over their dim at 1.8 s.
+ *
+ * A new player's run (round R9b, A1) signs onto a month without offers: the signing as ever, then the month's hand dealt
+ * from the publish, as any month without a draft starts; the step settles at 1.8 s, or once the hand is down if later.
  */
 export const SIGN = { signed: 120, undim: 600, publish: 750, settled: 1800 } as const;
-function signTimeline(mode: MotionMode): Timeline {
-  const beats: Beat[] = [{ at: 0, kind: 'signAway' }, { at: SIGN.signed, kind: 'signedAway' }, { at: SIGN.undim, kind: 'undim' }, { at: SIGN.publish, kind: 'publish' }, { at: SIGN.settled, kind: 'settled' }];
-  if (mode === 'reduced') return { beats: beats.map((b, i) => ({ ...b, at: i * 150 })), duration: (beats.length - 1) * 150, existingMessages: 0, incomingMessages: 0 };
-  return { beats, duration: SIGN.settled, existingMessages: 0, incomingMessages: 0 };
+function signTimeline(step: PlayedStep, mode: MotionMode): Timeline {
+  const beats: Beat[] = [{ at: 0, kind: 'signAway' }, { at: SIGN.signed, kind: 'signedAway' }, { at: SIGN.undim, kind: 'undim' }, { at: SIGN.publish, kind: 'publish' }];
+  let done: number = SIGN.settled;
+  const start = step.events.findIndex((e) => e.type === 'turnStart');
+  if (start >= 0) {
+    let drawCount = 0;
+    // onDraw effects follow their own draw, in the reducer's order.
+    step.events.slice(start).forEach((e, i) => {
+      if (e.type === 'draw') beats.push({ at: SIGN.publish + PACE.dealLead + drawCount++ * PACE.dealCard, kind: 'deal', uid: e.uid, event: start + i });
+      if (e.type === 'resource') beats.push({ at: SIGN.publish + PACE.dealLead + Math.max(0, drawCount - 1) * PACE.dealCard, kind: 'resources', resourceEvents: [e], event: start + i });
+    });
+    if (drawCount > 0) done = Math.max(done, SIGN.publish + PACE.dealLead + (drawCount - 1) * PACE.dealCard + PACE.dealHold);
+  }
+  beats.push({ at: done, kind: 'settled' });
+  if (mode === 'reduced') {
+    // The signing's four beats 150 ms apart, as ever; the deal after them quick, as a month's.
+    let at = 0, last = 0;
+    const reduced = beats.map((b, i) => {
+      const gap = b.at - last;
+      last = b.at;
+      at = i < 4 ? i * 150 : at + Math.min(150, gap);
+      return { ...b, at };
+    });
+    return { beats: reduced, duration: at, existingMessages: 0, incomingMessages: 0 };
+  }
+  return { beats, duration: done, existingMessages: 0, incomingMessages: 0 };
 }
 /**
  * An event's answer (round R2, Part C): the player's bubble or tick, then — after a few typing dots — their reply,
@@ -115,7 +140,9 @@ function eventTimeline(step: PlayedStep, mode: MotionMode, chosen: number): Time
   return {beats,duration:done,existingMessages,incomingMessages};
 }
 export function timeline(step: PlayedStep, history: readonly PlayedStep[], mode: MotionMode): Timeline | null {
-  if (step.action?.type === 'CHOOSE_MANAGER' && !step.events.some((e) => e.type === 'resource' || e.type === 'draw')) return signTimeline(mode);
+  // Signing: nothing of the month's before it opens (a new player's opens on its hand, round R9b, A1).
+  const opens = step.events.findIndex((e) => e.type === 'turnStart');
+  if (step.action?.type === 'CHOOSE_MANAGER' && !(opens < 0 ? step.events : step.events.slice(0, opens)).some((e) => e.type === 'resource' || e.type === 'draw')) return signTimeline(step, mode);
   const chosen = step.events.findIndex(e=>e.type==='eventChosen');
   if(chosen>=0) return eventTimeline(step,mode,chosen);
   const end = step.events.findIndex(e=>e.type==='turnEnd');

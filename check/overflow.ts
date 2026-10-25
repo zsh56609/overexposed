@@ -5,7 +5,7 @@
 // landscape — in headless Chrome and Firefox (check/browser.ts), and at every state:
 // - the desk is audited: each fixed box holds its text (stat cells, mastheads, datelines, the box office, card
 //   names, the notes' requirement lines, the phone's clock, END TURN), each page holds its stories, the notes stay
-//   on the glass and apart, the notebook holds its words and the script page holds every scene as written, the
+//   on the glass and apart, the season's doors card (round R9b) inside the glass and clear of the notes and bubbles, the notebook holds its words and the script page holds every scene as written, the
 //   bubbles stay below the stat bar, a card's text stays in the strip its neighbour leaves showing and above the
 //   stage's edge, and tooltips, previews and notes stay on the stage — with every card's preview, every stat
 //   tooltip, each paper pulled forward and a bubble's reaction row open along the way;
@@ -98,6 +98,19 @@ const AUDIT = `window.__deskAudit = (where) => {
     const all = [today, ...notes].filter(Boolean);
     for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = box(all[i]), b = box(all[j]); const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t); if (ox > 6 && oy > 6) add('mirror notes overlap ' + name(all[i]) + ' / ' + name(all[j]) + ' by ' + Math.round(ox) + 'x' + Math.round(oy)); }
     const clip = desk.querySelector('.mirror .clipM'); if (clip) within(clip, STAGE, 'clipping');
+    // The season's doors card (round R9b, A3): inside the glass with its tilt, clear of the black card, the three notes,
+    // the frenzy's clipping and the manager's bubbles; its height, its room above the glass's foot and its least gap to a
+    // note kept for the report, by season.
+    const doors = desk.querySelector('.mirror [data-hook="doors"]');
+    if (doors) {
+      within(doors, g, 'the doors card');
+      const d = box(doors);
+      const gapTo = (el) => { const b = box(el); return Math.max(d.t - b.b, b.t - d.b, d.l - b.r, b.l - d.r); };
+      for (const el of desk.querySelectorAll('.mirror .sticky, .mirror .today, .mirror .clipM, .bubbles .bub')) if (gapTo(el) <= 0) add('the doors card meets ' + name(el) + ' "' + el.textContent.slice(0, 30) + '"');
+      const seen = (window.__doorsCard ??= {}), season = desk.dataset.season ?? '?', was = seen[season];
+      const gap = Math.min(...all.map(gapTo));
+      seen[season] = { h: Math.max(doors.offsetHeight, was?.h ?? 0), room: Math.round(Math.min(g.b - d.b, was?.room ?? Infinity) * 10) / 10, gap: Math.round(Math.min(gap, was?.gap ?? Infinity) * 10) / 10 };
+    }
   }
   // The desk: the notebook's page and the script hold their words.
   const nb = desk.querySelector('.notebook'); if (nb) { const t = nb.querySelector('.nb-txt'); if (t && t.offsetTop + t.offsetHeight > nb.clientHeight + 1) add('notebook page overflows: ' + (t.offsetTop + t.offsetHeight) + ' > ' + nb.clientHeight + ' "' + t.textContent.slice(0, 40) + '"'); }
@@ -691,7 +704,7 @@ const DRIVE = (runs: number) => `(async () => {
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, doorsCard: window.__doorsCard ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /** Runs in the page, once a recorded state is reached: the desk, every card's preview, each paper pulled forward. */
@@ -708,7 +721,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; book: Record<string, { h: number; room: number }> | null; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; book: Record<string, { h: number; room: number }> | null; doorsCard: Record<string, { h: number; room: number; gap: number }> | null; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -750,6 +763,13 @@ try {
         if (!out.opening) {
           failed = true;
           console.log('OVERFLOW opening  the opening card was not measured');
+        }
+        // The season's doors card (round R9b, A3): each season's tallest, its least room above the glass's foot and to a note.
+        const seasons = ['spring', 'summer', 'autumn', 'winter'].map((s) => (out.doorsCard?.[s] ? `${s} ${out.doorsCard[s]!.h} px tall, ${out.doorsCard[s]!.room} px above the glass's foot, ${out.doorsCard[s]!.gap} px from the nearest note` : `${s} not seen`));
+        console.log(`overflow check, ${tag}: the doors card — ${seasons.join('; ')}`);
+        if (seasons.some((s) => s.endsWith('not seen'))) {
+          failed = true;
+          console.log('OVERFLOW doors card  a season\'s doors card was not seen');
         }
         // The doors (round R8a, D1): each pair's heights, the tallest and where it ends, the stamps' clearance.
         const d = out.doors;

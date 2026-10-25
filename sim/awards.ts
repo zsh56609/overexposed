@@ -1,4 +1,4 @@
-// npm run sim:awards -- [--runs=1000] [--seed=20260929] [--manager=<id>]   (default: each manager in turn)
+// npm run sim:awards -- [--runs=1000] [--seed=20260929] [--manager=<id>] [--skip-first-draft]   (default: each manager in turn)
 // Year-end award rates (docs/ui-plan.md §13, decisions 16 and 20): the same personas and seeds as
 // `npm run sim`, the /core awards query run on each finished year.
 // Awards are read-only, so this changes no run: `npm run sim` stays byte-identical. Ids and numbers only.
@@ -8,7 +8,7 @@
 // of player-like years with 5+ and 7+, the most any run won — and ten sample years with 5+.
 
 import { yearAwards, type GameState } from '../core/index.ts';
-import { managersToRun, runOne, runSeeds } from './batch.ts';
+import { managersToRun, runOne, runSeeds, skipFirstDraftArg } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS, type PersonaId } from './personas.ts';
 
@@ -16,6 +16,7 @@ const arg = (name: string, fallback: number) => Number(process.argv.find((a) => 
 const RUNS = arg('runs', 1000);
 const SEED = arg('seed', 20260929);
 const MANAGER = process.argv.find((a) => a.startsWith('--manager='))?.split('=')[1];
+const SKIP = skipFirstDraftArg(process.argv);
 const BAND = { min: 0.03, max: 0.4 } as const;
 
 const content = loadContent();
@@ -43,7 +44,7 @@ function awardsFor(manager: string | undefined): boolean {
         (state) => {
           last = state;
         },
-        manager === undefined ? {} : { manager },
+        { ...(manager === undefined ? {} : { manager }), ...(SKIP ? { skipFirstDraft: true } : {}) },
       );
       const final = last as GameState | null;
       if (!final || final.phase !== 'ended') continue;

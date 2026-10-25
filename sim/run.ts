@@ -1,8 +1,9 @@
-// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--manager=<id>|none] [--out=path] [--no-json]
-// npm run sim -- --replay=<run seed> --persona=<id> [--manager=<id>|none]      one run, action by action
+// npm run sim -- [--runs=1000] [--seed=20260929] [--persona=minmaxer,random] [--manager=<id>|none] [--out=path] [--no-json] [--skip-first-draft]
+// npm run sim -- --replay=<run seed> --persona=<id> [--manager=<id>|none] [--skip-first-draft]      one run, action by action
 //
 // Every band runs once per manager (round 2b): without --manager, one report per manager in content, in turn.
-// --manager=none runs the base game, without managers (round 2c).
+// --manager=none runs the base game, without managers (round 2c). --skip-first-draft (round R9b, A1): every run a new
+// player's, its first month without offers.
 //
 // Exit code 1 if any run crashed or soft-locked. Out-of-band balance is reported, not fatal.
 
@@ -10,12 +11,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import type { GameEvent } from '../core/index.ts';
 import { ROOT } from '../validate/load.ts';
-import { managersToRun, runBatch, runOne, type RunRecord } from './batch.ts';
+import { managersToRun, runBatch, runOne, type RunOptions, type RunRecord } from './batch.ts';
 import { loadContent } from './content.ts';
 import { PERSONA_IDS, type PersonaId } from './personas.ts';
 import { buildReport, formatReport } from './report.ts';
 
-const OPTIONS = ['runs', 'seed', 'persona', 'manager', 'replay', 'out', 'no-json'];
+const OPTIONS = ['runs', 'seed', 'persona', 'manager', 'replay', 'out', 'no-json', 'skip-first-draft'];
 const DEFAULT_SEED = 20260929;
 
 function parseArgs(argv: readonly string[]): Record<string, string> {
@@ -72,7 +73,7 @@ function describe(e: GameEvent): string {
   }
 }
 
-function replay(seed: number, persona: PersonaId, manager: string | undefined): RunRecord {
+function replay(seed: number, persona: PersonaId, options: RunOptions): RunRecord {
   const content = loadContent();
   const record = runOne(
     content,
@@ -82,9 +83,9 @@ function replay(seed: number, persona: PersonaId, manager: string | undefined): 
       const parts = state.events.map(describe);
       console.log(parts.join(', ').replaceAll(', \n', '\n'));
     },
-    manager === undefined ? {} : { manager },
+    options,
   );
-  console.log(`replay seed=${seed} persona=${persona} manager=${record.manager ?? 'none'}`);
+  console.log(`replay seed=${seed} persona=${persona} manager=${record.manager ?? 'none'}${options.skipFirstDraft ? ' skip-first-draft' : ''}`);
   console.log(`\nending ${record.endingId}, scandals held ${record.scandalsAtEnd}, actions ${record.actions}`);
   if (record.crash) console.log(`CRASH ${record.crash}`);
   if (record.softLock) console.log(`SOFT-LOCK ${record.softLock}`);
@@ -97,7 +98,7 @@ function main(): number {
   if (args.replay !== undefined) {
     const personas = toPersonas(args.persona);
     if (personas.length !== 1) throw new Error('--replay needs exactly one --persona');
-    const r = replay(toUint(args.replay, 'replay'), personas[0] as PersonaId, args.manager);
+    const r = replay(toUint(args.replay, 'replay'), personas[0] as PersonaId, { ...(args.manager === undefined ? {} : { manager: args.manager }), ...(args['skip-first-draft'] !== undefined ? { skipFirstDraft: true } : {}) });
     return r.crash || r.softLock ? 1 : 0;
   }
 
@@ -115,7 +116,7 @@ function main(): number {
 
 /** One batch under one manager: its report, and its JSON (report.<manager>.json when several run). Returns its crashes and soft-locks. */
 function simulate(runs: number, seed: number, content: ReturnType<typeof loadContent>, personas: PersonaId[], manager: string | undefined, several: boolean, args: Record<string, string>): number {
-  const batch = runBatch(runs, seed, { content, personas, ...(manager === undefined ? {} : { manager }) });
+  const batch = runBatch(runs, seed, { content, personas, ...(manager === undefined ? {} : { manager }), ...(args['skip-first-draft'] !== undefined ? { skipFirstDraft: true } : {}) });
   const report = buildReport(batch);
   console.log(formatReport(report));
 

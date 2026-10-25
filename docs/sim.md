@@ -49,4 +49,6 @@ The artisan persona leans hard toward The Long Game by design (docs/design/conte
 
 `--manager=none` (round 2c) runs the base game, without managers: the reference for the base-game margin (dealseeker's Breakthrough, docs/decisions.md). It is not a band population.
 
+`--skip-first-draft` (round R9b, A1) plays every run as a new player's: its first month opens without offers, as the game opens a run made with the manager's notes on. `sim`, `sim:awards`, `sim:tiers` and `sim:managers` take it, and `sim:baseline` passes it to all four. The bands are held on the default batch; this is a comparison, not a band population.
+
 Diagnostics, reported but not bands: the pooled major, minor and lane distributions and gate pass% (passed when chosen), which measure the persona mix as much as the game — an aggregate can pass while every persona is locked into one ending; and the pooled aggregates recomputed with probes included (scandal median, gate met%, lowest play rate), for comparison only. Probe results beyond their two assertions are diagnostics.

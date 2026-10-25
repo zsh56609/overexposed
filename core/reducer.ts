@@ -367,10 +367,13 @@ function offerEvent(d: Draft): boolean {
   return true;
 }
 
-/** The month's offers, or its play: a card draft first if this turn-in-act is listed in draft.atTurns, else play. */
+/**
+ * The month's offers, or its play: a card draft first if this turn-in-act is listed in draft.atTurns, else play. A new
+ * player's run (round R9b, A1) opens its very first month on its hand.
+ */
 function openMonth(d: Draft): void {
   const cfg = d.content.rules.draft;
-  if (!cfg || cfg.picks <= 0 || !cfg.atTurns.includes(turnInAct(d))) return startTurn(d);
+  if (!cfg || cfg.picks <= 0 || !cfg.atTurns.includes(turnInAct(d)) || (d.skipFirstDraft && d.turn === 1)) return startTurn(d);
   const { offer, extras } = rollOffer(d);
   if (offer.length === 0) {
     fault(d, 'noDraftPool', String(d.act));

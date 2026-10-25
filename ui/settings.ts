@@ -15,7 +15,7 @@ export interface Settings {
   readonly reduceMotion: boolean;
   /**
    * The manager's notes (round R8b, B1), on by default — a player of v0.7, with no such setting stored, has it on and
-   * sees the notes too. It turns itself off once all six have come and none is up.
+   * sees the notes too. It turns itself off once all seven have come (six before round R9b) and none is up.
    */
   readonly notes: boolean;
 }

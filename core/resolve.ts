@@ -25,6 +25,7 @@ export const EFFECT_BUDGET = 10_000;
 export interface Draft {
   seed: number;
   strict: boolean;
+  skipFirstDraft: boolean;
   content: ContentIndex;
   rng: RngCursor;
   phase: Phase;
@@ -64,6 +65,7 @@ export function openDraft(s: GameState): Draft {
   return {
     seed: s.seed,
     strict: s.strict,
+    skipFirstDraft: s.skipFirstDraft,
     content: s.content,
     rng: cursor(s.rng),
     phase: s.phase,
@@ -102,6 +104,7 @@ export function closeDraft(d: Draft): GameState {
   return {
     seed: d.seed,
     strict: d.strict,
+    skipFirstDraft: d.skipFirstDraft,
     content: d.content,
     rng: d.rng,
     phase: d.phase,

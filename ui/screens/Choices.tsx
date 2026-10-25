@@ -8,10 +8,10 @@ import { freeRerollAvailable, getGate, getManager, rerollCost, type Action, type
 import { doorUrl } from '../desk/halftone.ts';
 import { CardPicture } from '../desk/Hand.tsx';
 import { Icon } from '../desk/Icons.tsx';
-import { effectChips, offerCardModel, type HandWords, type IconId, type ValueChip } from '../desk/model.ts';
+import { effectChips, offerCardModel, requirementChip, type HandWords, type ValueChip } from '../desk/model.ts';
 import { t } from '../i18n.ts';
 import { previewGate, type GatePreview, type Legal } from '../preview.ts';
-import { awardName, calendarLabel, clauseText, endingPair, gateFlavor, gateName, money, offerLabels, seasonName } from '../text.ts';
+import { awardName, calendarLabel, endingPair, gateFlavor, gateName, money, offerLabels, seasonName } from '../text.ts';
 import { useArrivalSound } from '../sound/arrival.ts';
 import { cue, cues } from '../sound/sound.ts';
 import { flyToDeck, Header, prose, useStampedChoice } from './common.tsx';
@@ -125,39 +125,28 @@ export function OffersScreen({ s, legal, act, lane, season, words }: OffersProps
 // ---------------------------------------------------------------------------
 // The season's doors (the gates)
 
-/** A requirement's stat: its icon and its colour, as the stat bar and the cards show it. */
-const STAT: Partial<Record<ClauseReport['key'], { readonly icon: (lane: string | null) => IconId; readonly cls: string }>> = {
-  hype: { icon: () => 'star', cls: 'r-hype' },
-  craft: { icon: (lane) => (lane === 'screen' ? 'clap' : 'note'), cls: 'r-craft' },
-  heat: { icon: () => 'flame', cls: 'r-heat' },
-  capital: { icon: () => 'cash', cls: 'r-gain' },
-  scandalCount: { icon: () => 'paper', cls: 'r-cost' },
-};
-
 /**
  * One requirement: ✓ or ✗, the stat's icon and the threshold in its colour — never the stat's name — then what the
- * player has. A requirement without a stat ("Signed to a label") is plain text.
+ * player has. A requirement without a stat ("Signed to a label") is plain text. The chip is the mirror's doors card's
+ * too (round R9b, A3: model.ts requirementChip).
  */
 function Requirement({ clause, lane }: { clause: ClauseReport; lane: string | null }) {
   const mark = <i>{clause.met ? '✓' : '✗'}</i>;
-  const stat = STAT[clause.key];
-  if (stat && 'range' in clause) {
-    const { min, max } = clause.range;
-    const n = (x: number) => (clause.key === 'capital' ? money(x) : String(x));
-    const threshold = min !== undefined && max === undefined ? t('ui.doors.min', { n: n(min) }) : max !== undefined && min === undefined ? t('ui.doors.max', { n: n(max) }) : clauseText(clause);
+  const chip = requirementChip(clause, lane);
+  if (chip.icon && chip.cls) {
     return (
       <div className={`rq ${clause.met ? 'ok' : 'no'}`}>
         {mark}
-        <Icon id={stat.icon(lane)} className={stat.cls} />
-        <span className={stat.cls}>{threshold}</span>
-        <span className="n">{t('ui.doors.have', { n: n(clause.value) })}</span>
+        <Icon id={chip.icon} className={chip.cls} />
+        <span className={chip.cls}>{chip.text}</span>
+        <span className="n">{chip.have}</span>
       </div>
     );
   }
   return (
     <div className={`rq ${clause.met ? 'ok' : 'no'}`}>
       {mark}
-      <span>{clauseText(clause)}</span>
+      <span>{chip.text}</span>
     </div>
   );
 }

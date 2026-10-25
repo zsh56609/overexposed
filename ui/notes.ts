@@ -1,12 +1,13 @@
-// The manager's notes (round R8b, B1): six short notes in the manager's hand, each at the moment it matters in a new
-// player's first year. Which have come (`seen`) and which have had the first time's highlight (`lit`) are kept in this
-// browser under overexposed.notes — guarded as the settings are: unreadable or unavailable means both empty, and a
-// failed write still applies to this session. The switch itself is House rules' "Manager's notes" (ui/settings.ts).
+// The manager's notes (round R8b, B1): seven short notes in the manager's hand (the seventh, the season's doors, since
+// round R9b), each at the moment it matters in a new player's first year. Which have come (`seen`) and which have had
+// the first time's highlight (`lit`) are kept in this browser under overexposed.notes — guarded as the settings are:
+// unreadable or unavailable means both empty, and a failed write still applies to this session. The switch itself is
+// House rules' "Manager's notes" (ui/settings.ts).
 
 import { useSyncExternalStore } from 'react';
 
-/** The six, in the order they take turns when two could come at once (B3). */
-export const NOTE_IDS = ['stats', 'actions', 'heat', 'end', 'mirror', 'scandal'] as const;
+/** The seven, in the order they take turns when two could come at once (B3; the doors' since round R9b, A4). */
+export const NOTE_IDS = ['stats', 'actions', 'heat', 'doors', 'end', 'mirror', 'scandal'] as const;
 export type NoteId = (typeof NOTE_IDS)[number];
 
 /** The two whose words change under touch or pen (B6): "hold" where a mouse would hover — notes.<note>.<manager>.touch. */

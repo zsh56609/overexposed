@@ -29,7 +29,7 @@ import { AwardsNight } from './screens/Awards.tsx';
 import { EventScreen } from './screens/Events.tsx';
 import { SeasonCard } from './screens/Season.tsx';
 import { Notes } from './screens/Notes.tsx';
-import { useSettings } from './settings.ts';
+import { settings, useSettings } from './settings.ts';
 import { seasonPhotoUrl } from './desk/photo-preload.ts';
 import { TitleScreen } from './screens/Title.tsx';
 import { calendarLabel, openingText, seasonName, seasonOpener } from './text.ts';
@@ -64,10 +64,15 @@ interface RunHandle {
 /** A failed run's seed and memory, for the console (round R7, E2): with both, it replays. */
 const logFailure = (seed: number, memory: RunMemory | null) => console.error('Overexposed: the run failed', JSON.stringify({ seed, memory }));
 
-/** A run from its seed and the memory of the last (round R7, E2), or why it could not start. */
+/**
+ * A run from its seed and the memory of the last (round R7, E2), or why it could not start. A new player's (round R9b,
+ * A1) — the manager's notes on, and the run unseeded or asking for them — is decided once, here, as the run is made: its
+ * first month opens on its hand, without offers.
+ */
 function makeRun(seed: number, id: number, memory: RunMemory | null): RunHandle | string {
   try {
-    const state = createInitialState(seed, content, { strict: STRICT, ...(memory ? { memory } : {}) });
+    const newPlayer = settings().notes && notesAsked();
+    const state = createInitialState(seed, content, { strict: STRICT, ...(memory ? { memory } : {}), ...(newPlayer ? { skipFirstDraft: true } : {}) });
     return { id, seed, remember: memory !== null, queue: new EventQueue({ action: null, state, events: state.events }, motionMode) };
   } catch (err) {
     logFailure(seed, memory);
@@ -510,11 +515,12 @@ function Run({ run, onRestart }: { run: RunHandle; onRestart: () => void }) {
           s={s}
           steps={snap.active && !snap.steps.some((x) => x.id === snap.active?.step.id) ? [...snap.steps, snap.active.step] : snap.steps}
           idle={!snap.busy && scene === null}
-          screen={offers && s.phase === 'draft' ? 'offer' : mode === 'manager' || season !== null || offers || eventShown || signing !== null ? 'other' : 'none'}
+          screen={mode === 'manager' || season !== null || offers || eventShown || signing !== null ? 'other' : 'none'}
           panel={panel !== null}
           preview={(s.phase === 'play' && !!card && focus?.kind === 'card') || (!snap.busy && s.phase === 'play' && focus?.kind === 'end' && !!endPreview)}
           actionsLeft={model.stats.actions.left}
           craftIcon={model.stats.cells.find((x) => x.id === 'craft')?.icon ?? 'note'}
+          doors={model.mirror.doors !== null}
         />
       )}
       {panel === 'deck' && <DeckPanel s={s} lane={lines.lane} season={model.season} words={model.handWords} onClose={close} />}

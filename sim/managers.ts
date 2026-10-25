@@ -1,4 +1,4 @@
-// npm run sim:managers -- [--runs=1000] [--seed=20260929]
+// npm run sim:managers -- [--runs=1000] [--seed=20260929] [--skip-first-draft]
 //
 // The two managers side by side (round 2b): every persona plays the same seeds under each manager, and the
 // report shows per persona the major and minor endings, the scandals, the picks of Dex's extra card and the
@@ -8,7 +8,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { managerMessages, type GameState, type HistoryStep } from '../core/index.ts';
-import { managersToRun, runOne, runSeeds, type RunRecord } from './batch.ts';
+import { managersToRun, runOne, runSeeds, skipFirstDraftArg, type RunRecord } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS, type PersonaId } from './personas.ts';
 import { ROOT } from '../validate/load.ts';
@@ -17,6 +17,7 @@ import { messageLineKeys } from '../validate/validate.ts';
 const arg = (name: string, fallback: number) => Number(process.argv.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback);
 const RUNS = arg('runs', 1000);
 const SEED = arg('seed', 20260929);
+const SKIP = skipFirstDraftArg(process.argv);
 
 const content = loadContent();
 const managers = managersToRun(content, undefined).filter((m): m is string => m !== undefined);
@@ -65,7 +66,7 @@ for (const manager of managers) {
           history.push({ before, after: state, events: state.events });
           before = state;
         },
-        { manager },
+        { manager, ...(SKIP ? { skipFirstDraft: true } : {}) },
       );
       const messages = managerMessages(history);
       for (const target of isProbe(persona) ? [t] : [t, byPersona.get('players') as Tally]) {

@@ -14,6 +14,8 @@ import {
   cardFace,
   deriveSeed,
   endingIfYearEndedNow,
+  evaluate,
+  explainCondition,
   fameBand,
   frontPages,
   getCard,
@@ -62,6 +64,7 @@ import {
   effectText,
   flagName,
   flagNegative,
+  gateName,
   lineText,
   majorGoal,
   majorName,
@@ -136,6 +139,39 @@ export interface MirrorModel {
   readonly notes: readonly MirrorNote[];
   /** In a frenzy, the red clipping stuck to the glass: the month's newest scandal headline. */
   readonly clipping: string | null;
+  /** The season's two doors on a white index card (round R9b, A3); null when the act's doors are not one fixed pair. */
+  readonly doors: DoorsCardModel | null;
+}
+
+/**
+ * A door's requirement as the door states it (round R9b, A3: one helper for the doors and the mirror's doors card): the
+ * stat's icon and its threshold in the stat's colour — "18+", "4 or fewer", "$4,000+" — with what the player has; a
+ * requirement without a stat ("Signed to a label") is its words.
+ */
+export interface RequirementChip {
+  readonly met: boolean;
+  readonly icon: IconId | null;
+  /** The value colour's class: r-hype, r-craft, r-heat, r-gain (money), r-cost (scandals); none for words. */
+  readonly cls: string | null;
+  readonly text: string;
+  /** "(you have N)", for a stat. */
+  readonly have: string | null;
+}
+
+/** A door on the mirror's card (round R9b, A3): ✓ when every requirement is met now — the door's Likely — its name, its chips. */
+export interface DoorRow {
+  readonly gateId: string;
+  readonly met: boolean;
+  /** ✓ or ✗. */
+  readonly mark: string;
+  readonly name: string;
+  readonly chips: readonly RequirementChip[];
+}
+
+export interface DoorsCardModel {
+  /** "End of spring · one door"; in the last act "Winter · the last door". */
+  readonly kicker: string;
+  readonly rows: readonly DoorRow[];
 }
 
 export interface ItemModel {
@@ -359,7 +395,7 @@ export function deskModel({ state: s, steps, lines }: DeskInput): DeskModel {
     lane: laneClass,
     fameTier: fame,
     stats: statBar(s, lane),
-    mirror: mirror(s, issue),
+    mirror: mirror(s, issue, lane),
     papers: issue ? papers(s, issue, history, steps.length) : null,
     notebook: notebook(steps),
     script: laneClass === 'screen' ? script(s, fame) : null,
@@ -439,7 +475,47 @@ function noteReq(clause: MajorClause): NoteReq {
   return { met: clause.met, mark: mark(clause.met), icon: null, text: clauseText(clause) };
 }
 
-function mirror(s: GameState, issue: MonthPress | null): MirrorModel {
+/** A requirement's stat: its icon and its value colour, as the stat bar and the cards show it. */
+const REQUIREMENT_STAT: Partial<Record<ClauseReport['key'], { readonly icon: (lane: string | null) => IconId; readonly cls: string }>> = {
+  hype: { icon: () => 'star', cls: 'r-hype' },
+  craft: { icon: (lane) => (lane === 'screen' ? 'clap' : 'note'), cls: 'r-craft' },
+  heat: { icon: () => 'flame', cls: 'r-heat' },
+  capital: { icon: () => 'cash', cls: 'r-gain' },
+  scandalCount: { icon: () => 'paper', cls: 'r-cost' },
+};
+
+/** A door's requirement as a chip (see RequirementChip): the doors' "Requires" and the mirror's doors card. */
+export function requirementChip(clause: ClauseReport, lane: string | null): RequirementChip {
+  const stat = REQUIREMENT_STAT[clause.key];
+  if (stat && 'range' in clause) {
+    const { min, max } = clause.range;
+    const n = (x: number) => (clause.key === 'capital' ? money(x) : String(x));
+    const text = min !== undefined && max === undefined ? t('ui.doors.min', { n: n(min) }) : max !== undefined && min === undefined ? t('ui.doors.max', { n: n(max) }) : clauseText(clause);
+    return { met: clause.met, icon: stat.icon(lane), cls: stat.cls, text, have: t('ui.doors.have', { n: n(clause.value) }) };
+  }
+  return { met: clause.met, icon: null, cls: null, text: clauseText(clause), have: null };
+}
+
+/**
+ * The season's doors on the mirror (round R9b, A3): the act's pair is fixed and needs no draw — true only while each act
+ * has exactly the doors a season offers, else no card. Each door: ✓ when every requirement is met now, the test the
+ * reducer runs at the door (its Likely), its name and its requirements as the door states them.
+ */
+function doorsCard(s: GameState, lane: string | null): DoorsCardModel | null {
+  const c = s.content;
+  const gates = c.gatesByAct[String(s.act)] ?? [];
+  if (gates.length !== c.rules.gatesOffered) return null;
+  const season = seasonName(c, s.act);
+  return {
+    kicker: s.act === c.rules.acts ? t('ui.doors.lastKicker', { season }) : t('ui.doors.kicker', { season: season.toLocaleLowerCase('en') }),
+    rows: gates.map((gate) => {
+      const met = evaluate(gate.requires, s);
+      return { gateId: gate.id, met, mark: t(met ? 'ui.note.met' : 'ui.note.unmet'), name: gateName(c, gate.id), chips: explainCondition(gate.requires, s).map((clause) => requirementChip(clause, lane)) };
+    }),
+  };
+}
+
+function mirror(s: GameState, issue: MonthPress | null, lane: string | null): MirrorModel {
   const c = s.content;
   const today = endingIfYearEndedNow(s);
   // The frenzy's red clipping: the newest of the month's scandals, as the papers print it.
@@ -454,6 +530,7 @@ function mirror(s: GameState, issue: MonthPress | null): MirrorModel {
       .slice(0, 3)
       .map(({ m, colour }) => ({ majorId: m.id, colour, name: majorName(c, m.id), goal: majorGoal(c, m.id), reqs: majorRequirements(m, s).map(noteReq) })),
     clipping: newest ? pageItemText(c, newest) : null,
+    doors: doorsCard(s, lane),
   };
 }
 

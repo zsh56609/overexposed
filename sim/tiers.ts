@@ -1,4 +1,4 @@
-// npm run sim:tiers -- [--runs=1000] [--seed=20260929] [--manager=<id>]   (default: each manager in turn)
+// npm run sim:tiers -- [--runs=1000] [--seed=20260929] [--manager=<id>] [--skip-first-draft]   (default: each manager in turn)
 // The stat bar's tiers in play (docs/ui-plan.md §13, decision 25): the same personas and seeds as
 // `npm run sim`, the /core tier query run on every state a player would see — the start and after every
 // action. Tiers are read-only, so this changes no run: `npm run sim` stays byte-identical. Ids and numbers
@@ -7,7 +7,7 @@
 // Tuning target: every tier is actually reached in play — in at least 5% of player-like runs.
 
 import { statTiers, TIER_STATS, type GameState, type TierStat } from '../core/index.ts';
-import { managersToRun, runOne, runSeeds } from './batch.ts';
+import { managersToRun, runOne, runSeeds, skipFirstDraftArg } from './batch.ts';
 import { loadContent } from './content.ts';
 import { isProbe, PERSONA_IDS, type PersonaId } from './personas.ts';
 
@@ -15,6 +15,7 @@ const arg = (name: string, fallback: number) => Number(process.argv.find((a) => 
 const RUNS = arg('runs', 1000);
 const SEED = arg('seed', 20260929);
 const MANAGER = process.argv.find((a) => a.startsWith('--manager='))?.split('=')[1];
+const SKIP = skipFirstDraftArg(process.argv);
 const MIN_REACH = 0.05;
 
 const content = loadContent();
@@ -55,7 +56,7 @@ function tiersFor(manager: string | undefined): boolean {
             time[stat][tier.index] = (time[stat][tier.index] ?? 0) + 1;
           }
         },
-        manager === undefined ? {} : { manager },
+        { ...(manager === undefined ? {} : { manager }), ...(SKIP ? { skipFirstDraft: true } : {}) },
       );
       for (const target of isProbe(persona) ? [t] : [t, players]) {
         target.runs++;

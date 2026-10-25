@@ -1,20 +1,21 @@
 // npm run check:notes — the manager's notes (round R8b, B8) by real input, in headless Chrome, Firefox and WebKit
 // (check/browser.ts) at 1280×720 and 844×390, from the title of ?seed=3&notes=1 with a fresh store:
-// - the year played for heat (Dex): each of the six comes at its moment, whole on the stage — the stat bar on the
-//   first offers, the bulbs on the first hand, the countdown after a play that raised heat, END TURN with no actions
-//   left, the mirror on a later month's hand, a scandal in the hand (its note placed by its card); and on a recorded
-//   autumn hand holding a scandal (check/desk-states.json, s04), the scandal's note follows its card as the hand fans again;
-// - no note, turned as it stands, meets a hand card, END TURN, or an offer's card or button;
+// - the year played for heat (Dex): each of the seven comes at its moment, whole on the stage — the stat bar on the
+//   first hand (a new player's first month has no offers, round R9b), then the bulbs, the countdown after a play that
+//   raised heat, the season's doors after a play with actions left, END TURN with no actions left, the mirror on a later
+//   month's hand, a scandal in the hand (its note placed by its card); and on a recorded autumn hand holding a scandal
+//   (check/desk-states.json, s04), the scandal's note follows its card as the hand fans again;
+// - no note, turned as it stands, meets a hand card, END TURN, the bulbs, the doors card, or an offer's card or button;
 // - the first time each comes it is highlighted (the veil; the note in lit); a click puts it away (in seen); none
 //   comes twice;
 // - a card's preview over a note fades it and lets clicks through, and END TURN's over its own note; a panel hides a
 //   note, and it is back once the panel closes;
-// - all six seen, House rules' switch reads off; turned back on, a note comes again, not highlighted;
+// - all seven seen, House rules' switch reads off; turned back on, a note comes again, not highlighted;
 // - a seeded run without notes=1 shows none, nor does a run with the switch off;
 // - under touch input the actions note says "hold": its .touch line.
 // With --years instead: two years from the title as a new player has them — unseeded, a fresh store, one per manager,
 // played for Hype and the heat it brings (a Scandal in the hand by summer), through the awards night: when each note
-// came and why, all six, the switch off after them, and no console error (Chromium at 1280×720 unless --browsers and
+// came and why, all seven, the switch off after them, and no console error (Chromium at 1280×720 unless --browsers and
 // --sizes say otherwise).
 // Runs the Vite dev server in-process. Usage: node check/notes.ts [--years] [--browsers=chrome,firefox,webkit] [--sizes=1280x720,844x390m]
 
@@ -85,7 +86,7 @@ const HELPERS = `(() => {
       offers: !!q('.scr.offers'), hand: document.querySelectorAll('.desk .hand .card').length,
       used: document.querySelectorAll('.desk .slotbulbs i.used').length, bulbs: document.querySelectorAll('.desk .slotbulbs i').length,
       heat: Number(q('[data-hook="number-heat"]')?.dataset.final ?? NaN), scandals: document.querySelectorAll('.desk .hand .card.f-scandal').length,
-      label: q('.oxn')?.getAttribute('aria-label') ?? '',
+      doors: !!q('.desk [data-hook="doors"]'), label: q('.oxn')?.getAttribute('aria-label') ?? '',
     });
   };
   new MutationObserver(look).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-note'] });
@@ -106,6 +107,8 @@ interface Came {
   readonly bulbs: number;
   readonly heat: number;
   readonly scandals: number;
+  /** The season's doors card on the mirror (round R9b, A3). */
+  readonly doors: boolean;
   readonly label: string;
 }
 
@@ -136,9 +139,10 @@ const WHERE = `(() => {
     : q('.scr.offers') ? 'offers' : q('.scr.gates') ? 'doors' : q('.event-screen') ? 'event' : q('.desk .endbtn') ? 'play' : 'other';
 })()`;
 
-/** The year as the walk has played it: plays this month, months ended, the last move, the heat before the last play. */
+/** The year as the walk has played it: plays this month and in all, months ended, the last move, the heat before the last play. */
 interface Walk {
   plays: number;
+  played: number;
   monthsEnded: number;
   last: 'play' | 'end' | 'screen' | '';
   heatBefore: number;
@@ -199,6 +203,7 @@ async function move(page: Page, input: 'mouse' | 'touch', w: Walk, manager = 0, 
       await tap(await cardPoint(page, i));
       if (input === 'mouse') await page.move(...(await neutral(page)));
       w.plays++;
+      w.played++;
       w.last = 'play';
       await sleep(1400);
     } else {
@@ -233,6 +238,8 @@ const LAYOUT = `(() => {
   const obstacles = [
     ...all('.desk .hand .card').map((el, i) => ({ what: 'hand card ' + (i + 1), quad: window.__quad(el) })),
     ...all('.desk .endbtn').map((el) => ({ what: 'END TURN', quad: window.__quad(el) })),
+    ...all('.desk .stats .slotbulbs').map((el) => ({ what: 'the bulbs', quad: window.__quad(el) })),
+    ...all('.desk [data-hook="doors"]').map((el) => ({ what: 'the doors card', quad: window.__quad(el) })),
     ...all('.scr.offers .lift').map((el, i) => ({ what: 'offer ' + (i + 1), quad: window.__quad(el) })),
     ...all('.scr.offers .tkt').map((el) => ({ what: 'offer button ' + el.className.replace('tkt ', ''), quad: window.__quad(el) })),
   ];
@@ -261,11 +268,12 @@ function scandalLeft(hand: number, at: number): number {
 function atItsMoment(c: Came, w: Walk): [string, boolean] {
   switch (c.id) {
     case 'stats':
-      return ['on the offers', c.offers];
     case 'actions':
       return ['on a hand not yet played', c.hand > 0 && !c.offers && w.plays === 0];
     case 'heat':
       return [`after a play that raised heat (${w.heatBefore} → ${c.heat})`, w.last === 'play' && c.heat > w.heatBefore];
+    case 'doors':
+      return [`after a play, with actions left (${c.used} of ${c.bulbs} bulbs used), the doors card on the mirror`, w.played > 0 && c.bulbs > 0 && c.used < c.bulbs && c.doors];
     case 'end':
       return [`with no actions left (${c.used} of ${c.bulbs} bulbs used)`, c.bulbs > 0 && c.used === c.bulbs];
     case 'mirror':
@@ -357,6 +365,7 @@ async function seeNote(page: Page, c: Came, w: Walk, y: Year, first: boolean, ou
       await page.click(...at);
       await page.move(...(await neutral(page)));
       w.plays++;
+      w.played++;
       w.last = 'play';
       await sleep(1400);
       await idle(page);
@@ -402,14 +411,14 @@ async function seeNote(page: Page, c: Came, w: Walk, y: Year, first: boolean, ou
   y.done.add(c.id);
 }
 
-/** The year from its title with the notes asked for and a fresh store: the six at their moments, then the switch. */
+/** The year from its title with the notes asked for and a fresh store: the seven at their moments, then the switch. */
 async function year(page: Page, url: string): Promise<{ results: Result[]; timeline: string[] }> {
   const out: Result[] = [];
   await openReady(page, `${url}?seed=3&notes=1`);
   await page.evaluate(FRESH);
   await openReady(page, `${url}?seed=3&notes=1`);
   await page.evaluate(HELPERS);
-  const w: Walk = { plays: 0, monthsEnded: 0, last: '', heatBefore: NaN };
+  const w: Walk = { plays: 0, played: 0, monthsEnded: 0, last: '', heatBefore: NaN };
   const y: Year = { done: new Set(), timeline: [], cardPreview: false, endPreview: false, follows: false };
   let read = 0;
   const comes = async (ms: number): Promise<Came[]> => {
@@ -422,9 +431,7 @@ async function year(page: Page, url: string): Promise<{ results: Result[]; timel
   };
   for (let guard = 0; guard < 160 && y.done.size < NOTE_IDS.length; guard++) {
     await idle(page);
-    // The stat bar's note waits for the offers to be still (B2): on the first offers, time for it.
-    const where = await page.evaluate<string>(WHERE);
-    const fresh = await comes(where === 'offers' && !y.done.has('stats') ? 5000 : 350);
+    const fresh = await comes(350);
     if (fresh.length) {
       for (const c of fresh) {
         if (y.done.has(c.id)) out.push([`${c.id} comes twice`, false]);
@@ -436,29 +443,28 @@ async function year(page: Page, url: string): Promise<{ results: Result[]; timel
     await move(page, 'mouse', w);
   }
   const missing = NOTE_IDS.filter((id) => !y.done.has(id));
-  out.push([`all six came${missing.length ? `: not ${missing.join(', ')}` : ''}`, missing.length === 0]);
+  out.push([`all seven came${missing.length ? `: not ${missing.join(', ')}` : ''}`, missing.length === 0]);
   if (!y.cardPreview) out.push(["a card's preview over a note: none met one in this year", false]);
-  // All six seen and none up: House rules' switch reads off.
+  // All seven seen and none up: House rules' switch reads off.
   await idle(page);
   await sleep(500);
   await page.click(...((await centre(page, '.desk .setbtn')) as Pt));
   await sleep(600);
   const switchState = () => page.evaluate<string | null>(`document.querySelector('[data-setting="notes"]')?.getAttribute('aria-checked') ?? null`);
-  out.push(['all six seen, the switch reads off', (await switchState()) === 'false']);
-  // Turned back on: seen empties, lit keeps the six; a note comes again, not highlighted.
+  out.push(['all seven seen, the switch reads off', (await switchState()) === 'false']);
+  // Turned back on: seen empties, lit keeps the seven; a note comes again, not highlighted.
   const sw = await centre(page, '[data-setting="notes"]');
   if (sw) await page.click(...sw);
   await sleep(400);
   const store = await page.evaluate<{ seen?: string[]; lit?: string[] }>(STORE);
-  out.push([`turned back on: it reads on, seen empties, lit keeps the six (${store.lit?.length ?? 0})`, (await switchState()) === 'true' && (store.seen ?? []).length === 0 && NOTE_IDS.every((id) => store.lit?.includes(id))]);
+  out.push([`turned back on: it reads on, seen empties, lit keeps the seven (${store.lit?.length ?? 0})`, (await switchState()) === 'true' && (store.seen ?? []).length === 0 && NOTE_IDS.every((id) => store.lit?.includes(id))]);
   const close = await centre(page, '.p-settings .closeb');
   if (close) await page.click(...close);
   await sleep(600);
   let again: Came | null = null;
   for (let guard = 0; guard < 60 && !again; guard++) {
     await idle(page);
-    const where = await page.evaluate<string>(WHERE);
-    const fresh = await comes(where === 'offers' ? 5000 : 350);
+    const fresh = await comes(350);
     if (fresh.length) {
       again = fresh[0] as Came;
       read += fresh.length;
@@ -501,7 +507,7 @@ async function refan(page: Page, url: string): Promise<Result[]> {
   const close = await centre(page, '.p-settings .closeb');
   if (close) await page.click(...close);
   await sleep(600);
-  const w: Walk = { plays: 0, monthsEnded: 0, last: '', heatBefore: NaN };
+  const w: Walk = { plays: 0, played: 0, monthsEnded: 0, last: '', heatBefore: NaN };
   const y: Year = { done: new Set(), timeline: [], cardPreview: true, endPreview: true, follows: false };
   let read = 0;
   for (let guard = 0; guard < 8 && !y.follows; guard++) {
@@ -537,7 +543,7 @@ async function quiet(page: Page, url: string, how: 'seeded' | 'off'): Promise<Re
     if (off !== 'false') return ['the switch off: it would not turn off', false];
   }
   // Through the moments of the first month and into the second's hand: the offers, the hand, plays, END TURN.
-  const w: Walk = { plays: 0, monthsEnded: 0, last: '', heatBefore: NaN };
+  const w: Walk = { plays: 0, played: 0, monthsEnded: 0, last: '', heatBefore: NaN };
   for (let guard = 0; guard < 40 && !(w.monthsEnded >= 1 && (await page.evaluate<string>(WHERE)) === 'play' && w.plays >= 1); guard++) {
     await idle(page);
     if ((await page.evaluate<string>(WHERE)) === 'offers') await sleep(2500);
@@ -557,14 +563,13 @@ async function touchLine(page: Page, url: string): Promise<Result> {
   await page.evaluate(FRESH);
   await openReady(page, `${url}?seed=3&notes=1`);
   await page.evaluate(HELPERS);
-  const w: Walk = { plays: 0, monthsEnded: 0, last: '', heatBefore: NaN };
+  const w: Walk = { plays: 0, played: 0, monthsEnded: 0, last: '', heatBefore: NaN };
   let read = 0;
   try {
     for (let guard = 0; guard < 30; guard++) {
       await idle(page);
-      const where = await page.evaluate<string>(WHERE);
       let log: Came[] = [];
-      for (let t = 0; t < (where === 'offers' && read === 0 ? 5000 : 400); t += 100) {
+      for (let t = 0; t < 400; t += 100) {
         log = await page.evaluate<Came[]>('window.__notes');
         if (log.length > read) break;
         await sleep(100);
@@ -580,7 +585,7 @@ async function touchLine(page: Page, url: string): Promise<Result> {
           if (page.name === 'firefox' && pointer !== 'touch') return [`under touch input the actions note reads its touch line: Firefox's headless taps arrive as ${pointer ?? 'no pointer'}`, 'skipped'];
           return [`under touch input the actions note reads its touch line: it reads "${c.label.slice(0, 40)}…", the last pointer ${pointer ?? 'none'}`, false];
         }
-        // Another note on the way (the stat bar's): a tap puts it away.
+        // Another note on the way (the stat bar's, on the same first hand): a tap puts it away.
         const at = await centre(page, '.oxn:not(.out)');
         if (at) await page.press(at[0], at[1], 40);
         await sleep(400);
@@ -605,16 +610,14 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
   await page.evaluate(FRESH);
   await openReady(page, url);
   await page.evaluate(HELPERS);
-  const w: Walk = { plays: 0, monthsEnded: 0, last: '', heatBefore: NaN };
+  const w: Walk = { plays: 0, played: 0, monthsEnded: 0, last: '', heatBefore: NaN };
   let read = 0;
   let scandalBy = 0;
   const night = `!!document.querySelector('.ending')`;
   for (let guard = 0; guard < 900 && !(await page.evaluate<boolean>(night)); guard++) {
     await idle(page);
-    const where = await page.evaluate<string>(WHERE);
-    // Time for a note's moment to be read (the offers' once they are still).
-    if (where === 'offers') await sleep(1800);
-    else await sleep(350);
+    // Time for a note's moment to be read.
+    await sleep(350);
     const log = await page.evaluate<Came[]>('window.__notes');
     for (const c of log.slice(read)) {
       const [moment, ok] = atItsMoment(c, w);
@@ -636,7 +639,7 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
   out.push(['the awards night came, to PLAY AGAIN', !!again]);
   const came = (await page.evaluate<Came[]>('window.__notes')).map((c) => c.id);
   const missing = NOTE_IDS.filter((id) => !came.includes(id));
-  out.push([`all six notes came${missing.length ? `: not ${missing.join(', ')}` : ''}`, missing.length === 0]);
+  out.push([`all seven notes came${missing.length ? `: not ${missing.join(', ')}` : ''}`, missing.length === 0]);
   out.push([`each came once (${came.length} in all)`, came.length === new Set(came).size]);
   out.push([`a Scandal in the hand by summer (month ${scandalBy || 'none'})`, scandalBy > 0 && scandalBy <= 6]);
   // PLAY AGAIN, the title's House rules: the switch reads off (and so does the stored setting).
@@ -652,7 +655,7 @@ async function fullYear(page: Page, url: string, manager: number): Promise<{ res
     for (let k = 0; k < 20 && !(await page.evaluate<boolean>(`!!document.querySelector('[data-setting="notes"]')`)); k++) await sleep(150);
   }
   const sw = await page.evaluate<{ shown: string | null; stored: unknown }>(`(() => { let stored = null; try { stored = JSON.parse(localStorage.getItem('overexposed.settings') ?? 'null')?.notes ?? null; } catch {} return { shown: document.querySelector('[data-setting="notes"]')?.getAttribute('aria-checked') ?? null, stored }; })()`);
-  out.push([`after the six, House rules' switch reads off (it reads ${sw.shown ?? 'nothing: no House rules'}; stored ${String(sw.stored)})`, sw.shown === 'false' && sw.stored === false]);
+  out.push([`after the seven, House rules' switch reads off (it reads ${sw.shown ?? 'nothing: no House rules'}; stored ${String(sw.stored)})`, sw.shown === 'false' && sw.stored === false]);
   return { results: out, timeline };
 }
 

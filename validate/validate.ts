@@ -1996,7 +1996,7 @@ export function checkTrophies(references: Readonly<Record<string, string | null>
 }
 
 /**
- * The manager's notes (round R8b, B6): ui/notes.ts's six, each in every manager's words — notes.<note>.<manager>, and
+ * The manager's notes (round R8b, B6): ui/notes.ts's seven (six before round R9b), each in every manager's words — notes.<note>.<manager>, and
  * .touch too for the two that say "hold" where a mouse would hover — and each manager's signature, notes.sign.<manager>.
  * Marks are checked in notes.* lines only: [hype], [craft] and [heat] are drawn as the stat bar's icons, any other is
  * flagged. A notes.* key no note uses is a warning.
