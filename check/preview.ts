@@ -822,7 +822,7 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
       counts.boxOffices++;
       const rows = boxOffice(c, s.seed, issue.turn, issue.fameTier, issue.lane);
       if (right?.kind !== 'boxoffice') return bad(`${fp.paper}: no box office`);
-      if (right.rows.length !== rows.length || rows.some((r, k) => right.rows[k]?.title !== t(r.titleKey) || right.rows[k]?.gross !== `£${(r.gross / 10).toFixed(1)}m` || right.rows[k]?.player !== r.player || (right.rows[k]?.fresh !== null) !== r.fresh)) bad(`${fp.paper}: box office ${JSON.stringify(right.rows)}`);
+      if (right.rows.length !== rows.length || rows.some((r, k) => right.rows[k]?.title !== t(r.titleKey) || right.rows[k]?.gross !== `$${(r.gross / 10).toFixed(1)}M` || right.rows[k]?.player !== r.player || (right.rows[k]?.fresh !== null) !== r.fresh)) bad(`${fp.paper}: box office ${JSON.stringify(right.rows)}`);
       if ((rows[0]?.player === true) !== (issue.fameTier >= bo.player.fromTier && issue.lane === bo.player.lane)) bad(`${fp.paper}: the player's film ${rows[0]?.player ? 'tops' : 'misses'} the box office at fame ${issue.fameTier} on ${issue.lane}`);
     } else if (lead?.scene !== undefined) {
       counts.photos++;

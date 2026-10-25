@@ -2036,7 +2036,7 @@ export function checkNotes(
 }
 
 /**
- * The people's names (round R8c, E4): every face (AVATAR_IDS) and Gran has a colour pair in ui/people.ts; every name
+ * The people's names (round R8c, E4): every face (AVATAR_IDS) and Grandma has a colour pair in ui/people.ts; every name
  * there occurs in the words (a renamed person shows up as a stale name); and ui/names.ts splits four cases right.
  */
 export function checkNames(
@@ -2053,7 +2053,7 @@ export function checkNames(
   const colour = /^#[0-9a-f]{6}$/i;
   for (const id of [...AVATAR_IDS, 'gran']) {
     const p = people[id];
-    if (!p) err(`ui/people.ts ${id}`, 'no colours: every face, and Gran, has a lit and an ink colour');
+    if (!p) err(`ui/people.ts ${id}`, 'no colours: every face, and Grandma, has a lit and an ink colour');
     else if (!colour.test(p.lit) || !colour.test(p.ink)) err(`ui/people.ts ${id}`, `colours must be #rrggbb, got ${q(p.lit)} and ${q(p.ink)}`);
   }
   const words = isObj(i18n) ? Object.values(i18n).filter(isStr) : [];
@@ -2065,7 +2065,7 @@ export function checkNames(
   const cases: readonly [string, string | null][] = [
     ["Don't watch Juno Vale. Beat her.", 'juno'],
     ["Sam's band.", 'sam'],
-    ['Gran wants a ticket.', 'gran'],
+    ['Grandma wants a ticket.', 'gran'],
     ['Samples', null],
   ];
   for (const [text, person] of cases) {

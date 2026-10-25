@@ -27,19 +27,19 @@ import {
 import { t, tp } from './i18n.ts';
 
 const signedFormat = new Intl.NumberFormat('en', { signDisplay: 'exceptZero' });
-/** A true minus sign (U+2212), as the visual reference sets figures: "−2", "−£1,000" (round V1a). */
+/** A true minus sign (U+2212), as the visual reference sets figures: "−2", "−$1,000" (round V1a). */
 const trueMinus = (s: string): string => s.replace('-', '−');
 /** "+3", "−2", "0". */
 export const signed = (n: number): string => trueMinus(signedFormat.format(n));
 
 /**
- * Money as the player reads it (phase 2a): capital × £1,000 — capital 4 is "£4,000". Display only: every
- * value and rule stays in capital. A turn is a month, so the figures read true; money is for spending, not
- * status, so it has no tier word.
+ * Money as the player reads it (phase 2a): capital × $1,000 — capital 4 is "$4,000" (dollars since round R9b, C2;
+ * pounds before). Display only: every value and rule stays in capital. A turn is a month, so the figures read true;
+ * money is for spending, not status, so it has no tier word.
  */
 const MONEY_UNIT = 1000;
-const moneyFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 });
-const signedMoneyFormat = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0, signDisplay: 'exceptZero' });
+const moneyFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const signedMoneyFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0, signDisplay: 'exceptZero' });
 export const money = (capital: number): string => moneyFormat.format(capital * MONEY_UNIT);
 export const signedMoney = (capital: number): string => trueMinus(signedMoneyFormat.format(capital * MONEY_UNIT));
 /** An amount of a resource or condition key as the player reads it: money for capital, a number otherwise. */

@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { establishedLanes, getCard, pressLines, readLines } from '../../core/index.ts';
 import type { Snapshot } from '../queue.ts';
 import { t } from '../i18n.ts';
-import { lineText, mastheadName, signedAmount } from '../text.ts';
+import { lineText, mastheadName, money, signedAmount } from '../text.ts';
 import { tick } from '../sound/sound.ts';
 import { composeTransforms } from '../motion.ts';
 import { CardPicture } from './Hand.tsx';
@@ -144,7 +144,7 @@ export function MonthMotion({snap,model}:{snap:Snapshot;model:DeskModel}) {
         rolls.current.get(id)?.();
         if(!reduced){
           let frame=0,ticked=e.value-e.delta;const start=performance.now();
-          const roll=()=>{const t=Math.min(1,(performance.now()-start)/560),n=Math.round(e.value-e.delta*(1-t)**3);if(n!==ticked){ticked=n;tick();}value.textContent=id==='money'?`£${(n*1000).toLocaleString('en-GB')}`:String(n);if(t<1)frame=requestAnimationFrame(roll);else value.textContent=value.dataset.final??value.textContent;};
+          const roll=()=>{const t=Math.min(1,(performance.now()-start)/560),n=Math.round(e.value-e.delta*(1-t)**3);if(n!==ticked){ticked=n;tick();}value.textContent=id==='money'?money(n):String(n);if(t<1)frame=requestAnimationFrame(roll);else value.textContent=value.dataset.final??value.textContent;};
           frame=requestAnimationFrame(roll);rolls.current.set(id,()=>{cancelAnimationFrame(frame);value.textContent=value.dataset.final??value.textContent;});
         }
         const delta=document.createElement('span');delta.className=`motion-delta delta-${id}`;delta.textContent=signedAmount(e.target,e.delta);

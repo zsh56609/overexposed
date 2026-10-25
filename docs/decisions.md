@@ -6,6 +6,28 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9b, Part C: words
+
+- THE NEW WORDS, the round's list (docs/writing/draft-v14.md, with its fallbacks): the four NEW
+  keys — the doors' notes came with Part A, the deck's counts with Part B, as those parts needed
+  them — and the 155 CHANGED keys replaced exactly, by key; nothing else reworded. The passes are
+  the author's: no dashes in texts, notes, tips and the interface (letters' sign-offs and the
+  headlines keep theirs); varied rhythm in fourteen flavor lines, two tips, two category lines
+  and one opening; American English.
+- Money in dollars: ui/text.ts formats with Intl's en-US and USD, whole dollars as before
+  ("$3,000", "−$1,000", "+$2,000"); the roll-ups in Motion.tsx and MonthMotion.tsx use the same
+  formatter instead of writing "£…" themselves. The amounts are capital × 1,000 as ever. The box
+  office reads "$4.6M", and check:preview expects it. The papers' issue numbers keep their
+  formatter: en-GB's grouping reads as en-US's ("No. 20,524").
+- Mom and Grandma: ui/people.ts finds them by those names; validate's own example of the split
+  reads "Grandma wants a ticket." The portraits' aria-labels needed no change.
+- C4: every CHANGED and NEW line fits where it is shown at 1280×720, 800×450 and 844×390
+  (check:overflow, every line group at its longest): no fallback was needed.
+- C5: ui.tip.heldLine's words only. Its second clause holds from autumn on: in spring and summer
+  the heat threshold already stands at its floor (rules.json: heatThreshold 7, 6 and floor 7, 6),
+  so the scandals held lower it only from autumn (core/conditions.ts effectiveHeatThreshold) —
+  and the line now says so.
+
 ## 2026-10-25 — Round R9b, Part B: the interface
 
 - The author (round R9b): the stat bar in two rows a cell, the bubbles in liquid glass, the

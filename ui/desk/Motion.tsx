@@ -1,7 +1,7 @@
 // Presentation only. Event ids select objects, resource events supply every delta and roll endpoint.
 import { useLayoutEffect, useRef } from 'react';
 import { pressLines } from '../../core/index.ts';
-import { signedAmount } from '../text.ts';
+import { money, signedAmount } from '../text.ts';
 import type { Snapshot } from '../queue.ts';
 import { motionMode } from '../motion.ts';
 import { cue, tick } from '../sound/sound.ts';
@@ -159,7 +159,7 @@ export function Motion({ snap, onTails }: { snap: Snapshot; onTails: (settle: ()
         const t = Math.min(1, (performance.now() - start) / (mode === 'full' ? 560 : 150));
         const n = Math.round(e.value - e.delta * (1 - t) ** 3);
         if (n !== ticked) { ticked = n; tick(); }
-        value.textContent = id === 'money' ? `£${(n * 1000).toLocaleString('en-GB')}` : String(n);
+        value.textContent = id === 'money' ? money(n) : String(n);
         if (t < 1) frame = requestAnimationFrame(roll); else value.textContent = value.dataset.final??final;
       };
       if(mode==='full')frame = requestAnimationFrame(roll);

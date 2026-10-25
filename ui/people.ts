@@ -1,7 +1,7 @@
 // The people's colours (round R8c, E1; docs/design/visual/ref/r8c-awards.html): each person's names as running text
 // writes them, and two colours close to their portrait's — lit on dark grounds, ink on paper. Keyed by avatar id (core's
-// AVATAR_IDS), and Gran, who has no portrait. The unknown number (the photographer) has no name to find: its header is
-// coloured whole, grey. Plain TypeScript, so validate can read it (no check imports a .tsx). English names, as the
+// AVATAR_IDS), and Grandma (gran), who has no portrait; Mom and Grandma in American English since round R9b (C3). The
+// unknown number (the photographer) has no name to find: its header is coloured whole, grey. Plain TypeScript, so validate can read it (no check imports a .tsx). English names, as the
 // words are: a renamed person shows up in validate as a stale name.
 
 export interface Person {
@@ -14,8 +14,8 @@ export interface Person {
 }
 
 export const PEOPLE = {
-  mum: { names: ['Mum'], lit: '#ffcf4a', ink: '#a86f00' },
-  gran: { names: ['Gran'], lit: '#f2655f', ink: '#b0302a' },
+  mum: { names: ['Mom'], lit: '#ffcf4a', ink: '#a86f00' },
+  gran: { names: ['Grandma'], lit: '#f2655f', ink: '#b0302a' },
   sam: { names: ['Sam Whitlock', 'Sam'], lit: '#ffa36e', ink: '#b8501f' },
   alex: { names: ['Alex'], lit: '#b7a6f0', ink: '#5f4ea8' },
   juno: { names: ['Juno Vale', 'Juno'], lit: '#ff78b0', ink: '#c42d6c' },

@@ -791,7 +791,7 @@ function effectChip(c: ContentIndex, e: Effect, lane: string | null, self?: stri
   }
 }
 
-/** A threshold in icons: "★ 25+", "📰 2+", "£4,000" (money needs no plus), "♪ 6 or fewer". */
+/** A threshold in icons: "★ 25+", "📰 2+", "$4,000" (money needs no plus), "♪ 6 or fewer". */
 function thresholdChip(key: 'hype' | 'craft' | 'heat' | 'capital' | 'scandalCount', range: Range, lane: string | null): ValueChip {
   const n = (x: number) => (key === 'capital' ? money(x) : String(x));
   const { min, max } = range;

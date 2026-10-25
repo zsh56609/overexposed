@@ -1,5 +1,5 @@
 // The hover and long-press previews (decisions 2, 21), dressed for the desk; their results shown as the card faces
-// show them since round R2 (0.3): an icon and a number in the resource's colour ("★ +3", "+£1,000"), the action
+// show them since round R2 (0.3): an icon and a number in the resource's colour ("★ +3", "+$1,000"), the action
 // bulb for actions, the newspaper for scandal cards, and heat as "🔥 2 → 6 · 1 TO GO". Words only where no number
 // is involved: the story, a card added or removed, a flag, a line crossed, why a card can't be played.
 

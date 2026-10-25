@@ -34,7 +34,7 @@
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .hd { flex: 0 1 auto; min-width: 0; flex-wrap: wrap; gap: 2px 4px; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln.br .hd { flex: none; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .ch { flex: 1 1 auto; min-width: min-content; flex-wrap: wrap; gap: 2px 9px; }
-/* A value never breaks inside ("+£2,000"); words wrap. */
+/* A value never breaks inside ("+$2,000"); words wrap. */
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln span:not(.r-text, .r-add) { white-space: nowrap; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln .r-text { white-space: normal; min-width: 0; }
 :is(.desk :is(.hand, .motion-face), .faces) .card .ln:not(.br, .lbl) .ch { gap: 3px 10px; }
