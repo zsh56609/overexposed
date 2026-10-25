@@ -6,6 +6,19 @@ rules).
 
 ---
 
+## 2026-10-25 — Round R9b, Part D: v0.9.2
+
+- v0.9.2 is R9b (`package.json` and the lock 0.9.2); the credits' foot shows v0.9.2.
+- AGENTS.md's versions line, the one change to it: "Versions: R1 to R7 v0.1 to v0.7 (one each),
+  R8a + R8b v0.8, R8c + R8d v0.9, R9a v0.9.1, R9b v0.9.2, the submission v1.0." — 12 bytes
+  longer; the file is 24,572 bytes, under 24 KiB.
+- check/desk-states.json recorded again, as the round asks: the same 51 states, byte for byte —
+  the round changes no default run (sim:compare identical), and the states are reducer steps.
+- The README: the stat bar (§1), the mirror's doors card (§3), the bubbles in glass and the
+  people's names (§5), END TURN (§6), the tickets and the offers' row (§9), the scrapbook's room,
+  and the notes (§11: seven, a new player's March without offers).
+- The zip, as R9a's, from this round's last commit: overexposed-v0.9.2.zip.
+
 ## 2026-10-25 — Round R9b, Part D2b: the scrapbook's room
 
 - The author (round R9b, one more item): since R9a both pages are 580 tall, but the endings page

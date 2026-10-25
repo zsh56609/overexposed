@@ -46,18 +46,17 @@ bottom. Season changes the light (colour temperature and `--dim`).
 
 ### 1. Stat bar (top, 46px)
 
-- **Order:** hype · craft · heat · next scandal · money · actions. Then, at the right: season marks and the date.
-- **Geometry:** five equal cells of **114px** from x=16 to x=586. The **actions cell is fixed at 586–694**, so the three action bulbs are centred exactly on **x=640**; it has dividers on both sides. Keep these fixed.
-- **Cell content:** icon · tier word (bold) · small number. Money shows `£` amounts (display ×1000). Values are centred in their cell.
-- **Icon colours never change:** hype star `#ffd84a`, craft `#8fc7ff`, heat flame `#ff7a4a`, money `#b9e38a`, scandal newspaper `#e0584a`.
+- **Order:** hype · craft · heat · next scandal · money · actions, then Deck & discard, Settings and the date — since round R9b the last three are cells of the bar too.
+- **Geometry:** five equal cells of **114px** from x=16 to x=586. The **actions cell is fixed at 586–694**, so the three action bulbs are centred exactly on **x=640**. Deck & discard 694–874, Settings 874–988, the date 988–1266. A 1px divider (`rgba(255,220,170,.16)`) between every two. Keep these fixed.
+- **Cell content** (round R9b): every cell two rows, 34px high at top 6, 3px apart, centred in it. A label row — the icon (10px, in its colour) and 4px on, the label (Libre Franklin 800 8.5px, letter-spacing .15em, uppercase, `rgba(237,230,214,.58)`) — over a value row: a big value (Playfair Display 900 18px `#EDE6D6`) and a small word (Playfair italic 12px `#bfb3a0`), 5px apart on one baseline. Hype, Craft, Heat: the number big, the tier word small (Heat's amber, red in a frenzy). Next scandal: the count big, "to go" / "to next" small. Money: the money big — `$` amounts, display ×1000 — and no word. Deck & discard: "7 to draw · 0 played", each count big, a 3px dot 3px from either, the scandals held after them; the whole cell is its button, as Settings' is, whose value is the gear (15px). The date: the season's marks (11px) over the month (Playfair 700 18px). A clickable cell lights (`rgba(255,220,170,.07)`) under the pointer. A cell clips across, never down: Playfair's descenders reach below its 18px line. At 844×390 the labels are 4.6px on screen.
+- **Icon colours never change:** hype star `#ffd84a`, craft `#8fc7ff`, heat flame `#ff7a4a`, money `#b9e38a`, scandal `#e0584a`. Since round R9b the scandal's icon is the scandal card itself, tilted, its ✕ cut out (`i-paper`, one even-odd path, no mask), wherever a scandal is drawn: the bar, the held chip, card faces, effect chips, the mirror's notes, the doors card, the numbers panel.
 - **Craft icon** is a music note; it becomes a **clapperboard** when the established lane is screen. The celebrity lane keeps the note.
-- **Next-scandal countdown** (pill with the newspaper icon):
-  ≥5 to go neutral · 3–4 amber · ≤2 red · crossed ("N TO NEXT") filled red with a slow pulse.
-  The newspaper icon stays scandal-red in every state except the filled one, where it turns white.
+- **Next-scandal countdown** (its levels on the cell since round R9b; the scandal icon in its red throughout):
+  ≥5 to go as it is · 3–4 the count and its words amber `#ffcf85` · ≤2 red `#ff6b55` with a soft glow · crossed ("N to next") the count in a red tag (`#c3261a`, white, lining figures) with a slow pulse — none under reduced motion.
 - **Actions:** three bulbs; a used action goes dark.
 - **Season marks:** only the current season, as **three of its icons** (spring sprout `#8fd98a`, summer sun `#ffd84a`, autumn leaf `#ff8a3d`, winter snowflake `#d4e9ff`). Months passed: filled at 55%; this month: full colour with a glow; months to come: dim.
 - **Date:** month name + year. The year starts in **March 2027**; January and February are **2028** (awards season). All three papers always show the same date.
-- **Optical alignment:** icons and text are aligned by their ink, not their boxes. The offsets in `vanity.html` (search `translateY` near `.cell`) were measured: text +0.75px, numbers +1px, flame +1.25px, craft/money icons +0.25px, clapperboard −0.5px, date −1px, season marks +0.85px, pill contents +0.75px.
+- **Alignment:** the two rows centre in their cell; a label's trailing letter-spacing is taken back, so it centres by its ink. The mockup's measured offsets (`vanity.html`, `translateY` near `.cell`) went with its one-row cells (round R9b).
 - **Tooltips** on every cell (hover, keyboard focus and long-press on touch; never a short tap; above choice overlays): a header with the stat, tier and value, then one short line in the game's voice. Craft lines differ for singing and acting. Copy: the `TIP` object in `vanity.html` (draft; imported by round 2c).
 
 ### 2. The papers (back left)
@@ -77,6 +76,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - Bulb frame. In a frenzy some bulbs flicker or go dark and a red clipping of the month’s latest scandal headline is stuck to the glass.
 - **Black card** (taped, slight tilt): "If the year ended today" · major · minor.
 - **Three sticky notes** for the other three majors: Breakthrough yellow, Long Game green, Overexposed blue, Hard Way pink. Each shows the ending's name and what it takes — its requirements **in the stat bar's language** (no goal line on it since round R8a: fewer words on screen; since round R8b it is the note's tooltip): `✓/✗` + icon + tier word + number — "★ Known · 80+" — and a scandal clause the doors' way, the icon and the threshold: "📰 5 or fewer", "📰 6+" (round R5). The words stay in ink: the icons carry the stat's colour, ✓/✗ the met state. The unknown-side majors show "✗ ★ Already known" when the player is Known, so no note ever looks achieved when it is not. Requirement lines have an integer line height (11px) so icons and text stay aligned.
+- **The season's doors** (round R9b): a white index card taped to the glass below the notes (`#fbf8f0`, its top rule red `#c0261c`, a strip of tape): "End of spring · one door" — in winter "Winter · the last door" — and a row for each of the act's two doors: ✓ or ✗ (every requirement met now: the test the door makes, its Likely), its name (Playfair 700 11.5px), and its requirements right-aligned as the door states them — the stat's icon and "18+", "4 or fewer", "$4,000+", or "Signed to a label" — in Libre Franklin 800 9.5px and the value colours; they take a line of their own under the name when they don't fit beside it. Left 734, top 286, 206 wide, turned 1.6°; at most 82.5 tall, inside the glass (winter's, both rows wrapped). Above the glass, below the manager's bubbles; not focusable, no tooltip. The pair is the act's and needs no draw.
 - Notes and the black card scale up slightly on hover (×1.05, ×1.04).
 - **The goals as tooltips** (round R8b): hovering (mouse), a long-press (touch, 450 ms) or keyboard focus on the black card shows its major's goal, on a sticky note its own — the stat bar's tooltip (§1), the major's name as its header and the goal line under it, under the card or note (above it if there is no room), kept on the stage. It closes as the stat bar's do: leaving, a press elsewhere, blur. The black card and the notes take focus (tabIndex 0).
 
@@ -96,8 +96,8 @@ bottom. Season changes the light (colour temperature and `--dim`).
 - **Each message is two bubbles: a longer one, then a short one.**
 - **A reaction belongs to one bubble of one message** — its month, message position and bubble position — never to its words. A line that recurs later is a new message and starts with no reaction. (Lines come from the shuffle bags, so a repeat only happens once a pool is used up; 2c adds variants to the busiest groups.)
 - **People's colours** (round R8c; `docs/design/visual/ref/r8c-awards.html`): every person's name stands out in their
-  own colour, close to their portrait's — lit on dark grounds, ink on paper (`ui/people.ts`): Mum `#ffcf4a`/`#a86f00`,
-  Gran `#f2655f`/`#b0302a`, Sam `#ffa36e`/`#b8501f`, Alex `#b7a6f0`/`#5f4ea8`, Juno `#ff78b0`/`#c42d6c`, Lio
+  own colour, close to their portrait's — lit on dark grounds, ink on paper (`ui/people.ts`): Mom `#ffcf4a`/`#a86f00`,
+  Grandma `#f2655f`/`#b0302a`, Sam `#ffa36e`/`#b8501f`, Alex `#b7a6f0`/`#5f4ea8`, Juno `#ff78b0`/`#c42d6c`, Lio
   `#5cd6ec`/`#1f7d93`, Priya `#4fd3b6`/`#1f7f6c`, Dana `#87a0ff`/`#2f4fc0`, the unknown number (the photographer)
   `#b9bfcb`/`#5d6574`, Dex `#dcb46c`/`#8a6420`, Mags `#a9cf8e`/`#4f7a3a`. A name is found as a whole word,
   case-sensitive, the longest first (`ui/names.ts`), and drawn as `.pn`: 700 in running text, the line's own weight in
@@ -107,7 +107,8 @@ bottom. Season changes the light (colour temperature and `--dim`).
   the night's line for Juno and the two last words; the manager cards' names (Dex's dark card lit, Mags's cream one
   ink, each name's weight kept); the numbers panel's milestones; the manager's notes' signature (in ink). Papers, front
   pages, captions, letters, doors, cards, tooltips, the replies and the player's own bubble stay as they were.
-- **Faces** (round R8a): the people who text the player and the managers have portraits — in colour, never newsprint grey, with brows and a nose but no eyes or mouth (the author's, `docs/design/visual/ref/r8a-avatars/`, held as strings in `ui/avatars.ts` and shown from data URIs, never image files). Mum's is a sunflower: her own photo is her garden, and the player's family stays unpictured. The photographer's is the phone's grey placeholder: the number was never saved. Alex's is his profile against a dusk sky, violet to rose and amber (redrawn in round R8d: from afar the sun behind his head read as part of it; the sky is an SVG gradient, `alex-sky`). Dex and Mags wear their business cards' colours. Each sits in a circle with a 1 px ring, its alt empty — a name is always printed beside it: a text's phone header (40 px, ring `rgba(255,255,255,.1)`), the bubbles' name row (22 px, 7 px before the name; the row right-aligned; in a frenzy only the name changes colour), each business card's top right (56 px, inside the card at right 22, top 20; ring `rgba(214,180,110,.7)` on Dex's, `rgba(154,106,58,.5)` on Mags's; the name, the role and the quote wrap beside it, never under it) and the awards night's last word (22 px, as on the desk). A letter has none: its letterhead is its face.
+- **Faces** (round R8a): the people who text the player and the managers have portraits — in colour, never newsprint grey, with brows and a nose but no eyes or mouth (the author's, `docs/design/visual/ref/r8a-avatars/`, held as strings in `ui/avatars.ts` and shown from data URIs, never image files). Mom's is a sunflower: her own photo is her garden, and the player's family stays unpictured. The photographer's is the phone's grey placeholder: the number was never saved. Alex's is his profile against a dusk sky, violet to rose and amber (redrawn in round R8d: from afar the sun behind his head read as part of it; the sky is an SVG gradient, `alex-sky`). Dex and Mags wear their business cards' colours. Each sits in a circle with a 1 px ring, its alt empty — a name is always printed beside it: a text's phone header (40 px, ring `rgba(255,255,255,.1)`), the bubbles' name row (22 px, 7 px before the name; the row right-aligned; in a frenzy only the name changes colour), each business card's top right (56 px, inside the card at right 22, top 20; ring `rgba(214,180,110,.7)` on Dex's, `rgba(154,106,58,.5)` on Mags's; the name, the role and the quote wrap beside it, never under it) and the awards night's last word (22 px, as on the desk). A letter has none: its letterhead is its face.
+- **Liquid glass** (round R9b): every bubble is glass — the desk's (red-tinted in a frenzy; the name row stays clear), the manager choice's samples, the night's last words, the phone's: a light gradient over a little warm tint, what is behind blurred (14px; the phone's 12px) and saturated, a bright 1px top edge and a faint white ring, cream type with a soft shadow. The phone's screen is warm and dark; your own bubbles amber; the replies amber outlines, the one you can't afford grey-brown; the photograph's bubble as it was; no blue anywhere. Where backdrop-filter is not supported, the same in solid colours.
 - Bubbles scale up slightly on hover. **Tapback reactions:** clicking a bubble opens a row of three below it — calm ❤️ 😂 👍, frenzy 💔 😭 👍 (the thumbs-up never turns down). Choosing one leaves it as a badge on the bubble's corner; choosing it again removes it; choosing another replaces it. UI state only — no rule reads it. The bubble with the open row is raised above its neighbours.
 
 ### 6. The hand
@@ -123,7 +124,7 @@ bottom. Season changes the light (colour temperature and `--dim`).
   - celebrity: pink gloss · gold foil · all-access pass (black, gold type, lanyard slot)
   - neutral: spiral notebook page
   - scandal: red, dashed white border, ✕, and its in-hand line as flavour
-- **END TURN** (bottom right): "no scandal" / "N scandals will print"; red in a frenzy.
+- **END TURN** (bottom right): "no scandal" / "N scandals will print"; a ticket (round R9b, §9), red in a frenzy, its second line Playfair italic 12.5px `#5a5046` (`#ffd9d2` on red).
 
 ### 7. Scandals follow fame
 
@@ -176,7 +177,14 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
 
 Every screen happens *in the dressing room*: the scene dims behind it and the stat
 bar stays visible, so the player always sees what they have while they choose.
-The action bulbs remain visible during choices. The Deck & discard button and a small gear for House rules sit in the stat bar (round R1). Photographs are drawn and cached on first need.
+The action bulbs remain visible during choices. Deck & discard and House rules' gear sit in the stat bar (round R1; since round R9b, cells of it). Photographs are drawn and cached on first need.
+**Tickets** (round R9b): BEGIN, the title's three links, CONTINUE, the offers' two buttons, END TURN, the panels'
+close buttons, PLAY AGAIN and the night's two links are tickets with depth — one shape (its ends pointed, 11px in; 7px
+for the small ones), a cream body lit from above and darker at its foot, a light inner top edge and a dark inner foot,
+a hard edge under it and a soft shadow; red for BEGIN, and for END TURN in a frenzy; small (10px, uppercase) for the
+links. Hover lifts it 1px and a press sinks it 2px, 0.12s ease-out; disabled, at .45; under reduced motion or none
+the shadows change and nothing moves. Each kept its size, place and hit area. Not tickets: cards, doors, the events'
+replies, a letter's options, the scrapbook's tabs, House rules' switches, the credits' links, a note's ✕.
 Header pattern: amber small-caps kicker (usually the date), a Playfair title, an
 italic line.
 
@@ -185,8 +193,9 @@ italic line.
   would print, in its paper's voice — or the notebook, for quiet work. The preview
   sits above the card and rises with it: same distance, same curve, same delay. Dex's extra card
   wears a paper-clipped tag, "Dex knows someone". Clicking takes it (a TAKEN stamp; the
-  others fade). Below, ticket-shaped buttons: "Take one more £4,000", "Reroll the offer
-  £2,000" — greyed out when the player cannot afford them — and "You have £N".
+  others fade). Below, two tickets: "Take one more $4,000", "New offers $2,000" — "New offers ·
+  free" while Dex's free reroll stands — greyed out when the player cannot afford them; the money itself is the stat
+  bar's (round R9b).
 - **Season doors (gates).** Two invitations — cream card, a double gold rule, slight
   opposite tilts: "You're invited", the name, the flavour, **Requires** (✓/✗ + icon +
   threshold + "(you have N)"), **If you pass · if you fail** as effect chips, and a
@@ -229,7 +238,7 @@ italic line.
     replies appear only once they have finished. The choices are **reply bubbles**, each showing its effects;
     "↺ remembered" marks a choice that sets a flag a later event may call back. After
     replying: typing dots, then their answer — the outcome line.
-  - *A photo in a thread* (round R8b): some send a photograph with their text — Mum the Sunday table and Gran in her
+  - *A photo in a thread* (round R8b): some send a photograph with their text — Mom the Sunday table and Grandma in her
     coat, Lio the desk, Sam his band's poster, the photographer last night's shot of you, Priya the panel show's set,
     and Juno (round R8c, `r8c-photos/`) the premiere's carpet and the small room she plays now.
     It arrives as one more message, in its place: typing dots, then the photo, on the messages' rhythm and with the
@@ -351,15 +360,16 @@ fixed seed, nothing recorded. The music is six tracks by Holizna (CC0 1.0) in `p
 
 ### 11. The manager's notes (round R8b)
 
-In a new player's first year, six short notes in the manager's hand, each once, each at the moment it matters
+In a new player's first year, seven short notes in the manager's hand (the seventh, the doors', since round R9b), each once, each at the moment it matters
 (`ui/screens/Notes.tsx`; the look from `docs/design/visual/ref/r8b-notes.html`). Every moment is read from the steps'
 GameEvents and the desk's model, never by comparing state in /ui, and needs the desk idle.
 
 | Note | Comes | Points at · lit | Goes | Stands (stage px) |
 |---|---|---|---|---|
-| stats | the offers up, once they are still | Craft's cell · Hype, Craft, Heat | the offers close | 44, 66 · 286 wide · −1.2° |
-| actions | a hand dealt, no card played this month | the bulbs | the month's first play, END TURN | 318, 66 · 280 · 0.9° |
+| stats | a hand dealt, no card played this month — the first desk (round R9b) | Craft's cell · Hype, Craft, Heat | the month's first play, END TURN | 44, 66 · 286 wide · −1.2° |
+| actions | a hand dealt, no card played this month — once the stats note has gone | the bulbs | the month's first play, END TURN | 318, 66 · 280 · 0.9° |
 | heat | a play has landed whose step raised heat | the countdown | the next play, END TURN | 300, 70 · 284 · −0.8° |
+| doors | a play has landed, actions left, the doors card on the mirror (round R9b) | the doors card's left edge · the doors card | the next play, END TURN | 404, 214 · 276 · −0.8° |
 | end | no actions left | END TURN's left side · END TURN | END TURN | left 994, bottom 626 · 262 · 1.1° |
 | mirror | a hand dealt, no card played, a month ended since the switch came on | the black card's left edge · the black card | the first play, END TURN | 398, 84 · 268 · −1° |
 | scandal | a Scandal in the hand | the leftmost Scandal's top · the card | END TURN, or the card leaves the hand | top 204 · 284 · 0.8° |
@@ -368,9 +378,12 @@ GameEvents and the desk's model, never by comparing state in /ui, and needs the 
   scandal's** stands by its card, from fan.ts: a card right of the centre (640), 330 px left of the card's left;
   otherwise 30 px left of its centre; kept on the stage, and following the card as the hand fans again. A preview over
   it fades it.
+- **A new player's first month has no offers** (round R9b): a run made with the notes on, unseeded or with
+  ?notes=1, opens March on its hand — the signing deals it — so the stat bar's note and the bulbs' come on the first
+  desk, one after the other. Every later month's offers are as ever.
 - **One at a time**, in the table's order: the other waits, and comes when the first goes if its moment still holds,
   else at its next. **Never in the way**: the layer takes no click but the note's; no note covers a hand card, END
-  TURN, or an offer's cards and buttons. A card's or END TURN's preview over a note fades it and lets clicks through;
+  TURN, the bulbs, the doors card, or an offer's cards and buttons. A card's or END TURN's preview over a note fades it and lets clicks through;
   a panel hides it (it comes back if its moment holds). A click, Enter or Space puts it away. The note is a button
   whose accessible name is its words; the ✕ is drawn (aria-hidden); the layer is aria-live polite.
 - **The look**: cream paper (`#f7f1e1` → `#f1e9d4`, padding 15 16 11 17, the reference's two shadows), a strip of
@@ -382,8 +395,8 @@ GameEvents and the desk's model, never by comparing state in /ui, and needs the 
   motion off, at once. The layer is over the desk and its screens (the offers too), under the panels.
 - **The first time** each note ever shows, the eye is drawn to it: a veil (`rgba(6,4,2,.46)`) with two holes — the
   target's, 6 px round it, radius 10, and the note's — and the target's glow (`0 0 0 2.5px #ffcf85, 0 0 22px 6px
-  rgba(255,207,133,.55)`) on its own outline: a box for the stat cells, the bulbs, the countdown, the black card and
-  END TURN; a card's own outline, tilting with it. The veil in 160 ms, the glow on, off, on, off over 900 ms, the
+  rgba(255,207,133,.55)`) on its own outline: a box for the stat cells, the bulbs, the countdown, the doors card,
+  the black card and END TURN; a card's own outline, tilting with it. The veil in 160 ms, the glow on, off, on, off over 900 ms, the
   veil out 340 ms (about 1.4 s); reduced, no flashes: the veil fades in, holds 600 ms and fades out; motion off,
   none. The veil takes no click; any click ends it. A note is highlighted once, ever — never again, even after the
   switch comes back on.
@@ -391,7 +404,7 @@ GameEvents and the desk's model, never by comparing state in /ui, and needs the 
   a mouse would hover (`.touch`, when the last pointer put down was touch or a pen).
 - **The switch** — House rules' "Manager's notes", on by default (a v0.7 player, with no such setting stored, has it
   on). A note comes only while it is on and has not come before; it joins `seen` as it comes, and stays until it
-  goes or is clicked (a preview or a panel only hides it). Once all six are seen and none is up, the switch turns
+  goes or is clicked (a preview or a panel only hides it). Once all seven are seen and none is up, the switch turns
   itself off; turning it on empties `seen` (the highlights stay had). `seen` and `lit` are kept under
   `overexposed.notes`, guarded as the settings are. A run with `?seed=` shows none unless `?notes=1`; the dev pages
   never. `npm run check:notes` checks it all by real input.
