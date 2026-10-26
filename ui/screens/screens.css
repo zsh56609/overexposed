@@ -97,10 +97,11 @@
 .manager-choice .m-veteran .bcard .tag { color: #d6b46e; }
 .manager-choice .sample { margin-top: 22px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 .manager-choice .sample small { font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
-/* The bubbles in liquid glass (round R9b, B2), as the desk's. */
+/* The bubbles in the glass's look (round R9b, B2), as the desk's, but without backdrop-filter (round R9c, E1): one GPU
+   drew it in two pieces and the gradient started again a quarter of the way in. The solid base under the gradient reads
+   the same over this dark ground. */
 .manager-choice .sample .bub { font-size: 12px; line-height: 1.35; padding: 8px 12px; border-radius: 12px 12px 12px 3px;
-  background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(42, 36, 30, .30);
-  -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), #1f1a16;
   border: 1px solid rgba(255, 255, 255, .26); color: #fffaf2; text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 16px rgba(255, 255, 255, .04), 0 10px 22px rgba(0, 0, 0, .38);
 }
@@ -448,7 +449,7 @@
 .scr .rep.off { border-color: #4a4038; color: #a8987f; }
 /* Where backdrop-filter is not supported: the phone and its bubbles solid. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .manager-choice .sample .bub, .awards-night .lastword .bub { background: #2b2520; border-color: rgba(255, 220, 170, .10); }
+  .awards-night .lastword .bub { background: #2b2520; border-color: rgba(255, 220, 170, .10); }
   .event-screen .ph-screen { background: #15110e; }
   .event-screen :is(.m.in:not(.pic), .typing) { background: #2b2520; }
   .event-screen .m.out { background: #8a5a22; }
