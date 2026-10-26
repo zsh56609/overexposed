@@ -13,6 +13,7 @@ import { CARD_W, fan } from '../desk/fan.ts';
 import { Icon } from '../desk/Icons.tsx';
 import type { IconId } from '../desk/model.ts';
 import { t } from '../i18n.ts';
+import { seasonName } from '../text.ts';
 import { motionMode } from '../motion.ts';
 import { markLit, markSeen, NOTE_IDS, NOTE_MARKS, notesTurnedOn, TOUCH_NOTES, useNotesStore, type NoteId, type NoteMark } from '../notes.ts';
 import type { PlayedStep } from '../queue.ts';
@@ -309,7 +310,9 @@ export function Notes(p: NotesProps) {
   const shown = up && !p.panel ? up : null;
   const manager = p.s.manager ?? 'veteran';
   const touchy = !!shown && TOUCH_NOTES.includes(shown.id) && touch;
-  const line = shown ? t(`notes.${shown.id}.${manager}${touchy ? '.touch' : ''}`) : '';
+  // The doors' note names the season whose doors the card shows (round R9c, A): House rules' switch can bring it back in
+  // any season. A leaving note keeps the words it was shown with.
+  const line = shown ? t(`notes.${shown.id}.${manager}${touchy ? '.touch' : ''}`, shown.id === 'doors' ? { season: seasonName(p.s.content, p.s.act) } : {}) : '';
   const sign = t(`notes.sign.${manager}`);
   const note = useRef<HTMLButtonElement>(null);
   const [geo, setGeo] = useState<Geo | null>(null);

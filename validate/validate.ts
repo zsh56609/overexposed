@@ -1999,7 +1999,8 @@ export function checkTrophies(references: Readonly<Record<string, string | null>
  * The manager's notes (round R8b, B6): ui/notes.ts's seven (six before round R9b), each in every manager's words — notes.<note>.<manager>, and
  * .touch too for the two that say "hold" where a mouse would hover — and each manager's signature, notes.sign.<manager>.
  * Marks are checked in notes.* lines only: [hype], [craft] and [heat] are drawn as the stat bar's icons, any other is
- * flagged. A notes.* key no note uses is a warning.
+ * flagged. A note's one placeholder is the doors' note's {season} (round R9c, A); any other is flagged. A notes.* key
+ * no note uses is a warning.
  */
 export function checkNotes(
   i18n: unknown,
@@ -2030,6 +2031,9 @@ export function checkNotes(
     if (!wanted.has(key)) issues.push({ level: 'warning', check: 'notes', where: `i18n/en.json ${q(key)}`, message: 'no note uses this key' });
     for (const [, mark] of value.matchAll(/\[([^\]]*)\]/g)) {
       if (!notes.marks.includes(mark ?? '')) err(`i18n/en.json ${q(key)}`, `[${mark}] is not a mark: only [${notes.marks.join('], [')}]`);
+    }
+    for (const [, name] of value.matchAll(/\{([^}]*)\}/g)) {
+      if (name !== 'season' || !key.startsWith('notes.doors.')) err(`i18n/en.json ${q(key)}`, `{${name}} is not a note's placeholder: only {season}, in the doors' note`);
     }
   }
   return issues;

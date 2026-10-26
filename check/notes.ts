@@ -86,7 +86,7 @@ const HELPERS = `(() => {
       offers: !!q('.scr.offers'), hand: document.querySelectorAll('.desk .hand .card').length,
       used: document.querySelectorAll('.desk .slotbulbs i.used').length, bulbs: document.querySelectorAll('.desk .slotbulbs i').length,
       heat: Number(q('[data-hook="number-heat"]')?.dataset.final ?? NaN), scandals: document.querySelectorAll('.desk .hand .card.f-scandal').length,
-      doors: !!q('.desk [data-hook="doors"]'), label: q('.oxn')?.getAttribute('aria-label') ?? '',
+      doors: !!q('.desk [data-hook="doors"]'), season: desk?.dataset.season ?? '', label: q('.oxn')?.getAttribute('aria-label') ?? '',
     });
   };
   new MutationObserver(look).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-note'] });
@@ -109,6 +109,8 @@ interface Came {
   readonly scandals: number;
   /** The season's doors card on the mirror (round R9b, A3). */
   readonly doors: boolean;
+  /** The desk's season as the note came (round R9c, A: the doors' note names it). */
+  readonly season: string;
   readonly label: string;
 }
 
@@ -272,8 +274,11 @@ function atItsMoment(c: Came, w: Walk): [string, boolean] {
       return ['on a hand not yet played', c.hand > 0 && !c.offers && w.plays === 0];
     case 'heat':
       return [`after a play that raised heat (${w.heatBefore} → ${c.heat})`, w.last === 'play' && c.heat > w.heatBefore];
-    case 'doors':
-      return [`after a play, with actions left (${c.used} of ${c.bulbs} bulbs used), the doors card on the mirror`, w.played > 0 && c.bulbs > 0 && c.used < c.bulbs && c.doors];
+    case 'doors': {
+      // Its words name the season the card shows (round R9c, A): "Spring ends at …" in spring.
+      const season = en[`act.${c.season}.name`] ?? '?';
+      return [`after a play, with actions left (${c.used} of ${c.bulbs} bulbs used), the doors card on the mirror, its words "${c.label.split(' ').slice(0, 3).join(' ')} …"`, w.played > 0 && c.bulbs > 0 && c.used < c.bulbs && c.doors && c.label.startsWith(`${season} ends at`)];
+    }
     case 'end':
       return [`with no actions left (${c.used} of ${c.bulbs} bulbs used)`, c.bulbs > 0 && c.used === c.bulbs];
     case 'mirror':
