@@ -6,6 +6,103 @@ rules).
 
 ---
 
+## 2026-10-26 — Round R9c, Part F: v0.9.3
+
+- v0.9.3 is R9c (`package.json` and the lock 0.9.3); the credits' foot shows v0.9.3.
+- AGENTS.md's versions line, the one change to it: "Versions: R1 to R7 v0.1 to v0.7, R8a + R8b
+  v0.8, R8c + R8d v0.9, R9a v0.9.1, R9b v0.9.2, R9c v0.9.3, the submission v1.0." — one byte
+  longer; the file is 24,573 bytes as checked out here, under 24 KiB.
+- check/desk-states.json recorded again: the same 51 states, byte for byte — the round changes no
+  rule, no content and no default run (sim:compare identical in all 18 files).
+- The README: the doors card's hover, focus and tooltips (§3), the manager choice's samples
+  without backdrop-filter (§5), the clippings 17 apart (§9).
+- The zip, as R9b's, from this round's last game commit: overexposed-v0.9.3.zip.
+
+## 2026-10-26 — Round R9c, Part E2: the doors card answers as the notes do
+
+- The author (round R9c): the doors card takes hover, focus and tooltips, as the notes beside it
+  do.
+- The card grows (scale 1.04) with its tilt (1.6°) on hover, and while one of its rows has
+  keyboard focus (`:has(.door:focus-visible)` — the rows take the focus, not the card), above its
+  neighbours (z-index 6), over 0.28 s ease, with the notes' deeper shadow and, on keyboard focus,
+  their ring (mirror.css, as `.sticky`); its red top rule, an inset shadow, kept.
+- Each door's row is a tooltip target with the notes' binding (Mirror.tsx useGoalTip: hover, a
+  450 ms long-press on touch, keyboard focus; tabIndex 0). A hovered or focused row takes a faint
+  red wash, `rgba(192,38,28,.09)`, 4 px past it on either side (a `::before` under its words).
+- The tooltip is the notes' (GoalTipView: their look, placement and fade), under the card — the
+  card's box, not the row's — or above it when there is no room: the door's name, ui.doors.branches,
+  then the door's outcomes as the doors screen shows them (effectChips of onPass and onFail): the
+  pass chips on one line; ui.doors.or and the fail chips on the next. Chips Libre Franklin 800
+  12.5 px with 12 px icons, in the dark faces' colours (`--val-dark-hype`, `-craft`, `-heat`,
+  `-gain`, `-cost`); a card added, like a flag or words, in cream `#EDE6D6`. "or" in the doors
+  screen's type (8.5 px, 800, uppercase, .14em), in cream at 60%. No new words.
+- The model: each DoorRow carries its pass and fail chips; DoorsCardModel the line and "or".
+- As the notes are, the card stays grown after a tap or a long-press on touch until the pointer
+  is put down elsewhere: the browsers keep a tapped element's hover.
+- Checks: check:clicks takes the rows as the hand's controls, each inside the stage and hit at its
+  centre; check:interactions the card's hover ease, a row's tooltip on hover (the door's name, its
+  line, two lines of outcomes, whole on the stage and clear of the card, the card grown; closed on
+  leaving) and on keyboard focus; check:overflow every row's tooltip on every hand of its runs, on
+  the stage, its two lines of outcomes one line each, counted by season, all four seen;
+  check:notes the doors note's arrow ending at the card's left edge, and the note clear of the card.
+
+## 2026-10-26 — Round R9c, Part E1: the manager choice's samples without backdrop-filter
+
+- The author: on their GPU, at 1280×720 ×1.25, Mags' sample bubble was drawn in two pieces, its
+  gradient starting again a quarter of the way in.
+- `.manager-choice .sample .bub`: no backdrop-filter (either prefix); the gradient, border, inset
+  and shadow kept; its base `#1f1a16` for `rgba(42,36,30,.30)`; it leaves the @supports fallback,
+  which keeps the night's last words.
+- Looked for here in a headed Chrome with the GPU (AMD Radeon RX 5700 XT, D3D11) at 1280×720
+  ×1.25, before and after: the two samples; the desk's bubbles — Dex's, Mags', red in a frenzy,
+  short and long; the phone's incoming bubbles and its typing dots; the night's last words. No
+  seam in any of them on this GPU, before or after, so no other bubble is changed.
+
+## 2026-10-26 — Round R9c, Part D: words
+
+- THE NEW WORDS, the round's list (docs/writing/draft-v15.md): the 14 CHANGED keys replaced
+  exactly, by key — the doors notes' two with Part A, as it needed them; nothing else reworded.
+  The passes are the author's: the American English R9b missed; Dex's perk in the offers screen's
+  words ("New offers"); the stat names capitalized where a line means the stat (Heat, Hype); the
+  doors note's season.
+- goals.state.known ("Already known (Hype {value})") is read only by majorClauseLine (ui/text.ts),
+  which check:preview tests and no screen shows: a sticky note says "Already known"
+  (goals.note.known, not in the list), and a note's tooltip is its major's goal line. The line is
+  replaced as given; the report shows the note's "Already known" and its tooltip instead.
+
+## 2026-10-26 — Round R9c, Part C: the scrapbook's room here
+
+- The author (round R9c): on their Linux machine the endings page has the awards page's room under
+  it; R9b measured 16 px less here.
+- Measured here (Chromium on Windows, 1280×720; every ending found and every award won, none, and
+  six found with nine won): .pnh 53, the first column's h3 25 (line-height 24.7 px, one line), .gl
+  32 (14.95 px, one line), a clipping found 69 and one not 68 (its small 9.1 px, its b 16.5 or
+  23.1 px, each one line), a column 433, 431 or 432, .cols at offsetTop 103 — every part as the
+  author's Linux measures. No part is taller here, from a line-height of normal or a wrap.
+- So the room is arithmetic: 103 + 433 = 536 of the page's 580, 43.5 px under the contents (none
+  45.2, six 44.4) against the awards page's 60.6. With parts of these heights the endings page
+  cannot leave 60.6 px on any machine; the report says so.
+- As the round says for that case: `.ov .clip` margin-bottom 21 → 17 px (the floor was 15). A
+  column of four is 16 px shorter: the endings page leaves 59.5 px (none 61.2, six 60.4), each
+  within 2 px of the awards page's 60.6, which is unchanged. The comment over `.ov .book` says so.
+
+## 2026-10-26 — Round R9c, Part B: the deck cell's dot
+
+- The author: the dot between "7 to draw" and "0 played" stood at the small words' cap height.
+- `align-self: baseline` and `translateY(-1.5px)`: on the small words' baseline, lifted 1.5 px, so
+  it sits on their x-height; its size (3 px), colour and the 3 px either side kept. Checked at 3×,
+  with and without the held chip.
+
+## 2026-10-26 — Round R9c, Part A: the doors note names its season
+
+- The author: House rules' switch can bring the doors note back in any season, and it said spring.
+- notes.doors.veteran and .guardian start with {season} (THE NEW WORDS). Notes.tsx fills it for the
+  doors note only, with the season of the act the desk shows — the season whose doors the card
+  shows; a leaving note keeps the words it was shown with.
+- validate's notes check: a note's one placeholder is the doors note's {season}; any other in a
+  notes.* line is an error. check:notes holds the doors note's words to the desk's season ("Spring
+  ends at …" in spring).
+
 ## 2026-10-25 — Round R9b, Part D: v0.9.2
 
 - v0.9.2 is R9b (`package.json` and the lock 0.9.2); the credits' foot shows v0.9.2.
