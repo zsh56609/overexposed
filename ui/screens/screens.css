@@ -305,9 +305,10 @@
 .scr .mini .card.card { pointer-events: none; box-shadow: none; }
 /* The endings scrapbook: the green board, a column a major, found minors as taped clippings. */
 /* One size on both pages (round R9a, D1): 580 tall. The same room round both pages' contents (round R9b, D2b): each
-   starts 26 px under the heading, with room left under it — the plaques 124 high, as on the night, the shelf's rows 22
-   apart, the clippings with 2 px more padding and 4 more between them. The two pages share one cell while a page turns
-   (D2), the page going under no pointer. */
+   starts 26 px under the heading and leaves about 60 px under it — the plaques 124 high, as on the night, the shelf's
+   rows 22 apart, the clippings with 2 px more padding and 17 between them (round R9c, C: at 21 a column of four left the
+   endings page 16 px less room than the awards page). The two pages share one cell while a page turns (D2), the page
+   going under no pointer. */
 .ov .book { position: absolute; left: 120px; top: calc(var(--top) + 30px); width: 1040px; height: 580px; background: #2a3a2e; box-shadow: inset 0 0 70px rgba(0, 0, 0, .55), 0 30px 50px rgba(0, 0, 0, .7); padding: 24px 32px; color: #EDE6D6; }
 .ov .book .pages { display: grid; }
 .ov .book .pages > .page { grid-area: 1 / 1; min-width: 0; }
@@ -331,7 +332,7 @@
 .ov .book .pl.tro.dim > .tr img { filter: grayscale(1) brightness(.42) contrast(.9) opacity(.75); }
 .ov .col h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 19px; margin: 0 0 4px; color: #f3ead4; }
 .ov .col .gl { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 11.5px; color: #b9c4b6; margin-bottom: 14px; min-height: 32px; }
-.ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 11px 12px 12px; margin-bottom: 21px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
+.ov .clip { position: relative; background: #ece6d9; color: #15120E; padding: 11px 12px 12px; margin-bottom: 17px; box-shadow: 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(var(--r, 0deg)); }
 .ov .clip::before { content: ""; position: absolute; left: 50%; top: -7px; width: 36px; height: 12px; margin-left: -18px; background: rgba(255, 240, 200, .55); transform: rotate(-3deg); }
 .ov .clip small { display: block; font-size: 7px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: #b8281c; }
 .ov .clip b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 15px; line-height: 1.1; margin-top: 2px; }
