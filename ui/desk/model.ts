@@ -176,12 +176,18 @@ export interface DoorRow {
   readonly mark: string;
   readonly name: string;
   readonly chips: readonly RequirementChip[];
+  /** Its tooltip (round R9c, E2): what passing it brings and what failing it does, as the doors screen shows them. */
+  readonly pass: readonly ValueChip[];
+  readonly fail: readonly ValueChip[];
 }
 
 export interface DoorsCardModel {
   /** "End of spring · one door"; in the last act "Winter · the last door". */
   readonly kicker: string;
   readonly rows: readonly DoorRow[];
+  /** A row's tooltip line, "If you pass · if you fail", and the word before the fail chips (round R9c, E2). */
+  readonly branches: string;
+  readonly or: string;
 }
 
 export interface ItemModel {
@@ -525,8 +531,18 @@ function doorsCard(s: GameState, lane: string | null): DoorsCardModel | null {
     kicker: s.act === c.rules.acts ? t('ui.doors.lastKicker', { season }) : t('ui.doors.kicker', { season: season.toLocaleLowerCase('en') }),
     rows: gates.map((gate) => {
       const met = evaluate(gate.requires, s);
-      return { gateId: gate.id, met, mark: t(met ? 'ui.note.met' : 'ui.note.unmet'), name: gateName(c, gate.id), chips: explainCondition(gate.requires, s).map((clause) => requirementChip(clause, lane)) };
+      return {
+        gateId: gate.id,
+        met,
+        mark: t(met ? 'ui.note.met' : 'ui.note.unmet'),
+        name: gateName(c, gate.id),
+        chips: explainCondition(gate.requires, s).map((clause) => requirementChip(clause, lane)),
+        pass: effectChips(c, gate.onPass ?? [], lane),
+        fail: effectChips(c, gate.onFail ?? [], lane),
+      };
     }),
+    branches: t('ui.doors.branches'),
+    or: t('ui.doors.or'),
   };
 }
 

@@ -3,12 +3,15 @@
 // its requirements in the stat bar's words (no goal line since round R8a, E3). In a frenzy some bulbs flicker or go dark and a red
 // clipping is stuck to the glass. Every word is the adapter's (./model.ts). Round R8b (B7): the goal lines come back as
 // tooltips — hovering, a long-press or keyboard focus on the black card shows its major's, on a note its own. Round R9b
-// (A3): the season's two doors on a white index card taped below the notes — not focusable, no tooltip.
+// (A3): the season's two doors on a white index card taped below the notes. Since round R9c (E2) it answers as the notes
+// do — it grows on hover or keyboard focus — and each door's row is a tooltip target: the door's name, "If you pass · if
+// you fail", and what each brings, as the doors screen shows them.
 
 import { memo, useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type PointerEvent, type ReactNode } from 'react';
 import { isPlaceholder } from '../text.ts';
+import { Value } from './Hand.tsx';
 import { Icon, keyboardFocus } from './Icons.tsx';
-import type { MirrorModel } from './model.ts';
+import type { MirrorModel, ValueChip } from './model.ts';
 
 const W = 420;
 const H = 350;
@@ -41,8 +44,16 @@ const ph = (text: string, base: string): string => (isPlaceholder(text) ? `${bas
 interface GoalTip {
   readonly header: string;
   readonly line: string;
-  /** The hovered thing's box on the stage. */
+  /** The box it stands under (or over): the hovered thing's, or a door's card's for a door's row. */
   readonly box: { readonly x: number; readonly y: number; readonly w: number; readonly h: number };
+  /** A door's outcomes (round R9c, E2): the pass chips, then the word "or" and the fail chips. */
+  readonly chips?: DoorChips;
+}
+
+interface DoorChips {
+  readonly pass: readonly ValueChip[];
+  readonly or: string;
+  readonly fail: readonly ValueChip[];
 }
 
 /** An element's box in the stage's own 1280×720 frame. */
@@ -68,16 +79,17 @@ function useGoalTip() {
     return () => document.removeEventListener('pointerdown', close);
   }, [tip]);
   useEffect(() => () => window.clearTimeout(press.current), []);
-  const show = (header: string, line: string, el: Element) => {
-    const at = { header, line, box: stageBox(el) };
+  // `under`: the element the tooltip stands under (a door's row: its card); `chips`: a door's outcomes.
+  const show = (header: string, line: string, el: Element, chips?: DoorChips, under?: (el: Element) => Element) => {
+    const at = { header, line, box: stageBox(under ? under(el) : el), ...(chips ? { chips } : {}) };
     setTip(at);
     setLast(at);
   };
-  const bind = (header: string, line: string) => ({
+  const bind = (header: string, line: string, chips?: DoorChips, under?: (el: Element) => Element) => ({
     tabIndex: 0,
     'data-goal': '',
     onPointerEnter: (e: PointerEvent<HTMLElement>) => {
-      if (e.pointerType === 'mouse') show(header, line, e.currentTarget);
+      if (e.pointerType === 'mouse') show(header, line, e.currentTarget, chips, under);
     },
     onPointerLeave: (e: PointerEvent<HTMLElement>) => {
       if (e.pointerType === 'mouse') setTip(null);
@@ -86,12 +98,12 @@ function useGoalTip() {
       if (e.pointerType === 'mouse') return;
       const el = e.currentTarget;
       window.clearTimeout(press.current);
-      press.current = window.setTimeout(() => show(header, line, el), 450);
+      press.current = window.setTimeout(() => show(header, line, el, chips, under), 450);
     },
     onPointerUp: () => window.clearTimeout(press.current),
     onPointerCancel: () => window.clearTimeout(press.current),
     onFocus: (e: FocusEvent<HTMLElement>) => {
-      if (keyboardFocus(e.currentTarget)) show(header, line, e.currentTarget);
+      if (keyboardFocus(e.currentTarget)) show(header, line, e.currentTarget, chips, under);
     },
     onBlur: () => setTip(null),
   });
@@ -114,6 +126,22 @@ function GoalTipView({ tip, on }: { tip: GoalTip | null; on: boolean }) {
     <div ref={el} className={`tip goaltip${on && at ? ' on' : ''}${at?.above ? ' above' : ''}`} role="tooltip" aria-hidden={on ? undefined : true} style={{ left: at?.left ?? 0, top: at?.top ?? 0 }}>
       <b>{tip?.header}</b>
       <span className={tip && isPlaceholder(tip.line) ? 'placeholder' : undefined}>{tip?.line}</span>
+      {/* A door's outcomes (round R9c, E2): what passing brings on one line, "or" and what failing does on the next. */}
+      {tip?.chips && (
+        <span className="outcomes">
+          <span className="oc-row">
+            {tip.chips.pass.map((chip, i) => (
+              <Value key={i} v={chip} />
+            ))}
+          </span>
+          <span className="oc-row">
+            <em>{tip.chips.or}</em>
+            {tip.chips.fail.map((chip, i) => (
+              <Value key={i} v={chip} />
+            ))}
+          </span>
+        </span>
+      )}
     </div>
   );
 }
@@ -161,7 +189,7 @@ export const Mirror = memo(function Mirror({ mirror, crisis, children }: { mirro
             <i className="tape" aria-hidden="true" />
             <small>{mirror.doors.kicker}</small>
             {mirror.doors.rows.map((row) => (
-              <div key={row.gateId} className={`door ${row.met ? 'ok' : 'no'}`} data-gate={row.gateId}>
+              <div key={row.gateId} className={`door ${row.met ? 'ok' : 'no'}`} data-gate={row.gateId} {...goal.bind(row.name, mirror.doors!.branches, { pass: row.pass, or: mirror.doors!.or, fail: row.fail }, (el) => el.closest('[data-hook="doors"]') ?? el)}>
                 <i>{row.mark}</i>
                 <b className={ph(row.name, '')}>{row.name}</b>
                 <span className="chips">

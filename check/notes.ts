@@ -6,6 +6,7 @@
 //   month's hand, a scandal in the hand (its note placed by its card); and on a recorded autumn hand holding a scandal
 //   (check/desk-states.json, s04), the scandal's note follows its card as the hand fans again;
 // - no note, turned as it stands, meets a hand card, END TURN, the bulbs, the doors card, or an offer's card or button;
+//   the doors note's arrow ends at the doors card's left edge (round R9c, E2: the card grows on hover now);
 // - the first time each comes it is highlighted (the veil; the note in lit); a click puts it away (in seen); none
 //   comes twice;
 // - a card's preview over a note fades it and lets clicks through, and END TURN's over its own note; a panel hides a
@@ -228,6 +229,8 @@ interface Layout {
   readonly faded: boolean;
   readonly through: boolean;
   readonly obstacles: readonly { readonly what: string; readonly quad: Quad }[];
+  /** Where the note's arrow ends: its curve's last point. */
+  readonly tip: readonly [number, number] | null;
   readonly floating: Quad | null;
   /** The hand's size, and the leftmost scandal's place in it. */
   readonly hand: number;
@@ -253,6 +256,7 @@ const LAYOUT = `(() => {
     faded: !!note?.classList.contains('faded'),
     through: !!note && getComputedStyle(note).pointerEvents === 'none',
     obstacles,
+    tip: (() => { const m = (q('.oxn-arrow:not(.out) path')?.getAttribute('d') ?? '').match(/Q\\S+ \\S+ (\\S+) (\\S+)/); return m ? [Number(m[1]), Number(m[2])] : null; })(),
     floating: window.__quad(q('.desk .floating')),
     hand: cards.length,
     scandalAt: cards.findIndex((c) => c.classList.contains('f-scandal')),
@@ -322,6 +326,14 @@ async function seeNote(page: Page, c: Came, w: Walk, y: Year, first: boolean, ou
   out.push([`${tag} stands whole on the stage${off.length ? `: a corner at ${off.map(([x, yy]) => `${Math.round(x)},${Math.round(yy)}`).join(' ')}` : ''}`, off.length === 0]);
   const hit = L.obstacles.filter((o) => o.quad && meets(L.note as Quad, o.quad)).map((o) => o.what);
   out.push([`${tag} meets no hand card, END TURN or offer${hit.length ? `: meets ${hit.join(', ')}` : ''}`, hit.length === 0]);
+  // The doors note points at the card (round R9c, E2): its arrow ends 4 px left of the card's left edge, beside it.
+  const card = c.id === 'doors' ? L.obstacles.find((o) => o.what === 'the doors card')?.quad : undefined;
+  if (c.id === 'doors') {
+    const xs = card?.map(([x]) => x) ?? [],
+      ys = card?.map(([, yy]) => yy) ?? [];
+    const at = !!card && !!L.tip && L.tip[0] >= Math.min(...xs) - 9 && L.tip[0] <= Math.min(...xs) + 1 && L.tip[1] >= Math.min(...ys) && L.tip[1] <= Math.max(...ys);
+    out.push([`${tag} points at the doors card${L.tip && card ? `: its arrow ends at ${Math.round(L.tip[0])},${Math.round(L.tip[1])}, the card from x ${Math.round(Math.min(...xs))}, y ${Math.round(Math.min(...ys))} to ${Math.round(Math.max(...ys))}` : ''}`, at]);
+  }
   if (c.id === 'scandal' && L.scandalAt >= 0) {
     const want = scandalLeft(L.hand, L.scandalAt);
     out.push([`${tag} stands by its card (left ${Math.round(L.left)}, its card's place gives ${Math.round(want)})`, Math.abs(L.left - want) < 1]);

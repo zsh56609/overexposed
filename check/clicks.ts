@@ -6,8 +6,9 @@
 // 1. Reachable controls (round V1a, after the author found the draft's offers pushed off its panel): in every
 //    state — the title and its credits, the manager choice, every draft (three offers and Dex's four, after an
 //    extra pick, after a reroll), the season doors, every event (round R2: its replies, or its letter's tick
-//    boxes), the hand, the deck viewer, the ending — every control for a
-//    legal action lies inside the stage and is the element actually hit at its centre (elementFromPoint). A
+//    boxes), the hand (since round R9c, E2, the doors card's rows too: each a tooltip's target), the deck viewer,
+//    the ending — every control for a legal action lies inside the stage and is the element actually hit at its
+//    centre (elementFromPoint). A
 //    fanned card is hit at the centre of the strip of it the next card leaves showing, in its own tilted frame.
 //    A state with no control for any action fails too.
 // 2. Nothing swallows a click (round 2c and V1a): at every play state, with the floating preview open over
@@ -102,7 +103,7 @@ const DRIVE = (runs: number) => `(async () => {
     draft: ['.draft .take', '.draft > .row > button', '.desk .deckbtn', '.desk .setbtn'],
     doors: ['.gates .take', '.desk .deckbtn', '.desk .setbtn'],
     event: ['.event-screen .choose'],
-    hand: ['.desk .endbtn', '.desk .deckbtn', '.desk .setbtn'],
+    hand: ['.desk .endbtn', '.desk .deckbtn', '.desk .setbtn', '.desk [data-hook="doors"] .door'],
     ending: ['button.play-again', '.awards-night .links button'],
   };
   const reachable = () => {

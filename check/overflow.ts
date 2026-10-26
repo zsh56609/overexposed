@@ -8,7 +8,8 @@
 //   on the glass and apart, the season's doors card (round R9b) inside the glass and clear of the notes and bubbles, the notebook holds its words and the script page holds every scene as written, the
 //   bubbles stay below the stat bar, a card's text stays in the strip its neighbour leaves showing and above the
 //   stage's edge, and tooltips, previews and notes stay on the stage — with every card's preview, every stat
-//   tooltip, each paper pulled forward and a bubble's reaction row open along the way;
+//   tooltip, every door's row's tooltip on the doors card (round R9c, E2: its outcomes two lines, each one line; by
+//   season, all four seen), each paper pulled forward and a bubble's reaction row open along the way;
 // - the plain screens of round V2 are audited (after the author found the draft's offers pushed off its panel):
 //   the title, its credits, the manager choice, every draft (after extra picks and rerolls too), the deck viewer,
 //   the season doors, the ending — nothing in them leaves the stage, and nothing is cut off by a box that hides
@@ -518,7 +519,7 @@ const DRIVE = (runs: number) => `(async () => {
   const rand = (k) => { rnd = (Math.imul(rnd, 1103515245) + 12345) >>> 0; return (rnd >>> 8) % k; };
   const issues = {};
   const note = (l) => { for (const m of l) issues[m] = (issues[m] || 0) + 1; };
-  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0, doors: { pairs: 0, apart: 0, tallest: 0, bottom: 0, clear: Infinity, worst: 0, worstBottom: 0 } };
+  const seen = { cards: new Set(), faces: new Set(), papers: new Set(), states: 0, previews: 0, tips: 0, fronts: 0, bubbles: 0, maxHand: 0, screens: {}, extraPicks: 0, rerolls: 0, deckViews: 0, doors: { pairs: 0, apart: 0, tallest: 0, bottom: 0, clear: Infinity, worst: 0, worstBottom: 0 }, doorTips: {} };
   const longest = { ends: null, night: null };
   // The nights with five to eight awards (round R8c, B3): few years win five and seven is rare, so these are chosen
   // lists, shown in the night's place by the night's own component (ui/dev/night.tsx) — the plaques the longest
@@ -689,6 +690,18 @@ const DRIVE = (runs: number) => `(async () => {
       for (const c of cards) { seen.cards.add(c.dataset.card); seen.faces.add([...c.classList].find((x) => x.startsWith('f-'))); over(c); await shown('.floating'); seen.previews++; note(__deskAudit('preview')); out(c); await shown('.floating', false); }
       const end = document.querySelector('.desk .endbtn'); if (end) { over(end); await shown('.floating'); note(__deskAudit('end preview')); out(end); await shown('.floating', false); }
       for (const cell of document.querySelectorAll('.desk .stats [data-tip]')) { over(cell); await shown('.tip.on'); seen.tips++; note(__deskAudit('tooltip')); out(cell); await shown('.tip.on', false); }
+      // The doors card's rows (round R9c, E2): each its own tooltip, on the stage, its outcomes two lines of one line each.
+      for (const row of document.querySelectorAll('.desk [data-hook="doors"] .door')) {
+        over(row); await shown('.tip.on');
+        const season = document.querySelector('.desk')?.dataset.season ?? '?';
+        seen.doorTips[season] = (seen.doorTips[season] || 0) + 1;
+        note(__deskAudit('door tooltip'));
+        const t = document.querySelector('.desk .tip.on');
+        const lines = [...t.querySelectorAll('.outcomes .oc-row')];
+        if (lines.length !== 2) note(['door tooltip: ' + lines.length + ' lines of outcomes, not 2, for ' + row.dataset.gate]);
+        for (const l of lines) { const k = [...l.children].map((c) => c.getBoundingClientRect()); if (k.some((b, i) => i > 0 && b.top >= k[0].bottom - 1)) note(['door tooltip: a line of outcomes wraps, ' + row.dataset.gate + ' "' + l.textContent + '"']); }
+        out(row); await shown('.tip.on', false);
+      }
       if (rand(3) === 0) {
         for (const p of [...document.querySelectorAll('.desk .pp')].filter((p) => !p.classList.contains('pos0'))) { p.click(); await sleep(4); seen.fronts++; seen.papers.add(p.dataset.paper); note(__deskAudit('paper ' + p.dataset.paper + ' forward')); }
         const b = [...document.querySelectorAll('.desk .bub:not(.who)')].at(-1); if (b) { b.click(); await sleep(4); seen.bubbles++; note(__deskAudit('reaction row')); document.body.click(); await sleep(2); }
@@ -712,7 +725,7 @@ const DRIVE = (runs: number) => `(async () => {
     document.querySelector('button.play-again')?.click();
     await sleep(30);
   }
-  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, doorsCard: window.__doorsCard ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
+  return { states: seen.states, previews: seen.previews, tips: seen.tips, fronts: seen.fronts, bubbles: seen.bubbles, maxHand: seen.maxHand, screens: seen.screens, extraPicks: seen.extraPicks, rerolls: seen.rerolls, deckViews: seen.deckViews, doors: seen.doors, doorTips: seen.doorTips, nights: seen.nights, opening: seen.opening ?? null, book: window.__book ?? null, doorsCard: window.__doorsCard ?? null, cards: [...seen.cards].sort(), faces: [...seen.faces].sort(), issues: Object.entries(issues).sort((a, b) => b[1] - a[1]) };
 })()`;
 
 /**
@@ -810,7 +823,7 @@ const REPLAY_AUDIT = `(async () => {
   return { hand: document.querySelectorAll('.desk .hand .card').length, cards: [...document.querySelectorAll('.desk .hand .card')].map((c) => c.dataset.card), issues };
 })()`;
 
-type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; book: Record<string, { h: number; room: number }> | null; doorsCard: Record<string, { h: number; room: number; gap: number }> | null; cards: string[]; faces: string[]; issues: [string, number][] };
+type Out = { states: number; previews: number; tips: number; fronts: number; bubbles: number; maxHand: number; screens: Record<string, number>; extraPicks: number; rerolls: number; deckViews: number; doors: { pairs: number; apart: number; tallest: number; bottom: number; clear: number; worst: number; worstBottom: number }; doorTips: Record<string, number>; nights: { lists: number; tightest: { room: number; what: string } | null; lines: number; words: number }; opening: { top: number; bottom: number } | null; book: Record<string, { h: number; room: number }> | null; doorsCard: Record<string, { h: number; room: number; gap: number }> | null; cards: string[]; faces: string[]; issues: [string, number][] };
 
 const server = await createServer({ root: ROOT, logLevel: 'error', server: { port: 5191, strictPort: false } });
 await server.listen();
@@ -859,6 +872,13 @@ try {
         if (seasons.some((s) => s.endsWith('not seen'))) {
           failed = true;
           console.log('OVERFLOW doors card  a season\'s doors card was not seen');
+        }
+        // Its rows' tooltips (round R9c, E2): how many were opened in each season.
+        const rowTips = ['spring', 'summer', 'autumn', 'winter'].map((s) => `${s} ${out.doorTips[s] ?? 0}`);
+        console.log(`overflow check, ${tag}: the doors card's rows' tooltips — ${rowTips.join(', ')}`);
+        if (rowTips.some((s) => s.endsWith(' 0'))) {
+          failed = true;
+          console.log('OVERFLOW doors card  a season\'s rows\' tooltips were not seen');
         }
         // The doors (round R8a, D1): each pair's heights, the tallest and where it ends, the stamps' clearance.
         const d = out.doors;

@@ -88,6 +88,19 @@
 .desk .tip span { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 13px; line-height: 1.38; }
 /* The mirror's goals (round R8b, B7): the same tooltip, under the black card or a note — above it when there is no room. */
 .desk .tip.goaltip { top: 0; }
+/* A door's outcomes in its row's tooltip (round R9c, E2): the pass chips on one line, "or" and the fail chips on the next,
+   in the dark faces' value colours. */
+.desk .tip .outcomes { display: block; margin-top: 6px; font-style: normal; }
+.desk .tip .outcomes .oc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 12px; margin-top: 3px; font-family: 'Libre Franklin', system-ui, sans-serif; font-style: normal; font-weight: 800; font-size: 12.5px; line-height: 1.3; color: #EDE6D6; }
+.desk .tip .outcomes .oc-row > span { display: inline-flex; align-items: center; gap: 3px; font: inherit; }
+.desk .tip .outcomes .oc-row svg { width: 12px; height: 12px; flex: none; }
+.desk .tip .outcomes em { font-style: normal; font-size: 8.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: rgba(237, 230, 214, .6); }
+.desk .tip .outcomes .r-hype { color: var(--val-dark-hype); }
+.desk .tip .outcomes .r-craft { color: var(--val-dark-craft); }
+.desk .tip .outcomes .r-heat { color: var(--val-dark-heat); }
+.desk .tip .outcomes .r-gain { color: var(--val-dark-gain); }
+.desk .tip .outcomes :is(.r-cost, .r-scandal) { color: var(--val-dark-cost); }
+.desk .tip .outcomes .r-add { color: #EDE6D6; }
 .desk .tip.goaltip.above::before { top: auto; bottom: -6px; transform: rotate(225deg); }
 .desk .placeholder { outline: 1px dashed currentColor; outline-offset: 1px; opacity: .8; }
 

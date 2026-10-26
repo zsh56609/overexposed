@@ -57,12 +57,20 @@
    a door: ✓ or ✗, its name, its requirements right-aligned — on a line of their own under the name when they don't fit
    beside it. The header's line is its type's size and a wrapped row's chips line their icons' (10 px), so the card is
    at most 82.5 px tall — the padding 15, the header 15.5, a row 16, a row whose chips wrap 26 — and winter's, both rows
-   wrapped, stays inside the glass with its tilt. Above the glass, below the manager's bubbles; it takes no focus and has
-   no tooltip. */
+   wrapped, stays inside the glass with its tilt. Above the glass, below the manager's bubbles. Since round R9c (E2) it
+   answers as the notes do: on hover, or a row's keyboard focus, it grows (×1.04) with its tilt above its neighbours, with
+   their deeper shadow and focus ring; a hovered or focused row takes a faint red wash 4 px past it on either side and is
+   a tooltip target (Mirror.tsx: the door's name, its line, its outcomes). */
 .desk .doorscard {
   position: absolute; left: 46px; top: 234px; width: 206px; padding: 9px 11px 6px; z-index: 2;
   background: #fbf8f0; color: #1b160f; box-shadow: inset 0 3px 0 #c0261c, 0 6px 10px rgba(0, 0, 0, .45); transform: rotate(1.6deg);
+  transition: transform .28s ease, box-shadow .28s;
 }
+.desk .doorscard:is(:hover, :has(.door:focus-visible)) { transform: rotate(1.6deg) scale(1.04); z-index: 6; box-shadow: inset 0 3px 0 #c0261c, 0 8px 14px rgba(0, 0, 0, .42); }
+.desk .doorscard:has(.door:focus-visible) { box-shadow: inset 0 3px 0 #c0261c, 0 8px 14px rgba(0, 0, 0, .42), 0 0 0 2px rgba(255, 207, 133, .6); }
+.desk .doorscard .door { position: relative; isolation: isolate; cursor: help; outline: none; }
+.desk .doorscard .door::before { content: ""; position: absolute; inset: 0 -4px; z-index: -1; background: rgba(192, 38, 28, .09); opacity: 0; pointer-events: none; }
+.desk .doorscard .door:is(:hover, :focus-visible)::before { opacity: 1; }
 .desk .doorscard .tape { position: absolute; left: 50%; top: -5.5px; width: 34px; height: 11px; margin-left: -17px; background: rgba(255, 240, 200, .6); transform: rotate(-4deg); }
 .desk .doorscard small { display: block; margin: 2px 0 6px; font-family: 'Libre Franklin', system-ui, sans-serif; font-weight: 800; font-size: 7.5px; line-height: 7.5px; letter-spacing: .18em; text-transform: uppercase; color: #b8281c; white-space: nowrap; }
 .desk .doorscard .door { display: flex; flex-wrap: wrap; align-items: center; column-gap: 4px; }

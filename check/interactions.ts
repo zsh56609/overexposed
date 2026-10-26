@@ -4,7 +4,9 @@
 //   elsewhere; opens on keyboard focus;
 // - the mirror's goals (round R8b, B7): the black card's tooltip — its major's name and goal line — opens on hover and
 //   closes on leaving; a sticky note's, its own, opens on a long-press and closes on a tap elsewhere; on keyboard focus,
-//   and closes on blur; each whole on the stage;
+//   and closes on blur; each whole on the stage; a door's row on the doors card (round R9c, E2), its own — the door's
+//   name, its line, its outcomes on two lines — under the card or above it, on hover and on keyboard focus, the card
+//   grown;
 // - a bubble's reaction row opens on a click; a reaction becomes a badge, another replaces it, the same again
 //   removes it; a click elsewhere closes the row;
 // - the metronome swings, settles at the centre on a click, and swings again on the next;
@@ -14,8 +16,9 @@
 //   a click ends the month; the deck and House rules open from the stat bar and close (round R1, Part G);
 // - a bubble once shown stays until the month ends (round R3, C2): for each manager, from the title with motion full,
 //   through a month of plays, paper picks and prints, the bubbles shown, sampled every 90 ms, never decrease.
-// - hovers ease (round R4, A1): a manager card, an offer, a hand card, a paper, a sticky note, a bubble and a door,
-//   60 ms after each one's transition delay, stand strictly between their rest and their hover.
+// - hovers ease (round R4, A1): a manager card, an offer, a hand card, a paper, a sticky note, the doors card (round
+//   R9c, E2), a bubble and a door, 60 ms after each one's transition delay, stand strictly between their rest and their
+//   hover.
 // - a month's sounds (round R4, B7), from the cue log `?cues` keeps: a deal per card dealt, a pick and a land per
 //   play, a button at END TURN, a stamp for PRINTED, the month at the date; no cue twice for one beat (ticks
 //   excepted); and a click during the next month end (D7) drops the cues of the beats it skips.
@@ -151,6 +154,8 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
   // A paper behind, by the strip of it that shows above the front one.
   await eases('a paper', '.desk .news .pp.pos1', '.desk .news .pp.pos1', 0, () => page.evaluate<[number, number] | null>(`(() => { const p = document.querySelector('.desk .news .pp.pos1'); if (!p) return null; const r = p.getBoundingClientRect(); return [r.x + r.width / 2, r.y + 12]; })()`));
   await eases('a sticky note', '.desk .mirror .sticky', '.desk .mirror .sticky', 0);
+  // The doors card (round R9c, E2), hovered at a door's row: it grows with its tilt as the notes do.
+  await eases('the doors card', '.desk .mirror .doorscard', '.desk .mirror .doorscard .door', 0);
   await eases('a bubble', '.desk .bubbles .bub[data-k]', '.desk .bubbles .bub[data-k]', 0);
   // A door: the season's last month, its doors laid out; then full motion for the hover.
   const s02 = states.s02;
@@ -421,7 +426,9 @@ async function tooltips(page: Page, url: string): Promise<Result[]> {
 /**
  * The mirror's goals (round R8b, B7), on a recorded desk (s02): the black card's tooltip is its major's name and goal
  * line, on hover; a sticky note's is its own, on a long-press (450 ms, as the stat bar's) and on keyboard focus. It closes
- * as the stat bar's do — leaving, a tap elsewhere, blur — and stands whole on the stage.
+ * as the stat bar's do — leaving, a tap elsewhere, blur — and stands whole on the stage. A door's row (round R9c, E2):
+ * its own, the door's name, "If you pass · if you fail" and its outcomes on two lines, under the card or above it, on
+ * hover and on keyboard focus — the card grown then, as on hover.
  */
 async function mirrorTips(page: Page, url: string): Promise<Result[]> {
   const out: Result[] = [];
@@ -429,12 +436,18 @@ async function mirrorTips(page: Page, url: string): Promise<Result[]> {
   if (!state) return [['mirror tooltips: no recorded state s02', false]];
   await reach(page, url, state);
   const tip = () =>
-    page.evaluate<{ on: boolean; header: string; line: string; whole: boolean }>(`(() => {
+    page.evaluate<{ on: boolean; header: string; line: string; whole: boolean; rows: number; clear: boolean }>(`(() => {
       const t = document.querySelector('.desk .goaltip');
       const st = document.querySelector('.stage').getBoundingClientRect();
       const r = t?.getBoundingClientRect();
-      return { on: !!t?.classList.contains('on'), header: t?.querySelector('b')?.textContent ?? '', line: t?.querySelector('span')?.textContent ?? '', whole: !!r && r.left >= st.left - 0.5 && r.right <= st.right + 0.5 && r.top >= st.top - 0.5 && r.bottom <= st.bottom + 0.5 };
+      const card = document.querySelector('.desk .mirror .doorscard')?.getBoundingClientRect();
+      return { on: !!t?.classList.contains('on'), header: t?.querySelector('b')?.textContent ?? '', line: t?.querySelector('span')?.textContent ?? '', whole: !!r && r.left >= st.left - 0.5 && r.right <= st.right + 0.5 && r.top >= st.top - 0.5 && r.bottom <= st.bottom + 0.5,
+        rows: t?.querySelectorAll('.outcomes .oc-row').length ?? 0, clear: !!r && !!card && (r.top >= card.bottom || r.bottom <= card.top) };
     })()`);
+  // A door's row's tooltip says the door's name as its row prints it, the branches' line, and its outcomes on two lines.
+  const door = (gate: string) => page.evaluate<string>(`document.querySelector('.desk .mirror .doorscard .door[data-gate="${gate}"] > b')?.textContent ?? '?'`);
+  const doorSays = async (t: { header: string; line: string; rows: number }, gate: string | null) => !!gate && t.header === (await door(gate)) && t.line === en['ui.doors.branches'] && t.rows === 2;
+  const grown = () => page.evaluate<boolean>(`(() => { const t = getComputedStyle(document.querySelector('.desk .mirror .doorscard')).transform; const v = t.replace(/^matrix\\(|\\)$/g, '').split(',').map(Number); return Math.hypot(v[0], v[1]) > 1.03; })()`);
   const words = (major: string | null) => ({ header: en[`ending.${major}.name`] ?? '?', line: en[`ending.${major}.goal`] ?? '?' });
   const says = (t: { header: string; line: string }, major: string | null) => !!major && t.header === words(major).header && t.line === words(major).line;
   const today = await page.evaluate<string | null>(`document.querySelector('.desk .mirror .today')?.dataset.major ?? null`);
@@ -448,6 +461,19 @@ async function mirrorTips(page: Page, url: string): Promise<Result[]> {
   await page.move(...(await neutral(page)));
   await sleep(300);
   out.push(["the black card's tooltip closes when the pointer leaves", !(await tip()).on]);
+  // A door's row (round R9c, E2), hovered: its own tooltip, clear of the card, whole on the stage; leaving closes it.
+  const gate = await page.evaluate<string | null>(`document.querySelector('.desk .mirror .doorscard .door')?.dataset.gate ?? null`);
+  const row = await centre(page, '.desk .mirror .doorscard .door');
+  if (!row || !gate) return [...out, ['mirror tooltips: no doors card', false]];
+  await page.move(...row);
+  await sleep(350);
+  const onRow = await tip();
+  out.push([`a door's row's tooltip opens on hover: the door's name, its line, its outcomes on two lines${onRow.on && !(await doorSays(onRow, gate)) ? `: "${onRow.header}" "${onRow.line.slice(0, 30)}", ${onRow.rows} lines of outcomes` : ''}`, onRow.on && (await doorSays(onRow, gate))]);
+  out.push([`a door's row's tooltip stands whole on the stage, ${onRow.clear ? 'clear of' : 'over'} the card`, onRow.whole && onRow.clear]);
+  out.push(['the doors card grows on hover', await grown()]);
+  await page.move(...(await neutral(page)));
+  await sleep(400);
+  out.push(["a door's row's tooltip closes when the pointer leaves", !(await tip()).on]);
   const major = await page.evaluate<string | null>(`document.querySelector('.desk .mirror .sticky')?.dataset.major ?? null`);
   const sticky = await centre(page, '.desk .mirror .sticky');
   if (!sticky || !major) return [...out, ['mirror tooltips: no sticky note', false]];
@@ -476,6 +502,16 @@ async function mirrorTips(page: Page, url: string): Promise<Result[]> {
   await sleep(250);
   const keyed = await tip();
   out.push([`the mirror's tooltip opens on keyboard focus, the focused one's goal line`, !!focused && keyed.on && says(keyed, focused)]);
+  // On to a door's row (round R9c, E2): its own tooltip, and the card grown as on hover.
+  let rowFocused: string | null = null;
+  for (let i = 0; i < 60 && !rowFocused; i++) {
+    await page.key('Tab');
+    rowFocused = await page.evaluate<string | null>(`document.activeElement?.closest?.('.desk .mirror .doorscard .door')?.dataset.gate ?? null`);
+  }
+  await sleep(350);
+  const rowKeyed = await tip();
+  const rowGrown = await grown();
+  out.push([`a door's row's tooltip opens on keyboard focus, its own${rowGrown ? ', the card grown' : ', the card not grown'}`, !!rowFocused && rowKeyed.on && (await doorSays(rowKeyed, rowFocused)) && rowGrown]);
   await page.evaluate(`document.activeElement?.blur()`);
   await sleep(250);
   out.push(["the mirror's tooltip closes on blur", !(await tip()).on]);
