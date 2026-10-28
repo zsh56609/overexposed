@@ -731,7 +731,8 @@ function checkDesk(s: GameState, seed: number, history: readonly PlayedStep[], l
   if (s.manager !== null) {
     const msgs = m.messages;
     if (!msgs || msgs.messages.length !== due || msgs.messages.some((x, i) => x.id !== `${month?.turn}.${i}` || x.bubbles.length !== 2)) bad(`bubbles ${JSON.stringify(msgs?.messages)} for ${due} messages`);
-    if (msgs && !msgs.from.startsWith(t(`manager.${s.manager}.name`).split(' ')[0] as string)) bad(`bubbles from "${msgs.from}"`);
+    // Headed with the name the manager goes by (round R9d, C): "Mags · Manager".
+    if (msgs && msgs.from !== t('ui.phone.from', { name: t(`manager.${s.manager}.short`) })) bad(`bubbles from "${msgs.from}"`);
     if (msgs && msgs.reactions.join(' ') !== t(m.crisis ? 'ui.react.frenzy' : 'ui.react.calm')) bad(`reactions ${msgs.reactions}`);
   }
 

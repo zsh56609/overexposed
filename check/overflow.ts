@@ -285,9 +285,9 @@ window.__plainAudit = (where) => {
     const h = b.height / k;
     if (Math.abs(h - 580) > 0.5) add('the scrapbook is ' + h.toFixed(1) + ' px tall on its ' + book.dataset.page + ' page, not 580');
     if (b.top < stage.top - 0.5 || b.bottom > stage.bottom + 0.5) add('the book runs off the stage');
-    const seen = pg ? [...pg.querySelectorAll('.clip, .pl')] : [];
-    if (pg && seen.length > 0) {
-      const room = (b.bottom - Math.max(...seen.map((el) => el.getBoundingClientRect().bottom))) / k;
+    const things = pg ? [...pg.querySelectorAll('.clip, .pl')] : [];
+    if (pg && things.length > 0) {
+      const room = (b.bottom - Math.max(...things.map((el) => el.getBoundingClientRect().bottom))) / k;
       if (room < -0.5) add('the scrapbook\\'s ' + book.dataset.page + ' page ends ' + (-room).toFixed(1) + ' px below the book');
       const seen = (window.__book ??= {});
       const was = seen[book.dataset.page];
