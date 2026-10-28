@@ -6,6 +6,19 @@ rules).
 
 ---
 
+## 2026-10-29 — Round R9d: three checks
+
+- check:preview held the bubbles' header to the full name's first word ("Marguerite"); since Part C
+  it holds it to the short name's line exactly, "Mags · Manager" (f1472b0).
+- check:overflow's scrapbook room (Part B) named the things on the page as the block below it names
+  the report's record: the inner name shadowed the outer and the audit threw before it began
+  (f1472b0, `things`).
+- check:interactions read a ticket's hover in one call and its frames in the next; in headless
+  WebKit at 1280×720 each call took longer than the 0.12 s transition, which runs there (transform
+  over 120 ms: −0.50 px at 45 ms, −0.96 at 103, −1 at 167). The frames are read from the call that
+  takes the hover in, the first at once (42f4b1c); the check still wants one frame strictly on its
+  way.
+
 ## 2026-10-28 — Round R9d, Part D: v0.9.4
 
 - v0.9.4 is R9d (`package.json` and the lock 0.9.4); the credits' foot shows v0.9.4.
