@@ -106,15 +106,11 @@
 :root[data-motion-resolved='reduced'] .desk .bub[data-k] { animation: bub-fade .2s ease-out backwards; }
 @keyframes bub-fade { from { opacity: 0; } }
 :root[data-motion='off'] .desk .bub[data-k] { animation: none; }
-.desk .bub.who { display: flex; align-items: center; gap: 7px; background: transparent; border: 0; box-shadow: none; text-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
+.desk .bub.who { display: flex; align-items: center; gap: 7px; background: transparent; border: 0; box-shadow: none; text-shadow: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
 /* In a frenzy the glass is tinted red. */
 .desk.crisis .bub .frost::after { background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(150, 32, 24, .42); }
 .desk.crisis .bub:not(.who)::after { border-color: rgba(255, 190, 180, .30); }
 .desk.crisis .bub.who { color: #ffb3a6; }
-/* Where backdrop-filter is not supported: the bubbles solid, as dark as the glass reads. */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .desk .bub:not(.who) { background: #2b2520; border-color: rgba(255, 220, 170, .10); }
-}
 .desk .rx { position: absolute; left: -9px; bottom: -12px; font-size: 12px; line-height: 1; background: #0f151b; border: 1px solid rgba(255, 255, 255, .2); border-radius: 10px; padding: 2px 4px; box-shadow: 0 3px 6px rgba(0, 0, 0, .5); animation: desk-rxPop .22s cubic-bezier(.3, 1.6, .5, 1); }
 .desk .rx-bar { animation: desk-pop-in .15s ease-out backwards; position: absolute; right: 0; top: calc(100% + 7px); display: flex; gap: 2px; padding: 4px 6px; background: #0f151b; border: 1px solid rgba(255, 255, 255, .16); border-radius: 18px; box-shadow: 0 8px 18px rgba(0, 0, 0, .6); z-index: 9; animation: desk-rxIn .16s ease-out; }
 .desk .rx-bar button { border: 0; background: transparent; font-size: 17px; line-height: 1; padding: 3px 4px; border-radius: 12px; cursor: pointer; transition: transform .15s; }
