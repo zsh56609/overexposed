@@ -48,7 +48,8 @@ type Result = [what: string, ok: boolean | 'skipped'];
  * hand's and the offers' are 70 ms), its transform lies strictly between its rest and its hover value. Since round R9b
  * (B3) two tickets too, BEGIN and END TURN, whose lift is 1 px over 0.12 s: read at every frame for 250 ms — headless
  * WebKit's frames come about 70 ms apart, so a read at 60 ms lands after so short a transition — one frame of them
- * strictly on its way.
+ * strictly on its way. Since round R9d from the very call that takes the hover in: in headless WebKit at 1280x720 a
+ * second call to the page began after the transition had run.
  */
 async function hoversEase(page: Page, url: string): Promise<Result[]> {
   const out: Result[] = [];
@@ -61,7 +62,8 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
     const v = !t || t === 'none' ? [1, 0, 0, 1, 0, 0] : t.replace(/^matrix(3d)?\\(|\\)$/g, '').split(',').map(Number);
     return v.length === 16 ? v : [v[0], v[1], 0, 0, v[2], v[3], 0, 0, 0, 0, 1, 0, v[4], v[5], 0, 1];
   })()`);
-  // Every frame's transform for `ms`, as matrix() reads it (a ticket's short transition, R9b).
+  // Every frame's transform for `ms`, as matrix() reads it (a ticket's short transition, R9b): the first read at once,
+  // which takes the hover in (round R9d), then one a frame.
   const frames = (sel: string, ms: number) => page.evaluate<number[][]>(`new Promise((done) => {
     const el = document.querySelector(${JSON.stringify(sel)});
     const out = [];
@@ -72,7 +74,7 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
       out.push(v.length === 16 ? v : [v[0], v[1], 0, 0, v[2], v[3], 0, 0, 0, 0, 1, 0, v[4], v[5], 0, 1]);
       if (performance.now() - start < ${ms}) requestAnimationFrame(read); else done(out);
     };
-    requestAnimationFrame(read);
+    read();
   })`);
   const eases = async (label: string, sel: string, hover: string, delay: number, point?: () => Promise<[number, number] | null>, short = false): Promise<void> => {
     await page.move(4, 4);
@@ -84,9 +86,6 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
       return;
     }
     await page.move(at[0], at[1]);
-    // A browser takes the hover in at its next style update — headless WebKit's come about 70 ms apart here — so the
-    // style is read at once: the hover is taken in now, and its transition runs from now, in every browser.
-    await matrix(sel);
     if (short) {
       const seen = await frames(sel, 250);
       const end = seen.at(-1);
@@ -99,6 +98,9 @@ async function hoversEase(page: Page, url: string): Promise<Result[]> {
       out.push([`hover eases: ${label}, ${span === 0 ? 'no hover move' : `${on.length} of ${fs.length} frames on its way (${fs.map((f) => Math.round(f * 100)).join(', ')}%)`} in 250 ms`, on.length > 0]);
       return;
     }
+    // A browser takes the hover in at its next style update — headless WebKit's come about 70 ms apart here — so the
+    // style is read at once: the hover is taken in now, and its transition runs from now, in every browser.
+    await matrix(sel);
     await sleep(delay + 60);
     // Read at the next frame (round R5): an animation's time moves on only at a frame, and headless WebKit's come about
     // 70 ms apart here, so a read between two frames can still see the transition at its start.
