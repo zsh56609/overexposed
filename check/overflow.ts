@@ -96,8 +96,10 @@ const AUDIT = `window.__deskAudit = (where) => {
     const rw = p.querySelector('.rw'); if (rw) { const pr = S(p.getBoundingClientRect()), rr = S(rw.getBoundingClientRect()); if (p.classList.contains('pos0') && rr.b > pr.b - 4) add('the front paper ' + p.dataset.paper + ' is cut off at the bottom: row ends ' + Math.round(rr.b) + ', page ' + Math.round(pr.b)); }
     for (const e of p.querySelectorAll('.ear')) { const er = e.getBoundingClientRect(), mr = p.querySelector('.mhrow').getBoundingClientRect(); if (er.height > mr.height + 1) add('ear taller than its masthead row "' + e.textContent + '"'); }
   }
-  // The mirror: the black card and the notes inside the glass, the notes' requirement lines on one line.
-  const glass = desk.querySelector('.glass');
+  // The mirror: the black card and the notes inside the glass, the notes' requirement lines on one line. The real
+  // mirror's, by its hook: each of the manager's bubbles holds a frosted copy with its classes (round R9d, A2).
+  const mirror = desk.querySelector('[data-hook="mirror"]');
+  const glass = mirror?.querySelector('.glass');
   if (glass) {
     const g = S(glass.getBoundingClientRect());
     for (const n of desk.querySelectorAll('.mirror .sticky, .mirror .today')) within(n, { l: g.l - 30, t: g.t - 30, r: g.r + 30, b: g.b }, 'mirror note');
@@ -106,7 +108,7 @@ const AUDIT = `window.__deskAudit = (where) => {
     const box = (el) => S(el.getBoundingClientRect());
     const all = [today, ...notes].filter(Boolean);
     for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = box(all[i]), b = box(all[j]); const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t); if (ox > 6 && oy > 6) add('mirror notes overlap ' + name(all[i]) + ' / ' + name(all[j]) + ' by ' + Math.round(ox) + 'x' + Math.round(oy)); }
-    const clip = desk.querySelector('.mirror .clipM'); if (clip) within(clip, STAGE, 'clipping');
+    const clip = mirror.querySelector('.clipM'); if (clip) within(clip, STAGE, 'clipping');
     // The season's doors card (round R9b, A3): inside the glass with its tilt, clear of the black card, the three notes,
     // the frenzy's clipping and the manager's bubbles; its height, its room above the glass's foot and its least gap to a
     // note kept for the report, by season.
@@ -115,7 +117,7 @@ const AUDIT = `window.__deskAudit = (where) => {
       within(doors, g, 'the doors card');
       const d = box(doors);
       const gapTo = (el) => { const b = box(el); return Math.max(d.t - b.b, b.t - d.b, d.l - b.r, b.l - d.r); };
-      for (const el of desk.querySelectorAll('.mirror .sticky, .mirror .today, .mirror .clipM, .bubbles .bub')) if (gapTo(el) <= 0) add('the doors card meets ' + name(el) + ' "' + el.textContent.slice(0, 30) + '"');
+      for (const el of [...mirror.querySelectorAll('.sticky, .today, .clipM'), ...desk.querySelectorAll('.bubbles .bub')]) if (gapTo(el) <= 0) add('the doors card meets ' + name(el) + ' "' + el.textContent.slice(0, 30) + '"');
       const seen = (window.__doorsCard ??= {}), season = desk.dataset.season ?? '?', was = seen[season];
       const gap = Math.min(...all.map(gapTo));
       seen[season] = { h: Math.max(doors.offsetHeight, was?.h ?? 0), room: Math.round(Math.min(g.b - d.b, was?.room ?? Infinity) * 10) / 10, gap: Math.round(Math.min(gap, was?.gap ?? Infinity) * 10) / 10 };

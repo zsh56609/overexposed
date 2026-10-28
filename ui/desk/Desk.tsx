@@ -113,7 +113,7 @@ export function Desk({ model, on, children, snap, onTails, mode = 'game', busy =
       <Pile snap={snap} model={model}/>
       <Motion snap={snap} onTails={onTails} />
       {snap.active?.plan&&<MonthMotion key={snap.active.step.id} snap={snap} model={model}/>}
-      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} ending={ending} onShown={setBubbles} />}
+      {game && <Bubbles messages={model.messages} visibleBubbles={view.visibleBubbles} busy={snap.busy} ending={ending} onShown={setBubbles} crisis={model.crisis} clipping={model.mirror.clipping} />}
       <div className="dim" />
       {game && model.playing && <Hand cards={model.hand} words={model.handWords} endTurn={model.endTurn} season={model.season} play={on.play} end={on.end} focus={on.focus} toast={showToast} busy={snap.busy} hiddenCards={view.hiddenCards} />}
       <div className={`toast${toast.on ? ' on' : ''}`} role="status" data-hook="toast">

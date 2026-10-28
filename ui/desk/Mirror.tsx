@@ -40,6 +40,27 @@ const SPOTS = [
 
 const ph = (text: string, base: string): string => (isPlaceholder(text) ? `${base} placeholder` : base);
 
+/**
+ * The mirror as it stands behind the manager's bubbles (round R9d, A2), for their frosted glass (DeskItems.tsx, Frost):
+ * its frame, its glass with the glass's highlights, the bulbs as they are now, and the frenzy's red clipping as a box
+ * its size (Frost gives it the mirror's own clipping's height) — the mirror's own classes, without its words, hooks or
+ * anything to focus. Nothing else on the glass reaches the bubbles' column.
+ */
+export function MirrorBackdrop({ crisis, clipping }: { crisis: boolean; clipping: boolean }) {
+  return (
+    <div className="mirror">
+      <div className="mframe" />
+      <div className="glass" />
+      <div className="bulbs">
+        {BULBS.map(([x, y], i) => (
+          <div key={i} className={bulbClass(i, crisis)} style={{ left: x, top: y, ['--i' as string]: i }} />
+        ))}
+      </div>
+      {clipping && <div className="clipM" />}
+    </div>
+  );
+}
+
 /** A goal's tooltip (round R8b, B7): where it stands on the stage, and what it says. */
 interface GoalTip {
   readonly header: string;

@@ -10,8 +10,9 @@
 .desk {
   position: absolute; inset: 0; width: 1280px; height: 720px; overflow: hidden; overflow: clip;
   font-family: 'Libre Franklin', system-ui, sans-serif; font-size: 16px; line-height: normal; color: var(--ink);
-  background: radial-gradient(ellipse at 58% 26%, var(--wall) 0%, var(--wall2) 62%, #0c0907 100%);
 }
+/* The wall: the desk's, and the copy of it in each bubble's frosted glass (round R9d, A2; desk-items.css). */
+.desk, .desk .frost-scene { background: radial-gradient(ellipse at 58% 26%, var(--wall) 0%, var(--wall2) 62%, #0c0907 100%); }
 .desk *, .desk *::before, .desk *::after { box-sizing: border-box; margin: 0; padding: 0; }
 .desk button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: inherit; }
 .desk .icondefs { position: absolute; width: 0; height: 0; overflow: hidden; }

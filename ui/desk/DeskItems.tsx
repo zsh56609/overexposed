@@ -12,6 +12,7 @@ import { isPlaceholder } from '../text.ts';
 import { composeTransforms, motionMode, useMotionMode } from '../motion.ts';
 import { cue } from '../sound/sound.ts';
 import { crumple, sheetA, sheetB } from './drawings.ts';
+import { MirrorBackdrop } from './Mirror.tsx';
 import { LOCK_BARS, type DeskLabels, type LaneClass, type MessagesModel, type PhoneModel, type ScriptModel } from './model.ts';
 
 const reduceMotion = (): boolean => motionMode()!=='full';
@@ -366,6 +367,58 @@ export const Uprights = memo(function Uprights({ lane, crisis, labels, balls }: 
 /** How the month's bubbles come (round R3, C1): once its hand is dealt and the desk is still, one by one. */
 const REVEAL = { first: 250, next: 380 } as const;
 
+/** How far the frosted copy reaches past its bubble on every side (round R9d, A2): `.frost-blur`'s inset in CSS. */
+const FROST = 32;
+
+/**
+ * A bubble's frosted glass (round R9d, A2). Blurring the page behind the glass drew it in pieces where the page is
+ * composited off whole device pixels (itch's frame at 125 %), so each bubble holds its own copy of what stands behind
+ * it — the wall, the light pool and the mirror (Mirror.tsx, MirrorBackdrop) — lined up with the scene from the
+ * bubble's place in the desk (its layout offsets, not its animated box: during its entrance and its hover the copy
+ * moves with it) and blurred with an ordinary filter inside a box FROST px larger than the bubble. Placed again
+ * whenever the column changes: a bubble arrives, a reaction is left, a month opens. Over it, in CSS, the glass's tint
+ * and sheen, its edge and its inner light.
+ */
+function Frost({ crisis, clipping }: { crisis: boolean; clipping: string | null }) {
+  const scene = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const at = scene.current;
+    const bub = at?.closest<HTMLElement>('.bub');
+    const column = bub?.parentElement;
+    if (!at || !bub || !column) return;
+    const place = () => {
+      let x = 0;
+      let y = 0;
+      for (let el: HTMLElement | null = bub; el && !el.classList.contains('desk'); el = el.offsetParent as HTMLElement | null) {
+        x += el.offsetLeft;
+        y += el.offsetTop;
+      }
+      at.style.left = `${FROST - x}px`;
+      at.style.top = `${FROST - y}px`;
+      // The frenzy's clipping as tall as the mirror's own: its words make its height.
+      const copy = at.querySelector<HTMLElement>('.clipM');
+      const real = bub.closest('.desk')?.querySelector<HTMLElement>('[data-hook="clipping"]');
+      if (copy) copy.style.height = real ? `${real.offsetHeight}px` : '';
+    };
+    place();
+    const watch = new ResizeObserver(place);
+    watch.observe(column);
+    watch.observe(bub);
+    return () => watch.disconnect();
+  }, [clipping]);
+  return (
+    <div className="frost" aria-hidden="true">
+      <div className="frost-blur">
+        <div className="frost-scene" ref={scene}>
+          <div className="wallpaper" />
+          <div className="lightpool" />
+          <MirrorBackdrop crisis={crisis} clipping={clipping !== null} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** The phone's screen lights once — v18's own glow, never a whole-phone filter (V1b; on its own at signing, R4 A2). */
 export function glowPhone(desk: Element | null): Animation[] {
   const screen = desk?.querySelector('.phone .phone-screen');
@@ -399,8 +452,11 @@ function buzz(desk: Element | null): Animation[] {
  * Round R7 (A4): once a month's first bubble has come, the rest keep their pace whatever the player does — an action,
  * a card's flight and the month's end never bring them at once. They hold no input, so nothing waits on them; if the
  * month ends before they have all come, the rest are not shown. Reduced motion shows them all at once, with one buzz.
+ *
+ * Round R9d (A2): each bubble frosted by its own copy of the desk behind it (Frost): `crisis` for the bulbs' state, and
+ * the frenzy's `clipping`, if there is one.
  */
-export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, ending = false, onShown }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; ending?: boolean; onShown?: (n: number) => void }) {
+export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = false, ending = false, onShown, crisis = false, clipping = null }: { messages: MessagesModel | null; visibleBubbles?: number; busy?: boolean; ending?: boolean; onShown?: (n: number) => void; crisis?: boolean; clipping?: string | null }) {
   const [rx, setRx] = useState<ReadonlyMap<string, string>>(new Map());
   const [open, setOpen] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -479,6 +535,7 @@ export const Bubbles = memo(function Bubbles({ messages, visibleBubbles, busy = 
                 setOpen(open === k ? null : k);
               }}
             >
+              <Frost crisis={crisis} clipping={clipping} />
               <span className={ph(text)}>
                 <Named text={text} />
               </span>

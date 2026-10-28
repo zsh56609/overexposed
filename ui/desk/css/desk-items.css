@@ -81,15 +81,21 @@
 .desk .ball { position: absolute; z-index: 21; opacity: 0; transform: scale(.6); transition: opacity .4s, transform .45s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; line-height: 0; }
 .desk.crisis .ball { opacity: 1; transform: scale(1); }
 
-/* The manager's messages, above the phone: two bubbles each, the manager's name above. Liquid glass (round R9b, B2):
-   a light gradient over a little warm tint, the desk blurred and saturated behind it, a bright top edge. */
+/* The manager's messages, above the phone: two bubbles each, the manager's name above. In glass (round R9b, B2; round
+   R9d, A2): each bubble holds its own copy of what stands behind it — the wall, the light pool, the mirror's frame,
+   glass and bulbs (DeskItems.tsx, Frost) — blurred and saturated with an ordinary filter inside a box 32 px larger than
+   the bubble and clipped to the bubble's shape; over it the glass's tint and its sheen, over those its edge and its inner
+   light; under it all the bubble's shadow. Nothing blurs the page behind it: some GPUs drew that in pieces. The bubble
+   is its own stacking context, so its layers stay in that order through its entrance and its hover. */
 .desk .bubbles { position: absolute; right: 16px; bottom: 306px; width: 250px; z-index: 30; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-.desk .bub { position: relative; max-width: 240px; font-size: 11px; line-height: 1.38; padding: 8px 11px; border-radius: 12px 12px 3px 12px; transform-origin: 100% 50%; transition: transform .24s ease;
-  background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(42, 36, 30, .30);
-  -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, .26); color: #fffaf2; text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 16px rgba(255, 255, 255, .04), 0 10px 22px rgba(0, 0, 0, .38);
+.desk .bub { position: relative; isolation: isolate; max-width: 240px; font-size: 11px; line-height: 1.38; padding: 8px 11px; border-radius: 12px 12px 3px 12px; transform-origin: 100% 50%; transition: transform .24s ease;
+  border: 1px solid transparent; color: #fffaf2; text-shadow: 0 1px 1px rgba(0, 0, 0, .35); box-shadow: 0 10px 22px rgba(0, 0, 0, .38);
 }
+.desk .bub .frost { position: absolute; inset: -1px; z-index: -1; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.desk .bub .frost-blur { position: absolute; inset: -32px; overflow: hidden; filter: blur(14px) saturate(160%); }
+.desk .bub .frost-scene { position: absolute; width: 1280px; height: 720px; }
+.desk .bub .frost::after { content: ""; position: absolute; inset: 0; background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(42, 36, 30, .30); }
+.desk .bub:not(.who)::after { content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; border: 1px solid rgba(255, 255, 255, .26); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 16px rgba(255, 255, 255, .04); pointer-events: none; }
 .desk .bub:not(.who) { cursor: pointer; }
 .desk .bub:not(.who):hover { transform: scale(1.03); }
 .desk .bub.has-rx { margin-bottom: 9px; z-index: 2; }
@@ -102,8 +108,9 @@
 :root[data-motion='off'] .desk .bub[data-k] { animation: none; }
 .desk .bub.who { display: flex; align-items: center; gap: 7px; background: transparent; border: 0; box-shadow: none; text-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0 2px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #9fb3c2; }
 /* In a frenzy the glass is tinted red. */
-.desk.crisis .bub { background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(150, 32, 24, .42); border-color: rgba(255, 190, 180, .30); }
-.desk.crisis .bub.who { background: transparent; border: 0; color: #ffb3a6; }
+.desk.crisis .bub .frost::after { background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(150, 32, 24, .42); }
+.desk.crisis .bub:not(.who)::after { border-color: rgba(255, 190, 180, .30); }
+.desk.crisis .bub.who { color: #ffb3a6; }
 /* Where backdrop-filter is not supported: the bubbles solid, as dark as the glass reads. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .desk .bub:not(.who) { background: #2b2520; border-color: rgba(255, 220, 170, .10); }
