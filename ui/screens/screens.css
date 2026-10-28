@@ -97,11 +97,11 @@
 .manager-choice .m-veteran .bcard .tag { color: #d6b46e; }
 .manager-choice .sample { margin-top: 22px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 .manager-choice .sample small { font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
-/* The bubbles in the glass's look (round R9b, B2), as the desk's, but without backdrop-filter (round R9c, E1): one GPU
-   drew it in two pieces and the gradient started again a quarter of the way in. The solid base under the gradient reads
-   the same over this dark ground. */
+/* The bubbles in glass (round R9b, B2), the one glass of the game (round R9d, A1): the sheen over the glass's
+   translucent tint, the bright top edge, the border, the inner light and the shadow — and nothing blurring the page
+   behind it, which some GPUs drew in pieces. Over this dimmed ground the glass never had anything to blur. */
 .manager-choice .sample .bub { font-size: 12px; line-height: 1.35; padding: 8px 12px; border-radius: 12px 12px 12px 3px;
-  background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), #1f1a16;
+  background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(42, 36, 30, .30);
   border: 1px solid rgba(255, 255, 255, .26); color: #fffaf2; text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 16px rgba(255, 255, 255, .04), 0 10px 22px rgba(0, 0, 0, .38);
 }
@@ -250,13 +250,13 @@
 .awards-night .fp.red .h { color: #D92B1F; }
 .awards-night .fp .mini { position: absolute; right: 11px; bottom: 9px; width: 62px; height: 46px; object-fit: cover; }
 /* The night's last words (round R8c, D5; r8c-awards.html .word): the manager's under the first front page, Juno's under
-   the second, each one front page wide. */
+   the second, each one front page wide. In the game's one glass (round R9d, A1): its tint over the night's smooth dark
+   ground, nothing blurred behind it. */
 .awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 226px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
 .awards-night .lastword.rivalword { left: 406px; }
 .awards-night .lastword small { display: flex; align-items: center; gap: 7px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
 .awards-night .lastword .bub { max-width: 226px; font-size: 12px; line-height: 1.35; padding: 7px 12px; border-radius: 12px 12px 12px 3px;
   background: linear-gradient(165deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, .07) 45%, rgba(255, 255, 255, .12) 100%), rgba(42, 36, 30, .30);
-  -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, .26); color: #fffaf2; text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 16px rgba(255, 255, 255, .04), 0 10px 22px rgba(0, 0, 0, .38);
 }
@@ -406,7 +406,7 @@
 .event-screen .evcap b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 900; font-size: 28px; line-height: 1.1; margin-top: 6px; text-wrap: balance; }
 .event-screen .evcap i { display: block; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 14px; line-height: 1.4; color: #bfb3a0; margin-top: 8px; }
 .event-screen .phone-big { position: absolute; left: 470px; top: 22px; width: 340px; height: 624px; border-radius: 40px; background: #0b0d10; box-shadow: 0 0 0 3px #2a2d33, 0 30px 50px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); }
-/* The phone in liquid glass (round R9b, B2): a warm dark screen, glass bubbles on it, yours amber; no blue. */
+/* The phone in glass (round R9b, B2): a warm dark screen, glass bubbles on it, yours amber; no blue. */
 .event-screen .ph-screen { position: absolute; inset: 12px; border-radius: 29px; background: radial-gradient(130% 70% at 15% 0%, #4a3322 0%, #22180f 45%, #120e0b 100%); overflow: hidden; display: flex; flex-direction: column; }
 .event-screen .ph-top { flex: none; padding: 18px 16px 11px; border-bottom: 1px solid rgba(255, 255, 255, .08); display: flex; align-items: center; gap: 10px; color: #eef3f6; background: rgba(255, 255, 255, .03); }
 .event-screen .ph-av { width: 40px; height: 40px; border-radius: 50%; background: #3b6ea5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex: none; }
@@ -417,10 +417,10 @@
 .event-screen .thread { flex: 1; min-height: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 7px; overflow: hidden; }
 .event-screen .m { max-width: 80%; padding: 8px 11px; border-radius: 15px; font-size: 12.5px; line-height: 1.38; animation: ev-pop .28s ease-out backwards; }
 .event-screen .m.in { align-self: flex-start; color: #fffaf2; border-bottom-left-radius: 4px; }
-/* The glass, on every incoming bubble but the photograph, which stays as it was. */
+/* The glass, on every incoming bubble but the photograph, which stays as it was: its own gradient over the screen's
+   smooth dark ground, nothing blurred behind it (round R9d, A1). */
 .event-screen .m.in:not(.pic) {
   background: linear-gradient(165deg, rgba(255, 255, 255, .20), rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, .11));
-  -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, .2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4);
 }
 /* A photo in a thread (round R8b): one more incoming message, the photograph itself the bubble — 200×150, the sender's
@@ -432,7 +432,6 @@
 }
 .event-screen .typing { flex: none; align-self: flex-start; border-radius: 15px; padding: 10px 12px; display: flex; gap: 4px; animation: ev-pop .28s ease-out backwards;
   background: linear-gradient(165deg, rgba(255, 255, 255, .20), rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, .11));
-  -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, .2); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4);
 }
 .event-screen .typing.late { animation-delay: 450ms; }
