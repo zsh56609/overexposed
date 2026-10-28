@@ -70,7 +70,7 @@ import {
   lineText,
   majorGoal,
   majorName,
-  managerName,
+  managerShort,
   mastheadName,
   messageBubbles,
   minorName,
@@ -730,9 +730,9 @@ function messages(s: GameState, steps: readonly PlayedStep[], frenzy: boolean): 
   const month = thisMonth(s, steps);
   return {
     month: month?.turn ?? s.turn,
-    // The manager by their first name, as the mockup labels the bubbles ("Marguerite · Manager"): the full name
+    // The manager by the name they go by (round R9d, C): "Mags · Manager", as she asks to be called — the full name
     // runs into the mirror's bulbs.
-    from: t('ui.phone.from', { name: managerName(s.content, s.manager).split(/\s+/)[0] ?? '' }),
+    from: t('ui.phone.from', { name: managerShort(s.content, s.manager) }),
     avatar: getManager(s.content, s.manager)?.avatar ?? null,
     messages: (month?.messages ?? []).map((m, i) => ({ id: `${month?.turn ?? s.turn}.${i}`, bubbles: messageBubbles(s.manager as string, m) })),
     reactions: t(frenzy ? 'ui.react.frenzy' : 'ui.react.calm').split(' '),

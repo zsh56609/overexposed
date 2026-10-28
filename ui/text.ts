@@ -118,6 +118,8 @@ export const endingPair = (c: ContentIndex, majorId: string, minorId: string): s
   t('ui.ending.pair', { major: majorName(c, majorId), minor: minorName(c, minorId) });
 /** A manager's name (round 2b): the label on their messages. */
 export const managerName = (c: ContentIndex, id: string): string => t(getManager(c, id)?.nameKey ?? `manager.${id}.name`);
+/** The name a manager goes by (round R9d, C): "Dex", "Mags" — over their bubbles and with their last word on the night. */
+export const managerShort = (c: ContentIndex, id: string): string => t(getManager(c, id)?.shortKey ?? `manager.${id}.short`);
 /**
  * A manager's message as it reads (round 2c): two bubbles — the variant's own, and a one-bubble variant's
  * sign-off — one per line. With nothing written, its key, loudly.

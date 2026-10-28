@@ -15,7 +15,7 @@ import { Face } from '../Face.tsx';
 import { t } from '../i18n.ts';
 import { motionMode } from '../motion.ts';
 import type { PlayedStep } from '../queue.ts';
-import { awardCitation, awardName, awardShort, majorName, managerName, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
+import { awardCitation, awardName, awardShort, majorName, managerShort, mastheadName, minorName, minorText, pageItemText, seasonName } from '../text.ts';
 import { Trophy, trophyOf } from '../Trophy.tsx';
 import { isPerson, Named, PersonName } from '../Named.tsx';
 import { cue, music } from '../sound/sound.ts';
@@ -158,7 +158,7 @@ export function NightWords({ c, last, rival }: NightWordsProps) {
         <div className="lastword rv" style={{ animationDelay: '4.6s' }} data-hook="last-word">
           <small>
             {lastFace && <Face id={lastFace} size={22} />}
-            <Named text={t('ui.phone.from', { name: managerName(c, last.manager).split(/\s+/)[0] ?? '' })} />
+            <Named text={t('ui.phone.from', { name: managerShort(c, last.manager) })} />
           </small>
           {last.bubbles.map((key) => (
             <div key={key} className={prose(t(key), 'bub')}>

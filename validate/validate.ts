@@ -1545,7 +1545,7 @@ function checkPress(v: Ctx, raw: unknown, rules: Obj | null, majorIds: ReadonlyS
 // engine applies — and a line group per message trigger.
 
 const MANAGERS_FIELDS = ['choice', 'managers', 'messages'];
-const MANAGER_FIELDS = ['id', 'nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'avatar', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
+const MANAGER_FIELDS = ['id', 'nameKey', 'shortKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey', 'avatar', 'perk', 'sample', 'lines', 'signoffs', 'lastWord'];
 
 /** A face (round R8a): one of the portraits in core/content.ts's closed list, AVATAR_IDS. */
 function checkAvatar(v: Ctx, x: unknown, where: string): void {
@@ -1591,7 +1591,8 @@ function checkManagers(v: Ctx, raw: unknown, rules: Obj | null, endings: unknown
   const needed = messageLineKeys(majorIds, v.lanes, v.fameBands);
   const managers = checkList(v, raw.managers, `${file} managers`, 'manager', (m, where) => {
     v.fields(m, MANAGER_FIELDS, where);
-    for (const f of ['nameKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey'] as const) v.key(m[f], `${where}.${f}`);
+    // Their short name too (round R9d, C): every manager has one, the name over their bubbles and their last word.
+    for (const f of ['nameKey', 'shortKey', 'roleKey', 'quoteKey', 'descriptionKey', 'tagKey'] as const) v.key(m[f], `${where}.${f}`);
     // Their face (round R8a): on their card, beside their name above the bubbles, on the awards night.
     checkAvatar(v, m.avatar, `${where}.avatar`);
     const sample = m.sample;

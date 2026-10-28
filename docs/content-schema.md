@@ -219,7 +219,9 @@ Round 2b ([`design/content-expansion.md`](design/content-expansion.md)
 
 - `choice`: the choice screen's `kickerKey`, `titleKey`, `subtitleKey`,
   `footerKey`.
-- `managers`: `id`, `nameKey`, `roleKey`, `quoteKey`, `descriptionKey`,
+- `managers`: `id`, `nameKey`, `shortKey` (round R9d: the name they go
+  by, over their bubbles and with their last word on the awards night; every
+  manager has one), `roleKey`, `quoteKey`, `descriptionKey`,
   `tagKey`; `avatar` (round R8a), their face — on their business card,
   beside their name above the bubbles, on the awards night; `sample`
   (`labelKey`, `key`), the choice screen's sample text; `perk`, and

@@ -4,6 +4,7 @@
     {
       "id": "veteran",
       "nameKey": "manager.veteran.name",
+      "shortKey": "manager.veteran.short",
       "roleKey": "manager.veteran.role",
       "quoteKey": "manager.veteran.quote",
       "descriptionKey": "manager.veteran.description",
@@ -56,6 +57,7 @@
     {
       "id": "guardian",
       "nameKey": "manager.guardian.name",
+      "shortKey": "manager.guardian.short",
       "roleKey": "manager.guardian.role",
       "quoteKey": "manager.guardian.quote",
       "descriptionKey": "manager.guardian.description",

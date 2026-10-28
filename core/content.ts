@@ -500,6 +500,8 @@ export interface ManagerPerk {
 export interface ManagerDef {
   readonly id: string;
   readonly nameKey: string;
+  /** The name they go by (round R9d, C): above their bubbles on the desk and with their last word on the awards night. */
+  readonly shortKey: string;
   readonly roleKey: string;
   readonly quoteKey: string;
   readonly descriptionKey: string;
