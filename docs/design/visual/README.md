@@ -297,9 +297,11 @@ italic line.
   trophy a silhouette (`grayscale(1) brightness(.42) contrast(.9) opacity(.75)`), its
   how-line 10 px. Since round R9a the book is one size on both pages, 580 tall, and since
   round R9b both pages have the same room round their contents: each starts 26 px under the
-  heading, with about 60 px left under it — the plaques 124 high, as on the night, the shelf's
-  rows 22 apart, a clipping's padding 11 12 12 and 17 between clippings (round R9c: at 21 a
-  column of four left the endings page 16 px less room than the awards page), a gap's 17 12. And the page
+  heading, with 60.6 px between the lowest thing on it and the book's foot (the endings page
+  66.2 with none found) — the plaques 124 high, as on the night, the shelf's rows 22 apart, a
+  clipping's padding 11 12 12 and 21 between clippings (round R9c's 17 came from a measure to
+  the column's box, which counts the last clipping's unseen margin; round R9d put 21 back), a
+  gap's 17 12. And the page
   turns: the page going slides
   out and the next slides in, overlapping — 28 px, 240 ms, `cubic-bezier(.2, .7, .2, 1)`,
   each fading; Endings → Awards the old page leaves to the left and the awards come in from

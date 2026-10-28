@@ -277,14 +277,17 @@ window.__plainAudit = (where) => {
     if (last.bottom > b.bottom + 0.5) add('the shelf\\'s last row ends ' + (last.bottom - b.bottom).toFixed(1) + ' px below the book');
   }
   // The book one size on both pages (round R9a, D1): 580 tall, its page inside it, the book on the stage — the height
-  // and the room under each page kept for the report.
+  // and each page's room kept for the report: from the book's foot to the lowest thing that can be seen on the page, its
+  // clippings and gaps or its plaques, tilt included (round R9d, B) — never a column's box, which counts the last
+  // clipping's margin.
   if (book) {
     const k = stage.height / 720, b = book.getBoundingClientRect(), pg = book.querySelector('.pages > .page:not(.going)');
     const h = b.height / k;
     if (Math.abs(h - 580) > 0.5) add('the scrapbook is ' + h.toFixed(1) + ' px tall on its ' + book.dataset.page + ' page, not 580');
     if (b.top < stage.top - 0.5 || b.bottom > stage.bottom + 0.5) add('the book runs off the stage');
-    if (pg) {
-      const room = (b.bottom - pg.getBoundingClientRect().bottom) / k;
+    const seen = pg ? [...pg.querySelectorAll('.clip, .pl')] : [];
+    if (pg && seen.length > 0) {
+      const room = (b.bottom - Math.max(...seen.map((el) => el.getBoundingClientRect().bottom))) / k;
       if (room < -0.5) add('the scrapbook\\'s ' + book.dataset.page + ' page ends ' + (-room).toFixed(1) + ' px below the book');
       const seen = (window.__book ??= {});
       const was = seen[book.dataset.page];
@@ -732,9 +735,11 @@ const DRIVE = (runs: number) => `(async () => {
 
 /**
  * Runs in the page (round R9b, D2b): the scrapbook opened from the title, with the collections the page loaded with —
- * each page's room under it; on the endings page each column's first clipping's top and every clipping's height with
- * its margin (stage px, so the columns' worst mix can be summed); on the awards page each plaque's words against its
- * padding box (the least room, and any plaque whose words run out of it).
+ * each page's room, from the book's foot to the lowest thing that can be seen on it (round R9d, B: the clippings and
+ * gaps, or the plaques, by their boxes, tilt included; never a column's box, which counts the last clipping's margin);
+ * on the endings page each column's first clipping's top, every clipping's height with its margin, and how far under its
+ * place in layout it can be seen (stage px, so the columns' worst mix can be summed); on the awards page each plaque's
+ * words against its padding box (the least room, and any plaque whose words run out of it).
  */
 const BOOK_MEASURE = `(async () => {
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -747,19 +752,20 @@ const BOOK_MEASURE = `(async () => {
   await sleep(40);
   const k = document.querySelector('.stage').getBoundingClientRect().height / 720;
   const book = document.querySelector('.ov .book');
-  const room = () => (book.getBoundingClientRect().bottom - book.querySelector('.pages > .page:not(.going)').getBoundingClientRect().bottom) / k;
-  const endings = room();
+  const room = (sel) => (book.getBoundingClientRect().bottom - Math.max(...[...book.querySelectorAll('.pages > .page:not(.going) ' + sel)].map((el) => el.getBoundingClientRect().bottom))) / k;
+  const endings = room('.clip');
   const columns = [...book.querySelectorAll('.cols .col')].map((col) => {
     const clips = [...col.querySelectorAll('.clip')];
-    // The first clipping's top in layout (a found one is turned, so its box's top is not), from the column's own.
-    return { major: col.dataset.major, top: clips.length ? (col.getBoundingClientRect().top - book.getBoundingClientRect().top) / k + (clips[0].offsetTop - col.offsetTop) : 0, clips: clips.map((c) => ({ minor: c.dataset.minor, h: c.offsetHeight + parseFloat(getComputedStyle(c).marginBottom) })) };
+    // Each clipping's top in layout (a found one is turned, so its box's top is not), from the column's own.
+    const at = (c) => col.getBoundingClientRect().top + (c.offsetTop - col.offsetTop) * k;
+    return { major: col.dataset.major, top: clips.length ? (at(clips[0]) - book.getBoundingClientRect().top) / k : 0, clips: clips.map((c) => ({ minor: c.dataset.minor, h: c.offsetHeight + parseFloat(getComputedStyle(c).marginBottom), seen: (c.getBoundingClientRect().bottom - at(c)) / k })) };
   });
   const inner = (book.getBoundingClientRect().height) / k;
   document.querySelector('.p-scrapbook .tab[data-tab="awards"]').click();
   await shown('.p-scrapbook .awards-page');
   for (let i = 0; i < 50 && book.querySelector('.pages > .going'); i++) await sleep(20);
   await sleep(40);
-  const awards = room();
+  const awards = room('.pl');
   let tightest = Infinity;
   const out = [];
   for (const pl of book.querySelectorAll('.awards-page .pl')) {
@@ -775,7 +781,7 @@ const BOOK_MEASURE = `(async () => {
   await shown('.p-scrapbook', false);
   return { endings: Math.round(endings * 10) / 10, awards: Math.round(awards * 10) / 10, book: Math.round(inner * 10) / 10, columns, tightest: Math.round(tightest * 10) / 10, issues: out };
 })()`;
-type BookFill = { endings: number; awards: number; book: number; columns: { major: string; top: number; clips: { minor: string; h: number }[] }[]; tightest: number; issues: string[] };
+type BookFill = { endings: number; awards: number; book: number; columns: { major: string; top: number; clips: { minor: string; h: number; seen: number }[] }[]; tightest: number; issues: string[] };
 
 /**
  * The scrapbook at its fullest (round R9b, D2b): the ids from the scrapbook itself, then the page loaded again with every
@@ -802,10 +808,12 @@ async function bookExtremes(page: Awaited<ReturnType<typeof launch>>, url: strin
   const all = await fill(true);
   const none = await fill(false);
   await page.evaluate(`localStorage.removeItem('overexposed.endingsFound'); localStorage.removeItem('overexposed.awardsWon')`);
-  // Each column's worst mix: its first clipping's top, and each clipping found or not as it is taller.
+  // Each column's worst mix: its first clipping's top, and each clipping found or not as it is taller — the last one
+  // as far as it can be seen, its margin left out (round R9d, B).
   const worst = all.columns.map((col, i) => {
     const other = none.columns[i];
-    const height = col.clips.reduce((sum, clip, j) => sum + Math.max(clip.h, other?.clips[j]?.h ?? 0), 0);
+    const last = col.clips.length - 1;
+    const height = col.clips.reduce((sum, clip, j) => sum + (j < last ? Math.max(clip.h, other?.clips[j]?.h ?? 0) : Math.max(clip.seen, other?.clips[j]?.seen ?? 0)), 0);
     return { major: col.major, room: Math.round((all.book - col.top - height) * 10) / 10 };
   });
   return { all, none, worst: worst.reduce((a, b) => (b.room < a.room ? b : a)) };
