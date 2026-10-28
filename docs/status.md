@@ -1,7 +1,11 @@
 # Status
 
-As of 2026-10-26: round R9c is done, and with it v0.9.3 — a release candidate whose zip (`overexposed-v0.9.3.zip`,
-built outside the repo from R9c's last game commit) replaces v0.9.2 on itch; v0.9.3 is R9c. R9c, fixes only: the doors
+As of 2026-10-28: round R9d is done, and with it v0.9.4 — a release candidate whose zip (`overexposed-v0.9.4.zip`,
+built outside the repo from R9d's last game commit) replaces v0.9.3 on itch; v0.9.4 is R9d. R9d: one glass and nothing
+blurring the page behind it (the author saw the desk's bubbles drawn in pieces in itch's frame at 125 %) — the desk's
+bubbles frosted by their own copy of the mirror and the wall behind them, the rest the glass's tint over their dim
+ground, the scrim's dim alone; the clippings 21 apart again (R9c's 17 came from a measure that counted an unseen
+margin); the managers over their bubbles by the name they go by, "Mags · Manager". R9c before it, fixes only: the doors
 note names the season whose doors the card shows; the deck cell's dot on the small words' x-height; the scrapbook's
 clippings 17 apart, so the endings page has the awards page's room on this machine too; fourteen lines from the author
 (docs/writing/draft-v15.md); the manager choice's samples without backdrop-filter; the doors card answers hover and
@@ -21,7 +25,7 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-26-r9c.md](reports/2026-10-26-r9c.md).
+[reports/2026-10-28-r9d.md](reports/2026-10-28-r9d.md).
 
 ## Built
 
@@ -40,7 +44,7 @@ Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); th
 
 ## Next
 
-1. **Now:** v0.9.3 on itch (R9c; the zip is built outside the repo from R9c's last game commit — see the R9c
+1. **Now:** v0.9.4 on itch (R9d; the zip is built outside the repo from R9d's last game commit — see the R9d
    report), and the playtest it is for.
 2. **10/25–31:** polish and a retune, from what the playtest finds. **11/1:** feature freeze.
    **11/2–3:** fixes only, the itch page; submit 11/3 JST (v1.0). Deadline 11/5 04:00 JST — treat 11/4 as the real one.
@@ -66,8 +70,11 @@ as its own phase.
 - R8a's and R8d's pictures want a look on a real screen: the colours (the title, the four season ovals, the four
   backdrops, the eight doors; docs/design/visual/ref/r8d-colour.png is the reference), the faces at 22 px beside the
   bubbles and Alex's at 40 in his text, the phone's left side on the desk, the new mug and brush cup.
-- R9c wants the author's screen: the manager choice's samples (the seam this machine's GPU never showed), the
-  scrapbook's endings page beside the awards page, and the doors card's tooltips by mouse, keyboard and a long-press.
+- R9d wants the author's screen: the desk's bubbles in the itch embed at 125 % (the seam never showed on this
+  machine's GPU, before or after), their frosted copies over the mirror, and the ground showing faintly through the
+  night's last words and the samples now that nothing blurs it (the R9d report has the crops).
+- R9c wants the author's screen: the scrapbook's endings page beside the awards page, and the doors card's tooltips by
+  mouse, keyboard and a long-press.
 - R9b wants a real screen: the glass bubbles (backdrop-filter; Safari takes the -webkit- one), the tickets' depth,
   the stat bar's labels at phone size (4.6 px on an 844×390 screen), and a new player's first month — notes on, no
   offers in March, the doors note after the first play. The words want a read in place: dollars, Mom and Grandma.

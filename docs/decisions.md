@@ -6,6 +6,101 @@ rules).
 
 ---
 
+## 2026-10-28 — Round R9d, Part D: v0.9.4
+
+- v0.9.4 is R9d (`package.json` and the lock 0.9.4); the credits' foot shows v0.9.4.
+- AGENTS.md's versions line, as the round gives it: "Versions: R1-R7 v0.1-v0.7, R8a+b v0.8, R8c+d
+  v0.9, R9a v0.9.1, R9b v0.9.2, R9c v0.9.3, R9d v0.9.4, the submission v1.0." — 2 bytes shorter;
+  the file is 24,571 bytes as checked out here.
+- check/desk-states.json recorded again: the same 51 states, byte for byte. Part C adds a field to
+  the managers and no rule (sim:compare of the default batch identical).
+- THE NEW WORDS as docs/writing/draft-v16.md. The README: the glass and the managers' names (§5);
+  the scrapbook came with Part B.
+- The zip, as R9c's, from this round's last game commit: overexposed-v0.9.4.zip.
+
+## 2026-10-28 — Round R9d, Part C: the managers' short names
+
+- The desk's bubbles and the awards night's last word were headed with the manager's first name,
+  cut from the full one: "Dex · Manager", but "Marguerite · Manager" for the one who asks to be
+  called Mags, signs her notes "— Mags" and is "Mags" in the game's lines.
+- Each manager has a `shortKey` in content/managers.json (manager.veteran.short "Dex",
+  manager.guardian.short "Mags"; ManagerDef.shortKey), read by `managerShort` beside
+  `managerName` (ui/text.ts); ui.phone.from takes it on the desk (ui/desk/model.ts) and on the
+  night (ui/screens/Awards.tsx). validate holds every manager to one (a key, used); the schema says
+  so. The manager choice keeps the full names; the feed's speaker stays the full name, as the spec
+  names only the two headers. ui/people.ts already colours "Mags".
+
+## 2026-10-28 — Round R9d, Part B: the clippings 21 apart again
+
+- The author: R9c measured the endings page's room to the column's box, which includes the last
+  clipping's 21 px bottom margin, which can't be seen; their 60.6 was measured to the last
+  clipping's visible edge (its box, tilt included). The parts matched Linux exactly, so the two
+  machines never differed: R9c's note that 60.6 could not be reached came from R9c's own measure.
+- `.ov .clip` margin-bottom 17 → 21 px. Measured here at 1280×720 to what can be seen: at 17 the
+  endings page left 72.6 px with every ending found, 78.2 with none, 77.4 with R9b's six; at 21,
+  60.6, 66.2 and 65.4; the awards page 60.6 throughout, as the author measured. R9b's six end
+  their four-ending columns on gaps, which are not turned; with a found clipping at the foot of a
+  four-ending column the page leaves 60.6, as with all.
+- check:overflow measures each page's room from the book's foot to the lowest thing that can be
+  seen on it — the clippings and gaps, or the plaques, by their boxes, tilt included — in its
+  runs and with the scrapbook at its fullest and emptiest; never a column's box. The worst column
+  counts its last clipping as far as it can be seen. The comment over the book and the README say
+  so.
+
+## 2026-10-28 — Round R9d, Part A3: the scrim's dim alone, and no fallbacks
+
+- The panels' scrim keeps its dim, rgba(8, 6, 4, .74), and blurs nothing behind it.
+- Both fallbacks for browsers without the backdrop's blur go (desk-items.css; screens.css: the
+  phone, its bubbles and replies, the night's last words), and the name row's "none" with them:
+  every browser draws the same glass. The comments that described the glass say it in other words,
+  so a search of ui/ for the property's name finds nothing.
+
+## 2026-10-28 — Round R9d, Part A2: the desk's bubbles frosted by a copy of the desk
+
+- The author saw the desk's bubbles in pieces in the itch embed (Windows, Chrome with the GPU,
+  125 %), whole in fullscreen: the likeliest cause Chrome drawing the backdrop's blur in pieces off
+  whole device pixels. The desk's bubbles are the one glass with bright, detailed things behind it
+  (the mirror's frame and bulbs), so each gets a frosted copy of its own.
+- Inside each bubble (not the name row), under its words: `Frost` (ui/desk/DeskItems.tsx) — the
+  wall's gradient (one rule for the desk and the copy, ui/desk/css/scene.css), the wallpaper, the
+  light pool and `MirrorBackdrop` (ui/desk/Mirror.tsx: the frame, the glass and its highlights, the
+  bulbs from the mirror's own BULBS and bulbClass, and the frenzy's clipping as a box as tall as the
+  mirror's own, without its words). The mirror's own classes; no words, hooks, ids or focus;
+  aria-hidden. Nothing else on the glass reaches the bubbles' column. Not in it, as in the
+  author's prototype: the mirror's shadow and the desk's back edge, under the lowest bubble's foot.
+- Lined up from the bubble's layout offsets (offsetLeft/offsetTop up to the desk: whole pixels, so
+  within half a pixel of the scene), placed again by a ResizeObserver on the column and the bubble
+  (a bubble arrives, a reaction is left, a month opens); it moves with the bubble's entrance and
+  hover. Blurred by `blur(14px) saturate(160%)` in a box 32 px larger than the bubble that clips
+  its contents; clipped to the bubble's shape. The bubble isolates its layers: the copy and the
+  tint and sheen over it (`.frost`, z-index −1), then the edge and the inner light (`::after`), then
+  the words; the drop shadow on the bubble itself. The copy's flickering bulbs keep their own clock
+  from the bubble's arrival, not the mirror's — under the blur, a soft glow.
+- A4, on this machine (AMD Radeon RX 5700 XT, D3D11), headed Chrome, a page like itch's: the
+  game on localhost in a 1280×720 frame on 127.0.0.1 at 101.4, 167.6, at ×1.25 and ×1.5. A
+  seam scan of each bubble with its words made transparent (a column or row whose jump stands
+  above the rest; it finds a 4-level step on a bubble's right quarter, a 3-level step on its foot,
+  a 3 px tear): 0de4b60's desk bubbles (Dex in spring, Mags in summer, a frenzy with each, four
+  bubbles each; 28 in all) show no seam here — it does not reproduce on this GPU. This round's 50
+  bubbles (the desk's, the samples, the phone's incoming bubbles and typing dots, the night's last
+  words) show none either. The copies shipped, not the solid bases.
+- Frame times, Chrome at 1280×720, four bubbles up in a frenzy (s09, Mags in winter; s07, Dex in
+  summer), 10 s of requestAnimationFrame twice: before and after alike, 170 fps (this display's
+  rate), median 5.9 ms, p99 6.0, the longest 7.7, none over 20 ms; the same at ×1.5.
+
+## 2026-10-28 — Round R9d, Part A1: one glass, nothing blurred behind it
+
+- One recipe for every bubble: its sheen, its translucent tint, its bright top edge, its border,
+  its inner light and its shadow, as in v0.9.2, and nothing blurring the page behind it.
+- The manager choice's samples go back from R9c's solid `#1f1a16` to the glass's tint,
+  rgba(42, 36, 30, .30), the desk's: the author measured them at (44, 40, 36) and (48, 43, 39)
+  against v0.9.2's real glass at (48, 42, 38) and (50, 44, 39). The night's last words keep their
+  tint, the phone's incoming bubbles and typing dots their own gradient.
+- Seen here (A4): their ground is not quite smooth everywhere. The night's floor line shows through
+  the top of the last words, a band 2.4 px tall under the top edge, 12 levels darker (18 under
+  Juno's) where v0.9.3's blur kept them even; a line of the desk behind Dex's sample shows 8 px
+  above its foot, 4 levels. Left as specified: the report has the crops.
+
 ## 2026-10-26 — Round R9c, Part F: v0.9.3
 
 - v0.9.3 is R9c (`package.json` and the lock 0.9.3); the credits' foot shows v0.9.3.
