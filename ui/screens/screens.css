@@ -192,7 +192,7 @@
 @keyframes awards-backdrop { from { opacity: 0; } to { opacity: .26; } }
 :root:is([data-motion-resolved='reduced'], [data-motion='off']) .awards-night .backdrop { animation: none; }
 .awards-night .spot { position: absolute; left: 340px; top: 0; width: 600px; height: 720px; z-index: 1; background: radial-gradient(ellipse at 50% 0%, rgba(255, 236, 190, .22), rgba(255, 236, 190, .05) 45%, transparent 70%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); }
-.awards-night .floorA { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 1; background: radial-gradient(ellipse at 50% 0%, rgba(255, 230, 180, .12), transparent 60%), linear-gradient(180deg, #120d0b, #050404); }
+.awards-night .floorA { position: absolute; left: 0; right: 0; bottom: 0; height: 128px; z-index: 1; background: radial-gradient(ellipse at 50% 0%, rgba(255, 230, 180, .12), transparent 60%), linear-gradient(180deg, #120d0b, #050404); }
 .awards-night .a-top { position: absolute; left: 160px; right: 160px; top: 34px; z-index: 5; display: flex; flex-direction: column; align-items: center; }
 .awards-night .a-later { font-weight: 800; font-size: 11px; letter-spacing: .36em; text-transform: uppercase; color: #bfb3a0; }
 .awards-night .a-cat { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 10px; font-weight: 800; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; color: #ffcf85; }
@@ -250,8 +250,10 @@
 .awards-night .fp.red .h { color: #D92B1F; }
 .awards-night .fp .mini { position: absolute; right: 11px; bottom: 9px; width: 62px; height: 46px; object-fit: cover; }
 /* The night's last words (round R8c, D5; r8c-awards.html .word): the manager's under the first front page, Juno's under
-   the second, each one front page wide. In the game's one glass (round R9d, A1): its tint over the night's smooth dark
-   ground, nothing blurred behind it. */
+   the second, each one front page wide. In the game's one glass (round R9d, A1): its tint, nothing blurred behind it.
+   The bubbles stand wholly on the floor (round R10, A): .floorA is 128 px tall, its top edge at y 592, in the gap between
+   the name row (568-590) and the bubbles (from 595); at 120 its edge crossed the bubbles' tops and showed through the
+   glass. The block's top lines up with PLAY AGAIN's. */
 .awards-night .lastword { position: absolute; left: 164px; top: 568px; z-index: 5; width: 226px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; text-align: left; }
 .awards-night .lastword.rivalword { left: 406px; }
 .awards-night .lastword small { display: flex; align-items: center; gap: 7px; font-size: 8.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #8a7d6c; }
