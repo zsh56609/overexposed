@@ -1,7 +1,10 @@
 # Status
 
-As of 2026-10-28: round R9d is done, and with it v0.9.4 — a release candidate whose zip (`overexposed-v0.9.4.zip`,
-built outside the repo from R9d's last game commit) replaces v0.9.3 on itch; v0.9.4 is R9d. R9d: one glass and nothing
+As of 2026-11-02: round R10 is done, and with it **v1.0, the jam build** — its zip (`overexposed-v1.0.zip`, built
+outside the repo from R10's last game commit) is the one the author submits on 11/3 JST. R10: the awards night's floor
+under the last words (128 px, its edge between the name row and the bubbles), and the version. **During rating,
+11/5–11/10, fixes for serious bugs only** (crashes, soft-locks, launch failures, save corruption: AGENTS.md §10). R9d
+before it, v0.9.4: one glass and nothing
 blurring the page behind it (the author saw the desk's bubbles drawn in pieces in itch's frame at 125 %) — the desk's
 bubbles frosted by their own copy of the mirror and the wall behind them, the rest the glass's tint over their dim
 ground, the scrim's dim alone; the clippings 21 apart again (R9c's 17 came from a measure that counted an unseen
@@ -25,7 +28,7 @@ hand by winter. The year ends on one of 4 major and 14 minor endings. A run take
 Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); the look,
 [design/visual/README.md](design/visual/README.md) with its mockups and shots; decisions,
 [decisions.md](decisions.md); round reports, [reports/](reports/) — the latest,
-[reports/2026-10-28-r9d.md](reports/2026-10-28-r9d.md).
+[reports/2026-11-02-r10.md](reports/2026-11-02-r10.md).
 
 ## Built
 
@@ -44,10 +47,10 @@ Where things are: the rules and the frozen design, [AGENTS.md](../AGENTS.md); th
 
 ## Next
 
-1. **Now:** v0.9.4 on itch (R9d; the zip is built outside the repo from R9d's last game commit — see the R9d
-   report), and the playtest it is for.
-2. **10/25–31:** polish and a retune, from what the playtest finds. **11/1:** feature freeze.
-   **11/2–3:** fixes only, the itch page; submit 11/3 JST (v1.0). Deadline 11/5 04:00 JST — treat 11/4 as the real one.
+1. **Now:** v1.0 is the jam build (R10; the zip is built outside the repo from R10's last game commit — see the R10
+   report). The author submits it on 11/3 JST, with the itch page; the deadline is 11/5 04:00 JST.
+2. **During rating, 11/5–11/10 JST:** fixes for serious bugs only — crashes, soft-locks, launch failures, save
+   corruption (AGENTS.md §10), each with a one-line devlog. Rate at least five other entries.
 
 Cut for the jam: hand-painted illustration and the photo collage (every image is drawn in code); the year in review
 as its own phase.

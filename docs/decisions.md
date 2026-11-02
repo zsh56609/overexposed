@@ -6,6 +6,34 @@ rules).
 
 ---
 
+## 2026-11-02 — Round R10, Part B: v1.0
+
+- v1.0 is R10, the jam build (`package.json` and the lock 1.0.0); the credits strip the ".0", as
+  they show a patch only when there is one, and read v1.0.
+- AGENTS.md's versions line, as the round gives it: "Versions: R1-R7 v0.1-v0.7, R8a+b v0.8, R8c+d
+  v0.9, R9a v0.9.1, R9b v0.9.2, R9c v0.9.3, R9d v0.9.4, R10 v1.0, submitted." — 119 bytes, as
+  before; the file stays 24,571 bytes as checked out here.
+- check/desk-states.json recorded again: the same 51 states, byte for byte.
+- The README (the awards night's floor), status.md (v1.0 is the jam build; during rating, 11/5–11/10,
+  fixes for serious bugs only) and these entries.
+- The zip, as R9d's, from this round's last game commit: overexposed-v1.0.zip.
+
+## 2026-11-02 — Round R10, Part A: the awards night's floor under the last words
+
+- The author: since R9d took the blur away, the last words' bubbles showed a dark band across their
+  top 5 px — the floor's top edge. `.awards-night .floorA` stood 120 px on the stage's bottom, its
+  edge at y 600; the bubbles start at 595 (the block's top 568, the name row 568–590, the 5 px
+  gap). Above 600 the night's ground is 6–11 levels, the floor's top 15–38: through the glass's 30 %
+  tint, the step showed.
+- `.floorA` 120 → 128 px: its edge at 592, in the gap between the name row and the bubbles, which
+  stand wholly on the floor. Its two gradients as they were; the last words and the bottom block
+  unmoved (the last words' top lines up with PLAY AGAIN's). The comment over the last words says so.
+- Measured with R9d's A4 scan on its itch-like page, ×1 and ×1.25, the manager's two bubbles and
+  Juno's one: v0.9.4 showed the ground through the glass in 4 places (the manager's first bubble
+  11.8 and 12.2 levels, Juno's 18.3 and 18.5); v1.0 in none, every row's jump 2.24 levels or less.
+  The scan keeps 3.5 px off a bubble's sides now (2.5 in R9d): at ×1 a rounding put the border's
+  inner column into it. The 4-level line on the manager choice's Dex sample stays as it is.
+
 ## 2026-10-29 — Round R9d: three checks
 
 - check:preview held the bubbles' header to the full name's first word ("Marguerite"); since Part C

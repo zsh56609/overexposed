@@ -166,6 +166,10 @@ desk even when tied with the lane paper; Famous overwhelms the page. See `shots/
   wide), its small line her face (22 px) and her name, one bubble in the manager's bubble look; it comes at 4.75 s,
   between the manager's word (4.6) and the bottom block (4.9). The manager's block narrows to the first front page
   (226 wide, its bubbles too), at left 164 as before.
+- **The floor under the last words** (round R10): the night's floor (`.floorA`, its two gradients) is 128 px tall, its
+  top edge at y 592, in the gap between the last words' name row (568–590) and their bubbles (from 595), which stand
+  wholly on it. Since round R9d the glass blurs nothing behind it, and at 120 px the floor's edge crossed the bubbles'
+  tops and showed through their tint as a dark band. The last words' top still lines up with PLAY AGAIN's.
 - **Hover on the night** (round R9a, as in the scrapbook: pointer devices only, 0.16 s ease-out, silent; `translate`
   and `scale`, which add to the reveal's held transform): a plaque as an award won; the rest's box as a plaque, the row
   under the pointer its name amber (`#ffcf85`); a front page lifts 4 px and grows 3 % (shadow
