@@ -47,6 +47,7 @@ import { ROOT, loadRawContent } from '../../validate/load.ts';
 import { variantGroups } from '../../validate/validate.ts';
 import { runOne } from '../batch.ts';
 import { loadContent } from '../content.ts';
+import { configure } from '../options/configs.ts';
 import { isProbe, PERSONA_IDS } from '../personas.ts';
 import { buildInventory, conditionText } from './inventory.ts';
 
@@ -69,12 +70,43 @@ export const VARIANT_TYPES: readonly ItemType[] = ['once_text', 'manager_msg', '
 
 interface Cell { readonly id: string; readonly strategy: string; readonly manager: string }
 
+/**
+ * Round R11b: --events=<E0..E5> and --doors=<D0..D2> (sim/options/configs.ts) play the same survey on content with options
+ * switched on, and add the "extras" the comparison needs to survey.json. With neither flag nothing changes: the output is R11a's.
+ */
+interface Config { readonly events: string; readonly doors: string; readonly extras: boolean }
+let CONFIG: Config = { events: 'E0', doors: 'D0', extras: false };
+/** How many past years of events the content's memory holds back (rules.events.memoryDepth; 1 as v1.0). */
+let MEMORY_DEPTH = 1;
+/** Each event's class (what gates it) and lane, for the capacity tables. */
+let EVENT_CLASS: Record<string, { cls: string; lane: string }> = {};
+
+function classTable(content: Content): Record<string, { cls: string; lane: string }> {
+  const out: Record<string, { cls: string; lane: string }> = {};
+  for (const ev of content.events?.events ?? []) {
+    const cond = ev.when.condition ?? {};
+    const cls = ev.chain?.role === 'followUp' ? 'follow-up' : ev.when.first === true ? 'first-marked' : cond.hype !== undefined ? 'hype-gated' : cond.flags !== undefined ? 'flag-gated' : 'open';
+    out[ev.id] = { cls, lane: ev.when.lane ?? 'none' };
+  }
+  return out;
+}
+
+/** The content a run plays: v1.0's, or under the configuration asked for. Also reads the options the survey's own bookkeeping needs. */
+function playedContent(): Content {
+  const base = loadContent();
+  const content = CONFIG.extras ? configure(base, CONFIG.events, CONFIG.doors) : base;
+  EVENT_MONTHS = content.rules.events?.months ?? [];
+  MEMORY_DEPTH = content.rules.events?.memoryDepth ?? 1;
+  EVENT_CLASS = classTable(content);
+  return content;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // One year
 
 interface SlotInfo {
   readonly turn: number;
-  /** 'followUp' | 'first' | 'draw' */
+  /** 'followUp' | 'first' | 'draw'; 'ride': the second event of a ride-along month (round R11b). */
   readonly how: string;
   readonly chosen: string;
   /** Eligible openers/one-offs before the memory's filter; after it. */
@@ -84,6 +116,8 @@ interface SlotInfo {
   readonly memoryFell: boolean;
   readonly poolIds0: readonly string[];
   readonly reasons: Readonly<Record<string, string>>;
+  /** Extras only: the regular pool's candidates here (first-marked ones left out): what a new event would compete in. */
+  readonly regularIds?: readonly string[];
 }
 
 interface YearData {
@@ -99,6 +133,10 @@ interface YearData {
   readonly endingId: string;
   readonly majorId: string;
   readonly persona: string;
+  /** Extras (round R11b): the resources the year ended with, its doors, the months its events came in. */
+  readonly final: Record<string, number>;
+  readonly gates: readonly { readonly offered: readonly string[]; readonly gateId: string; readonly passed: boolean }[];
+  readonly eventTurns: readonly number[];
 }
 
 const rangeText = (key: string, r: { min?: number; max?: number }) => `${key}${r.min !== undefined ? `>=${r.min}` : ''}${r.max !== undefined ? `<=${r.max}` : ''}`;
@@ -119,8 +157,11 @@ function unmetText(report: ClauseReport, held: Readonly<Record<string, true>>): 
 
 /** Why each event is, or is not, a candidate at the slot this state has just opened (the draw's own rules, core/events.ts). */
 function slotOf(state: GameState, content: Content): SlotInfo {
-  const without = eventCandidates({ ...state, memory: NO_MEMORY });
-  const withMemory = eventCandidates(state);
+  // The second event of a ride-along month (round R11b) is drawn by its own rules.
+  const second = state.eventLog.some((r) => r.turn === state.turn);
+  const mode = second ? 'second' : 'month';
+  const without = eventCandidates({ ...state, memory: NO_MEMORY }, mode);
+  const withMemory = eventCandidates(state, mode);
   const rules = content.rules.events;
   const met = new Set(state.eventLog.map((r) => r.eventId));
   const arc = rivalArc(state.content, state.seed)?.id;
@@ -130,7 +171,7 @@ function slotOf(state: GameState, content: Content): SlotInfo {
   const inPool0 = new Set(without.pool.map((p) => p.event.id));
   const firstRun = without.pool.length > 0 && without.pool.every((p) => p.event.when.first === true);
   const reasons: Record<string, string> = {};
-  for (const ev of (content.events?.events ?? []) as readonly EventDef[]) {
+  for (const ev of second ? [] : ((content.events?.events ?? []) as readonly EventDef[])) {
     let why: string;
     if (met.has(ev.id)) why = 'already met this year';
     else if (state.turn < ev.when.months.from || state.turn > (ev.when.months.to ?? last)) why = 'month window';
@@ -148,13 +189,14 @@ function slotOf(state: GameState, content: Content): SlotInfo {
   }
   return {
     turn: state.turn,
-    how: without.followUp !== null ? 'followUp' : firstRun ? 'first' : 'draw',
+    how: second ? 'ride' : without.followUp !== null ? 'followUp' : firstRun ? 'first' : 'draw',
     chosen: state.event ?? '',
     pool0: without.followUp !== null ? 1 : without.pool.length,
-    memoryFell: without.followUp === null && state.memory.events.length > 0 && without.pool.length > 0 && without.pool.every((p) => state.memory.events.includes(p.event.id)) && !firstRun,
+    memoryFell: withMemory.relaxed > 0,
     pool1: withMemory.followUp !== null ? 1 : withMemory.pool.length,
     poolIds0: without.followUp !== null ? [without.followUp.id] : without.pool.map((p) => p.event.id),
     reasons,
+    ...(CONFIG.extras ? { regularIds: eventCandidates({ ...state, memory: NO_MEMORY }, 'regular').pool.filter((p) => p.event.when.first !== true).map((p) => p.event.id) } : {}),
   };
 }
 
@@ -168,7 +210,7 @@ function playYear(content: Content, persona: string, manager: string, seed: numb
     seed,
     (state) => {
       history.push({ before, after: state, events: state.events });
-      if (state.phase === 'event' && state.event !== null && before?.phase !== 'event') slots.push(slotOf(state, content));
+      if (state.phase === 'event' && state.event !== null && (before?.phase !== 'event' || before.event !== state.event)) slots.push(slotOf(state, content));
       before = state;
     },
     { manager, ...(memory ? { memory } : {}), ...(newPlayer ? { skipFirstDraft: true } : {}) },
@@ -305,12 +347,20 @@ function playYear(content: Content, persona: string, manager: string, seed: numb
     endingId: last.endingId,
     majorId: rec.majorId as string,
     persona,
+    final: { ...last.resources },
+    gates: rec.gates,
+    eventTurns: rec.events.map((e) => e.turn),
   };
 }
 
 /** The memory the UI keeps (ui/memory.ts): the events of the latest earlier run that met any, and the variant each once-a-run group last showed. */
 function nextMemory(prev: RunMemory | undefined, year: YearData): RunMemory {
-  return { events: year.eventIds.length > 0 ? year.eventIds : (prev?.events ?? []), lines: { ...(prev?.lines ?? {}), ...year.onceShown } };
+  const lines = { ...(prev?.lines ?? {}), ...year.onceShown };
+  if (MEMORY_DEPTH <= 1) return { events: year.eventIds.length > 0 ? year.eventIds : (prev?.events ?? []), lines };
+  // Depth N (round R11b): a year that met events files the last one's as a past year; the past is kept N-1 years deep.
+  if (year.eventIds.length === 0) return { events: prev?.events ?? [], lines, ...(prev?.past ? { past: prev.past } : {}) };
+  const past = [...(prev && prev.events.length > 0 ? [prev.events] : []), ...(prev?.past ?? [])].slice(0, MEMORY_DEPTH - 1);
+  return { events: year.eventIds, lines, past };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -350,13 +400,37 @@ interface CellCounts {
   };
   strategyYears: Record<string, number>;
   eventsAgain: { shownYear: number[]; again: number[] };
+  /** Round R11b; only when a configuration is asked for. */
+  extras?: Extras;
 }
+
+/** What the configuration comparison needs beyond R11a's counts (integers only). */
+interface MonthExtras {
+  /** Years that reached this event month; by how many events came in it (0, 1, 2). */
+  n: number;
+  evHist: number[];
+  /** Months with a regular draw (a draw from the pool: the month's own, or a ride-along's second), the candidates it had, by class and by lane. */
+  drawn: number; regSum: number; regClass: Record<string, number>; regLane: Record<string, number>;
+  /** The regular pool at the month's first slot whether or not it was drawn from: where a new event could stand. */
+  potSum: number; potClass: Record<string, number>; potLane: Record<string, number>;
+}
+interface Extras {
+  years: number;
+  final: Record<string, number>;
+  gates: Record<string, { offered: number; taken: number; passed: number }>;
+  /** Items of year k that year k-1 also showed: items shown (pairs) and of them in the year before (same). */
+  adj: Record<string, { pairs: number; same: number }>;
+  months: Record<string, MonthExtras>;
+}
+const emptyExtras = (): Extras => ({ years: 0, final: { hype: 0, craft: 0, capital: 0, heat: 0 }, gates: {}, adj: {}, months: {} });
+const emptyMonth = (): MonthExtras => ({ n: 0, evHist: [0, 0, 0], drawn: 0, regSum: 0, regClass: {}, regLane: {}, potSum: 0, potClass: {}, potLane: {} });
 
 const zeros = (n: number) => Array.from({ length: n }, () => 0);
 const emptyCounts = (cell: Cell): CellCounts => ({
   cell, sequences: 0, types: {}, groups: {}, slots: {}, context: {}, offerAct: {}, scandalAct: {}, worldAct: {}, strategyYears: {},
   endings: { distinctMinorHist: zeros(YEARS + 1), distinctMajorHist: zeros(YEARS + 1), distinctAwardsHist: zeros(20), sameMinor3: 0, sameMajor3: 0, sameMinorAll5: 0, maxMinorHist: zeros(YEARS + 1) },
   eventsAgain: { shownYear: zeros(YEARS), again: zeros(YEARS) },
+  ...(CONFIG.extras ? { extras: emptyExtras() } : {}),
 });
 const bump = (rec: Record<string, number>, key: string, by = 1) => void (rec[key] = (rec[key] ?? 0) + by);
 
@@ -409,8 +483,8 @@ function accumulate(c: CellCounts, years: YearData[]): void {
   years.forEach((y) => {
     const seenTurns = new Set<number>();
     for (const s of y.slots) {
-      seenTurns.add(s.turn);
-      const sc = (c.slots[String(s.turn)] ??= { n: 0, empty: 0, how: {}, pool0: {}, pool1: {}, memoryEmptied: 0, reasons: {}, chosen: {}, inPool: {} });
+      if (s.how !== 'ride') seenTurns.add(s.turn);
+      const sc = (c.slots[s.how === 'ride' ? `${s.turn}r` : String(s.turn)] ??= { n: 0, empty: 0, how: {}, pool0: {}, pool1: {}, memoryEmptied: 0, reasons: {}, chosen: {}, inPool: {} });
       sc.n++;
       bump(sc.how, s.how);
       bump(sc.pool0, String(s.pool0));
@@ -474,6 +548,52 @@ function accumulate(c: CellCounts, years: YearData[]): void {
   if (maxMinor >= 3) e.sameMinor3++;
   if (maxMinor >= 5) e.sameMinorAll5++;
   if (Math.max(...Object.values(cM)) >= 3) e.sameMajor3++;
+  if (c.extras) accumulateExtras(c.extras, years);
+}
+
+function accumulateExtras(x: Extras, years: YearData[]): void {
+  years.forEach((y, k) => {
+    x.years++;
+    for (const [r, v] of Object.entries(y.final)) x.final[r] = (x.final[r] ?? 0) + v;
+    for (const g of y.gates) {
+      for (const id of g.offered) (x.gates[id] ??= { offered: 0, taken: 0, passed: 0 }).offered++;
+      const t = (x.gates[g.gateId] ??= { offered: 0, taken: 0, passed: 0 });
+      t.taken++;
+      if (g.passed) t.passed++;
+    }
+    if (k > 0)
+      for (const type of ['event', 'door', 'door_taken', 'card_offered']) {
+        const now = y.items[type] ?? new Set<string>();
+        const before = (years[k - 1] as YearData).items[type] ?? new Set<string>();
+        const a = (x.adj[type] ??= { pairs: 0, same: 0 });
+        a.pairs += now.size;
+        for (const id of now) if (before.has(id)) a.same++;
+      }
+    const perMonth: Record<number, number> = {};
+    for (const t of y.eventTurns) perMonth[t] = (perMonth[t] ?? 0) + 1;
+    for (const m of EVENT_MONTHS) {
+      const mm = (x.months[String(m)] ??= emptyMonth());
+      mm.n++;
+      mm.evHist[Math.min(2, perMonth[m] ?? 0)]!++;
+    }
+    for (const s of y.slots) {
+      const mm = (x.months[String(s.turn)] ??= emptyMonth());
+      const ids = s.regularIds ?? [];
+      const tally = (sum: 'regSum' | 'potSum', cls: 'regClass' | 'potClass', lane: 'regLane' | 'potLane') => {
+        mm[sum] += ids.length;
+        for (const id of ids) {
+          const info = EVENT_CLASS[id] ?? { cls: 'open', lane: 'none' };
+          bump(mm[cls], info.cls);
+          bump(mm[lane], info.lane);
+        }
+      };
+      if (s.how === 'draw' || s.how === 'ride') {
+        mm.drawn++;
+        tally('regSum', 'regClass', 'regLane');
+      }
+      if (s.how !== 'ride') tally('potSum', 'potClass', 'potLane');
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -533,6 +653,19 @@ function mergeInto(a: CellCounts, b: CellCounts): void {
   addArr(ae.distinctMinorHist, be.distinctMinorHist); addArr(ae.distinctMajorHist, be.distinctMajorHist); addArr(ae.distinctAwardsHist, be.distinctAwardsHist); addArr(ae.maxMinorHist, be.maxMinorHist);
   ae.sameMinor3 += be.sameMinor3; ae.sameMajor3 += be.sameMajor3; ae.sameMinorAll5 += be.sameMinorAll5;
   addArr(a.eventsAgain.shownYear, b.eventsAgain.shownYear); addArr(a.eventsAgain.again, b.eventsAgain.again);
+  if (a.extras && b.extras) {
+    const ax = a.extras; const bx = b.extras;
+    ax.years += bx.years;
+    for (const [r, v] of Object.entries(bx.final)) bump(ax.final, r, v);
+    for (const [id, g] of Object.entries(bx.gates)) { const t = (ax.gates[id] ??= { offered: 0, taken: 0, passed: 0 }); t.offered += g.offered; t.taken += g.taken; t.passed += g.passed; }
+    for (const [type, v] of Object.entries(bx.adj)) { const t = (ax.adj[type] ??= { pairs: 0, same: 0 }); t.pairs += v.pairs; t.same += v.same; }
+    for (const [m, v] of Object.entries(bx.months)) {
+      const t = (ax.months[m] ??= emptyMonth());
+      t.n += v.n; t.drawn += v.drawn; t.regSum += v.regSum; t.potSum += v.potSum;
+      addArr(t.evHist, v.evHist);
+      for (const k of ['regClass', 'regLane', 'potClass', 'potLane'] as const) for (const [id, n] of Object.entries(v[k])) bump(t[k], id, n);
+    }
+  }
 }
 
 /** Sorts every object's keys, so the JSON written is the same bytes whatever order the workers finished in. */
@@ -543,8 +676,8 @@ function canonical(x: unknown): unknown {
 }
 
 if (!isMainThread) {
-  const content = loadContent();
-  EVENT_MONTHS = content.rules.events?.months ?? [];
+  CONFIG = (workerData as { config: Config }).config;
+  const content = playedContent();
   parentPort?.on('message', (msg: { task: Task; index: number } | 'done') => {
     if (msg === 'done') process.exit(0);
     parentPort?.postMessage({ index: msg.index, counts: runTask(content, msg.task) });
@@ -563,12 +696,15 @@ async function main(): Promise<void> {
   const CHUNK = 50;
   const t0 = performance.now();
 
-  const content = loadContent();
-  EVENT_MONTHS = content.rules.events?.months ?? [];
+  const events = flag('events');
+  const doors = flag('doors');
+  CONFIG = { events: events ?? 'E0', doors: doors ?? 'D0', extras: events !== undefined || doors !== undefined };
+  const content = playedContent();
   const managers = (content.managers?.managers ?? []).map((m) => m.id);
   const strategies = [...PERSONA_IDS, MIXED];
   const cells: Cell[] = managers.flatMap((manager) => strategies.map((strategy) => ({ id: `${strategy}/${manager}`, strategy, manager })));
-  const raw = loadRawContent();
+  const raw0 = loadRawContent();
+  const raw = CONFIG.extras ? (configure(raw0 as unknown as Content, CONFIG.events, CONFIG.doors) as unknown as typeof raw0) : raw0;
   const i18n = JSON.parse(readFileSync(join(ROOT, 'i18n/en.json'), 'utf8')) as Record<string, string>;
   const inventory = buildInventory(raw, i18n);
 
@@ -586,7 +722,7 @@ async function main(): Promise<void> {
       } else w.postMessage('done');
     };
     for (let i = 0; i < WORKERS; i++) {
-      const w = new Worker(fileURLToPath(import.meta.url), { workerData: { id: i } });
+      const w = new Worker(fileURLToPath(import.meta.url), { workerData: { id: i, config: CONFIG } });
       workers.push(w);
       w.on('error', reject);
       w.on('message', (m: { ready?: boolean; index?: number; counts?: CellCounts }) => {
@@ -694,6 +830,7 @@ async function main(): Promise<void> {
     pools,
     gateText,
     eventMonths: EVENT_MONTHS,
+    ...(CONFIG.extras ? { config: { events: CONFIG.events, doors: CONFIG.doors, memoryDepth: MEMORY_DEPTH, rules: content.rules.events, gateSelection: content.rules.gateSelection ?? 'any', eventClass: EVENT_CLASS } } : {}),
     results: Object.fromEntries([...merged].map(([id, c]) => [id, c])),
   };
   mkdirSync(OUT, { recursive: true });

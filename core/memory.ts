@@ -12,6 +12,11 @@ export interface RunMemory {
   readonly events: readonly string[];
   /** For each group shown once a run, by its item (core/variants.ts onceItem), the key of the variant last shown. */
   readonly lines: Readonly<Record<string, string>>;
+  /**
+   * Round R11b (option rules.events.memoryDepth): the events of the years before the last, the most recent first, each
+   * year's list as `events` is. Absent: the memory holds one year, as v1.0 does.
+   */
+  readonly past?: readonly (readonly string[])[];
 }
 
 /** No memory: a run as runs have always played. */
@@ -36,7 +41,8 @@ export function memoryFor(c: ContentIndex, memory: RunMemory | undefined): RunMe
   const groups = new Map(onceGroups(c).map((g) => [g.item, g.keys]));
   const lines: Record<string, string> = {};
   for (const [item, key] of Object.entries(memory.lines ?? {})) if (groups.get(item)?.includes(key)) lines[item] = key;
-  return { events: [...new Set((memory.events ?? []).filter((id) => known.has(id)))], lines };
+  const past = memory.past?.map((year) => [...new Set(year.filter((id) => known.has(id)))]);
+  return { events: [...new Set((memory.events ?? []).filter((id) => known.has(id)))], lines, ...(past ? { past } : {}) };
 }
 
 /**

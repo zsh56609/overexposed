@@ -65,7 +65,8 @@ export {
 } from './manager.ts';
 export { yearHolds, yearStats, type YearStats, type YearSubject } from './year.ts';
 export { memoryFor, NO_MEMORY, onceGroups, settleLines, type RunMemory } from './memory.ts';
-export { choiceRemembered, eventCandidates, eventChoiceCheck, eventMessageKeys, eventPress, isEventMonth, rememberedFlags, runChains, type EventSubject } from './events.ts';
+export { choiceRemembered, eventCandidates, eventChoiceCheck, eventMessageKeys, eventPress, freshPool, isEventMonth, memoryYears, rememberedFlags, runChains, type CandidateMode, type EventSubject } from './events.ts';
+export { gateLead, type DoorLead } from './gates.ts';
 export {
   effectiveHeatThreshold,
   evaluate,

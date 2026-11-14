@@ -600,6 +600,16 @@ export interface EventRules {
   readonly maxChains: number;
   /** An event with a lane is this many times as likely while that lane is established. */
   readonly laneWeight: number;
+  /**
+   * Option (round R11b; absent = false, the game as v1.0 plays). A follow-up or a first-marked one-off that is due still
+   * takes its month, and the month then also draws one event from the regular pool (core/events.ts, mode 'second').
+   */
+  readonly rideAlong?: boolean;
+  /**
+   * Option (round R11b; absent = 1, as v1.0). How many past years of events the memory holds back: an event met in any of
+   * the last N years is left out while anything else is eligible; when nothing else is, the oldest year is relaxed first.
+   */
+  readonly memoryDepth?: number;
 }
 
 export interface Rules {
@@ -622,6 +632,11 @@ export interface Rules {
   readonly slotsPerTurn: number;
   /** Gates offered at the end of each act; the player picks one. */
   readonly gatesOffered: number;
+  /**
+   * Option (round R11b; absent = 'any', as v1.0). With more doors in a season than are offered: 'any' draws the offered doors
+   * at random; 'craftHype' draws one Craft-led and one Hype-led door first (core/gates.ts gateLead), then any for the rest.
+   */
+  readonly gateSelection?: 'any' | 'craftHype';
   /** Base threshold per act: heatThreshold(act) = heatThreshold[act - 1]. See effectiveHeatThreshold. */
   readonly heatThreshold: readonly number[];
   /** Threshold lost per scandal held: tolerance falls as scandals pile up. */

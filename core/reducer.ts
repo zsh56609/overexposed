@@ -15,6 +15,7 @@ import { CoreError, getCard, getEvent, getGate, getManager, type GateDef } from 
 import { effectiveHeatThreshold, evaluate, explainCondition, scandalCount, type ClauseReport } from './conditions.ts';
 import { endingIfYearEndedNow } from './endings.ts';
 import { eventCandidates, isEventMonth } from './events.ts';
+import { gateLead } from './gates.ts';
 import { nextEstablishedLane } from './lanes.ts';
 import { nextInt } from './rng.ts';
 import {
@@ -319,8 +320,31 @@ function chooseEvent(state: GameState, choice: number): GameState {
   d.eventLog.push({ eventId: ev.id, turn: d.turn, choice });
   d.event = null;
   applyEffects(d, def.effects);
-  openMonth(d);
+  // Option rules.events.rideAlong (round R11b): a follow-up or a first-marked one-off has taken the month; the month now
+  // also draws a second event (core/events.ts, mode 'second'), before its offers. One second event at most.
+  if (!(d.content.rules.events?.rideAlong === true && offerSecondEvent(d, ev))) openMonth(d);
   return closeDraft(d);
+}
+
+/** Whether an event took its month by right (a chain's follow-up, or a one-off marked first) rather than by the draw. */
+const takesItsMonth = (ev: { readonly chain?: { readonly role: string }; readonly when: { readonly first?: boolean } }): boolean =>
+  ev.chain?.role === 'followUp' || ev.when.first === true;
+
+/**
+ * The second event of a ride-along month (round R11b): the month's actions are not refreshed again (the first event's
+ * answer may have spent some). False: the month has no second event.
+ */
+function offerSecondEvent(d: Draft, answered: Parameters<typeof takesItsMonth>[0]): boolean {
+  if (!takesItsMonth(answered) || d.eventLog.filter((r) => r.turn === d.turn).length !== 1) return false;
+  const { pool } = eventCandidates(d, 'second');
+  if (pool.length === 0) return false;
+  let r = nextInt(d.rng, pool.reduce((n, p) => n + p.weight, 0));
+  const ev = pool.find((p) => (r -= p.weight) < 0)?.event ?? null;
+  if (!ev) return false;
+  d.phase = 'event';
+  d.event = ev.id;
+  d.events.push({ type: 'eventOffered', eventId: ev.id });
+  return true;
 }
 
 function chooseGate(state: GameState, gateId: string): GameState {
@@ -484,7 +508,22 @@ function offerGates(d: Draft): void {
   if (all.length > rules.gatesOffered) {
     // Seeded partial Fisher–Yates, then back into content order.
     const pool = [...all];
-    for (let i = 0; i < rules.gatesOffered; i++) {
+    let start = 0;
+    // Option rules.gateSelection 'craftHype' (round R11b): the offer holds one Craft-led and one Hype-led door, drawn first
+    // (one of each when the season has both), the rest of the offer from what is left.
+    if (rules.gateSelection === 'craftHype' && rules.gatesOffered >= 2) {
+      const leaders = (lead: 'craft' | 'hype') => pool.filter((g) => gateLead(g) === lead);
+      if (leaders('craft').length > 0 && leaders('hype').length > 0) {
+        for (const lead of ['craft', 'hype'] as const) {
+          const choices = leaders(lead).filter((g) => pool.indexOf(g) >= start);
+          const g = choices[nextInt(d.rng, choices.length)] as GateDef;
+          const at = pool.indexOf(g);
+          [pool[start], pool[at]] = [pool[at] as GateDef, pool[start] as GateDef];
+          start++;
+        }
+      }
+    }
+    for (let i = start; i < rules.gatesOffered; i++) {
       const j = i + nextInt(d.rng, pool.length - i);
       [pool[i], pool[j]] = [pool[j] as GateDef, pool[i] as GateDef];
     }

@@ -132,7 +132,7 @@ const RULES_FIELDS = [
   'acts', 'turnsPerAct', 'actNameKeys', 'actOpenerKeys', 'openingKeys', 'handSize', 'slotsPerTurn', 'gatesOffered',
   'heatThreshold', 'degradePerScandal', 'thresholdFloor', 'vent',
   'startingResources', 'startingDeck', 'draft', 'tiers', 'lanes', 'laneStartingDeck', 'laneEstablished', 'calendar', 'statTips', 'fameBands', 'cardFaces',
-  'seasons', 'seasonScenes', 'events',
+  'seasons', 'seasonScenes', 'events', 'gateSelection',
 ];
 const DRAFT_FIELDS = ['atTurns', 'offerSize', 'picks', 'extraPickCost', 'maxExtraPicks', 'rerollCost', 'maxRerolls', 'laneCards'];
 
@@ -379,6 +379,8 @@ function checkRules(v: Ctx, raw: unknown): Obj | null {
   v.int(raw.handSize, 'rules.handSize', LIMIT.handSize);
   v.int(raw.slotsPerTurn, 'rules.slotsPerTurn', LIMIT.slotsPerTurn);
   v.int(raw.gatesOffered, 'rules.gatesOffered', LIMIT.count);
+  // Option (round R11b): which doors a season offers when it holds more than it offers. Absent: 'any', as v1.0.
+  if (raw.gateSelection !== undefined && raw.gateSelection !== 'any' && raw.gateSelection !== 'craftHype') v.error('schema', 'rules.gateSelection', "must be 'any' or 'craftHype'");
 
   if (!Array.isArray(raw.heatThreshold)) v.error('schema', 'rules.heatThreshold', 'must be an array: one threshold per act');
   else {
@@ -1748,7 +1750,10 @@ function checkEvents(v: Ctx, raw: unknown, rules: Obj | null, paperIds: Readonly
   const months: number[] = [];
   if (!re) v.error('schema', 'rules.events', 'is missing: the months events come in');
   else {
-    v.fields(re, ['months', 'maxChains', 'laneWeight'], 'rules.events');
+    v.fields(re, ['months', 'maxChains', 'laneWeight', 'rideAlong', 'memoryDepth'], 'rules.events');
+    // Options (round R11b), absent in v1.0's content: a second event in a month once a follow-up or a first-marked one-off has come; how many past years the memory holds back.
+    if (re.rideAlong !== undefined && typeof re.rideAlong !== 'boolean') v.error('schema', 'rules.events.rideAlong', 'must be true or false');
+    if (re.memoryDepth !== undefined) v.int(re.memoryDepth, 'rules.events.memoryDepth', [1, 5]);
     if (!Array.isArray(re.months) || re.months.length === 0) v.error('schema', 'rules.events.months', 'must be a non-empty list of months');
     else re.months.forEach((m, i) => v.int(m, `rules.events.months[${i}]`, [1, v.totalTurns]) && months.push(m));
     v.int(re.maxChains, 'rules.events.maxChains', [0, 10]);
